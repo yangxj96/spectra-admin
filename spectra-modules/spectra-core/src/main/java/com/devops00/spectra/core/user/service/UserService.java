@@ -29,7 +29,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
-import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
+import com.devops00.spectra.common.port.security.UserOnlineVO;
 
 import java.util.List;
 import java.util.UUID;

@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.security.authorization.service;
 
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;

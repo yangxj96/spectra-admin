@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization.javabean.from;
 
-import com.devops00.spectra.security.base.authorization.ScopeMode;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;

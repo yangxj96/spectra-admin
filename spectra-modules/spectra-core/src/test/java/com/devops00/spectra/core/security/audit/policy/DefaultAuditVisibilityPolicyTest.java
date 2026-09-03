@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.security.audit.policy;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 

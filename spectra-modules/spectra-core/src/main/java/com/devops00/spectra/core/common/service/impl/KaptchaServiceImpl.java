@@ -20,13 +20,11 @@ import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.ReadPropertiesException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;
-import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
-import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.google.code.kaptcha.Producer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 
@@ -48,17 +46,18 @@ public class KaptchaServiceImpl implements KaptchaService {
 
     private final KaptchaProperties properties;
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final SecurityVerificationCodeStore verificationCodeStore;
 
     private final HttpServletRequest request;
 
     private final HttpServletResponse response;
 
-    public KaptchaServiceImpl(Producer kaptchaProducer, KaptchaProperties properties, RedisTemplate<String, Object> redisTemplate,
+    public KaptchaServiceImpl(Producer kaptchaProducer, KaptchaProperties properties,
+                              SecurityVerificationCodeStore verificationCodeStore,
                               HttpServletRequest request, HttpServletResponse response) {
         this.kaptchaProducer = kaptchaProducer;
         this.properties = properties;
-        this.redisTemplate = redisTemplate;
+        this.verificationCodeStore = verificationCodeStore;
         this.request = request;
         this.response = response;
     }
@@ -93,8 +92,7 @@ public class KaptchaServiceImpl implements KaptchaService {
         }
 
         // 存储到缓存中
-        SecurityRedisExecutor.run("写入图形验证码",
-                () -> redisTemplate.opsForValue().set(RedisCacheKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration()));
+        verificationCodeStore.save(RedisCacheKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration());
 
         var out = response.getOutputStream();
         try (out) {
@@ -114,7 +112,7 @@ public class KaptchaServiceImpl implements KaptchaService {
             return false;
         }
         var key = RedisCacheKey.KAPTCHA + request.getSession().getId();
-        return VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, code);
+        return verificationCodeStore.compareAndDelete(key, code);
     }
 
 }

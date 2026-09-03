@@ -17,8 +17,8 @@
 package com.devops00.spectra.core.security.authorization;
 
 import com.devops00.spectra.core.security.authorization.service.impl.JdbcAuthorizationSnapshotLoader;
-import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
-import com.devops00.spectra.security.base.authorization.ScopeQuery;
+import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.security.authorization.ScopeQuery;
 import com.devops00.spectra.core.security.authorization.mapper.AssignmentGrantBoundaryMapper;
 import com.devops00.spectra.core.security.authorization.mapper.AssignmentPermissionBoundaryMapper;
 import com.devops00.spectra.core.security.authorization.mapper.AuthorizationScopeMapper;

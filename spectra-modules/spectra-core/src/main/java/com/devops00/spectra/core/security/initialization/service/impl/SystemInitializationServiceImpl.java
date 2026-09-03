@@ -31,7 +31,7 @@ import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
+import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;

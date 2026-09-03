@@ -18,8 +18,8 @@ package com.devops00.test.spectra;
 
 import com.devops00.spectra.core.CoreModule;
 import com.devops00.spectra.core.system.service.impl.RegionServiceImpl;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

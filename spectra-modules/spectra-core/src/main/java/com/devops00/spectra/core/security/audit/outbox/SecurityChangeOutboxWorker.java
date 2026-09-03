@@ -15,7 +15,7 @@ import com.devops00.spectra.common.scheduler.ScheduledLoopCycleResult;
 import com.devops00.spectra.common.scheduler.ScheduledLoopHandler;
 import com.devops00.spectra.common.scheduler.ScheduledRunScope;
 import com.devops00.spectra.common.scheduler.ScheduledScheduleKind;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;

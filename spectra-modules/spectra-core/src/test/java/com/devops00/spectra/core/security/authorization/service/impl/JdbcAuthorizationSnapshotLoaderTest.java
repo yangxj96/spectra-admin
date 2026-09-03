@@ -35,7 +35,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleGrantablePerm
 import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
-import com.devops00.spectra.security.base.authorization.ScopeQuery;
+import com.devops00.spectra.common.security.authorization.ScopeQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

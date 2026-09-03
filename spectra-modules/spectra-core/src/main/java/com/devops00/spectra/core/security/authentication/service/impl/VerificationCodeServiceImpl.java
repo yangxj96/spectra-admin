@@ -26,19 +26,16 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.security.authentication.service.VerificationCodeService;
-import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
-import com.devops00.spectra.security.base.util.VerificationCodeDigest;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 认证验证码生成、摘要存储和通知投递服务。
@@ -53,14 +50,14 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final NotificationService notificationService;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final SecurityVerificationCodeStore verificationCodeStore;
     private final SecurityProperties securityProperties;
 
     public VerificationCodeServiceImpl(@Nullable NotificationService notificationService,
-                                       @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+                                       SecurityVerificationCodeStore verificationCodeStore,
                                        SecurityProperties securityProperties) {
         this.notificationService = notificationService;
-        this.redisTemplate = redisTemplate;
+        this.verificationCodeStore = verificationCodeStore;
         this.securityProperties = securityProperties;
     }
 
@@ -100,9 +97,9 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         try {
             var requestWindow = Instant.now().getEpochSecond()
                     / Math.max(1L, securityProperties.getVerificationCodeExpire());
-            var stored = SecurityRedisExecutor.require("写入验证码", () -> redisTemplate.opsForValue()
-                    .setIfAbsent(redisKey, digest(code), securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS));
-            if (Boolean.FALSE.equals(stored)) {
+            var stored = verificationCodeStore.saveIfAbsent(redisKey, digest(code),
+                    java.time.Duration.ofSeconds(securityProperties.getVerificationCodeExpire()));
+            if (!stored) {
                 return;
             }
             var purposeKey = purpose == NotificationPurpose.LOGIN_CODE
@@ -125,7 +122,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         } catch (SecurityRedisUnavailableException exception) {
             throw exception;
         } catch (RuntimeException exception) {
-            SecurityRedisExecutor.run("清理验证码", () -> redisTemplate.delete(redisKey));
+            verificationCodeStore.delete(redisKey);
             if (exception instanceof SpectraException) {
                 throw exception;
             }

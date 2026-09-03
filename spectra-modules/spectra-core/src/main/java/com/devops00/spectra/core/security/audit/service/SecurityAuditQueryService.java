@@ -26,10 +26,10 @@ import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetenti
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
 import com.devops00.spectra.core.security.audit.observability.SecurityAuditMetrics;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.AuditVisibilityPolicy;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.AuditVisibilityPolicy;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;

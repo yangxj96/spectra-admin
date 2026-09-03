@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.security.policy.repository;
 
-import com.devops00.spectra.security.base.policy.PasswordPolicy;
-import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
-import com.devops00.spectra.security.base.policy.SecurityPolicyUnavailableException;
+import com.devops00.spectra.common.security.policy.PasswordPolicy;
+import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
+import com.devops00.spectra.common.security.policy.SecurityPolicyUnavailableException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

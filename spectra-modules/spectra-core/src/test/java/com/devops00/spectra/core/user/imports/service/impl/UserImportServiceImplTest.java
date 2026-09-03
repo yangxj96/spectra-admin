@@ -30,7 +30,7 @@ import com.devops00.spectra.core.user.imports.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

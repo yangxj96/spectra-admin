@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.security.base.change.AuthorizationEpochGuard;
+import com.devops00.spectra.core.security.change.AuthorizationEpochGuard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -23,22 +23,20 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.security.base.constant.LoginType;
-import com.devops00.spectra.security.base.exception.LoginException;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.strategy.provider.EmailAuthenticationProvider;
-import com.devops00.spectra.security.base.util.VerificationCodeDigest;
-import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
-import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
+import com.devops00.spectra.core.security.authentication.constant.LoginType;
+import com.devops00.spectra.core.security.authentication.exception.LoginException;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.core.security.authentication.strategy.provider.EmailAuthenticationProvider;
+import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
+import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 /**
  * 邮箱验证码登录
@@ -51,7 +49,9 @@ import java.util.concurrent.TimeUnit;
 @NullMarked
 public class LoginEmailProvider extends EmailAuthenticationProvider {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final SecurityVerificationCodeStore verificationCodeStore;
+
+    private final SecurityVerificationAttemptStore verificationAttemptStore;
 
     private final UserService userService;
 
@@ -63,11 +63,14 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     private final SecurityProperties securityProperties;
 
-    public LoginEmailProvider(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate, UserService userService,
+    public LoginEmailProvider(SecurityVerificationCodeStore verificationCodeStore,
+                              SecurityVerificationAttemptStore verificationAttemptStore,
+                              UserService userService,
                               AuthenticationIdentityService identityService,
                               PasswordCredentialService passwordCredentialService,
                               SecurityUserHelper securityUserHelper, SecurityProperties securityProperties) {
-        this.redisTemplate = redisTemplate;
+        this.verificationCodeStore = verificationCodeStore;
+        this.verificationAttemptStore = verificationAttemptStore;
         this.userService = userService;
         this.identityService = identityService;
         this.passwordCredentialService = passwordCredentialService;
@@ -92,22 +95,17 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     @Override
     public void kaptchaValidate(String email, String kaptcha) {
-        SecurityRedisExecutor.run("校验邮箱登录验证码", () -> {
-            var key = RedisCacheKey.LOGIN_EMAIL_CODE + email;
-            var attemptsKey = RedisCacheKey.LOGIN_EMAIL_CODE_ATTEMPTS + email;
-            var attempts = SecurityRedisExecutor.require("记录邮箱验证码失败次数",
-                    () -> redisTemplate.opsForValue().increment(attemptsKey));
-            if (attempts == 1L) {
-                redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS);
-            }
-            if (attempts > securityProperties.getVerificationCodeMaxAttempts()) {
-                throw new KaptchaNotMatchException("验证码尝试次数过多");
-            }
-            var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
-            if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
-                throw new KaptchaNotMatchException("验证码错误");
-            }
-        });
+        var key = RedisCacheKey.LOGIN_EMAIL_CODE + email;
+        var attemptsKey = RedisCacheKey.LOGIN_EMAIL_CODE_ATTEMPTS + email;
+        var attempts = verificationAttemptStore.increment(attemptsKey,
+                Duration.ofSeconds(securityProperties.getVerificationCodeExpire()));
+        if (attempts > securityProperties.getVerificationCodeMaxAttempts()) {
+            throw new KaptchaNotMatchException("验证码尝试次数过多");
+        }
+        var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
+        if (!verificationCodeStore.compareAndDelete(key, digest)) {
+            throw new KaptchaNotMatchException("验证码错误");
+        }
     }
 
 }

@@ -17,9 +17,9 @@
 package com.devops00.spectra.core.security.audit.repository;
 
 import com.devops00.spectra.common.audit.AuditSanitizer;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditUnavailableException;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditUnavailableException;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jdbc.core.JdbcTemplate;

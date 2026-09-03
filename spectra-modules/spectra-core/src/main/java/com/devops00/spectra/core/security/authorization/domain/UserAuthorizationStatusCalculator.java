@@ -19,7 +19,7 @@ package com.devops00.spectra.core.security.authorization.domain;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
-import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
+import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
 
 import java.time.LocalDateTime;
 import java.util.List;

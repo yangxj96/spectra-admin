@@ -6,9 +6,9 @@
 
 package com.devops00.spectra.core.security.audit.outbox;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditUnavailableException;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditUnavailableException;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 

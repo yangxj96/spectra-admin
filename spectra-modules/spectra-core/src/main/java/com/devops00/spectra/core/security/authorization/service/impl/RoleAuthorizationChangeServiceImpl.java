@@ -45,25 +45,24 @@ import com.devops00.spectra.core.security.authorization.service.RoleChangeImpact
 import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
-import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
-import com.devops00.spectra.security.base.authorization.AuthorizationScope;
-import com.devops00.spectra.security.base.authorization.ScopeMode;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
+import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
-import com.devops00.spectra.security.base.change.AuthorizationChangeToken;
-import com.devops00.spectra.security.base.change.AuthorizationChangeTokenService;
-import com.devops00.spectra.security.base.change.AuthorizationEpochGuard;
-import com.devops00.spectra.security.base.change.HighRiskApprovalGate;
-import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
-import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
+import com.devops00.spectra.core.security.change.AuthorizationChangeToken;
+import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
+import com.devops00.spectra.core.security.change.AuthorizationEpochGuard;
+import com.devops00.spectra.core.security.change.HighRiskApprovalGate;
+import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
+import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -216,7 +215,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         var impact = impactAnalyzer.analyze(before, after, activeAssignments(roleId).size(), affectedUserIds(roleId).size());
         var requests = requestsForAddedCapabilities(before, after);
         var rootPolicy = rootPolicyProvider.getIfAvailable();
-        boolean root = rootPolicy != null && rootPolicy.isRoot(SecurityContextHolder.getContext().getAuthentication());
+        boolean root = rootPolicy != null && rootPolicy.isRoot(securityContextAccessor.currentUser());
         if (!requests.isEmpty()) {
             grantBoundaryService.evaluate(snapshotLoader.load(operatorId), operatorId, null, requests, root);
         }

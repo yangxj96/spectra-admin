@@ -7,8 +7,8 @@
 package com.devops00.spectra.core.security.authorization.controller;
 
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationContextVO;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

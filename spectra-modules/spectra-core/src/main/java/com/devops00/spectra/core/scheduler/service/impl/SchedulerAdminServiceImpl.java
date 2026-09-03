@@ -51,7 +51,7 @@ import com.devops00.spectra.core.scheduler.service.ScheduledJobRegistry;
 import com.devops00.spectra.core.scheduler.service.SchedulerAdminService;
 import com.devops00.spectra.core.scheduler.service.SchedulerExecutionService;
 import com.devops00.spectra.core.scheduler.service.SchedulerTimeZoneResolver;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;

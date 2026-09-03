@@ -18,7 +18,7 @@ package com.devops00.spectra.core.controller;
 
 import com.devops00.spectra.core.system.controller.MenuController;
 import com.devops00.spectra.core.system.service.MenuService;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 

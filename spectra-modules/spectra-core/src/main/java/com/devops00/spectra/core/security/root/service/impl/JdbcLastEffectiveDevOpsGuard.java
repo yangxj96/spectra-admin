@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.core.security.root.service.impl;
 
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
-import com.devops00.spectra.security.base.root.LastEffectiveDevOpsGuard;
-import com.devops00.spectra.security.base.root.RootGovernanceException;
-import com.devops00.spectra.security.base.root.RootPolicy;
-import com.devops00.spectra.security.base.root.RootPolicyRepository;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
+import com.devops00.spectra.core.security.root.RootGovernanceException;
+import com.devops00.spectra.core.security.root.RootPolicy;
+import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

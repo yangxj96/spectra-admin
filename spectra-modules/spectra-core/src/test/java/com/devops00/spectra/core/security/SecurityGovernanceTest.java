@@ -19,12 +19,12 @@ package com.devops00.spectra.core.security;
 import com.devops00.spectra.core.security.change.service.impl.DefaultSecurityChangeExecutor;
 import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditUnavailableException;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
-import com.devops00.spectra.security.base.root.RootPolicy;
-import com.devops00.spectra.security.base.root.RootPolicyRepository;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditUnavailableException;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.root.RootPolicy;
+import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

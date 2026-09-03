@@ -22,10 +22,10 @@ import com.devops00.spectra.core.security.authentication.javabean.enums.Authenti
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.constant.LoginType;
-import com.devops00.spectra.security.base.exception.LoginException;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authentication.constant.LoginType;
+import com.devops00.spectra.core.security.authentication.exception.LoginException;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;

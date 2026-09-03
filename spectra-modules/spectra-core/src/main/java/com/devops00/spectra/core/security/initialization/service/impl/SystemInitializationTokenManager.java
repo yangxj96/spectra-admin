@@ -17,11 +17,8 @@
 package com.devops00.spectra.core.security.initialization.service.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.security.base.constant.SecurityRedisKey;
-import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
+import com.devops00.spectra.common.port.security.SecurityInitializationTokenStore;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -50,11 +47,10 @@ public class SystemInitializationTokenManager {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final SecurityInitializationTokenStore tokenStore;
 
-    public SystemInitializationTokenManager(
-                                            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    public SystemInitializationTokenManager(SecurityInitializationTokenStore tokenStore) {
+        this.tokenStore = tokenStore;
     }
 
     /**
@@ -63,9 +59,7 @@ public class SystemInitializationTokenManager {
     public void ensureToken() {
         String token = generateToken();
         String digest = digest(token);
-        Boolean created = SecurityRedisExecutor.require("写入系统初始化令牌",
-                () -> redisTemplate.opsForValue().setIfAbsent(tokenKey(), digest));
-        if (Boolean.TRUE.equals(created)) {
+        if (tokenStore.putIfAbsent(digest)) {
             log.warn(LogPrefix.SECURITY.f("系统尚未初始化，请使用以下一次性初始化令牌：{}；令牌仅在本次生成时显示，" +
                     "完成初始化后会自动清理，请勿写入共享日志或工单"), token);
         } else {
@@ -82,11 +76,10 @@ public class SystemInitializationTokenManager {
         if (token == null || token.isBlank()) {
             throw new AccessDeniedException("系统初始化令牌无效");
         }
-        Object stored = SecurityRedisExecutor.require("读取系统初始化令牌",
-                () -> redisTemplate.opsForValue().get(tokenKey()));
-        if (!(stored instanceof String expectedDigest)
-                || !MessageDigest.isEqual(expectedDigest.getBytes(StandardCharsets.US_ASCII),
-                        digest(token).getBytes(StandardCharsets.US_ASCII))) {
+        String expectedDigest = tokenStore.getDigest()
+                .orElseThrow(() -> new AccessDeniedException("系统初始化令牌无效"));
+        if (!MessageDigest.isEqual(expectedDigest.getBytes(StandardCharsets.US_ASCII),
+                digest(token).getBytes(StandardCharsets.US_ASCII))) {
             throw new AccessDeniedException("系统初始化令牌无效");
         }
     }
@@ -95,8 +88,7 @@ public class SystemInitializationTokenManager {
      * 系统完成初始化后删除引导令牌摘要。
      */
     public void clear() {
-        SecurityRedisExecutor.require("删除系统初始化令牌",
-                () -> redisTemplate.delete(tokenKey()));
+        tokenStore.clear();
     }
 
     /**
@@ -121,10 +113,4 @@ public class SystemInitializationTokenManager {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    /**
-     * 转换、解析或规范化数据（{@code tokenKey}）。
-     */
-    private String tokenKey() {
-        return SecurityRedisKey.INITIALIZATION_TOKEN.getPattern();
-    }
 }

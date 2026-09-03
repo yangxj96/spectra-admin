@@ -22,18 +22,17 @@ import com.devops00.spectra.core.security.authentication.service.VerificationCod
 import com.devops00.spectra.framework.configure.mvc.security.AuthenticationWebUtils;
 import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.audit.AuditCategory;
-import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.from.EmailCodeFrom;
-import com.devops00.spectra.security.base.javabean.from.LoginFrom;
-import com.devops00.spectra.security.base.javabean.from.RefreshTokenFrom;
-import com.devops00.spectra.security.base.javabean.from.SmsCodeFrom;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.session.WebCookiePolicy;
+import com.devops00.spectra.common.constant.ClientType;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.security.authentication.javabean.from.EmailCodeFrom;
+import com.devops00.spectra.core.security.authentication.javabean.from.LoginFrom;
+import com.devops00.spectra.core.security.authentication.javabean.from.RefreshTokenFrom;
+import com.devops00.spectra.core.security.authentication.javabean.from.SmsCodeFrom;
+import com.devops00.spectra.common.port.security.SecurityToken;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.security.configuration.WebCookiePolicy;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -79,10 +78,10 @@ public class AuthenticationController {
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", version = "1.0.0")
-    public TokenVO login(@Validated @RequestBody LoginFrom params, HttpServletRequest request,
-                         HttpServletResponse response) {
+    public SecurityToken login(@Validated @RequestBody LoginFrom params, HttpServletRequest request,
+                               HttpServletResponse response) {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
-        TokenVO token = loginService.login(params, clientType);
+        SecurityToken token = loginService.login(params, clientType);
         return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
     }
 
@@ -154,8 +153,8 @@ public class AuthenticationController {
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", version = "1.0.0")
-    public TokenVO refresh(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
-                           HttpServletResponse response) {
+    public SecurityToken refresh(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
+                                 HttpServletResponse response) {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
         if (AuthenticationWebUtils.isWebClient(clientType)) {
             AuthenticationWebUtils.validateCsrf(request, securityProperties);
@@ -164,7 +163,7 @@ public class AuthenticationController {
         String refreshToken = AuthenticationWebUtils.isWebClient(clientType)
                 ? cookieRefreshToken
                 : params != null ? params.getRefreshToken() : null;
-        TokenVO token = loginService.refresh(refreshToken, clientType);
+        SecurityToken token = loginService.refresh(refreshToken, clientType);
         AuthenticationWebUtils.issueWebCookies(response, token.getRefreshToken(), securityProperties, clientType);
         if (AuthenticationWebUtils.isWebClient(clientType)) {
             token.setRefreshToken(null);

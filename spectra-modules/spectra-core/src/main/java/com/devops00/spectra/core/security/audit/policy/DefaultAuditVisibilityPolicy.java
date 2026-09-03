@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.security.audit.policy;
 
-import com.devops00.spectra.security.base.audit.AuditVisibilityPolicy;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.AuditVisibilityPolicy;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 

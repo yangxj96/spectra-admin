@@ -6,7 +6,7 @@
 
 package com.devops00.spectra.core.security.audit.outbox;
 
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 
 /**
  * 安全变更 outbox 的下游动作扩展端口。

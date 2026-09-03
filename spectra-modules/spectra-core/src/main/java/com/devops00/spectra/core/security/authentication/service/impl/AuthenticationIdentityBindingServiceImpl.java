@@ -24,14 +24,12 @@ import com.devops00.spectra.core.security.authentication.javabean.enums.Authenti
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
-import com.devops00.spectra.security.base.constant.LoginType;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.util.VerificationCodeDigest;
-import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
+import com.devops00.spectra.core.security.authentication.constant.LoginType;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +47,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     /**
      * 处理内部业务逻辑（{@code Qualifier}）。
      */
-    private final @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate;
+    private final SecurityVerificationCodeStore verificationCodeStore;
 
     private final SecurityProperties securityProperties;
 
@@ -109,7 +107,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
         }
         var key = prefix + address;
         var digest = VerificationCodeDigest.digest(code, securityProperties.getVerificationCodeHmacKey());
-        if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
+        if (!verificationCodeStore.compareAndDelete(key, digest)) {
             throw new SpectraException("绑定验证码无效或已过期");
         }
     }

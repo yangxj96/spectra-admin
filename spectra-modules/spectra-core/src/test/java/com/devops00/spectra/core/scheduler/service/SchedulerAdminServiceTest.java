@@ -34,7 +34,7 @@ import com.devops00.spectra.core.scheduler.mapper.SchedulerLoopRuntimeMapper;
 import com.devops00.spectra.core.scheduler.mapper.SchedulerOperationAuditMapper;
 import com.devops00.spectra.core.scheduler.mapper.SchedulerOperationHistoryMapper;
 import com.devops00.spectra.core.scheduler.service.impl.SchedulerAdminServiceImpl;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.dao.DataAccessResourceFailureException;

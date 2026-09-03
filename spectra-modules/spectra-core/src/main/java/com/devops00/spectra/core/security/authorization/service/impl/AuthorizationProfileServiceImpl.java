@@ -47,7 +47,7 @@ import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMappe
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.service.DepartmentService;
-import com.devops00.spectra.security.base.authorization.ScopeMode;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

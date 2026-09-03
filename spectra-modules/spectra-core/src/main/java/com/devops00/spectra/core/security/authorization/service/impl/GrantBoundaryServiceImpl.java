@@ -17,9 +17,9 @@
 package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
-import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
-import com.devops00.spectra.security.base.authorization.GrantBoundaryPolicy;
+import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.core.security.authorization.GrantBoundaryPolicy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

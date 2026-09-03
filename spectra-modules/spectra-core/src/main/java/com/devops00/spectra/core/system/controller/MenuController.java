@@ -21,7 +21,7 @@ import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import com.devops00.spectra.core.system.service.MenuService;
 import com.devops00.spectra.common.audit.Audit;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;

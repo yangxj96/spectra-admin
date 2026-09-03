@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization.service.impl;
 
-import com.devops00.spectra.security.base.change.AuthorizationChangeToken;
+import com.devops00.spectra.core.security.change.AuthorizationChangeToken;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;

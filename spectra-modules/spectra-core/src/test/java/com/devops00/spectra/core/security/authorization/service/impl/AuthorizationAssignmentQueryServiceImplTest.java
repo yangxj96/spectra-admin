@@ -33,7 +33,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMap
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

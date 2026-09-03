@@ -22,9 +22,9 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.security.base.constant.LoginType;
-import com.devops00.spectra.security.base.exception.LoginException;
-import com.devops00.spectra.security.base.strategy.provider.UsernamePasswordAuthenticationProvider;
+import com.devops00.spectra.core.security.authentication.constant.LoginType;
+import com.devops00.spectra.core.security.authentication.exception.LoginException;
+import com.devops00.spectra.core.security.authentication.strategy.provider.UsernamePasswordAuthenticationProvider;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

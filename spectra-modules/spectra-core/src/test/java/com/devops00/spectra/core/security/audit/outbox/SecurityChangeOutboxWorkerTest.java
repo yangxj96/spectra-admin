@@ -7,8 +7,8 @@
 package com.devops00.spectra.core.security.audit.outbox;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

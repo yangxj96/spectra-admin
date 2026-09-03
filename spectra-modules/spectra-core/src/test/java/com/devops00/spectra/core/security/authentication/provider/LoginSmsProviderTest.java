@@ -17,21 +17,19 @@
 package com.devops00.spectra.core.security.authentication.provider;
 
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
+import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.util.VerificationCodeDigest;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.core.script.RedisScript;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,56 +52,58 @@ class LoginSmsProviderTest {
 
     private static final String HMAC_KEY = "test-verification-hmac-key";
 
-    private RedisTemplate<String, Object> redisTemplate;
+    private SecurityVerificationCodeStore verificationCodeStore;
 
-    private ValueOperations<String, Object> valueOperations;
+    private SecurityVerificationAttemptStore verificationAttemptStore;
 
     private LoginSmsProvider provider;
 
     @BeforeEach
     void setUp() {
-        redisTemplate = mock(RedisTemplate.class);
-        valueOperations = mock(ValueOperations.class);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        verificationCodeStore = mock(SecurityVerificationCodeStore.class);
+        verificationAttemptStore = mock(SecurityVerificationAttemptStore.class);
         var properties = new SecurityProperties();
         properties.setVerificationCodeHmacKey(HMAC_KEY);
-        provider = new LoginSmsProvider(redisTemplate, mock(UserService.class), mock(AuthenticationIdentityService.class),
-                mock(PasswordCredentialService.class), mock(SecurityUserHelper.class), properties);
+        provider = new LoginSmsProvider(verificationCodeStore, verificationAttemptStore, mock(UserService.class),
+                mock(AuthenticationIdentityService.class), mock(PasswordCredentialService.class),
+                mock(SecurityUserHelper.class), properties);
     }
 
     @Test
     void shouldConsumeDigestAtomicallyAndStartAttemptWindow() {
         var key = RedisCacheKey.LOGIN_SMS_CODE + PHONE;
-        when(valueOperations.increment(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE)).thenReturn(1L);
-        when(redisTemplate.execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY))))
+        when(verificationAttemptStore.increment(eq(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE), any(Duration.class)))
                 .thenReturn(1L);
+        when(verificationCodeStore.compareAndDelete(key, VerificationCodeDigest.digest("123456", HMAC_KEY)))
+                .thenReturn(true);
 
         provider.kaptchaValidate(PHONE, "123456");
 
-        verify(redisTemplate).expire(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE, 300L, TimeUnit.SECONDS);
-        verify(redisTemplate).execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY)));
+        verify(verificationAttemptStore).increment(eq(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE), any(Duration.class));
+        verify(verificationCodeStore).compareAndDelete(key, VerificationCodeDigest.digest("123456", HMAC_KEY));
     }
 
     @Test
     void shouldRejectWhenAttemptsExceedLimitBeforeReadingCode() {
-        when(valueOperations.increment(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE)).thenReturn(6L);
+        when(verificationAttemptStore.increment(eq(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE), any(Duration.class)))
+                .thenReturn(6L);
 
         assertThrows(KaptchaNotMatchException.class, () -> provider.kaptchaValidate(PHONE, "123456"));
 
-        verify(valueOperations, never()).get(any());
+        verify(verificationCodeStore, never()).compareAndDelete(any(), any());
     }
 
     @Test
     void shouldRejectDigestMismatchWithoutReadingOrDeletingInApplicationCode() {
         var key = RedisCacheKey.LOGIN_SMS_CODE + PHONE;
-        when(valueOperations.increment(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE)).thenReturn(1L);
-        when(redisTemplate.execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY))))
-                .thenReturn(0L);
+        when(verificationAttemptStore.increment(eq(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE), any(Duration.class)))
+                .thenReturn(1L);
+        when(verificationCodeStore.compareAndDelete(key, VerificationCodeDigest.digest("123456", HMAC_KEY)))
+                .thenReturn(false);
 
         assertThrows(KaptchaNotMatchException.class, () -> provider.kaptchaValidate(PHONE, "123456"));
 
-        verify(redisTemplate).execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY)));
-        verify(valueOperations, never()).get(any());
-        verify(redisTemplate, never()).delete(any(String.class));
+        verify(verificationCodeStore).compareAndDelete(key, VerificationCodeDigest.digest("123456", HMAC_KEY));
+        verify(verificationCodeStore, never()).delete(any());
     }
 }

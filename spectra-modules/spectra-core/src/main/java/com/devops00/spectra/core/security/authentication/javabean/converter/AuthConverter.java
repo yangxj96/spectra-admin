@@ -19,7 +19,7 @@ package com.devops00.spectra.core.security.authentication.javabean.converter;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import org.mapstruct.Mapper;
 
 /**

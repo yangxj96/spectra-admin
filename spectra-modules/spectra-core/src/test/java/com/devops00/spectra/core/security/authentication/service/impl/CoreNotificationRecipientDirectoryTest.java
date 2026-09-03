@@ -23,13 +23,13 @@ import com.devops00.spectra.core.security.authentication.service.UserContactServ
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.security.base.authorization.AuthorizationAssignment;
-import com.devops00.spectra.security.base.authorization.AuthorizationScope;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.authorization.PermissionBoundary;
-import com.devops00.spectra.security.base.authorization.ScopeMode;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationAssignment;
+import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.authorization.PermissionBoundary;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

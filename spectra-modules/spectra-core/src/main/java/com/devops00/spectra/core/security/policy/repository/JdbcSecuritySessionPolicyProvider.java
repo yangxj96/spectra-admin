@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.core.security.policy.repository;
 
-import com.devops00.spectra.security.base.policy.SecurityPolicyUnavailableException;
-import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
-import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
-import com.devops00.spectra.security.base.session.SessionPolicy;
+import com.devops00.spectra.common.security.policy.SecurityPolicyUnavailableException;
+import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
+import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
+import com.devops00.spectra.common.security.policy.SessionPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

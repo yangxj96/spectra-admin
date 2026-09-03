@@ -18,16 +18,16 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
-import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
-import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.exception.LoginException;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
-import com.devops00.spectra.security.base.javabean.from.LoginFrom;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.port.security.SecurityAuthenticationPort;
+import com.devops00.spectra.common.constant.ClientType;
+import com.devops00.spectra.core.security.authentication.exception.LoginException;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
+import com.devops00.spectra.core.security.authentication.javabean.from.LoginFrom;
+import com.devops00.spectra.common.port.security.SecurityToken;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public TokenVO login(LoginFrom params, ClientType clientType) {
+    public SecurityToken login(LoginFrom params, ClientType clientType) {
         String username = params.getUsername() != null ? params.getUsername() : "";
         if (securityAuthenticationPort.isLockedOut(username)) {
             audit("AUTH_LOGIN_FAILED", null, clientType, "LOCKED_OUT");
@@ -98,12 +98,12 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public TokenVO refresh(String refreshToken, ClientType clientType) {
+    public SecurityToken refresh(String refreshToken, ClientType clientType) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new LoginException("刷新token不能为空");
         }
         try {
-            TokenVO token = securityAuthenticationPort.refreshByRefreshToken(refreshToken);
+            SecurityToken token = securityAuthenticationPort.refreshByRefreshToken(refreshToken);
             audit("TOKEN_REFRESH_SUCCEEDED", securityContextAccessor.currentUserId(), clientType, null);
             return token;
         } catch (RuntimeException exception) {
@@ -116,7 +116,7 @@ public class LoginServiceImpl implements LoginService {
     /**
      * 判断条件是否满足（{@code issueAuthenticatedToken}）。
      */
-    private TokenVO issueAuthenticatedToken(SecurityUser user, ClientType clientType) {
+    private SecurityToken issueAuthenticatedToken(SecurityUser user, ClientType clientType) {
         SecurityContextHolder.getContext()
                 .setAuthentication(
                         new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(

@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.audit.javabean.from;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.AuditResult;
 import lombok.Data;
 
 import java.util.UUID;

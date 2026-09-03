@@ -26,7 +26,7 @@ import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetenti
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
 import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.core.security.authentication.util.AuthenticationContextUtils;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ContentDisposition;

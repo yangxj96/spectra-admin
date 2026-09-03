@@ -16,14 +16,14 @@
 
 package com.devops00.spectra.core.security.authentication.service.impl;
 
-import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
-import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.constant.LoginType;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
-import com.devops00.spectra.security.base.javabean.from.LoginFrom;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.port.security.SecurityAuthenticationPort;
+import com.devops00.spectra.common.constant.ClientType;
+import com.devops00.spectra.core.security.authentication.constant.LoginType;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
+import com.devops00.spectra.core.security.authentication.javabean.from.LoginFrom;
+import com.devops00.spectra.common.port.security.SecurityToken;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -53,7 +53,7 @@ class LoginServiceImplTest {
         SecurityUser user = user(userId, "user@example.com", "ROLE_USER");
         LoginDispatcher dispatcher = mock(LoginDispatcher.class);
         SecurityAuthenticationPort authenticationPort = mock(SecurityAuthenticationPort.class);
-        TokenVO expected = TokenVO.builder().id(userId).build();
+        SecurityToken expected = SecurityToken.builder().id(userId).build();
 
         when(dispatcher.authenticate(any(LoginFrom.class)))
                 .thenReturn(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
@@ -61,7 +61,7 @@ class LoginServiceImplTest {
         when(authenticationPort.login(user)).thenReturn(expected);
 
         LoginServiceImpl service = service(dispatcher, authenticationPort);
-        TokenVO result = service.login(passwordLogin(user.getUsername()), ClientType.WEB);
+        SecurityToken result = service.login(passwordLogin(user.getUsername()), ClientType.WEB);
 
         assertSame(expected, result);
         verify(authenticationPort).login(user);
@@ -73,7 +73,7 @@ class LoginServiceImplTest {
         SecurityUser user = user(userId, "devops@example.com", "ROLE_DEV_OPS");
         LoginDispatcher dispatcher = mock(LoginDispatcher.class);
         SecurityAuthenticationPort authenticationPort = mock(SecurityAuthenticationPort.class);
-        TokenVO expected = TokenVO.builder().id(userId).build();
+        SecurityToken expected = SecurityToken.builder().id(userId).build();
 
         when(dispatcher.authenticate(any(LoginFrom.class)))
                 .thenReturn(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
@@ -81,7 +81,7 @@ class LoginServiceImplTest {
         when(authenticationPort.login(user)).thenReturn(expected);
 
         LoginServiceImpl service = service(dispatcher, authenticationPort);
-        TokenVO result = service.login(passwordLogin(user.getUsername()), ClientType.WEB);
+        SecurityToken result = service.login(passwordLogin(user.getUsername()), ClientType.WEB);
 
         assertSame(expected, result);
         verify(authenticationPort).login(user);

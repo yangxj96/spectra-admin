@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.security.authorization.service.impl;
 
-import com.devops00.spectra.security.base.change.AuthorizationChangeToken;
-import com.devops00.spectra.security.base.change.AuthorizationChangeTokenService;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.core.security.change.AuthorizationChangeToken;
+import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;

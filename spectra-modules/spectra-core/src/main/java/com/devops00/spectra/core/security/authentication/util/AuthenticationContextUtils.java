@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authentication.util;
 
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 
 import java.util.UUID;
 

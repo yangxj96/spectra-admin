@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.security.authentication.service;
 
-import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.javabean.from.LoginFrom;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
+import com.devops00.spectra.common.constant.ClientType;
+import com.devops00.spectra.core.security.authentication.javabean.from.LoginFrom;
+import com.devops00.spectra.common.port.security.SecurityToken;
 
 /**
  * 登录认证用例。
@@ -30,11 +30,11 @@ import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 public interface LoginService {
 
     /** 执行账号主认证并签发正式会话。 */
-    TokenVO login(LoginFrom params, ClientType clientType);
+    SecurityToken login(LoginFrom params, ClientType clientType);
 
     /** 撤销当前会话和刷新会话。 */
     void logout(String token, String refreshToken, ClientType clientType);
 
     /** 轮换刷新令牌并返回新会话。 */
-    TokenVO refresh(String refreshToken, ClientType clientType);
+    SecurityToken refresh(String refreshToken, ClientType clientType);
 }

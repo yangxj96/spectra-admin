@@ -19,7 +19,7 @@ package com.devops00.spectra.core.common.constant;
 /**
  * Core 使用的 Redis 缓存 key。
  *
- * <p>安全 Session、Token、防重放和登录锁定 key 由 security-base 的 {@code SecurityRedisKey}
+ * <p>安全 Session、Token、防重放和登录锁定 key 由 framework 的 {@code SecurityRedisKey}
  * 统一维护；本类只保留 Core 的验证码和认证身份绑定缓存 key。</p>
  *
  * @author yangxj96

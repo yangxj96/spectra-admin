@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.security.authorization.service;
 
-import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
 
 import java.util.List;
 import java.util.UUID;

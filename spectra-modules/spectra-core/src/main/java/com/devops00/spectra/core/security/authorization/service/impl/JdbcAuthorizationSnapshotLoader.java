@@ -36,11 +36,11 @@ import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMap
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
-import com.devops00.spectra.security.base.authorization.AuthorizationAssignment;
-import com.devops00.spectra.security.base.authorization.AuthorizationScope;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
-import com.devops00.spectra.security.base.authorization.PermissionBoundary;
-import com.devops00.spectra.security.base.authorization.ScopeMode;
+import com.devops00.spectra.common.security.authorization.AuthorizationAssignment;
+import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.PermissionBoundary;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -14,7 +14,7 @@ import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authorization.controller.AuthorizationController;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeFrom;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;

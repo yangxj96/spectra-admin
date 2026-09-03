@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.audit.javabean.vo;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.AuditResult;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

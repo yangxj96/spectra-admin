@@ -17,12 +17,12 @@
 package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +40,8 @@ class AuthenticationIdentityBindingServiceImplTest {
         var userId = UUID.randomUUID();
         var password = identity("PASSWORD", userId);
         when(identityService.listByUserId(userId)).thenReturn(List.of(password));
-        var service = new AuthenticationIdentityBindingServiceImpl(mock(RedisTemplate.class), mock(SecurityProperties.class), identityService,
+        var service = new AuthenticationIdentityBindingServiceImpl(mock(SecurityVerificationCodeStore.class), mock(SecurityProperties.class),
+                identityService,
                 mock(UserContactService.class));
 
         assertThrows(SpectraException.class, () -> service.unbind(userId, password.getId()));
@@ -53,7 +54,8 @@ class AuthenticationIdentityBindingServiceImplTest {
         var password = identity("PASSWORD", userId);
         var phone = identity("SMS", userId);
         when(identityService.listByUserId(userId)).thenReturn(List.of(password, phone));
-        var service = new AuthenticationIdentityBindingServiceImpl(mock(RedisTemplate.class), mock(SecurityProperties.class), identityService,
+        var service = new AuthenticationIdentityBindingServiceImpl(mock(SecurityVerificationCodeStore.class), mock(SecurityProperties.class),
+                identityService,
                 mock(UserContactService.class));
 
         service.unbind(userId, phone.getId());

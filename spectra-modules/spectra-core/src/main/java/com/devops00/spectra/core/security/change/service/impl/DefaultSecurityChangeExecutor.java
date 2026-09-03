@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.core.security.change.service.impl;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.audit.AuditResult;
+import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
 import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
-import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
+import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

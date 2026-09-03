@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.security.root.repository;
 
-import com.devops00.spectra.security.base.root.RootGovernanceException;
-import com.devops00.spectra.security.base.root.RootPolicy;
-import com.devops00.spectra.security.base.root.RootPolicyRepository;
+import com.devops00.spectra.core.security.root.RootGovernanceException;
+import com.devops00.spectra.core.security.root.RootPolicy;
+import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
