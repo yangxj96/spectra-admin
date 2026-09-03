@@ -22,27 +22,27 @@
         <Bug pattern="SPEL_INJECTION"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.notification.dispatch.NotificationTaskWorker"/>
+        <Class name="com.devops00.spectra.core.notification.dispatch.NotificationTaskWorker"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.notification.dispatch.NotificationTaskLoopHandler"/>
+        <Class name="com.devops00.spectra.core.notification.dispatch.NotificationTaskLoopHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.notification.service.NotificationCleanupService"/>
+        <Class name="com.devops00.spectra.core.notification.service.NotificationCleanupService"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.notification.service.NotificationCleanupScheduledHandler"/>
+        <Class name="com.devops00.spectra.core.notification.service.NotificationCleanupScheduledHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.notification.service.impl.NotificationGatewayImpl"/>
+        <Class name="com.devops00.spectra.core.notification.service.impl.NotificationGatewayImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.notification.observability.NotificationMetrics"/>
+        <Class name="com.devops00.spectra.core.notification.observability.NotificationMetrics"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <!-- DataSource is a Spring-managed collaborator retained for connection checks. -->
@@ -137,29 +137,29 @@
     </Match>
     <!-- Spring collaborators are intentionally retained by the local storage service. -->
     <Match>
-        <Class name="com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl"/>
+        <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceLocalImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <!-- Upload roots are trusted deployment configuration, not request-controlled paths. -->
     <Match>
-        <Class name="com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl"/>
+        <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceLocalImpl"/>
         <Bug pattern="PATH_TRAVERSAL_IN"/>
     </Match>
     <!-- Spring-managed upload collaborators are intentionally retained by technical adapters/services. -->
     <Match>
-        <Class name="com.devops00.spectra.upload.configure.FileUploadBinarySecurityFilter"/>
+        <Class name="com.devops00.spectra.core.upload.configure.FileUploadBinarySecurityFilter"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.upload.service.FileUploadCleanupService"/>
+        <Class name="com.devops00.spectra.core.upload.service.FileUploadCleanupService"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.upload.service.UploadApplicationService"/>
+        <Class name="com.devops00.spectra.core.upload.service.UploadApplicationService"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.upload.storage.s3.S3FileStorageProvider"/>
+        <Class name="com.devops00.spectra.core.upload.storage.s3.S3FileStorageProvider"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <!-- Flowable's repository service is a Spring-managed collaborator for health checks. -->
@@ -169,7 +169,7 @@
     </Match>
     <!-- S3 presigner creates the redirect URL from trusted deployment credentials and endpoint. -->
     <Match>
-        <Class name="com.devops00.spectra.upload.service.impl.FileUploadServiceS3Impl"/>
+        <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceS3Impl"/>
         <Bug pattern="UNVALIDATED_REDIRECT"/>
     </Match>
     <!-- ObjectMapper/RedisTemplate/configuration/Converter are private Spring collaborators. -->

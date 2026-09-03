@@ -44,8 +44,6 @@ class OptionalModuleIsolationTest {
             "com.devops00.spectra.core.",
             "com.devops00.spectra.oa.",
             "com.devops00.spectra.workflow.",
-            "com.devops00.spectra.notification.",
-            "com.devops00.spectra.upload.",
             "com.devops00.spectra.erp.");
 
     @Test
@@ -88,9 +86,9 @@ class OptionalModuleIsolationTest {
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
                 "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/scheduler/health/SchedulerHealthIndicator.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
-                "spectra-modules/spectra-notification/src/main/java/com/devops00/spectra/notification/health/NotificationHealthIndicator.java",
+                "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/health/NotificationHealthIndicator.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
-                "spectra-modules/spectra-upload/src/main/java/com/devops00/spectra/upload/health/FileStorageHealthIndicator.java",
+                "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload/health/FileStorageHealthIndicator.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
                 "spectra-modules/spectra-workflow/src/main/java/com/devops00/spectra/workflow/health/FlowableHealthContributor.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor");

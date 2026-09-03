@@ -30,7 +30,6 @@ import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
 import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -53,7 +52,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private final SecurityVerificationCodeStore verificationCodeStore;
     private final SecurityProperties securityProperties;
 
-    public VerificationCodeServiceImpl(@Nullable NotificationService notificationService,
+    public VerificationCodeServiceImpl(NotificationService notificationService,
                                        SecurityVerificationCodeStore verificationCodeStore,
                                        SecurityProperties securityProperties) {
         this.notificationService = notificationService;
@@ -92,7 +91,6 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
                           NotificationPurpose purpose, String templateCode) {
         var redisKey = redisPrefix + address;
         requireHmacKey();
-        var notificationService = requireNotificationService();
         var code = generateCode();
         try {
             var requestWindow = Instant.now().getEpochSecond()
@@ -157,15 +155,4 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         }
     }
 
-    /**
-     * 获取通知适配器；通知模块未装配时给出明确的能力缺失信息。
-     *
-     * @return 通知服务
-     */
-    private NotificationService requireNotificationService() {
-        if (notificationService == null) {
-            throw new SpectraException("通知模块未启用，无法发送验证码");
-        }
-        return notificationService;
-    }
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.notification.mapper.NotificationRequestMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.notification.javabean.entity.NotificationRequestEntity">
+        <!--@mbg.generated-->
+        <!--@Table spectra_notification.ntf_request-->
+        <result column="external_request_id"             property="externalRequestId"/>
+        <result column="idempotency_key"                 property="idempotencyKey"/>
+        <result column="purpose"                         property="purpose"/>
+        <result column="template_group_code"             property="templateGroupCode"/>
+        <result column="source_module"                   property="sourceModule"/>
+        <result column="business_type"                   property="businessType"/>
+        <result column="business_id"                     property="businessId"/>
+        <result column="initiator_type"                  property="initiatorType"/>
+        <result column="initiator_user_id"               property="initiatorUserId"/>
+        <result column="source_department_id"            property="sourceDepartmentId"/>
+        <result column="parameters"                      property="parameters" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="template_snapshot"                property="templateSnapshot" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="sensitive_parameters_ciphertext" property="sensitiveParametersCiphertext"/>
+        <result column="encryption_key_id"               property="encryptionKeyId"/>
+        <result column="status"                          property="status"/>
+        <result column="recipient_count"                 property="recipientCount"/>
+        <result column="task_count"                      property="taskCount"/>
+        <result column="scheduled_at"                    property="scheduledAt"/>
+        <result column="expires_at"                      property="expiresAt"/>
+        <result column="priority"                        property="priority"/>
+        <result column="trace_id"                        property="traceId"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        external_request_id,
+        idempotency_key,
+        purpose,
+        template_group_code,
+        source_module,
+        business_type,
+        business_id,
+        initiator_type,
+        initiator_user_id,
+        source_department_id,
+        parameters,
+        template_snapshot,
+        sensitive_parameters_ciphertext,
+        encryption_key_id,
+        status,
+        recipient_count,
+        task_count,
+        scheduled_at,
+        expires_at,
+        priority,
+        trace_id,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <!-- 清理终态或过期请求中的敏感载荷；批量处理避免长事务。 -->
+    <update id="clearSensitivePayloads">
+        WITH candidates AS (
+            SELECT id
+            FROM spectra_notification.ntf_request
+            WHERE deleted IS NULL
+              AND sensitive_parameters_ciphertext IS NOT NULL
+              AND (
+                    expires_at IS NOT NULL AND expires_at &lt;= #{now}
+                    OR (status IN ('SUCCEEDED', 'PARTIAL', 'FAILED', 'CANCELLED', 'EXPIRED')
+                        AND updated_at &lt;= #{cutoff})
+                  )
+            ORDER BY updated_at NULLS FIRST
+            LIMIT #{limit}
+        )
+        UPDATE spectra_notification.ntf_request target
+           SET sensitive_parameters_ciphertext = NULL,
+               encryption_key_id = NULL,
+               updated_at = CURRENT_TIMESTAMP
+         WHERE target.id IN (SELECT id FROM candidates)
+    </update>
+</mapper>

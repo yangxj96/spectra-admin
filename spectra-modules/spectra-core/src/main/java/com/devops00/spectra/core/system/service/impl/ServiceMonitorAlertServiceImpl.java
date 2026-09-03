@@ -38,7 +38,6 @@ import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -46,7 +45,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,15 +64,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     private final RoleAssignmentMapper roleAssignmentMapper;
     private final UserMapper userMapper;
     private final TimeMapper timeMapper;
-    private Optional<NotificationService> notificationService = Optional.empty();
-
-    /**
-     * 更新或推进目标状态（{@code setNotificationService}）。
-     */
-    @Autowired(required = false)
-    public void setNotificationService(NotificationService notificationService) {
-        this.notificationService = Optional.ofNullable(notificationService);
-    }
+    private final NotificationService notificationService;
 
     @Override
     public void evaluate(ServiceMonitorSample sample) {
@@ -305,10 +295,6 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
             log.warn("服务监控告警通知不可用：告警事件尚未生成 ID");
             return false;
         }
-        if (notificationService.isEmpty()) {
-            log.warn("服务监控告警通知不可用：通知模块未启用，eventId={}", event.getId());
-            return false;
-        }
         var role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, ROLE_DEV_OPS)
                 .eq(SecurityRole::getState, ACTIVE)
@@ -342,7 +328,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (recipients.isEmpty()) {
             return false;
         }
-        notificationService.get()
+        notificationService
                 .send(NotificationSendRequest.inApp(
                         "service-monitor-alert:" + event.getId() + ":" + event.getOccurrenceCount(),
                         NotificationPurpose.SYSTEM_NOTICE, recipients, NotificationTemplateCode.SYSTEM_SERVICE_MONITOR_ALERT)

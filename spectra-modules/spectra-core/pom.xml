@@ -39,6 +39,23 @@
     </properties>
 
     <dependencies>
+        <!-- 统一通知 Provider 的邮件渠道依赖。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!-- 文件上传的 S3 存储适配依赖。 -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.42.34</version>
+        </dependency>
+        <!-- 文件内容检测依赖。 -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+        </dependency>
+
         <!-- 测试上下文复用集中管理的 application-dev.yml，不进入核心模块运行时依赖。 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>

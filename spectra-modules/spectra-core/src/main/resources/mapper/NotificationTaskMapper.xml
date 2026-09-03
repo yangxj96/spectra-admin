@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.notification.mapper.NotificationTaskMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity">
+        <!--@mbg.generated-->
+        <!--@Table spectra_notification.ntf_task-->
+        <result column="notification_request_id"        property="notificationRequestId"/>
+        <result column="channel"                         property="channel"/>
+        <result column="receiver_user_id"                property="receiverUserId"/>
+        <result column="recipient_key_hash"              property="recipientKeyHash"/>
+        <result column="recipient_masked"                property="recipientMasked"/>
+        <result column="recipient_ciphertext"            property="recipientCiphertext"/>
+        <result column="template_id"                     property="templateId"/>
+        <result column="template_version_no"             property="templateVersionNo"/>
+        <result column="template_version_digest"         property="templateVersionDigest"/>
+        <result column="purpose"                         property="purpose"/>
+        <result column="title"                           property="title"/>
+        <result column="content"                         property="content"/>
+        <result column="link"                            property="link"/>
+        <result column="extra"                           property="extra" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="sensitive_parameters_ciphertext" property="sensitiveParametersCiphertext"/>
+        <result column="priority"                        property="priority"/>
+        <result column="attempt_count"                   property="attemptCount"/>
+        <result column="max_attempts"                    property="maxAttempts"/>
+        <result column="scheduled_at"                    property="scheduledAt"/>
+        <result column="next_retry_at"                   property="nextRetryAt"/>
+        <result column="expires_at"                      property="expiresAt"/>
+        <result column="locked_by"                       property="lockedBy"/>
+        <result column="locked_at"                       property="lockedAt"/>
+        <result column="status"                          property="status"/>
+        <result column="last_error_code"                 property="lastErrorCode"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        notification_request_id,
+        channel,
+        receiver_user_id,
+        recipient_key_hash,
+        recipient_masked,
+        recipient_ciphertext,
+        template_id,
+        template_version_no,
+        template_version_digest,
+        purpose,
+        title,
+        content,
+        link,
+        extra,
+        sensitive_parameters_ciphertext,
+        priority,
+        attempt_count,
+        max_attempts,
+        scheduled_at,
+        next_retry_at,
+        expires_at,
+        locked_by,
+        locked_at,
+        status,
+        last_error_code,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <!-- PostgreSQL 的锁定子句必须位于 ORDER BY/LIMIT 之后。 -->
+    <select id="selectPendingTasks" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM spectra_notification.ntf_task
+        WHERE deleted IS NULL
+        AND status IN ('PENDING', 'RETRYING')
+        AND scheduled_at &lt;= #{now}
+        AND (next_retry_at IS NULL OR next_retry_at &lt;= #{now})
+        AND (expires_at IS NULL OR expires_at &gt; #{now})
+        ORDER BY priority DESC, scheduled_at ASC, created_at ASC
+        LIMIT #{limit}
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <!-- 清理终态或过期任务中的敏感渲染载荷；批量处理避免长事务。 -->
+    <update id="clearSensitivePayloads">
+        WITH candidates AS (
+            SELECT id
+            FROM spectra_notification.ntf_task
+            WHERE deleted IS NULL
+              AND sensitive_parameters_ciphertext IS NOT NULL
+              AND (
+                    expires_at IS NOT NULL AND expires_at &lt;= #{now}
+                    OR (status IN ('SENT', 'FAILED', 'BLOCKED', 'UNKNOWN', 'EXPIRED', 'CANCELLED')
+                        AND updated_at &lt;= #{cutoff})
+                  )
+            ORDER BY updated_at NULLS FIRST
+            LIMIT #{limit}
+        )
+        UPDATE spectra_notification.ntf_task target
+           SET sensitive_parameters_ciphertext = NULL,
+               updated_at = CURRENT_TIMESTAMP
+         WHERE target.id IN (SELECT id FROM candidates)
+    </update>
+</mapper>

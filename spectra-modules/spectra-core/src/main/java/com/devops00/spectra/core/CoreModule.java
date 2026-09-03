@@ -16,9 +16,12 @@
 
 package com.devops00.spectra.core;
 
+import com.devops00.spectra.core.notification.properties.NotificationCleanupProperties;
+import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.framework.FrameworkModule;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -31,6 +34,7 @@ import org.springframework.context.annotation.ComponentScan;
 @AutoConfiguration(after = FrameworkModule.class)
 @ComponentScan(basePackageClasses = CoreModule.class)
 @MapperScan("com.devops00.spectra.core.**.mapper")
+@EnableConfigurationProperties({NotificationModuleProperties.class, NotificationCleanupProperties.class})
 public class CoreModule {
 
 }

@@ -74,18 +74,6 @@
         </dependency>
 
         <!-- === 项目模块-基础功能 === -->
-        <!-- 统一通知模块 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-notification</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- 文件上传 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-upload</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- 工作流 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>

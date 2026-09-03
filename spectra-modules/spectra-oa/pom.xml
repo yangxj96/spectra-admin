@@ -50,12 +50,6 @@
             <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-upload</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- === Excel 导出 === -->
         <dependency>
             <groupId>org.apache.poi</groupId>

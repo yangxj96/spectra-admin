@@ -24,9 +24,7 @@
     </properties>
 
     <modules>
-        <module>spectra-notification</module>
         <module>spectra-core</module>
-        <module>spectra-upload</module>
         <module>spectra-workflow</module>
         <module>spectra-oa</module>
     </modules>

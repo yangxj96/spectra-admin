@@ -39,14 +39,11 @@ public record ModuleAssembly(Set<String> enabledModules) {
     public static final String CORE = "core";
     public static final String OA = "oa";
     public static final String WORKFLOW = "workflow";
-    public static final String NOTIFICATION = "notification";
-    public static final String UPLOAD = "upload";
 
-    private static final List<String> KNOWN_OPTIONAL_MODULES = List.of(NOTIFICATION, UPLOAD, WORKFLOW, OA);
+    private static final List<String> KNOWN_OPTIONAL_MODULES = List.of(WORKFLOW, OA);
 
     private static final Map<String, List<String>> REQUIRED_MODULES = Map.of(
-            OA, List.of(WORKFLOW, UPLOAD, NOTIFICATION),
-            WORKFLOW, List.of(NOTIFICATION));
+            OA, List.of(WORKFLOW));
 
     public ModuleAssembly {
         var normalizedModules = new LinkedHashSet<>(enabledModules);

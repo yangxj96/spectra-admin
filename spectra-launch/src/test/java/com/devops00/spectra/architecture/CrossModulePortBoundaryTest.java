@@ -33,8 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CrossModulePortBoundaryTest {
 
     @Test
-    void uploadMustNotDependOnCoreSecurityImplementations() throws IOException {
-        var source = readJavaSources("spectra-modules/spectra-upload/src/main/java");
+    void coreUploadMustNotDependOnCoreSecurityImplementations() throws IOException {
+        var source = readJavaSources("spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload");
 
         assertThat(source).noneMatch(content -> content.contains(
                 "import com.devops00.spectra.core.security.authentication.util.AuthenticationWebUtils;"));
@@ -48,13 +48,6 @@ class CrossModulePortBoundaryTest {
 
         assertThat(source).noneMatch(content -> content.contains(
                 "import com.devops00.spectra.workflow.service."));
-    }
-
-    @Test
-    void uploadMustNotDeclareCoreAsProductionDependency() throws IOException {
-        var pom = Files.readString(resolveBackendPath("spectra-modules/spectra-upload/pom.xml"));
-
-        assertThat(pom).doesNotContain("<artifactId>spectra-core</artifactId>");
     }
 
     @Test

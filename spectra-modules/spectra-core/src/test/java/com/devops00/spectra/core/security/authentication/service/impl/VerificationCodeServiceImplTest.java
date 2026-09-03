@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -130,15 +131,10 @@ class VerificationCodeServiceImplTest {
     }
 
     @Test
-    void shouldExplainWhenNotificationModuleIsNotAssembled() {
-        var verificationCodeStore = mock(SecurityVerificationCodeStore.class);
-        when(verificationCodeStore.saveIfAbsent(any(), any(), any(Duration.class))).thenReturn(true);
-        var properties = new SecurityProperties();
-        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(null, verificationCodeStore, properties);
+    void shouldRequireNotificationServiceAsConstructorDependency() throws NoSuchMethodException {
+        var constructor = VerificationCodeServiceImpl.class.getConstructor(
+                NotificationService.class, SecurityVerificationCodeStore.class, SecurityProperties.class);
 
-        var exception = assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
-
-        assertTrue(exception.getMessage().contains("通知模块未启用"));
+        assertEquals(NotificationService.class, constructor.getParameterTypes()[0]);
     }
 }

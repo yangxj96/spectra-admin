@@ -38,8 +38,6 @@ class CoreOwnershipTest {
     private static final List<String> OPTIONAL_PACKAGES = List.of(
             "com.devops00.spectra.oa.",
             "com.devops00.spectra.workflow.",
-            "com.devops00.spectra.notification.",
-            "com.devops00.spectra.upload.",
             "com.devops00.spectra.erp.");
 
     private static final Pattern DEPENDENCY_ARTIFACT = Pattern.compile(
@@ -67,7 +65,9 @@ class CoreOwnershipTest {
                 "系统管理", "com.devops00.spectra.core.system",
                 "安全审计", "com.devops00.spectra.core.security.audit",
                 "普通操作日志", "com.devops00.spectra.core.audit",
-                "调度", "com.devops00.spectra.core.scheduler");
+                "调度", "com.devops00.spectra.core.scheduler",
+                "统一通知", "com.devops00.spectra.core.notification",
+                "文件上传", "com.devops00.spectra.core.upload");
 
         var packages = javaSources(sourceRoot).stream()
                 .map(thisPath -> readPackage(thisPath).replaceFirst("^package\\s+", "").replace(";", ""))
@@ -101,8 +101,6 @@ class CoreOwnershipTest {
                         || artifact.equals("spectra-starter")
                         || artifact.equals("spectra-oa")
                         || artifact.equals("spectra-workflow")
-                        || artifact.equals("spectra-notification")
-                        || artifact.equals("spectra-upload")
                         || artifact.equals("spectra-erp"));
     }
 

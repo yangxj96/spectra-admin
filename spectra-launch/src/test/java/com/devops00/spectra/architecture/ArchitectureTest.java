@@ -90,8 +90,6 @@ class ArchitectureTest {
             .resideInAnyPackage(
                     "com.devops00.spectra.oa..",
                     "com.devops00.spectra.workflow..",
-                    "com.devops00.spectra.notification..",
-                    "com.devops00.spectra.upload..",
                     "com.devops00.spectra.erp..");
 
     @ArchTest
@@ -116,8 +114,6 @@ class ArchitectureTest {
                     "com.devops00.spectra.core..",
                     "com.devops00.spectra.oa..",
                     "com.devops00.spectra.workflow..",
-                    "com.devops00.spectra.notification..",
-                    "com.devops00.spectra.upload..",
                     "com.devops00.spectra.erp..");
 
     @ArchTest
@@ -130,8 +126,6 @@ class ArchitectureTest {
                     "com.devops00.spectra.core..",
                     "com.devops00.spectra.oa..",
                     "com.devops00.spectra.workflow..",
-                    "com.devops00.spectra.notification..",
-                    "com.devops00.spectra.upload..",
                     "com.devops00.spectra.erp..");
 
     @ArchTest
@@ -141,8 +135,6 @@ class ArchitectureTest {
                     "com.devops00.spectra.core..",
                     "com.devops00.spectra.oa..",
                     "com.devops00.spectra.workflow..",
-                    "com.devops00.spectra.notification..",
-                    "com.devops00.spectra.upload..",
                     "com.devops00.spectra.erp..")
             .should()
             .dependOnClassesThat()
@@ -171,17 +163,19 @@ class ArchitectureTest {
 
     @ArchTest
     static void coreMustOwnMandatoryBusinessCapabilities(JavaClasses classes) {
-        Map<String, String> mandatoryCapabilities = Map.of(
-                "用户", "com.devops00.spectra.core.user",
-                "角色和权限", "com.devops00.spectra.core.security.authorization",
-                "组织", "com.devops00.spectra.core.system",
-                "菜单", "com.devops00.spectra.core.system",
-                "字典", "com.devops00.spectra.core.system",
-                "系统配置", "com.devops00.spectra.core.system",
-                "安全审计", "com.devops00.spectra.core.security.audit",
-                "普通操作日志", "com.devops00.spectra.core.audit",
-                "调度", "com.devops00.spectra.core.scheduler",
-                "服务监控", "com.devops00.spectra.core.system.service");
+        Map<String, String> mandatoryCapabilities = Map.ofEntries(
+                Map.entry("用户", "com.devops00.spectra.core.user"),
+                Map.entry("角色和权限", "com.devops00.spectra.core.security.authorization"),
+                Map.entry("组织", "com.devops00.spectra.core.system"),
+                Map.entry("菜单", "com.devops00.spectra.core.system"),
+                Map.entry("字典", "com.devops00.spectra.core.system"),
+                Map.entry("系统配置", "com.devops00.spectra.core.system"),
+                Map.entry("安全审计", "com.devops00.spectra.core.security.audit"),
+                Map.entry("普通操作日志", "com.devops00.spectra.core.audit"),
+                Map.entry("调度", "com.devops00.spectra.core.scheduler"),
+                Map.entry("服务监控", "com.devops00.spectra.core.system.service"),
+                Map.entry("统一通知", "com.devops00.spectra.core.notification"),
+                Map.entry("文件上传", "com.devops00.spectra.core.upload"));
 
         var packageNames = classes.stream()
                 .map(JavaClass::getPackageName)
@@ -199,8 +193,6 @@ class ArchitectureTest {
                 .map(JavaClass::getPackageName)
                 .filter(packageName -> packageName.startsWith("com.devops00.spectra.core.oa.")
                         || packageName.startsWith("com.devops00.spectra.core.workflow.")
-                        || packageName.startsWith("com.devops00.spectra.core.notification.")
-                        || packageName.startsWith("com.devops00.spectra.core.upload.")
                         || packageName.startsWith("com.devops00.spectra.core.erp."))
                 .toList();
 
@@ -229,8 +221,6 @@ class ArchitectureTest {
     void corePomMustNotDeclareOptionalBusinessModules() throws IOException {
         String pom = Files.readString(resolveBackendPath("spectra-modules/spectra-core/pom.xml"));
 
-        assertFalse(pom.contains("<artifactId>spectra-notification</artifactId>"));
-        assertFalse(pom.contains("<artifactId>spectra-upload</artifactId>"));
         assertFalse(pom.contains("<artifactId>spectra-workflow</artifactId>"));
         assertFalse(pom.contains("<artifactId>spectra-oa</artifactId>"));
     }
@@ -240,8 +230,6 @@ class ArchitectureTest {
         String pom = Files.readString(resolveBackendPath("spectra-launch/pom.xml"));
 
         assertTrue(pom.contains("<artifactId>spectra-core</artifactId>"));
-        assertTrue(pom.contains("<artifactId>spectra-notification</artifactId>"));
-        assertTrue(pom.contains("<artifactId>spectra-upload</artifactId>"));
         assertTrue(pom.contains("<artifactId>spectra-workflow</artifactId>"));
         assertTrue(pom.contains("<artifactId>spectra-oa</artifactId>"));
     }
@@ -250,9 +238,7 @@ class ArchitectureTest {
     void optionalBusinessTypesMustRemainInTheirOwningModule() throws IOException {
         Map<String, String> optionalModules = Map.of(
                 "spectra-modules/spectra-oa/src/main/java", "com.devops00.spectra.oa",
-                "spectra-modules/spectra-workflow/src/main/java", "com.devops00.spectra.workflow",
-                "spectra-modules/spectra-notification/src/main/java", "com.devops00.spectra.notification",
-                "spectra-modules/spectra-upload/src/main/java", "com.devops00.spectra.upload");
+                "spectra-modules/spectra-workflow/src/main/java", "com.devops00.spectra.workflow");
 
         for (var entry : optionalModules.entrySet()) {
             Path sourceRoot = resolveBackendPath(entry.getKey());

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.notification.mapper.NotificationDeliveryMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.notification.javabean.entity.NotificationDeliveryEntity">
+        <!--@mbg.generated-->
+        <!--@Table spectra_notification.ntf_delivery-->
+        <result column="notification_task_id"    property="notificationTaskId"/>
+        <result column="template_id"              property="templateId"/>
+        <result column="template_version_no"     property="templateVersionNo"/>
+        <result column="template_version_digest" property="templateVersionDigest"/>
+        <result column="rendered_title"          property="renderedTitle"/>
+        <result column="rendered_content"        property="renderedContent"/>
+        <result column="attempt_no"              property="attemptNo"/>
+        <result column="provider"                property="provider"/>
+        <result column="provider_message_id"     property="providerMessageId"/>
+        <result column="started_at"              property="startedAt"/>
+        <result column="completed_at"            property="completedAt"/>
+        <result column="result_status"           property="resultStatus"/>
+        <result column="error_code"              property="errorCode"/>
+        <result column="error_message_sanitized" property="errorMessageSanitized"/>
+        <result column="duration_ms"              property="durationMs"/>
+        <result column="response_summary"         property="responseSummary" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+    </resultMap>
+
+    <resultMap id="AdminResultMap"
+               extends="BaseResultMap"
+               type="com.devops00.spectra.core.notification.javabean.entity.NotificationDeliveryEntity">
+        <result column="channel" property="channel"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <resultMap id="OverviewTrendMap"
+               type="com.devops00.spectra.core.notification.javabean.vo.NotificationOverviewTrendVO">
+        <result column="bucket_at" property="bucketAt"/>
+        <result column="total_count" property="totalCount"/>
+        <result column="success_count" property="successCount"/>
+        <result column="failed_count" property="failedCount"/>
+        <result column="unknown_count" property="unknownCount"/>
+    </resultMap>
+
+    <resultMap id="OverviewErrorMap"
+               type="com.devops00.spectra.core.notification.javabean.vo.NotificationOverviewErrorVO">
+        <result column="occurred_at" property="occurredAt"/>
+        <result column="channel" property="channel"/>
+        <result column="status" property="status"/>
+        <result column="error_code" property="errorCode"/>
+        <result column="message" property="message"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        notification_task_id,
+        template_id,
+        template_version_no,
+        template_version_digest,
+        rendered_title,
+        rendered_content,
+        attempt_no,
+        provider,
+        provider_message_id,
+        started_at,
+        completed_at,
+        result_status,
+        error_code,
+        error_message_sanitized,
+        duration_ms,
+        response_summary,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <select id="selectOverviewTrend" resultMap="OverviewTrendMap">
+        SELECT date_trunc('hour', created_at) AS bucket_at,
+               COUNT(*) AS total_count,
+               COUNT(*) FILTER (WHERE result_status IN ('ACCEPTED', 'SENT')) AS success_count,
+               COUNT(*) FILTER (WHERE result_status IN ('FAILED', 'BLOCKED')) AS failed_count,
+               COUNT(*) FILTER (WHERE result_status = 'UNKNOWN') AS unknown_count
+          FROM spectra_notification.ntf_delivery
+         WHERE deleted IS NULL
+           AND created_at &gt;= #{from}
+           AND created_at &lt; #{to}
+         GROUP BY date_trunc('hour', created_at)
+         ORDER BY bucket_at ASC
+    </select>
+
+    <select id="selectByProviderMessageId" resultMap="AdminResultMap">
+        SELECT d.*,
+               t.channel AS channel
+          FROM spectra_notification.ntf_delivery d
+          JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id
+         WHERE d.deleted IS NULL
+           AND t.deleted IS NULL
+           AND d.provider = #{provider}
+           AND d.provider_message_id = #{messageId}
+           AND t.channel = #{channel}
+         ORDER BY d.created_at DESC
+         LIMIT 1
+    </select>
+
+    <select id="selectAdminPage" resultMap="AdminResultMap">
+        SELECT d.*,
+               t.channel AS channel
+          FROM spectra_notification.ntf_delivery d
+          JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id
+         WHERE d.deleted IS NULL
+           AND t.deleted IS NULL
+        <if test="from != null">
+           AND d.created_at &gt;= #{from}
+           AND d.created_at &lt; #{to}
+        </if>
+        <if test="requestId != null">
+           AND t.notification_request_id = #{requestId}
+        </if>
+        <if test="taskId != null">
+           AND d.notification_task_id = #{taskId}
+        </if>
+        <if test="recipientUserId != null">
+           AND t.receiver_user_id = #{recipientUserId}
+        </if>
+        <if test="status != null and status != ''">
+           AND d.result_status = #{status}
+        </if>
+        <if test="channel != null and channel != ''">
+           AND t.channel = #{channel}
+        </if>
+         ORDER BY d.created_at DESC
+    </select>
+
+    <select id="selectRecentErrors" resultMap="OverviewErrorMap">
+        SELECT d.created_at AS occurred_at,
+               t.channel AS channel,
+               d.result_status AS status,
+               d.error_code AS error_code,
+               d.error_message_sanitized AS message
+          FROM spectra_notification.ntf_delivery d
+          JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id
+         WHERE d.deleted IS NULL
+           AND t.deleted IS NULL
+           AND d.created_at &gt;= #{from}
+           AND d.created_at &lt; #{to}
+           AND d.result_status IN ('FAILED', 'BLOCKED', 'UNKNOWN')
+         ORDER BY d.created_at DESC
+         LIMIT #{limit}
+    </select>
+</mapper>
