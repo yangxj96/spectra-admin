@@ -18,8 +18,8 @@ package com.devops00.spectra.framework;
 
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.framework.configure.mybatis.MetaObjectHandlerImpl;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +65,7 @@ class MetaObjectHandlerImplTest {
     private static SecurityContextAccessor emptySecurityContext() {
         return new SecurityContextAccessor() {
             @Override
-            public SecurityUser currentUser() {
+            public SecurityPrincipal currentUser() {
                 return null;
             }
 

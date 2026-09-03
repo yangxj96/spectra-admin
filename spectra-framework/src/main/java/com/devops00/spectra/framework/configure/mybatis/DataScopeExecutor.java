@@ -8,7 +8,7 @@ package com.devops00.spectra.framework.configure.mybatis;
 
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.mybatis.DataScopeContextHolder;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -52,9 +52,9 @@ public class DataScopeExecutor {
     private void requireSystemOperator() {
         var user = securityContextAccessor.currentUser();
         if (user == null
-                || user.getAuthorities()
+                || user.getAuthorityNames()
                         .stream()
-                        .noneMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()))) {
+                        .noneMatch(authority -> "ROLE_DEV_OPS".equals(authority) || "*".equals(authority))) {
             throw new DataScopeViolationException("当前用户无权临时绕过数据隔离");
         }
     }

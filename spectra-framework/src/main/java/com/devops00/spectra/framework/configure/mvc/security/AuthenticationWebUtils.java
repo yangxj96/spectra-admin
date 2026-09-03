@@ -8,10 +8,10 @@
 package com.devops00.spectra.framework.configure.mvc.security;
 
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.util.TokenDigestService;
+import com.devops00.spectra.common.constant.ClientType;
+import com.devops00.spectra.common.port.security.SecurityToken;
+import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.security.redis.TokenDigestService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,8 +35,8 @@ public final class AuthenticationWebUtils {
         return clientType == ClientType.WEB;
     }
 
-    public static TokenVO writeWebToken(HttpServletResponse response, TokenVO token,
-                                        SecurityProperties securityProperties, ClientType clientType) {
+    public static SecurityToken writeWebToken(HttpServletResponse response, SecurityToken token,
+                                              SecurityProperties securityProperties, ClientType clientType) {
         issueWebCookies(response, token.getRefreshToken(), securityProperties, clientType);
         if (isWebClient(clientType)) {
             token.setRefreshToken(null);

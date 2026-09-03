@@ -18,7 +18,7 @@ package com.devops00.spectra.framework;
 
 import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.framework.configure.mvc.advice.exception.SqlExceptionAdvice;
-import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;

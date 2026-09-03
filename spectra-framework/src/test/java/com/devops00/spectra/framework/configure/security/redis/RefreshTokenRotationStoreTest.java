@@ -1,0 +1,69 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.devops00.spectra.framework.configure.security.redis;
+
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Refresh Token Rotation 原子消费结果测试。
+ */
+class RefreshTokenRotationStoreTest {
+
+    private static final List<String> REFRESH_KEYS = List.of("sec:rt:refresh-digest", "sec:rt:claim:refresh-digest");
+
+    @Test
+    void shouldMapFirstClaimToClaimed() {
+        var redis = mock(RedisTemplate.class);
+        when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
+                .thenReturn(1L);
+
+        assertEquals(RefreshTokenRotationStore.ClaimResult.CLAIMED,
+                RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
+    }
+
+    @Test
+    void shouldMapSecondClaimToReplay() {
+        var redis = mock(RedisTemplate.class);
+        when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
+                .thenReturn(0L);
+
+        assertEquals(RefreshTokenRotationStore.ClaimResult.REPLAY,
+                RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
+    }
+
+    @Test
+    void shouldRejectWhenRedisReturnsNoScriptResult() {
+        var redis = mock(RedisTemplate.class);
+        when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
+                .thenReturn(null);
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
+    }
+}

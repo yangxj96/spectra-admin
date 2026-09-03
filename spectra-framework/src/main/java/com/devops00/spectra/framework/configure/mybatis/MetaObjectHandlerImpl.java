@@ -18,7 +18,7 @@ package com.devops00.spectra.framework.configure.mybatis;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.github.f4b6a3.uuid.UuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;

@@ -7,9 +7,9 @@
 package com.devops00.spectra.framework.configure.mybatis.security;
 
 import com.devops00.spectra.common.annotation.DataScope;
-import com.devops00.spectra.security.base.authorization.AuthorizationScope;
-import com.devops00.spectra.security.base.authorization.PermissionBoundary;
-import com.devops00.spectra.security.base.authorization.ScopeMode;
+import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.PermissionBoundary;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;

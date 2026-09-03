@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.framework.configure.mapstruct;
 
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

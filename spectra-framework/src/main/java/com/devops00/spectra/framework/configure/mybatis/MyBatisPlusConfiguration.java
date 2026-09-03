@@ -26,8 +26,8 @@ import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInt
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.framework.configure.mybatis.interceptor.DataScopeInnerInterceptor;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;

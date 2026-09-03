@@ -7,12 +7,12 @@
 package com.devops00.spectra.framework.configure.mybatis.security;
 
 import com.devops00.spectra.common.exception.DataScopeViolationException;
-import com.devops00.spectra.security.base.authorization.ResourceOperation;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
-import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.authorization.ExecutionContext;
-import com.devops00.spectra.security.base.authorization.ScopeQuery;
-import com.devops00.spectra.security.base.authorization.ScopedAuthorization;
+import com.devops00.spectra.common.security.authorization.ResourceOperation;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.authorization.ExecutionContext;
+import com.devops00.spectra.common.security.authorization.ScopeQuery;
+import com.devops00.spectra.common.security.authorization.ScopedAuthorization;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
