@@ -7,10 +7,9 @@
 | 模块 | 职责 |
 |---|---|
 | `spectra-config` | 集中管理 `application-*.yml` 配置 |
-| `spectra-common` | DTO、Entity 基类、公共工具和共享依赖 |
-| `spectra-framework` | MVC、JSON、MyBatis-Plus、Redis、缓存和接口加解密 |
-| `spectra-starter` | Security 和日志自动配置 Starter |
-| `spectra-modules/spectra-core` | 用户、账号、角色权限、组织、菜单、字典、区域、配置、日志和消息中心 |
+| `spectra-common` | DTO、Entity 基类、安全公共端口、公共工具和共享依赖 |
+| `spectra-framework` | MVC、JSON、MyBatis-Plus、Redis、缓存、Spring Security、安全 Redis 适配和接口加解密 |
+| `spectra-modules/spectra-core` | 用户、认证、角色权限、组织、菜单、字典、区域、配置、安全审计、日志和消息中心 |
 | `spectra-modules/spectra-upload` | 本地/S3 文件存储和分片上传 |
 | `spectra-modules/spectra-workflow` | Flowable 流程定义、实例、任务、表单和审批能力 |
 | `spectra-modules/spectra-oa` | 通用申请、请假、公告、日程、会议、文档、合同、报销、采购、资产、用品和报表 |

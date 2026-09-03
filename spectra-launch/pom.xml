@@ -93,13 +93,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- === 项目模块-starter === -->
-        <!-- Security -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-security-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- === 项目模块-功能模块 === -->
         <!-- 基础模块 -->
         <dependency>

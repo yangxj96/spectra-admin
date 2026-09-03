@@ -47,7 +47,6 @@
         <testcontainers-redis.version>2.2.4</testcontainers-redis.version>
 
         <!-- 测试分类：默认只运行快速测试，外部依赖测试必须显式启用 integration profile。 -->
-        <spectra.test.groups.include></spectra.test.groups.include>
         <spectra.test.groups.exclude>integration,manual-integration</spectra.test.groups.exclude>
 
         <!-- 数据库 -->
@@ -68,7 +67,6 @@
         <module>spectra-common</module>
         <module>spectra-framework</module>
         <module>spectra-launch</module>
-        <module>spectra-starter</module>
         <module>spectra-modules</module>
     </modules>
 
@@ -209,7 +207,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <groups>${spectra.test.groups.include}</groups>
                     <excludedGroups>${spectra.test.groups.exclude}</excludedGroups>
                 </configuration>
             </plugin>
@@ -399,7 +396,6 @@
             </activation>
             <properties>
                 <spectra.test.groups.include>integration</spectra.test.groups.include>
-                <spectra.test.groups.exclude></spectra.test.groups.exclude>
             </properties>
         </profile>
         <profile>
@@ -412,7 +408,6 @@
             </activation>
             <properties>
                 <spectra.test.groups.include>manual-integration</spectra.test.groups.include>
-                <spectra.test.groups.exclude></spectra.test.groups.exclude>
             </properties>
         </profile>
     </profiles>

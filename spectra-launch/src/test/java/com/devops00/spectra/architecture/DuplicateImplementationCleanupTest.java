@@ -67,8 +67,8 @@ class DuplicateImplementationCleanupTest {
                 .as("在线用户视图不应在 Core 保留第二份定义")
                 .isFalse();
         assertThat(Files.exists(backend.resolve(
-                "spectra-starter/spectra-security-base/src/main/java/com/devops00/spectra/security/base/javabean/vo/UserOnlineVO.java")))
-                .as("在线用户会话视图应由 security-base 统一提供")
+                "spectra-common/src/main/java/com/devops00/spectra/common/port/security/UserOnlineVO.java")))
+                .as("在线用户会话视图应由 common 统一提供")
                 .isTrue();
     }
 

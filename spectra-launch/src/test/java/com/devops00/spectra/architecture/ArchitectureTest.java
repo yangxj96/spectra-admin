@@ -149,17 +149,22 @@ class ArchitectureTest {
             .resideInAnyPackage("com.devops00.spectra.launch..");
 
     @ArchTest
-    static final ArchRule CORE_MUST_NOT_DEPEND_ON_SECURITY_STARTER = noClasses()
+    static final ArchRule COMMON_MUST_NOT_DEPEND_ON_SECURITY_IMPLEMENTATION = noClasses()
             .that()
-            .resideInAnyPackage("com.devops00.spectra.core..")
+            .resideInAnyPackage(
+                    "com.devops00.spectra.common.port.security..",
+                    "com.devops00.spectra.common.security..")
             .should()
             .dependOnClassesThat()
-            .resideInAnyPackage("com.devops00.spectra.security.starter..");
+            .resideInAnyPackage(
+                    "org.springframework.security..",
+                    "org.springframework.data.redis..",
+                    "jakarta.servlet..");
 
     @ArchTest
-    static final ArchRule SECURITY_STARTER_MUST_NOT_DEPEND_ON_CORE_BUSINESS = noClasses()
+    static final ArchRule FRAMEWORK_MUST_NOT_DEPEND_ON_CORE = noClasses()
             .that()
-            .resideInAnyPackage("com.devops00.spectra.security.starter..")
+            .resideInAnyPackage("com.devops00.spectra.framework..")
             .should()
             .dependOnClassesThat()
             .resideInAnyPackage("com.devops00.spectra.core..");
@@ -204,11 +209,11 @@ class ArchitectureTest {
     }
 
     @ArchTest
-    static void securityStarterMustOwnTechnicalMechanisms(JavaClasses classes) {
+    static void frameworkMustOwnSecurityTechnicalMechanisms(JavaClasses classes) {
         Map<String, String> technicalPackages = Map.of(
-                "安全过滤器", "com.devops00.spectra.security.starter.filter",
-                "安全运行时配置", "com.devops00.spectra.security.starter.configuration",
-                "安全 Redis repository", "com.devops00.spectra.security.starter.strategy");
+                "安全过滤器", "com.devops00.spectra.framework.configure.security.filter",
+                "安全运行时配置", "com.devops00.spectra.framework.configure.security.configuration",
+                "安全 Redis repository", "com.devops00.spectra.framework.configure.security.strategy");
 
         var packageNames = classes.stream()
                 .map(JavaClass::getPackageName)
@@ -217,7 +222,7 @@ class ArchitectureTest {
                 packageNames.stream()
                         .anyMatch(current -> current.equals(packageName)
                                 || current.startsWith(packageName + ".")),
-                () -> "安全 starter 必须保留技术机制「" + capability + "」对应的包: " + packageName));
+                () -> "framework 必须拥有安全技术机制「" + capability + "」对应的包: " + packageName));
     }
 
     @Test

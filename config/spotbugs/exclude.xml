@@ -174,28 +174,36 @@
     </Match>
     <!-- ObjectMapper/RedisTemplate/configuration/Converter are private Spring collaborators. -->
     <Match>
-        <Class name="com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler"/>
+        <Class name="com.devops00.spectra.framework.configure.security.redis.RedisSecurityVerificationStore"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint"/>
+        <Class name="com.devops00.spectra.framework.configure.security.redis.RedisSecurityInitializationTokenStore"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.security.starter.ratelimit.RequestRateLimitFilter"/>
+        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAccessDeniedHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.security.starter.strategy.RedisSecuritySessionRepository"/>
+        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAuthenticationEntryPoint"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.configure.security.ratelimit.RequestRateLimitFilter"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.configure.security.strategy.RedisSecuritySessionRepository"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <!-- These handlers serialize a fixed R body as application/json; PrintWriter is not an HTML sink. -->
     <Match>
-        <Class name="com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler"/>
+        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAccessDeniedHandler"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint"/>
+        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAuthenticationEntryPoint"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
     <!-- Scheduler repositories/services retain Spring-managed collaborators by constructor injection. -->
