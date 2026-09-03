@@ -44,7 +44,7 @@ import com.devops00.spectra.oa.meeting.mapper.MeetingMapper;
 import com.devops00.spectra.oa.meeting.mapper.MeetingParticipantMapper;
 import com.devops00.spectra.oa.meeting.mapper.MeetingRecordMapper;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -46,7 +46,7 @@ import com.devops00.spectra.oa.document.mapper.DocumentFolderMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
 import com.devops00.spectra.oa.document.service.DocumentService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileAssetPort;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.oa.support.OaFileReferenceBinder;

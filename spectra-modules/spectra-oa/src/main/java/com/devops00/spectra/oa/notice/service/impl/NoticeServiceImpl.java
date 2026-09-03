@@ -40,7 +40,7 @@ import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 import com.devops00.spectra.oa.notice.mapper.NoticeMapper;
 import com.devops00.spectra.oa.notice.mapper.NoticeReaderMapper;
 import com.devops00.spectra.oa.notice.service.NoticeService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

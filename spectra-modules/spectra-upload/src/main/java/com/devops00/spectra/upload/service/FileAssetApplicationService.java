@@ -7,7 +7,7 @@ package com.devops00.spectra.upload.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileAccessContext;
 import com.devops00.spectra.common.port.file.FileAssetPort;
 import com.devops00.spectra.common.port.file.FileAssetSnapshot;

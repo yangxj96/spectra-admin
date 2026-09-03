@@ -52,7 +52,7 @@ import com.devops00.spectra.oa.purchase.mapper.PurchaseMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptItemMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptMapper;
 import com.devops00.spectra.oa.purchase.service.PurchaseService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.workflow.api.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

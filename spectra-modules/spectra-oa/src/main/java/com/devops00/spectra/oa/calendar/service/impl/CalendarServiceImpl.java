@@ -31,7 +31,7 @@ import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
 import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 import com.devops00.spectra.oa.calendar.mapper.CalendarMapper;
 import com.devops00.spectra.oa.calendar.service.CalendarService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

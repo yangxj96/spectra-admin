@@ -7,7 +7,7 @@
 package com.devops00.spectra.upload.service;
 
 import com.devops00.spectra.common.port.file.FileAccessContext;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.upload.api.FileUploadException;
 import com.devops00.spectra.upload.configure.FileStorageProviderRegistry;
 import com.devops00.spectra.upload.javabean.constant.FileAssetStatus;

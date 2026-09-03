@@ -52,7 +52,7 @@ import com.devops00.spectra.notification.service.NotificationControlledSendServi
 import com.devops00.spectra.notification.utils.NotificationMaskingUtils;
 import com.devops00.spectra.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.notification.strategy.NotificationPolicy;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -34,7 +34,7 @@ import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.workflow.api.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,10 +105,11 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         var user = securityContextAccessor.currentUser();
         var applicantId = entity.getApplicantId();
         var departmentId = entity.getDepartmentId();
+        var userDepartmentId = user == null ? null : user.getDepartmentId();
         if (user != null
                 && user.getId() != null
-                && user.getDepartmentId() != null
-                && (user.getId().equals(applicantId) || user.getDepartmentId().equals(departmentId))) {
+                && userDepartmentId != null
+                && (user.getId().equals(applicantId) || userDepartmentId.equals(departmentId))) {
             return entity;
         }
         String username = securityContextAccessor.currentUsername();

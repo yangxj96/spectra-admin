@@ -23,7 +23,7 @@ import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.service.ApplicationService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.workflow.api.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

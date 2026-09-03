@@ -47,7 +47,7 @@ import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
 import com.devops00.spectra.oa.reimbursement.service.ReimbursementService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.oa.support.OaFileReferenceBinder;
 import com.devops00.spectra.oa.support.OaFileReferenceType;

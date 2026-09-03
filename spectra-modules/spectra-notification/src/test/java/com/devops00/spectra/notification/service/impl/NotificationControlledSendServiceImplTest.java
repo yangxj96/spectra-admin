@@ -38,7 +38,7 @@ import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.support.NotificationTestTimeMapper;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.ObjectTypeHandler;

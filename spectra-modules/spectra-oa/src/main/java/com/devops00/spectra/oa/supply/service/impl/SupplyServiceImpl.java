@@ -21,7 +21,7 @@ import com.devops00.spectra.oa.supply.javabean.vo.SupplyItemVO;
 import com.devops00.spectra.oa.supply.mapper.SupplyItemMapper;
 import com.devops00.spectra.oa.supply.mapper.SupplyOperationMapper;
 import com.devops00.spectra.oa.supply.service.SupplyService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

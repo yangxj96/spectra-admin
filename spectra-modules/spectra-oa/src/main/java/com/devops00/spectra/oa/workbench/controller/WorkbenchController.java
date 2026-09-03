@@ -29,7 +29,7 @@ import com.devops00.spectra.oa.notice.javabean.from.NoticePageFrom;
 import com.devops00.spectra.oa.notice.javabean.constant.NoticeStatus;
 import com.devops00.spectra.oa.notice.service.NoticeService;
 import com.devops00.spectra.oa.workbench.javabean.vo.WorkbenchSummaryVO;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.workflow.api.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

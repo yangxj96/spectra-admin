@@ -18,7 +18,7 @@ package com.devops00.spectra.workflow.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.audit.Audit;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskPageFrom;

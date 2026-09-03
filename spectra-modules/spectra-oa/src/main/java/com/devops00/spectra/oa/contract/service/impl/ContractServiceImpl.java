@@ -48,8 +48,8 @@ import com.devops00.spectra.oa.contract.mapper.ContractMapper;
 import com.devops00.spectra.oa.contract.mapper.ContractMilestoneMapper;
 import com.devops00.spectra.oa.contract.mapper.ContractVersionMapper;
 import com.devops00.spectra.oa.contract.service.ContractService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.file.FileAssetPort;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.oa.support.OaFileReferenceBinder;
@@ -476,7 +476,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     /**
      * 校验并确保数据满足当前约束（{@code requireCurrentUser}）。
      */
-    private SecurityUser requireCurrentUser() {
+    private SecurityPrincipal requireCurrentUser() {
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");

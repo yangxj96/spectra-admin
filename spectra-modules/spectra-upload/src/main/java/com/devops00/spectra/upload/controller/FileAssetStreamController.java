@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.upload.controller;
 
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileAccessContext;
 import com.devops00.spectra.common.port.file.FileDownload;
 import com.devops00.spectra.upload.service.FileAssetApplicationService;

@@ -17,7 +17,7 @@
 package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -22,7 +22,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationBatchDeleteFr
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationInboxVO;
 import com.devops00.spectra.notification.service.NotificationInboxService;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

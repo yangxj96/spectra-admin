@@ -12,7 +12,7 @@ import com.devops00.spectra.common.port.file.FileReferenceView;
 import com.devops00.spectra.upload.javabean.entity.FileReference;
 import com.devops00.spectra.upload.mapper.FileReferenceMapper;
 import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

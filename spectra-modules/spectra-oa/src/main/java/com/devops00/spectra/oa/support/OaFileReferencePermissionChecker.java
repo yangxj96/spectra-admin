@@ -17,7 +17,7 @@ import com.devops00.spectra.oa.document.javabean.entity.Document;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentVersion;
 import com.devops00.spectra.oa.document.mapper.DocumentMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

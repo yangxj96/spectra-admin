@@ -20,9 +20,9 @@ import com.devops00.spectra.common.notification.NotificationAudienceDirectory;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.config.SystemConfigValueProvider;
-import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -49,7 +49,7 @@ public class UploadTestApplication {
     SecurityContextAccessor securityContextAccessor() {
         return new SecurityContextAccessor() {
             @Override
-            public SecurityUser currentUser() {
+            public SecurityPrincipal currentUser() {
                 return null;
             }
 

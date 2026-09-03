@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.upload.javabean.converter;
 
-import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.upload.javabean.entity.FileAsset;
 import com.devops00.spectra.upload.javabean.vo.FileAssetVO;
 import com.devops00.spectra.upload.javabean.vo.FileReferenceAdminVO;
