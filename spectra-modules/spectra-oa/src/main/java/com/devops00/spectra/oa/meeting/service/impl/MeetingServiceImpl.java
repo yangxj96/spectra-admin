@@ -27,7 +27,8 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
-import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
+import com.devops00.spectra.common.port.directory.DirectoryUserSnapshot;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
@@ -53,8 +54,11 @@ import org.springframework.util.StringUtils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 会议业务服务实现。
@@ -71,7 +75,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final MeetingParticipantMapper participantMapper;
     private final MeetingRecordMapper recordMapper;
     private final NotificationService notificationService;
-    private final UserService userService;
+    private final DirectoryQueryPort directoryQueryPort;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -102,6 +106,19 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         var receivers = new ArrayList<UUID>();
         addParticipant(entity, userId, "host", user.getDepartmentId(), MeetingParticipantStatus.ACCEPTED.getValue());
         receivers.add(userId);
+        var participantIds = from.getParticipants() == null
+                ? List.<UUID>of()
+                : from.getParticipants()
+                        .stream()
+                        .filter(participant -> StringUtils.hasText(participant.getUserId()))
+                        .map(participant -> UUID.fromString(participant.getUserId()))
+                        .distinct()
+                        .toList();
+        Map<UUID, DirectoryUserSnapshot> participants = participantIds.isEmpty()
+                ? Map.of()
+                : directoryQueryPort.findUsersByIds(participantIds)
+                        .stream()
+                        .collect(Collectors.toMap(DirectoryUserSnapshot::id, Function.identity(), (left, right) -> left));
         if (from.getParticipants() != null) {
             for (var fromParticipant : from.getParticipants()) {
                 if (!StringUtils.hasText(fromParticipant.getUserId())) {
@@ -111,12 +128,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                 if (participantId.equals(userId)) {
                     continue;
                 }
-                var participant = userService.getById(participantId);
+                var participant = participants.get(participantId);
                 if (participant == null) {
                     continue;
                 }
                 addParticipant(entity, participantId, StringUtils.hasText(fromParticipant.getRole()) ? fromParticipant.getRole() : "attendee",
-                        participant.getDepartmentId(), MeetingParticipantStatus.PENDING.getValue());
+                        participant.departmentId(), MeetingParticipantStatus.PENDING.getValue());
                 receivers.add(participantId);
             }
         }

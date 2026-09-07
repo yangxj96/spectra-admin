@@ -25,6 +25,7 @@ import java.util.UUID;
  * @param employeeNo   工号
  * @param displayName  显示名称
  * @param username     登录用户名
+ * @param avatar       头像
  * @param status       生命周期状态名称
  * @param departmentId 主部门 ID
  * @author yangxj96
@@ -36,6 +37,7 @@ public record DirectoryUserSnapshot(
                                     String employeeNo,
                                     String displayName,
                                     String username,
+                                    String avatar,
                                     String status,
                                     UUID departmentId) {
 }

@@ -96,6 +96,43 @@ class DirectoryQueryAdapterTest {
     }
 
     @Test
+    void allUsersAreMappedToSnapshotsWithoutExposingCoreEntities() {
+        UUID userId = UUID.randomUUID();
+        var user = new User();
+        user.setId(userId);
+        user.setEmployeeNo("E001");
+        user.setRealName("Alice");
+        user.setUsername("alice");
+        user.setAvatar("avatar.png");
+        user.setStatus(UserStatus.ACTIVE);
+        when(userMapper.selectList(isNull())).thenReturn(List.of(user));
+
+        var result = adapter().listUsers();
+
+        assertThat(result).singleElement().satisfies(snapshot -> {
+            assertThat(snapshot.id()).isEqualTo(userId);
+            assertThat(snapshot.avatar()).isEqualTo("avatar.png");
+            assertThat(snapshot.status()).isEqualTo("ACTIVE");
+        });
+        verify(userMapper).selectList(isNull());
+    }
+
+    @Test
+    void usersAreLoadedByPrimaryDepartmentWithoutExposingCoreEntities() {
+        UUID departmentId = UUID.randomUUID();
+        var user = new User();
+        user.setId(UUID.randomUUID());
+        user.setDepartmentId(departmentId);
+        user.setRealName("Alice");
+        when(userMapper.selectList(org.mockito.ArgumentMatchers.any())).thenReturn(List.of(user));
+
+        var result = adapter().findUsersByDepartmentId(departmentId);
+
+        assertThat(result).singleElement().satisfies(snapshot -> assertThat(snapshot.departmentId()).isEqualTo(departmentId));
+        verify(userMapper).selectList(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
     void departmentsAreBatchLoadedAndListQueriesMapToImmutableSnapshots() {
         UUID departmentId = UUID.randomUUID();
         UUID parentId = UUID.randomUUID();

@@ -31,6 +31,21 @@ import java.util.UUID;
 public interface DirectoryQueryPort {
 
     /**
+     * 查询目录中的全部用户。
+     *
+     * @return 用户快照列表，永不返回 {@code null}
+     */
+    List<DirectoryUserSnapshot> listUsers();
+
+    /**
+     * 查询指定主部门下的全部用户。
+     *
+     * @param departmentId 主部门 ID
+     * @return 用户快照列表，永不返回 {@code null}
+     */
+    List<DirectoryUserSnapshot> findUsersByDepartmentId(UUID departmentId);
+
+    /**
      * 批量查询用户。
      *
      * @param userIds 用户 ID 集合

@@ -27,8 +27,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.notice.javabean.converter.NoticeConverter;
 import com.devops00.spectra.oa.notice.javabean.constant.NoticeStatus;
@@ -64,7 +63,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
 
     private final NoticeReaderMapper noticeReaderMapper;
     private final NotificationService notificationService;
-    private final UserService userService;
+    private final DirectoryQueryPort directoryQueryPort;
     private final NoticeConverter noticeConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
@@ -222,8 +221,8 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if ("ALL".equals(notice.getTargetType())) {
             return true;
         }
-        var user = userService.getById(userId);
-        return user != null && notice.getTargetDepartmentId() != null && notice.getTargetDepartmentId().equals(user.getDepartmentId());
+        var user = directoryQueryPort.findUsersByIds(List.of(userId)).stream().findFirst().orElse(null);
+        return user != null && notice.getTargetDepartmentId() != null && notice.getTargetDepartmentId().equals(user.departmentId());
     }
 
     /**
@@ -239,11 +238,12 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
      * 更新或推进目标状态（{@code sendNotifications}）。
      */
     private void sendNotifications(Notice notice) {
-        var wrapper = new LambdaQueryWrapper<User>();
-        if ("DEPARTMENT".equals(notice.getTargetType())) {
-            wrapper.eq(User::getDepartmentId, notice.getTargetDepartmentId());
-        }
-        List<UUID> receiverIds = userService.list(wrapper).stream().map(User::getId).toList();
+        var users = "DEPARTMENT".equals(notice.getTargetType())
+                ? directoryQueryPort.findUsersByDepartmentId(notice.getTargetDepartmentId())
+                : directoryQueryPort.listUsers();
+        List<UUID> receiverIds = users.stream()
+                .map(user -> user.id())
+                .toList();
         if (receiverIds.isEmpty()) {
             return;
         }

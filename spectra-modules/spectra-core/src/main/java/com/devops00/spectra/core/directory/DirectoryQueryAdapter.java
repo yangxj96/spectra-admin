@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.directory;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.port.directory.DirectoryContactSnapshot;
 import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
 import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
@@ -64,6 +65,27 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         this.userMapper = userMapper;
         this.departmentMapper = departmentMapper;
         this.userContactService = userContactService;
+    }
+
+    @Override
+    public List<DirectoryUserSnapshot> listUsers() {
+        return userMapper.selectList(null)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(DirectoryQueryAdapter::toUserSnapshot)
+                .toList();
+    }
+
+    @Override
+    public List<DirectoryUserSnapshot> findUsersByDepartmentId(UUID departmentId) {
+        if (departmentId == null) {
+            return List.of();
+        }
+        return userMapper.selectList(new LambdaQueryWrapper<User>().eq(User::getDepartmentId, departmentId))
+                .stream()
+                .filter(Objects::nonNull)
+                .map(DirectoryQueryAdapter::toUserSnapshot)
+                .toList();
     }
 
     @Override
@@ -141,6 +163,7 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
                 user.getEmployeeNo(),
                 user.getRealName(),
                 user.getUsername(),
+                user.getAvatar(),
                 user.getStatus() == null ? null : user.getStatus().name(),
                 user.getDepartmentId());
     }

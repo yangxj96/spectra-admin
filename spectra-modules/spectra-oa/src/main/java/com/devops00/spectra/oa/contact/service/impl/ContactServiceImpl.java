@@ -6,17 +6,13 @@
 
 package com.devops00.spectra.oa.contact.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.user.javabean.constant.UserStatus;
-import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
-import com.devops00.spectra.core.security.authentication.service.UserContactService;
-import com.devops00.spectra.core.system.javabean.entity.Department;
-import com.devops00.spectra.core.system.mapper.DepartmentMapper;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.common.port.directory.DirectoryContactSnapshot;
+import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
+import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
+import com.devops00.spectra.common.port.directory.DirectoryUserSnapshot;
 import com.devops00.spectra.oa.contact.javabean.converter.ContactConverter;
 import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
 import com.devops00.spectra.oa.contact.service.ContactService;
@@ -24,11 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -42,49 +39,70 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
-    private static final UserStatus ENABLED = UserStatus.ACTIVE;
+    private static final String ENABLED = "ACTIVE";
+    private static final String PHONE = "PHONE";
+    private static final String EMAIL = "EMAIL";
 
-    private final UserMapper userMapper;
-    private final DepartmentMapper departmentMapper;
+    private final DirectoryQueryPort directoryQueryPort;
     private final ContactConverter contactConverter;
-    private final UserContactService userContactService;
 
     @Override
     public IPage<ContactVO> page(PageFrom page, String keyword) {
-        var wrapper = new LambdaQueryWrapper<User>().eq(User::getStatus, ENABLED);
-        if (StringUtils.hasText(keyword)) {
-            String value = keyword.trim();
-            wrapper.and(query -> query.like(User::getEmployeeNo, value)
-                    .or()
-                    .like(User::getRealName, value)
-                    .or()
-                    .like(User::getUsername, value));
-        }
-        wrapper.orderByAsc(User::getRealName).orderByAsc(User::getEmployeeNo);
-        var users = userMapper.selectPage(page.toPage(), wrapper);
-        var departmentIds = users.getRecords().stream().map(User::getDepartmentId).filter(Objects::nonNull).distinct().toList();
-        Map<UUID, Department> departments = departmentIds.isEmpty()
-                ? Collections.emptyMap()
-                : departmentMapper.selectByIds(departmentIds).stream().collect(Collectors.toMap(Department::getId, Function.identity()));
-        var contacts = userContactService.listActiveByUserIds(users.getRecords().stream().map(User::getId).toList());
-        var result = new Page<ContactVO>(users.getCurrent(), users.getSize(), users.getTotal());
-        result.setRecords(users.getRecords().stream().map(user -> {
+        var users = directoryQueryPort.listUsers()
+                .stream()
+                .filter(user -> ENABLED.equals(user.status()))
+                .filter(user -> matches(user, keyword))
+                .sorted(Comparator.comparing(DirectoryUserSnapshot::displayName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
+                        .thenComparing(DirectoryUserSnapshot::employeeNo, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                .toList();
+        var total = users.size();
+        int fromIndex = Math.toIntExact(Math.min(pageOffset(page), total));
+        var toIndex = Math.min(fromIndex + pageSize(page), total);
+        var currentUsers = users.subList(fromIndex, toIndex);
+        var departmentIds = currentUsers.stream().map(DirectoryUserSnapshot::departmentId).filter(Objects::nonNull).distinct().toList();
+        Map<UUID, DirectoryDepartmentSnapshot> departments = directoryQueryPort.findDepartmentsByIds(departmentIds)
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(DirectoryDepartmentSnapshot::id, value -> value, (left, right) -> left));
+        var contacts = directoryQueryPort.findActiveContactsByUserIds(currentUsers.stream().map(DirectoryUserSnapshot::id).toList());
+        var result = new Page<ContactVO>(page.getPageNum(), page.getPageSize(), total);
+        result.setRecords(currentUsers.stream().map(user -> {
             var vo = contactConverter.toVO(user);
-            vo.setUsername(user.getUsername());
-            var userContacts = contacts.getOrDefault(user.getId(), java.util.List.of());
-            vo.setPhone(contactValue(userContacts, UserContactService.PHONE));
-            vo.setEmail(contactValue(userContacts, UserContactService.EMAIL));
-            var department = user.getDepartmentId() == null ? null : departments.get(user.getDepartmentId());
-            vo.setDepartmentName(department == null ? null : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
+            vo.setUsername(user.username());
+            var userContacts = contacts.getOrDefault(user.id(), List.of());
+            vo.setPhone(contactValue(userContacts, PHONE));
+            vo.setEmail(contactValue(userContacts, EMAIL));
+            var department = user.departmentId() == null ? null : departments.get(user.departmentId());
+            vo.setDepartmentName(department == null ? null : StringUtils.hasText(department.path()) ? department.path() : department.name());
             return vo;
         }).toList());
         return result;
     }
 
-    private String contactValue(java.util.List<UserContact> contacts, String type) {
+    private static boolean matches(DirectoryUserSnapshot user, String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return true;
+        }
+        var value = keyword.trim().toLowerCase(Locale.ROOT);
+        return contains(user.employeeNo(), value) || contains(user.displayName(), value) || contains(user.username(), value);
+    }
+
+    private static boolean contains(String source, String keyword) {
+        return source != null && source.toLowerCase(Locale.ROOT).contains(keyword);
+    }
+
+    private static long pageOffset(PageFrom page) {
+        return Math.max(0L, (page.getPageNum() - 1L) * page.getPageSize());
+    }
+
+    private static int pageSize(PageFrom page) {
+        return Math.toIntExact(Math.max(0L, page.getPageSize()));
+    }
+
+    private String contactValue(List<DirectoryContactSnapshot> contacts, String type) {
         return contacts.stream()
-                .filter(contact -> type.equals(contact.getContactType()))
-                .map(UserContact::getContactValue)
+                .filter(contact -> type.equals(contact.contactType()))
+                .map(DirectoryContactSnapshot::contactValue)
                 .findFirst()
                 .orElse(null);
     }

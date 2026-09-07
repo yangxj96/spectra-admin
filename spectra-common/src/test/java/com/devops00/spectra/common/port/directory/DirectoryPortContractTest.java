@@ -30,16 +30,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DirectoryPortContractTest {
 
     @Test
-    void directoryPortMustExposeOnlyStableBatchSnapshotQueries() throws NoSuchMethodException {
+    void directoryPortMustExposeOnlyStableSnapshotQueries() throws NoSuchMethodException {
         assertThat(DirectoryQueryPort.class.isInterface()).isTrue();
         assertThat(Arrays.stream(DirectoryQueryPort.class.getDeclaredMethods())
                 .map(Method::getName)
                 .toList())
                 .containsExactlyInAnyOrder(
+                        "listUsers",
+                        "findUsersByDepartmentId",
                         "findUsersByIds",
                         "findDepartmentsByIds",
                         "listDepartments",
                         "findActiveContactsByUserIds");
+        assertThat(DirectoryQueryPort.class.getMethod("listUsers").getReturnType())
+                .isEqualTo(List.class);
+        assertThat(DirectoryQueryPort.class.getMethod("findUsersByDepartmentId", UUID.class).getReturnType())
+                .isEqualTo(List.class);
         assertThat(DirectoryQueryPort.class.getMethod("findUsersByIds", Collection.class).getReturnType())
                 .isEqualTo(List.class);
         assertThat(DirectoryQueryPort.class.getMethod("findDepartmentsByIds", Collection.class).getReturnType())
@@ -56,7 +62,7 @@ class DirectoryPortContractTest {
         UUID userId = UUID.randomUUID();
         UUID departmentId = UUID.randomUUID();
 
-        var user = new DirectoryUserSnapshot(userId, "E001", "Alice", "alice", "ACTIVE", departmentId);
+        var user = new DirectoryUserSnapshot(userId, "E001", "Alice", "alice", "avatar.png", "ACTIVE", departmentId);
         var department = new DirectoryDepartmentSnapshot(departmentId, null, "Engineering", "HQ/Engineering");
         var contact = new DirectoryContactSnapshot("EMAIL", "alice@example.com");
 

@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.contact.javabean.converter;
 
-import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.common.port.directory.DirectoryUserSnapshot;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
@@ -34,11 +34,12 @@ import org.mapstruct.Mapping;
 public interface ContactConverter {
 
     /**
-     * 用户实体转通讯录视图，部门名称由 Service 根据批量查询结果补充。
+     * 用户目录快照转通讯录视图，部门名称由 Service 根据批量查询结果补充。
      */
     @Mapping(target = "departmentName", ignore = true)
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "phone", ignore = true)
     @Mapping(target = "email", ignore = true)
-    ContactVO toVO(User source);
+    @Mapping(source = "displayName", target = "realName")
+    ContactVO toVO(DirectoryUserSnapshot source);
 }

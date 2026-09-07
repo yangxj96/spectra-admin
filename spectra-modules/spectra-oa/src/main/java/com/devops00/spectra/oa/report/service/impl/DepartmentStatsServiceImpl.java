@@ -18,8 +18,8 @@ package com.devops00.spectra.oa.report.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.system.javabean.entity.Department;
-import com.devops00.spectra.core.system.service.DepartmentService;
+import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
+import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
 import com.devops00.spectra.oa.asset.mapper.AssetMapper;
 import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
@@ -69,7 +69,7 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
 
     private static final String[] HEADERS = {"部门", "资产条目数", "资产数量", "资产金额", "办公用品 SKU 数", "当前库存", "最低库存", "报销单数", "报销金额", "采购申请数", "采购预算"};
 
-    private final DepartmentService departmentService;
+    private final DirectoryQueryPort directoryQueryPort;
     private final AssetMapper assetMapper;
     private final SupplyItemMapper supplyItemMapper;
     private final ReimbursementMapper reimbursementMapper;
@@ -79,12 +79,12 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     @Override
     public List<DepartmentStatsVO> list(DepartmentStatsFrom from) {
         UUID departmentId = from == null ? null : from.getDepartmentId();
-        Map<UUID, DepartmentStatsVO> result = departmentService.list()
+        Map<UUID, DepartmentStatsVO> result = directoryQueryPort.listDepartments()
                 .stream()
-                .filter(department -> departmentId == null || departmentId.equals(department.getId()))
-                .collect(Collectors.toMap(Department::getId, department -> {
+                .filter(department -> departmentId == null || departmentId.equals(department.id()))
+                .collect(Collectors.toMap(DirectoryDepartmentSnapshot::id, department -> {
                     var vo = departmentStatsConverter.toVO(department);
-                    vo.setDepartmentName(department.getPath() == null ? department.getName() : department.getPath());
+                    vo.setDepartmentName(department.path() == null ? department.name() : department.path());
                     return vo;
                 }, (left, right) -> left, HashMap::new));
 

@@ -28,8 +28,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
 import com.devops00.spectra.oa.document.javabean.converter.DocumentConverter;
 import com.devops00.spectra.oa.document.javabean.constant.DocumentStatus;
 import com.devops00.spectra.oa.document.javabean.entity.Document;
@@ -84,7 +83,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private final FileReferenceService fileReferenceService;
     private final OaFileReferenceBinder fileReferenceBinder;
     private final NotificationService notificationService;
-    private final UserService userService;
+    private final DirectoryQueryPort directoryQueryPort;
     private final DocumentConverter documentConverter;
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -338,13 +337,14 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
      */
     private void sendPublishNotification(Document document) {
         try {
-            var wrapper = new LambdaQueryWrapper<User>();
-            if (VISIBILITY_DEPARTMENT.equals(document.getVisibility())) {
-                wrapper.eq(User::getDepartmentId, document.getDepartmentId());
-            } else if (VISIBILITY_PRIVATE.equals(document.getVisibility())) {
-                wrapper.eq(User::getId, document.getOwnerId());
-            }
-            var receiverIds = userService.list(wrapper).stream().map(User::getId).toList();
+            var users = VISIBILITY_PRIVATE.equals(document.getVisibility()) && document.getOwnerId() != null
+                    ? directoryQueryPort.findUsersByIds(List.of(document.getOwnerId()))
+                    : VISIBILITY_DEPARTMENT.equals(document.getVisibility())
+                            ? directoryQueryPort.findUsersByDepartmentId(document.getDepartmentId())
+                            : directoryQueryPort.listUsers();
+            var receiverIds = users.stream()
+                    .map(user -> user.id())
+                    .toList();
             if (receiverIds.isEmpty()) {
                 return;
             }

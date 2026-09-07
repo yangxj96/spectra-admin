@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.report.javabean.converter;
 
-import com.devops00.spectra.core.system.javabean.entity.Department;
+import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
@@ -38,5 +38,5 @@ public interface DepartmentStatsConverter {
      */
     @Mapping(source = "id", target = "departmentId")
     @Mapping(target = "departmentName", ignore = true)
-    DepartmentStatsVO toVO(Department source);
+    DepartmentStatsVO toVO(DirectoryDepartmentSnapshot source);
 }
