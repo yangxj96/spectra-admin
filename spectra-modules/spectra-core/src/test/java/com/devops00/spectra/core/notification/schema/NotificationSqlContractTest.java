@@ -80,6 +80,28 @@ class NotificationSqlContractTest {
     }
 
     @Test
+    void shouldDefineBatchTemplateLookupAndTaskPersistenceStatements() throws IOException {
+        var taskMapper = readResource("mapper/NotificationTaskMapper.xml");
+        var templateMapper = readResource("mapper/NotificationTemplateMapper.xml");
+
+        assertTrue(taskMapper.contains("<select id=\"selectExistingTasks\""));
+        assertTrue(taskMapper.contains("notification_request_id = #{requestId}"));
+        assertTrue(taskMapper.contains("recipient_key_hash = #{task.recipientKeyHash}"));
+        assertTrue(taskMapper.contains("channel = #{task.channel}"));
+        assertTrue(taskMapper.contains("<insert id=\"insertBatch\""));
+        assertTrue(taskMapper.contains("<foreach collection=\"tasks\" item=\"task\" separator=\",\">"));
+        assertTrue(taskMapper.contains("PgJsonbTypeHandler"));
+        assertTrue(taskMapper.contains("created_by"));
+        assertTrue(taskMapper.contains("#{task.createdAt}"));
+        assertTrue(taskMapper.contains("updated_by"));
+
+        assertTrue(templateMapper.contains("<select id=\"selectPublishedTemplates\""));
+        assertTrue(templateMapper.contains("state = 'PUBLISHED'"));
+        assertTrue(templateMapper.contains("templateVersionIds"));
+        assertTrue(templateMapper.contains("<foreach collection=\"channels\""));
+    }
+
+    @Test
     void shouldBypassDataPermissionParserForPostgresLockingQuery() throws Exception {
         var method = NotificationTaskMapper.class.getMethod("selectPendingTasks", Instant.class, int.class);
         var interceptorIgnore = method.getAnnotation(InterceptorIgnore.class);

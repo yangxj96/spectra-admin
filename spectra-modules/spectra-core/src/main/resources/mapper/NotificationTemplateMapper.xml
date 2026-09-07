@@ -52,4 +52,37 @@
         version_digest,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
+
+    <!-- 一个通知批次一次加载所有实际渠道使用的已发布模板。 -->
+    <select id="selectPublishedTemplates" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM spectra_notification.ntf_template
+        WHERE deleted IS NULL
+          AND state = 'PUBLISHED'
+          AND purpose = #{purpose}
+        <choose>
+            <when test="channels != null and channels.size() > 0">
+                AND channel IN
+                <foreach collection="channels" item="channel" open="(" separator="," close=")">
+                    #{channel}
+                </foreach>
+            </when>
+            <otherwise>
+                AND 1 = 0
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="templateVersionIds != null and templateVersionIds.size() > 0">
+                AND id IN
+                <foreach collection="templateVersionIds" item="templateVersionId" open="(" separator="," close=")">
+                    #{templateVersionId}
+                </foreach>
+            </when>
+            <otherwise>
+                AND template_group_code = #{templateGroupCode}
+            </otherwise>
+        </choose>
+        ORDER BY channel, version_no DESC
+    </select>
 </mapper>

@@ -33,7 +33,6 @@ import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationRequestStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
-import com.devops00.spectra.core.notification.javabean.domain.NotificationTemplateState;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
@@ -45,7 +44,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationUserPreferenceM
 import com.devops00.spectra.core.notification.observability.NotificationMetrics;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.core.notification.sender.NotificationSender;
-import com.devops00.spectra.core.notification.utils.NotificationMaskingUtils;
+import com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner;
 import com.devops00.spectra.core.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +55,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -94,6 +96,10 @@ public class NotificationGatewayImpl implements NotificationGateway {
      * 通知模板 Mapper。
      */
     private final NotificationTemplateMapper templateMapper;
+    /**
+     * 通知任务批量规划器。
+     */
+    private final NotificationTaskBatchPlanner taskPlanner;
     /**
      * 用户通知偏好 Mapper。
      */
@@ -229,8 +235,28 @@ public class NotificationGatewayImpl implements NotificationGateway {
             metrics.recordRequest(request.purpose().name(), NotificationRequestStatus.ACCEPTED.name());
         }
 
-        var taskCount = 0;
         var templateSnapshot = new LinkedHashMap<String, Object>();
+        var targets = collectTargets(request, channels, recipients);
+        var renderedTemplates = renderTemplates(request, targets, lockedTemplateVersions, templateSnapshot);
+        var drafts = taskPlanner.plan(request, requestId, now, entity.getCreatedBy(), targets, renderedTemplates);
+        var taskCount = persistTasks(request, requestId, drafts);
+        requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
+                .eq(NotificationRequestEntity::getId, requestId)
+                .set(NotificationRequestEntity::getTaskCount, taskCount)
+                .set(
+                        NotificationRequestEntity::getTemplateSnapshot,
+                        templateSnapshot,
+                        "typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"));
+        return new NotificationReceipt(requestId, NotificationRequestStatus.ACCEPTED.name(), taskCount, false);
+    }
+
+    /**
+     * 收集并去重实际需要投递的接收人和渠道目标。
+     */
+    private List<NotificationTaskBatchPlanner.TaskTarget> collectTargets(NotificationRequest request,
+                                                                         List<NotificationChannel> channels,
+                                                                         List<NotificationRecipient> recipients) {
+        var targets = new LinkedHashMap<String, NotificationTaskBatchPlanner.TaskTarget>();
         for (var recipient : recipients) {
             if (!recipient.active()) {
                 log.warn("通知收件人不存在或已禁用: userId={}", recipient.userId());
@@ -245,111 +271,99 @@ public class NotificationGatewayImpl implements NotificationGateway {
                     log.warn("通知收件人缺少已验证渠道地址: userId={}, channel={}", recipient.userId(), channel);
                     continue;
                 }
-                taskCount += createTask(request, requestId, recipient.userId(), channel, address, now, templateSnapshot,
-                        lockedTemplateVersions);
+                var target = new NotificationTaskBatchPlanner.TaskTarget(recipient.userId(), channel, address);
+                targets.putIfAbsent(targetKey(target), target);
             }
         }
         for (var directAddress : request.directAddresses()) {
             if (!channels.contains(directAddress.channel())) {
                 continue;
             }
-            taskCount += createTask(request, requestId, null, directAddress.channel(), directAddress.address(), now,
-                    templateSnapshot, lockedTemplateVersions);
+            var target = new NotificationTaskBatchPlanner.TaskTarget(null, directAddress.channel(),
+                    directAddress.address());
+            targets.putIfAbsent(targetKey(target), target);
         }
-        requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
-                .eq(NotificationRequestEntity::getId, requestId)
-                .set(NotificationRequestEntity::getTaskCount, taskCount)
-                .set(
-                        NotificationRequestEntity::getTemplateSnapshot,
-                        templateSnapshot,
-                        "typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"));
-        return new NotificationReceipt(requestId, NotificationRequestStatus.ACCEPTED.name(), taskCount, false);
+        return List.copyOf(targets.values());
     }
 
     /**
-     * 为单个收件人和渠道创建幂等投递任务。
+     * 一次加载批次实际使用的模板并渲染每个渠道一次。
      */
-    private int createTask(NotificationRequest request, UUID requestId, UUID recipientUserId,
-                           NotificationChannel channel, String address, Instant now,
-                           Map<String, Object> templateSnapshot,
-                           Map<NotificationChannel, UUID> templateVersionIds) {
-        var recipientKeyHash = recipientKeyHash(recipientUserId, channel, address);
-        if (taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getNotificationRequestId, requestId)
-                .eq(NotificationTaskEntity::getRecipientKeyHash, recipientKeyHash)
-                .eq(NotificationTaskEntity::getChannel, channel.name())) > 0) {
+    private Map<NotificationChannel, NotificationTaskBatchPlanner.TemplateSnapshot> renderTemplates(
+                                                                                                    NotificationRequest request,
+                                                                                                    List<NotificationTaskBatchPlanner.TaskTarget> targets,
+                                                                                                    Map<NotificationChannel, UUID> templateVersionIds,
+                                                                                                    Map<String, Object> templateSnapshot) {
+        if (targets.isEmpty()) {
+            return Map.of();
+        }
+        var channels = targets.stream().map(NotificationTaskBatchPlanner.TaskTarget::channel).distinct().toList();
+        var channelNames = channels.stream().map(NotificationChannel::name).toList();
+        var lockedTemplateIds = new ArrayList<>(templateVersionIds.values());
+        var templates = templateMapper.selectPublishedTemplates(request.templateGroupCode(), request.purpose().name(),
+                channelNames, lockedTemplateIds);
+        var templatesByChannel = new EnumMap<NotificationChannel, NotificationTemplateEntity>(NotificationChannel.class);
+        for (var template : templates == null ? List.<NotificationTemplateEntity>of() : templates) {
+            try {
+                templatesByChannel.putIfAbsent(NotificationChannel.valueOf(template.getChannel()), template);
+            } catch (IllegalArgumentException exception) {
+                throw new DataSaveException("通知模板渠道不合法", exception);
+            }
+        }
+        var renderedByChannel = new EnumMap<NotificationChannel, NotificationTaskBatchPlanner.TemplateSnapshot>(
+                NotificationChannel.class);
+        for (var channel : channels) {
+            var template = templatesByChannel.get(channel);
+            var renderParameters = new HashMap<String, Object>(request.parameters());
+            renderParameters.putAll(request.sensitiveParameters());
+            var rendered = render(request, renderParameters, template,
+                    templateVersionIds.containsKey(channel));
+            renderedByChannel.put(channel, rendered);
+            recordTemplateSnapshot(templateSnapshot, channel, rendered);
+        }
+        return Map.copyOf(renderedByChannel);
+    }
+
+    /**
+     * 批量过滤已有幂等任务并写入剩余任务。
+     */
+    private int persistTasks(NotificationRequest request, UUID requestId,
+                             List<NotificationTaskBatchPlanner.TaskDraft> drafts) {
+        if (drafts.isEmpty()) {
             return 0;
         }
-        var renderParameters = new HashMap<String, Object>(request.parameters());
-        renderParameters.putAll(request.sensitiveParameters());
-        var rendered = render(request, channel, renderParameters, templateVersionIds);
-        recordTemplateSnapshot(templateSnapshot, channel, rendered);
-        var hasSensitivePayload = !request.sensitiveParameters().isEmpty();
-        var task = new NotificationTaskEntity();
-        task.setNotificationRequestId(requestId);
-        task.setReceiverUserId(recipientUserId);
-        task.setRecipientKeyHash(recipientKeyHash);
-        task.setRecipientMasked(NotificationMaskingUtils.maskAddress(address));
-        task.setRecipientCiphertext(address == null ? null : payloadProtector.protectAddress(address));
-        task.setChannel(channel.name());
-        task.setPurpose(request.purpose().name());
-        task.setTemplateId(rendered.templateId());
-        task.setTemplateVersionNo(rendered.versionNo());
-        task.setTemplateVersionDigest(rendered.versionDigest());
-        task.setTitle(hasSensitivePayload ? "安全通知" : rendered.title());
-        task.setContent(hasSensitivePayload ? "敏感通知内容已加密" : rendered.content());
-        task.setLink(request.link());
-        var taskParameters = new LinkedHashMap<String, Object>(request.parameters());
-        if (rendered.providerTemplateCode() != null && !rendered.providerTemplateCode().isBlank()) {
-            taskParameters.put("__provider_template_code", rendered.providerTemplateCode());
+        var candidates = drafts.stream().map(NotificationTaskBatchPlanner.TaskDraft::task).toList();
+        var existing = taskMapper.selectExistingTasks(requestId, candidates);
+        var existingKeys = new HashSet<String>();
+        for (var task : existing == null ? List.<NotificationTaskEntity>of() : existing) {
+            existingKeys.add(taskKey(task.getRecipientKeyHash(), task.getChannel()));
         }
-        task.setExtra(taskParameters);
-        if (hasSensitivePayload) {
-            var protectedPayload = new LinkedHashMap<String, Object>();
-            protectedPayload.put("title", rendered.title());
-            protectedPayload.put("content", rendered.content());
-            protectedPayload.put("parameters", request.sensitiveParameters());
-            task.setSensitiveParametersCiphertext(payloadProtector.protectParameters(protectedPayload));
-        } else {
-            task.setSensitiveParametersCiphertext(null);
+        var tasks = drafts.stream()
+                .filter(draft -> !existingKeys.contains(draft.idempotencyKey()))
+                .map(NotificationTaskBatchPlanner.TaskDraft::task)
+                .toList();
+        if (tasks.isEmpty()) {
+            return 0;
         }
-        task.setPriority(normalizePriority(request.priority()));
-        task.setAttemptCount(0);
-        task.setMaxAttempts(3);
-        task.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
-        task.setNextRetryAt(task.getScheduledAt());
-        task.setExpiresAt(request.expiresAt());
-        task.setStatus(NotificationTaskStatus.PENDING.name());
-        if (taskMapper.insert(task) != 1) {
+        if (taskMapper.insertBatch(tasks) != tasks.size()) {
             throw new DataSaveException("创建通知任务失败");
         }
         if (metrics != null) {
-            metrics.recordTask(channel.name(), NotificationTaskStatus.PENDING.name(), request.purpose().name());
+            for (var task : tasks) {
+                metrics.recordTask(task.getChannel(), NotificationTaskStatus.PENDING.name(), request.purpose().name());
+            }
         }
-        return 1;
+        return tasks.size();
     }
 
     /**
-     * 优先使用渠道模板渲染内容，没有模板时回退到请求参数。
+     * 优先使用已加载的渠道模板渲染内容，没有模板时回退到请求参数。
      */
-    private RenderedContent render(NotificationRequest request, NotificationChannel channel,
-                                   Map<String, Object> parameters,
-                                   Map<NotificationChannel, UUID> templateVersionIds) {
-        var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
-                .eq(NotificationTemplateEntity::getChannel, channel.name())
-                .eq(NotificationTemplateEntity::getPurpose, request.purpose().name())
-                .eq(NotificationTemplateEntity::getState, NotificationTemplateState.PUBLISHED.name())
-                .isNull(NotificationTemplateEntity::getDeleted);
-        var lockedTemplateId = templateVersionIds.get(channel);
-        if (lockedTemplateId != null) {
-            query.eq(NotificationTemplateEntity::getId, lockedTemplateId);
-        } else {
-            query.eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
-                    .orderByDesc(NotificationTemplateEntity::getVersionNo)
-                    .last("LIMIT 1");
-        }
-        var template = templateMapper.selectOne(query);
-        if (lockedTemplateId != null && template == null) {
+    private NotificationTaskBatchPlanner.TemplateSnapshot render(NotificationRequest request,
+                                                                 Map<String, Object> parameters,
+                                                                 NotificationTemplateEntity template,
+                                                                 boolean lockedTemplate) {
+        if (lockedTemplate && template == null) {
             throw new DataSaveException("受控发送模板版本已不可用");
         }
         if (template != null) {
@@ -357,7 +371,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
                     request.sensitiveParameters());
             templateRenderer.validateAll(parameters, template.getTitleTemplate(), template.getContentTemplate());
             templateRenderer.validateHtml(template.getHtmlTemplate());
-            return new RenderedContent(template.getId(), template.getVersionNo(), template.getVersionDigest(),
+            return new NotificationTaskBatchPlanner.TemplateSnapshot(template.getId(), template.getVersionNo(),
+                    template.getVersionDigest(),
                     template.getProviderTemplateCode(),
                     templateRenderer.render(template.getTitleTemplate(), parameters),
                     templateRenderer.render(template.getContentTemplate(), parameters));
@@ -371,14 +386,14 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (!StringUtils.hasText(title)) {
             throw new DataSaveException("通知标题不能为空");
         }
-        return new RenderedContent(null, null, null, null, title, content);
+        return new NotificationTaskBatchPlanner.TemplateSnapshot(null, null, null, null, title, content);
     }
 
     /**
      * 在逻辑请求上记录每个实际渠道使用的模板版本元数据。
      */
     private void recordTemplateSnapshot(Map<String, Object> snapshots, NotificationChannel channel,
-                                        RenderedContent rendered) {
+                                        NotificationTaskBatchPlanner.TemplateSnapshot rendered) {
         if (rendered.templateId() == null) {
             return;
         }
@@ -480,17 +495,19 @@ public class NotificationGatewayImpl implements NotificationGateway {
     }
 
     /**
-     * 生成不包含明文地址的稳定接收人键。
+     * 返回与任务唯一索引一致的接收人和渠道组合键。
      */
-    private String recipientKeyHash(UUID recipientUserId, NotificationChannel channel, String address) {
-        var key = recipientUserId == null ? channel.name() + ":" + address : recipientUserId.toString();
-        return SHA256Utils.hash(key);
+    private String taskKey(String recipientKeyHash, String channel) {
+        return recipientKeyHash + "\u0000" + channel;
     }
 
     /**
-     * 渲染后的标题和正文。
+     * 返回与任务幂等键一致的目标去重键。
      */
-    private record RenderedContent(UUID templateId, Integer versionNo, String versionDigest,
-                                   String providerTemplateCode, String title, String content) {
+    private String targetKey(NotificationTaskBatchPlanner.TaskTarget target) {
+        var key = target.recipientUserId() == null
+                ? target.channel().name() + ":" + target.address()
+                : target.recipientUserId().toString();
+        return taskKey(SHA256Utils.hash(key), target.channel().name());
     }
 }

@@ -37,6 +37,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner;
 import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeAll;
@@ -55,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -84,22 +87,18 @@ class NotificationGatewayImplTest {
         var templateMapper = mock(NotificationTemplateMapper.class);
         var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
         var directory = mock(NotificationRecipientDirectory.class);
-        var protector = protector();
         var first = UUID.randomUUID();
         var second = UUID.randomUUID();
         when(requestMapper.selectOne(any())).thenReturn(null);
         when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
-        when(taskMapper.selectCount(any())).thenReturn(0L);
-        when(taskMapper.insert(any(NotificationTaskEntity.class))).thenReturn(1);
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(null);
         when(directory.resolve(any())).thenReturn(List.of(
                 new NotificationRecipient(first, null, null, true, true, null),
                 new NotificationRecipient(second, null, null, true, true, null)));
 
-        var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
-                new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", "", List.of()),
-                directory, protector, List.of());
+        stubBatchSuccess(taskMapper);
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory, protectorWithKey());
         NotificationReceipt receipt;
         try (var ignored = RequestCorrelationContext.openWithMdc(
                 RequestCorrelationContext.forHttp("request-123", "correlation-456"))) {
@@ -110,10 +109,152 @@ class NotificationGatewayImplTest {
 
         assertEquals(2, receipt.taskCount());
         assertTrue(!receipt.idempotentReplay());
-        verify(taskMapper, times(2)).insert(any(NotificationTaskEntity.class));
+        verify(taskMapper).insertBatch(argThat(tasks -> tasks.size() == 2));
         var requestCaptor = ArgumentCaptor.forClass(NotificationRequestEntity.class);
         verify(requestMapper).insert(requestCaptor.capture());
         assertEquals("correlation-456", requestCaptor.getValue().getTraceId());
+    }
+
+    @Test
+    void shouldBatchTemplateLookupIdempotencyLookupAndTaskInsert() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipients = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(true);
+        preference.setDoNotDisturb(false);
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(templateMapper.selectPublishedTemplates(any(), any(), anyList(), anyList())).thenReturn(List.of(
+                template(NotificationChannel.SMS), template(NotificationChannel.EMAIL)));
+        when(taskMapper.selectExistingTasks(any(), anyList())).thenReturn(List.of());
+        when(taskMapper.insertBatch(anyList())).thenReturn(6);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(recipients.stream()
+                .map(id -> new NotificationRecipient(id, "13800138000", "user@example.com", true, true, "UTC"))
+                .toList());
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory, protectorWithKey());
+        var request = new NotificationRequest(null, "test:batch", NotificationPurpose.SYSTEM_NOTICE,
+                List.of(NotificationChannel.SMS, NotificationChannel.EMAIL), recipients, List.of(), "test",
+                Map.of(), Map.of(), "SYSTEM", "batch", "SYSTEM", null, null, null, 0, null);
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(6, receipt.taskCount());
+        verify(templateMapper).selectPublishedTemplates(any(), any(), anyList(), anyList());
+        verify(taskMapper).selectExistingTasks(any(), argThat(tasks -> tasks.size() == 6));
+        verify(taskMapper).insertBatch(argThat(tasks -> tasks.size() == 6));
+        verify(taskMapper, never()).selectCount(any());
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
+    }
+
+    @Test
+    void shouldSkipExistingTaskFromSingleBatchIdempotencyLookup() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipients = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(true);
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(templateMapper.selectPublishedTemplates(any(), any(), anyList(), anyList())).thenReturn(List.of(
+                template(NotificationChannel.SMS), template(NotificationChannel.EMAIL)));
+        when(taskMapper.selectExistingTasks(any(), anyList())).thenAnswer(invocation -> {
+            var candidates = invocation.<List<NotificationTaskEntity>>getArgument(1);
+            return List.of(candidates.getFirst());
+        });
+        when(taskMapper.insertBatch(anyList())).thenReturn(5);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(recipients.stream()
+                .map(id -> new NotificationRecipient(id, "13800138000", "user@example.com", true, true, "UTC"))
+                .toList());
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory, protectorWithKey());
+        var request = new NotificationRequest(null, "test:batch-existing", NotificationPurpose.SYSTEM_NOTICE,
+                List.of(NotificationChannel.SMS, NotificationChannel.EMAIL), recipients, List.of(), "test",
+                Map.of(), Map.of(), "SYSTEM", "batch-existing", "SYSTEM", null, null, null, 0, null);
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(5, receipt.taskCount());
+        verify(taskMapper).selectExistingTasks(any(), argThat(tasks -> tasks.size() == 6));
+        verify(taskMapper).insertBatch(argThat(tasks -> tasks.size() == 5));
+        verify(taskMapper, never()).selectCount(any());
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
+    }
+
+    @Test
+    void shouldUseFallbackContentWhenBatchTemplateLookupReturnsEmpty() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipientId = UUID.randomUUID();
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(true);
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(templateMapper.selectPublishedTemplates(any(), any(), anyList(), anyList())).thenReturn(List.of());
+        when(taskMapper.selectExistingTasks(any(), anyList())).thenReturn(List.of());
+        when(taskMapper.insertBatch(anyList())).thenReturn(1);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(List.of(
+                new NotificationRecipient(recipientId, "13800138000", null, true, true, "UTC")));
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory, protectorWithKey());
+        var request = request(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.SMS, recipientId,
+                "test:batch-fallback");
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(1, receipt.taskCount());
+        verify(templateMapper).selectPublishedTemplates(any(), any(), anyList(), anyList());
+        verify(taskMapper).insertBatch(argThat(tasks -> tasks.size() == 1
+                && "通知".equals(tasks.getFirst().getTitle())
+                && "正文".equals(tasks.getFirst().getContent())));
+    }
+
+    @Test
+    void shouldAbortBatchWhenOneChannelTemplateFailsValidation() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipients = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(true);
+        var invalid = template(NotificationChannel.EMAIL);
+        invalid.setTitleTemplate("{{missing}}");
+        invalid.setParameterSchema(Map.of("properties", Map.of(
+                "missing", Map.of("type", "string"))));
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(templateMapper.selectPublishedTemplates(any(), any(), anyList(), anyList())).thenReturn(List.of(
+                template(NotificationChannel.SMS), invalid));
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(recipients.stream()
+                .map(id -> new NotificationRecipient(id, "13800138000", "user@example.com", true, true, "UTC"))
+                .toList());
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
+        var request = new NotificationRequest(null, "test:batch-failure", NotificationPurpose.SYSTEM_NOTICE,
+                List.of(NotificationChannel.SMS, NotificationChannel.EMAIL), recipients, List.of(), "test",
+                Map.of(), Map.of(), "SYSTEM", "batch-failure", "SYSTEM", null, null, null, 0, null);
+
+        assertThrows(DataSaveException.class, () -> gateway.enqueue(request));
+        verify(templateMapper).selectPublishedTemplates(any(), any(), anyList(), anyList());
+        verify(taskMapper, never()).selectExistingTasks(any(), anyList());
+        verify(taskMapper, never()).insertBatch(anyList());
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
     }
 
     @Test
@@ -127,9 +268,8 @@ class NotificationGatewayImplTest {
         when(requestMapper.selectOne(any())).thenReturn(existing);
         when(taskMapper.selectCount(any())).thenReturn(3L);
 
-        var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, mock(NotificationTemplateMapper.class),
-                mock(NotificationUserPreferenceMapper.class), new NotificationTemplateRenderer(), new NotificationPolicy(),
-                new NotificationModuleProperties(true, "", "", List.of()), directory, protector(), List.of());
+        var gateway = gateway(requestMapper, taskMapper, mock(NotificationTemplateMapper.class),
+                mock(NotificationUserPreferenceMapper.class), directory);
         var receipt = gateway
                 .enqueue(NotificationRequest.inApp("test:replay", NotificationPurpose.SYSTEM_NOTICE,
                         List.of(UUID.randomUUID()), "test", "标题", "正文", "TEST", "2", "TEST", null));
@@ -150,16 +290,13 @@ class NotificationGatewayImplTest {
         var recipientId = UUID.randomUUID();
         when(requestMapper.selectOne(any())).thenReturn(null);
         when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
-        when(taskMapper.selectCount(any())).thenReturn(0L);
-        when(taskMapper.insert(any(NotificationTaskEntity.class))).thenReturn(1);
+        stubBatchSuccess(taskMapper);
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(null);
         when(directory.resolve(any())).thenReturn(List.of(
                 new NotificationRecipient(recipientId, null, null, true, true, null)));
 
-        var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
-                new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", "", List.of()),
-                directory, protectorWithKey(), List.of());
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory, protectorWithKey());
         var request = new NotificationRequest(null, "test:sensitive", NotificationPurpose.SYSTEM_NOTICE,
                 List.of(NotificationChannel.IN_APP), List.of(recipientId), List.of(), "login",
                 Map.of("title", "登录通知", "content", "验证码 {{code}}"),
@@ -171,10 +308,11 @@ class NotificationGatewayImplTest {
         var requestCaptor = ArgumentCaptor.forClass(NotificationRequestEntity.class);
         verify(requestMapper).insert(requestCaptor.capture());
         assertFalse(requestCaptor.getValue().getSensitiveParametersCiphertext().contains("123456"));
-        var taskCaptor = ArgumentCaptor.forClass(NotificationTaskEntity.class);
-        verify(taskMapper).insert(taskCaptor.capture());
-        assertEquals("安全通知", taskCaptor.getValue().getTitle());
-        assertFalse(taskCaptor.getValue().getSensitiveParametersCiphertext().contains("123456"));
+        var taskCaptor = ArgumentCaptor.forClass(List.class);
+        verify(taskMapper).insertBatch(taskCaptor.capture());
+        var task = (NotificationTaskEntity) taskCaptor.getValue().getFirst();
+        assertEquals("安全通知", task.getTitle());
+        assertFalse(task.getSensitiveParametersCiphertext().contains("123456"));
     }
 
     @Test
@@ -196,7 +334,6 @@ class NotificationGatewayImplTest {
                 "code", Map.of("type", "string", "sensitive", true))));
         when(requestMapper.selectOne(any())).thenReturn(null);
         when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
-        when(taskMapper.selectCount(any())).thenReturn(0L);
         when(templateMapper.selectOne(any())).thenReturn(template);
         when(directory.resolve(any())).thenReturn(List.of(
                 new NotificationRecipient(recipientId, null, null, true, true, null)));
@@ -224,7 +361,6 @@ class NotificationGatewayImplTest {
         preference.setDoNotDisturb(false);
         when(requestMapper.selectOne(any())).thenReturn(null);
         when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
-        when(taskMapper.selectCount(any())).thenReturn(0L);
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(preference);
         when(directory.resolve(any())).thenReturn(List.of(
@@ -253,9 +389,8 @@ class NotificationGatewayImplTest {
         preference.setDoNotDisturb(true);
         when(requestMapper.selectOne(any())).thenReturn(null);
         when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
-        when(taskMapper.selectCount(any())).thenReturn(0L);
-        when(taskMapper.insert(any(NotificationTaskEntity.class))).thenReturn(1);
         when(templateMapper.selectOne(any())).thenReturn(null);
+        stubBatchSuccess(taskMapper);
         when(preferenceMapper.selectOne(any())).thenReturn(preference);
         when(directory.resolve(any())).thenReturn(List.of(
                 new NotificationRecipient(recipientId, null, null, true, true, null)));
@@ -267,7 +402,7 @@ class NotificationGatewayImplTest {
         var receipt = gateway.enqueue(request);
 
         assertEquals(1, receipt.taskCount());
-        verify(taskMapper).insert(any(NotificationTaskEntity.class));
+        verify(taskMapper).insertBatch(argThat(tasks -> tasks.size() == 1));
         verify(preferenceMapper, never()).selectOne(any());
     }
 
@@ -352,9 +487,27 @@ class NotificationGatewayImplTest {
                                             NotificationTemplateMapper templateMapper,
                                             NotificationUserPreferenceMapper preferenceMapper,
                                             NotificationRecipientDirectory directory) {
-        return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
+        return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper,
+                new NotificationTaskBatchPlanner(protector()), preferenceMapper,
                 new NotificationTemplateRenderer(), new NotificationPolicy(),
                 new NotificationModuleProperties(true, "", "", List.of()), directory, protector(), List.of());
+    }
+
+    private NotificationGatewayImpl gateway(NotificationRequestMapper requestMapper,
+                                            NotificationTaskMapper taskMapper,
+                                            NotificationTemplateMapper templateMapper,
+                                            NotificationUserPreferenceMapper preferenceMapper,
+                                            NotificationRecipientDirectory directory,
+                                            NotificationPayloadProtector protector) {
+        return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper,
+                new NotificationTaskBatchPlanner(protector), preferenceMapper,
+                new NotificationTemplateRenderer(), new NotificationPolicy(),
+                new NotificationModuleProperties(true, "", "", List.of()), directory, protector, List.of());
+    }
+
+    private void stubBatchSuccess(NotificationTaskMapper taskMapper) {
+        when(taskMapper.selectExistingTasks(any(), anyList())).thenReturn(List.of());
+        when(taskMapper.insertBatch(anyList())).thenAnswer(invocation -> invocation.<List<NotificationTaskEntity>>getArgument(0).size());
     }
 
     private NotificationRequest request(NotificationPurpose purpose, NotificationChannel channel, UUID recipientId,
@@ -362,6 +515,19 @@ class NotificationGatewayImplTest {
         return new NotificationRequest(null, idempotencyKey, purpose, List.of(channel), List.of(recipientId),
                 List.of(), "test", Map.of("title", "通知", "content", "正文"), Map.of(),
                 "SYSTEM", idempotencyKey, "SYSTEM", null, null, null, 0, null);
+    }
+
+    private NotificationTemplateEntity template(NotificationChannel channel) {
+        var template = new NotificationTemplateEntity();
+        template.setTemplateGroupCode("test");
+        template.setChannel(channel.name());
+        template.setPurpose(NotificationPurpose.SYSTEM_NOTICE.name());
+        template.setVersionNo(1);
+        template.setTitleTemplate("通知");
+        template.setContentTemplate("正文");
+        template.setParameterSchema(Map.of());
+        template.setState("PUBLISHED");
+        return template;
     }
 
     private NotificationPayloadProtector protector() {

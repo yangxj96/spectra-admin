@@ -81,6 +81,97 @@
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 
+    <!-- 一次读取当前通知请求中已经存在的接收人和渠道组合。 -->
+    <select id="selectExistingTasks" resultMap="BaseResultMap">
+        SELECT id, recipient_key_hash, channel
+        FROM spectra_notification.ntf_task
+        WHERE deleted IS NULL
+          AND notification_request_id = #{requestId}
+        <choose>
+            <when test="tasks != null and tasks.size() > 0">
+                AND (
+                <foreach collection="tasks" item="task" separator=" OR ">
+                    (recipient_key_hash = #{task.recipientKeyHash} AND channel = #{task.channel})
+                </foreach>
+                )
+            </when>
+            <otherwise>
+                AND 1 = 0
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 任务字段已经在批量规划阶段完成快照，使用单条 SQL 写入整个批次。 -->
+    <insert id="insertBatch">
+        INSERT INTO spectra_notification.ntf_task (
+            id,
+            notification_request_id,
+            channel,
+            receiver_user_id,
+            recipient_key_hash,
+            recipient_masked,
+            recipient_ciphertext,
+            template_id,
+            purpose,
+            title,
+            content,
+            link,
+            extra,
+            sensitive_parameters_ciphertext,
+            priority,
+            attempt_count,
+            max_attempts,
+            scheduled_at,
+            next_retry_at,
+            expires_at,
+            locked_by,
+            locked_at,
+            status,
+            last_error_code,
+            template_version_no,
+            template_version_digest,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        )
+        VALUES
+        <foreach collection="tasks" item="task" separator=",">
+            (
+                #{task.id},
+                #{task.notificationRequestId},
+                #{task.channel},
+                #{task.receiverUserId},
+                #{task.recipientKeyHash},
+                #{task.recipientMasked},
+                #{task.recipientCiphertext},
+                #{task.templateId},
+                #{task.purpose},
+                #{task.title},
+                #{task.content},
+                #{task.link},
+                #{task.extra,typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+                #{task.sensitiveParametersCiphertext},
+                #{task.priority},
+                #{task.attemptCount},
+                #{task.maxAttempts},
+                #{task.scheduledAt},
+                #{task.nextRetryAt},
+                #{task.expiresAt},
+                #{task.lockedBy},
+                #{task.lockedAt},
+                #{task.status},
+                #{task.lastErrorCode},
+                #{task.templateVersionNo},
+                #{task.templateVersionDigest},
+                #{task.createdBy},
+                #{task.createdAt},
+                #{task.updatedBy},
+                #{task.updatedAt}
+            )
+        </foreach>
+    </insert>
+
     <!-- PostgreSQL 的锁定子句必须位于 ORDER BY/LIMIT 之后。 -->
     <select id="selectPendingTasks" resultMap="BaseResultMap">
         SELECT
