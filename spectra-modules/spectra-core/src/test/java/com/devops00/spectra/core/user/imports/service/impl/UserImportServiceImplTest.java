@@ -16,22 +16,14 @@
 
 package com.devops00.spectra.core.user.imports.service.impl;
 
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
-import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
-import com.devops00.spectra.core.system.service.DepartmentService;
-import com.devops00.spectra.core.system.service.DictService;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.core.user.imports.entity.UserImportRow;
 import com.devops00.spectra.core.user.imports.entity.UserImportTask;
+import com.devops00.spectra.core.user.imports.javabean.enums.UserImportRowState;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportApplyFrom;
 import com.devops00.spectra.core.user.imports.javabean.vo.UserImportTaskVO;
 import com.devops00.spectra.core.user.imports.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper;
-import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,12 +31,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.TaskExecutor;
-import com.devops00.spectra.common.utils.SHA256Utils;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -66,58 +57,49 @@ class UserImportServiceImplTest {
     private UserImportRowMapper rowMapper;
 
     @Mock
-    private UserImportRowProcessor rowProcessor;
+    private UserImportPreviewService previewService;
 
     @Mock
-    private UserMapper userMapper;
-
-    @Mock
-    private DepartmentService departmentService;
-
-    @Mock
-    private DictService dictService;
-
-    @Mock
-    private AuthorizationProfileService profileService;
+    private UserImportResultService resultService;
 
     @Mock
     private SecurityContextAccessor securityContextAccessor;
 
     @Mock
-    private TimeMapper timeMapper;
+    private UserImportExecutionWorker executionWorker;
 
     @Mock
     private TaskExecutor taskExecutor;
 
     @InjectMocks
-    private UserImportServiceImpl service;
+    private UserImportExecutionService service;
 
     private final AtomicReference<Runnable> submittedTask = new AtomicReference<>();
 
     @BeforeEach
     void setUp() {
-        var configuration = new MybatisConfiguration();
-        configuration.getTypeHandlerRegistry().register(UUID.class, UUIDTypeHandler.class);
-        var assistant = new MapperBuilderAssistant(configuration, "user-import-test");
-        TableInfoHelper.initTableInfo(assistant, UserImportTask.class);
-        TableInfoHelper.initTableInfo(assistant, UserImportRow.class);
         when(securityContextAccessor.currentUserId()).thenReturn(OPERATOR_ID);
-        when(timeMapper.toLocalDateTime(any(Instant.class))).thenReturn(LocalDateTime.of(2026, 8, 22, 22, 55, 16));
-        when(departmentService.list()).thenReturn(List.of());
-        when(dictService.listDictDataByGroupCode(any())).thenReturn(List.of());
-        when(profileService.all()).thenReturn(List.of());
         when(taskMapper.update(any(), any())).thenReturn(1);
         when(taskMapper.updateById(any(UserImportTask.class))).thenReturn(1);
         doAnswer(invocation -> {
             submittedTask.set(invocation.getArgument(0));
             return null;
         }).when(taskExecutor).execute(any(Runnable.class));
+        when(previewService.loadReferenceData()).thenReturn(
+                new UserImportPreviewService.ReferenceData(Map.of(), Set.of(), Set.of(), Map.of()));
+        when(resultService.toVO(any(UserImportTask.class))).thenAnswer(invocation -> {
+            var task = invocation.getArgument(0, UserImportTask.class);
+            var result = new UserImportTaskVO();
+            result.setStatus(task.getStatus());
+            return result;
+        });
     }
 
     @Test
     void applyShouldReturnApplyingAndRejectRepeatedDispatch() {
-        var task = task("file-hash", false, List.of());
-        when(taskMapper.selectOne(any())).thenReturn(task);
+        var task = task(List.of());
+        when(resultService.requireTask(task.getId())).thenReturn(task);
+        when(resultService.findTask(task.getId(), OPERATOR_ID)).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of());
 
         UserImportTaskVO result = service.apply(task.getId(), applyRequest());
@@ -134,58 +116,55 @@ class UserImportServiceImplTest {
     }
 
     @Test
-    void applyShouldCountPreviewErrorsAsCompletedRows() {
-        var row = errorRow();
-        var task = task("file-hash", false, List.of(row));
-        task.setTotalRows(1);
+    void applyShouldRetainPartialFailureAtRowAndTaskLevel() {
+        var row = new UserImportRow();
+        row.setState(UserImportRowState.VALID.name());
+        var task = task(List.of(row));
+        when(resultService.requireTask(task.getId())).thenReturn(task);
+        when(resultService.findTask(task.getId(), OPERATOR_ID)).thenReturn(task);
+        when(rowMapper.selectList(any())).thenReturn(List.of(row));
+        when(executionWorker.processChunk(any(), any(), any(), any(Boolean.TYPE), any()))
+                .thenReturn(new UserImportExecutionWorker.ChunkResult(1, 0, 0, 1));
+
+        service.apply(task.getId(), applyRequest());
+        submittedTask.get().run();
+
+        assertThat(task.getStatus()).isEqualTo("PARTIAL_FAILED");
+        assertThat(task.getErrorRows()).isEqualTo(1);
+        assertThat(task.getCompletedRows()).isEqualTo(0);
+    }
+
+    @Test
+    void applyShouldCountPreviewErrorsAsCompletedAndFailed() {
+        var row = new UserImportRow();
+        row.setState(UserImportRowState.ERROR.name());
+        var task = task(List.of(row));
         task.setErrorRows(1);
-        task.setProfileVersionHash(SHA256Utils.hash("profile|MISSING"));
-        task.setRequestHash(SHA256Utils.hash("file-hash\u001ffalse\u001e\u001fEMP-001\u001f张三\u001fzhangsan\u001f13800138000"
-                + "\u001fzhangsan@example.com\u001fdept\u001fzh-CN\u001fAsia/Shanghai\u001fprofile"));
-        when(taskMapper.selectOne(any())).thenReturn(task);
+        task.setCompletedRows(1);
+        when(resultService.requireTask(task.getId())).thenReturn(task);
+        when(resultService.findTask(task.getId(), OPERATOR_ID)).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of(row));
 
         service.apply(task.getId(), applyRequest());
         submittedTask.get().run();
 
-        assertThat(task.getCompletedRows()).isEqualTo(1);
-        assertThat(task.getErrorRows()).isEqualTo(1);
         assertThat(task.getStatus()).isEqualTo("FAILED");
+        assertThat(task.getErrorRows()).isEqualTo(1);
     }
 
-    private UserImportTask task(String fileHash, boolean skipExisting, List<UserImportRow> rows) {
+    private UserImportTask task(List<UserImportRow> rows) {
         var task = new UserImportTask();
         task.setId(UUID.randomUUID());
         task.setOperatorId(OPERATOR_ID);
-        task.setFileHash(fileHash);
-        task.setSkipExisting(skipExisting);
+        task.setFileHash("file-hash");
+        task.setSkipExisting(false);
         task.setStatus("PREVIEWED");
         task.setExpiresAt(Instant.now().plusSeconds(60));
         task.setPreviewExpiresAt(Instant.now().plusSeconds(60));
-        task.setPreviewTokenHash(SHA256Utils.hash("preview-token"));
         task.setTotalRows(rows.size());
         task.setValidRows(rows.size());
         task.setErrorRows(0);
-        task.setProfileVersionHash(SHA256Utils.hash(""));
-        task.setRequestHash(SHA256Utils.hash(fileHash + "\u001f" + skipExisting));
         return task;
-    }
-
-    private UserImportRow errorRow() {
-        var normalized = new LinkedHashMap<String, Object>();
-        normalized.put("employee_no", "EMP-001");
-        normalized.put("real_name", "张三");
-        normalized.put("username", "zhangsan");
-        normalized.put("phone", "13800138000");
-        normalized.put("email", "zhangsan@example.com");
-        normalized.put("department_code", "dept");
-        normalized.put("language", "zh-CN");
-        normalized.put("timezone", "Asia/Shanghai");
-        normalized.put("authorization_profile_code", "profile");
-        var row = new UserImportRow();
-        row.setState("ERROR");
-        row.setNormalizedData(normalized);
-        return row;
     }
 
     private UserImportApplyFrom applyRequest() {
@@ -193,5 +172,4 @@ class UserImportServiceImplTest {
         request.setPreviewToken("preview-token");
         return request;
     }
-
 }

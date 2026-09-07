@@ -82,6 +82,26 @@ public class UserImportRowProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ProcessResult process(UserImportRow row, boolean skipExisting, Map<String, UUID> departmentIds,
                                  Map<String, AuthorizationProfileVO> profiles) {
+        return processInternal(row, skipExisting, departmentIds, profiles);
+    }
+
+    /**
+     * 在调用方已经创建的分块事务中应用一行用户及其授权方案。
+     *
+     * @param row           暂存行
+     * @param skipExisting  是否跳过已存在用户
+     * @param departmentIds 部门编码到 ID 的映射
+     * @param profiles      授权方案编码到方案的映射
+     * @return 行处理结果
+     */
+    public ProcessResult processInCurrentTransaction(UserImportRow row, boolean skipExisting,
+                                                     Map<String, UUID> departmentIds,
+                                                     Map<String, AuthorizationProfileVO> profiles) {
+        return processInternal(row, skipExisting, departmentIds, profiles);
+    }
+
+    private ProcessResult processInternal(UserImportRow row, boolean skipExisting, Map<String, UUID> departmentIds,
+                                          Map<String, AuthorizationProfileVO> profiles) {
         var source = toSource(row.getNormalizedData());
         var existing = findExisting(source);
         if (existing != null) {
