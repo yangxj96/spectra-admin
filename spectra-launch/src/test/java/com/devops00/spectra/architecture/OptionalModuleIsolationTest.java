@@ -109,8 +109,9 @@ class OptionalModuleIsolationTest {
     void auditCallsMustUseUnifiedAuditServiceAndNoLegacySinkTypes() throws IOException {
         var backend = resolveBackendPath("");
         var productionSources = uncheckedJavaSources(backend).stream()
-                .filter(path -> path.toString().contains("src\\main\\java"))
+                .filter(path -> path.toString().replace('\\', '/').contains("src/main/java"))
                 .toList();
+        assertThat(productionSources).isNotEmpty();
         var annotatedSources = productionSources.stream()
                 .filter(path -> read(path).contains("@Audit"))
                 .toList();
