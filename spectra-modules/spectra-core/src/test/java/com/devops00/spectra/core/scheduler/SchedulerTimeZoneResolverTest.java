@@ -28,6 +28,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
 
 import java.time.ZoneId;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,6 +48,17 @@ class SchedulerTimeZoneResolverTest {
     @Test
     void resolverImplementsStableSchedulerTimeZonePort() {
         assertTrue(SchedulerTimeZonePort.class.isAssignableFrom(SchedulerTimeZoneResolver.class));
+    }
+
+    @Test
+    void resolverMethodsDeclareSchedulerTimeZonePortOverrides() throws Exception {
+        var sourcePath = Path.of("src", "main", "java", "com", "devops00", "spectra", "core", "scheduler",
+                "service", "SchedulerTimeZoneResolver.java");
+        assertTrue(Files.isRegularFile(sourcePath), "缺少时区解析器源码: " + sourcePath);
+        var source = Files.readString(sourcePath, StandardCharsets.UTF_8);
+
+        assertTrue(source.contains("    @Override\n    public ZoneId resolve()"));
+        assertTrue(source.contains("    @Override\n    public ZoneId resolve(String configuredValue)"));
     }
 
     @ParameterizedTest

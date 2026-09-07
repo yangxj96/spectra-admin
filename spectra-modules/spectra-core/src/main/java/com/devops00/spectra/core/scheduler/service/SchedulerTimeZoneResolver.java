@@ -39,11 +39,13 @@ public class SchedulerTimeZoneResolver implements SchedulerTimeZonePort {
      * 读取系统默认时区；缺失或非法配置回退到 UTC。
      * <p>读取数据库失败会向上抛出，不能伪装成缺失配置。</p>
      */
+    @Override
     public ZoneId resolve() {
         return resolve(configuredService.findValue(SystemConfigKeys.SYSTEM_DEFAULT_TIMEZONE).orElse(null));
     }
 
     /** 按规则解析一项时区配置。 */
+    @Override
     public ZoneId resolve(String configuredValue) {
         if (configuredValue == null || configuredValue.isBlank()) {
             return UTC;
