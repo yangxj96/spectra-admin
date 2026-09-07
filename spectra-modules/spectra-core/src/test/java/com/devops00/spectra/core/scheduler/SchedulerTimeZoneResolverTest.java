@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.scheduler;
 
 import com.devops00.spectra.core.scheduler.service.SchedulerTimeZoneResolver;
+import com.devops00.spectra.common.port.scheduler.SchedulerTimeZonePort;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,11 +25,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessResourceFailureException;
 
 import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +41,11 @@ class SchedulerTimeZoneResolverTest {
 
     @Mock
     private ConfiguredService configuredService;
+
+    @Test
+    void resolverImplementsStableSchedulerTimeZonePort() {
+        assertTrue(SchedulerTimeZonePort.class.isAssignableFrom(SchedulerTimeZoneResolver.class));
+    }
 
     @ParameterizedTest
     @CsvSource({"Asia/Shanghai,Asia/Shanghai", "UTC,UTC", "' ',UTC", "Invalid/Zone,UTC"})
@@ -52,5 +62,15 @@ class SchedulerTimeZoneResolverTest {
         var resolver = new SchedulerTimeZoneResolver(configuredService);
 
         assertEquals(ZoneId.of("UTC"), resolver.resolve());
+    }
+
+    @Test
+    void configurationDatabaseFailureIsPropagated() {
+        var failure = new DataAccessResourceFailureException("database unavailable");
+        when(configuredService.findValue("system.default-timezone")).thenThrow(failure);
+
+        var resolver = new SchedulerTimeZoneResolver(configuredService);
+
+        assertSame(failure, assertThrows(DataAccessResourceFailureException.class, resolver::resolve));
     }
 }

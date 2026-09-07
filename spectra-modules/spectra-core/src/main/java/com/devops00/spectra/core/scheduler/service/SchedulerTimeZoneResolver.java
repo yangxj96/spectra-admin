@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.scheduler.service;
 
+import com.devops00.spectra.common.port.scheduler.SchedulerTimeZonePort;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ import java.time.ZoneId;
 
 /** 从系统配置解析调度使用的 IANA 时区。 */
 @Service
-public class SchedulerTimeZoneResolver {
+public class SchedulerTimeZoneResolver implements SchedulerTimeZonePort {
 
     private static final ZoneId UTC = ZoneId.of("UTC");
 
