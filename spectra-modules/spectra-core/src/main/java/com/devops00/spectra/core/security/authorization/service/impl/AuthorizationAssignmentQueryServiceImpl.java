@@ -36,7 +36,7 @@ import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMappe
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

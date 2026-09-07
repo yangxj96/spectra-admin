@@ -1,7 +1,7 @@
 package com.devops00.spectra.oa.supply.javabean.converter;
 
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyItem;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyOperation;
 import com.devops00.spectra.oa.supply.javabean.from.SupplySaveFrom;

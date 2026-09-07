@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.oa.leave.javabean.converter;
 
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
 import org.mapstruct.Mapper;

@@ -40,84 +40,138 @@ class FrameworkPackageLayoutTest {
 
     private static final String CONFIGURE_PACKAGE = FRAMEWORK_PACKAGE + ".configure";
 
+    private static final List<String> CAPABILITY_PACKAGES = List.of(
+            FRAMEWORK_PACKAGE + ".cache",
+            FRAMEWORK_PACKAGE + ".captcha",
+            FRAMEWORK_PACKAGE + ".persistence",
+            FRAMEWORK_PACKAGE + ".security",
+            FRAMEWORK_PACKAGE + ".serialization",
+            FRAMEWORK_PACKAGE + ".web",
+            FRAMEWORK_PACKAGE + ".assembler",
+            FRAMEWORK_PACKAGE + ".health");
+
     /**
      * Task 11 的 64 个历史类型清单及其目标包。清单保持一类一个入口，防止迁移遗漏或重复。
      */
     private static final Map<String, String> MIGRATION_TARGETS = Map.ofEntries(
-            Map.entry("CacheConfiguration", CONFIGURE_PACKAGE),
+            Map.entry("CacheConfiguration", FRAMEWORK_PACKAGE + ".cache.configuration"),
             Map.entry("StandardCacheKeyGenerator", FRAMEWORK_PACKAGE + ".cache"),
-            Map.entry("JacksonConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("JacksonProperties", CONFIGURE_PACKAGE),
-            Map.entry("KaptchaConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("KaptchaTextCreator", FRAMEWORK_PACKAGE + ".captcha"),
-            Map.entry("KaptchaType", FRAMEWORK_PACKAGE + ".captcha"),
-            Map.entry("KaptchaProperties", CONFIGURE_PACKAGE),
-            Map.entry("GlobalMapperConfig", CONFIGURE_PACKAGE),
-            Map.entry("TimeMapper", FRAMEWORK_PACKAGE + ".serialization"),
-            Map.entry("MvcConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("PasswordEncoderConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("CommonExceptionAdvice", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("KaptchaExceptionAdvice", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("SqlExceptionAdvice", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("RequestDecryptAdvice", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("ResponseEncryptAdvice", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("ResponseModifyAdvice", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("CryptoKeyManager", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("RequestCorrelationFilter", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("RequestGetParamsFilter", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("AuthenticationWebUtils", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("DataScopeContextFilter", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("DataScopeEntityRegistry", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("DataScopeExecutor", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("MetaObjectHandlerImpl", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("MyBatisPlusConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("DataScopeInnerInterceptor", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("ResourceAuthorizationGuard", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("ScopeSqlPolicy", FRAMEWORK_PACKAGE + ".persistence"),
-            Map.entry("RedisConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("LoginExceptionAdvice", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RestAccessDeniedHandler", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RestAuthenticationEntryPoint", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecurityAutoConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("SecJacksonConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("SecRedisConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("SecurityConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("SecuritySessionPortConfiguration", CONFIGURE_PACKAGE),
-            Map.entry("WebCookiePolicy", FRAMEWORK_PACKAGE + ".web"),
-            Map.entry("UserOnlineConverter", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SpectraPermissionEvaluator", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("TokenAuthenticationFilter", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecurityLoginFailureTracker", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecuritySessionContextAccessor", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecuritySessionIssuer", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecuritySessionQuery", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecuritySessionReader", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecuritySessionRevoker", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecurityTokenAccessor", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecMode", CONFIGURE_PACKAGE),
-            Map.entry("SecurityProperties", CONFIGURE_PACKAGE),
-            Map.entry("RateLimitPolicy", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RedisRateLimiter", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RequestRateLimitFilter", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RedisSecurityInitializationTokenStore", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RedisSecurityVerificationStore", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RefreshTokenRotationStore", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecurityRedisExecutor", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecurityRedisKey", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("SecurityRedisNamespace", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("TokenDigestService", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("DefaultRootAuthorizationPolicy", FRAMEWORK_PACKAGE + ".security"),
-            Map.entry("RedisSecuritySessionRepository", FRAMEWORK_PACKAGE + ".security"));
+            Map.entry("JacksonConfiguration", FRAMEWORK_PACKAGE + ".serialization.jackson"),
+            Map.entry("JacksonProperties", FRAMEWORK_PACKAGE + ".serialization.jackson"),
+            Map.entry("KaptchaConfiguration", FRAMEWORK_PACKAGE + ".captcha.configuration"),
+            Map.entry("KaptchaTextCreator", FRAMEWORK_PACKAGE + ".captcha.generator"),
+            Map.entry("KaptchaType", FRAMEWORK_PACKAGE + ".captcha.generator"),
+            Map.entry("KaptchaProperties", FRAMEWORK_PACKAGE + ".captcha.configuration"),
+            Map.entry("GlobalMapperConfig", FRAMEWORK_PACKAGE + ".serialization.mapper"),
+            Map.entry("TimeMapper", FRAMEWORK_PACKAGE + ".serialization.mapper"),
+            Map.entry("MvcConfiguration", FRAMEWORK_PACKAGE + ".web.configuration"),
+            Map.entry("PasswordEncoderConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.authentication"),
+            Map.entry("CommonExceptionAdvice", FRAMEWORK_PACKAGE + ".web.advice.exception"),
+            Map.entry("KaptchaExceptionAdvice", FRAMEWORK_PACKAGE + ".web.advice.exception"),
+            Map.entry("SqlExceptionAdvice", FRAMEWORK_PACKAGE + ".web.advice.exception"),
+            Map.entry("RequestDecryptAdvice", FRAMEWORK_PACKAGE + ".web.advice.crypto"),
+            Map.entry("ResponseEncryptAdvice", FRAMEWORK_PACKAGE + ".web.advice.crypto"),
+            Map.entry("ResponseModifyAdvice", FRAMEWORK_PACKAGE + ".web.advice.crypto"),
+            Map.entry("CryptoKeyManager", FRAMEWORK_PACKAGE + ".web.crypto"),
+            Map.entry("RequestCorrelationFilter", FRAMEWORK_PACKAGE + ".web.filter"),
+            Map.entry("RequestGetParamsFilter", FRAMEWORK_PACKAGE + ".web.filter"),
+            Map.entry("AuthenticationWebUtils", FRAMEWORK_PACKAGE + ".web.security"),
+            Map.entry("DataScopeContextFilter", FRAMEWORK_PACKAGE + ".persistence.scope.context"),
+            Map.entry("DataScopeEntityRegistry", FRAMEWORK_PACKAGE + ".persistence.scope.context"),
+            Map.entry("DataScopeExecutor", FRAMEWORK_PACKAGE + ".persistence.scope.context"),
+            Map.entry("MetaObjectHandlerImpl", FRAMEWORK_PACKAGE + ".persistence.mybatis"),
+            Map.entry("MyBatisPlusConfiguration", FRAMEWORK_PACKAGE + ".persistence.configuration"),
+            Map.entry("DataScopeInnerInterceptor", FRAMEWORK_PACKAGE + ".persistence.scope.authorization"),
+            Map.entry("ResourceAuthorizationGuard", FRAMEWORK_PACKAGE + ".persistence.scope.authorization"),
+            Map.entry("ScopeSqlPolicy", FRAMEWORK_PACKAGE + ".persistence.scope.authorization"),
+            Map.entry("RedisConfiguration", FRAMEWORK_PACKAGE + ".cache.configuration"),
+            Map.entry("LoginExceptionAdvice", FRAMEWORK_PACKAGE + ".security.advice"),
+            Map.entry("RestAccessDeniedHandler", FRAMEWORK_PACKAGE + ".security.advice"),
+            Map.entry("RestAuthenticationEntryPoint", FRAMEWORK_PACKAGE + ".security.advice"),
+            Map.entry("SecurityAutoConfiguration", FRAMEWORK_PACKAGE + ".security.configuration"),
+            Map.entry("SecJacksonConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.redis"),
+            Map.entry("SecRedisConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.redis"),
+            Map.entry("SecurityConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.authentication"),
+            Map.entry("SecuritySessionPortConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.session"),
+            Map.entry("WebCookiePolicy", FRAMEWORK_PACKAGE + ".web.security"),
+            Map.entry("UserOnlineConverter", FRAMEWORK_PACKAGE + ".security.converter"),
+            Map.entry("SpectraPermissionEvaluator", FRAMEWORK_PACKAGE + ".security.authorization"),
+            Map.entry("TokenAuthenticationFilter", FRAMEWORK_PACKAGE + ".security.authentication"),
+            Map.entry("SecurityLoginFailureTracker", FRAMEWORK_PACKAGE + ".security.session.lifecycle"),
+            Map.entry("SecuritySessionContextAccessor", FRAMEWORK_PACKAGE + ".security.session.query"),
+            Map.entry("SecuritySessionIssuer", FRAMEWORK_PACKAGE + ".security.session.lifecycle"),
+            Map.entry("SecuritySessionQuery", FRAMEWORK_PACKAGE + ".security.session.query"),
+            Map.entry("SecuritySessionReader", FRAMEWORK_PACKAGE + ".security.session.query"),
+            Map.entry("SecuritySessionRevoker", FRAMEWORK_PACKAGE + ".security.session.lifecycle"),
+            Map.entry("SecurityTokenAccessor", FRAMEWORK_PACKAGE + ".security.session.token"),
+            Map.entry("SecMode", FRAMEWORK_PACKAGE + ".security.properties"),
+            Map.entry("SecurityProperties", FRAMEWORK_PACKAGE + ".security.properties"),
+            Map.entry("RateLimitPolicy", FRAMEWORK_PACKAGE + ".security.ratelimit"),
+            Map.entry("RedisRateLimiter", FRAMEWORK_PACKAGE + ".security.ratelimit"),
+            Map.entry("RequestRateLimitFilter", FRAMEWORK_PACKAGE + ".security.ratelimit"),
+            Map.entry("RedisSecurityInitializationTokenStore", FRAMEWORK_PACKAGE + ".security.redis.store"),
+            Map.entry("RedisSecurityVerificationStore", FRAMEWORK_PACKAGE + ".security.redis.store"),
+            Map.entry("RefreshTokenRotationStore", FRAMEWORK_PACKAGE + ".security.redis.store"),
+            Map.entry("SecurityRedisExecutor", FRAMEWORK_PACKAGE + ".security.redis.key"),
+            Map.entry("SecurityRedisKey", FRAMEWORK_PACKAGE + ".security.redis.key"),
+            Map.entry("SecurityRedisNamespace", FRAMEWORK_PACKAGE + ".security.redis.key"),
+            Map.entry("TokenDigestService", FRAMEWORK_PACKAGE + ".security.redis.token"),
+            Map.entry("DefaultRootAuthorizationPolicy", FRAMEWORK_PACKAGE + ".security.authorization"),
+            Map.entry("RedisSecuritySessionRepository", FRAMEWORK_PACKAGE + ".security.session.repository"));
 
     @Test
-    void configurePackageMustBeFlat() throws IOException {
+    void configurePackageMustBeRemoved() throws IOException {
         var violations = frameworkSources().stream()
-                .filter(source -> source.packageName().startsWith(CONFIGURE_PACKAGE + "."))
+                .filter(source -> source.packageName().equals(CONFIGURE_PACKAGE)
+                        || source.packageName().startsWith(CONFIGURE_PACKAGE + "."))
                 .toList();
 
         assertThat(violations)
-                .as("framework.configure 不得包含更深层子包")
+                .as("framework.configure 不得包含生产类")
                 .isEmpty();
+    }
+
+    @Test
+    void autoConfigurationImportsMustExposeOnlyFrameworkModule() throws IOException {
+        Path imports = resolveBackendPath(
+                "spectra-framework/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports");
+
+        var entries = Files.readAllLines(imports)
+                .stream()
+                .map(String::trim)
+                .filter(line -> !line.isEmpty() && !line.startsWith("#"))
+                .toList();
+
+        assertThat(entries)
+                .as("自动配置索引只允许暴露 framework 组合入口")
+                .containsExactly("com.devops00.spectra.framework.FrameworkModule");
+    }
+
+    @Test
+    void frameworkModuleMustScanTheWholeFrameworkPackage() throws IOException {
+        Path source = resolveBackendPath(
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/FrameworkModule.java");
+        String contents = Files.readString(source);
+
+        assertThat(contents)
+                .contains("@ComponentScan(basePackageClasses = FrameworkModule.class)")
+                .doesNotContain("@Import(")
+                .doesNotContain("excludeFilters");
+    }
+
+    @Test
+    void frameworkMustNotAddPerCapabilityAutoConfigurations() throws IOException {
+        Path sourceRoot = resolveBackendPath("spectra-framework/src/main/java");
+        try (var paths = Files.walk(sourceRoot)) {
+            var autoConfigurations = paths.filter(path -> Files.isRegularFile(path)
+                    && path.getFileName().toString().endsWith("AutoConfiguration.java"))
+                    .map(path -> path.getFileName().toString())
+                    .toList();
+
+            assertThat(autoConfigurations)
+                    .as("Framework 只保留安全配置本身，能力包不得增加独立 AutoConfiguration 入口")
+                    .containsExactly("SecurityAutoConfiguration.java");
+        }
     }
 
     @Test
@@ -163,6 +217,21 @@ class FrameworkPackageLayoutTest {
 
         assertThat(violations)
                 .as("framework 生产源码路径必须与 package 声明一致")
+                .isEmpty();
+    }
+
+    @Test
+    void capabilityPackagesMustNotAccumulateDirectTypes() throws IOException {
+        var directTypeCounts = frameworkSources().stream()
+                .collect(Collectors.groupingBy(SourceFile::packageName, Collectors.counting()));
+
+        var violations = CAPABILITY_PACKAGES.stream()
+                .filter(packageName -> directTypeCounts.getOrDefault(packageName, 0L) > 3)
+                .collect(Collectors.toMap(packageName -> packageName,
+                        packageName -> directTypeCounts.get(packageName)));
+
+        assertThat(violations)
+                .as("framework 能力包的直接源码文件不得超过 3 个，超出后必须按职责拆分子包")
                 .isEmpty();
     }
 

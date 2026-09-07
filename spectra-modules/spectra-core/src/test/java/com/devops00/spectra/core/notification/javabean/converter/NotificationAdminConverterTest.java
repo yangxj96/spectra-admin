@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.notification.javabean.converter;
 
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;

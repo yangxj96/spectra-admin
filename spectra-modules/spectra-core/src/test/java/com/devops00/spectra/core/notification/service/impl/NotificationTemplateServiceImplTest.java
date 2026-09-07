@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.converter.NotificationTemplateConverter;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
 import com.devops00.spectra.core.notification.javabean.from.NotificationTemplateSaveFrom;

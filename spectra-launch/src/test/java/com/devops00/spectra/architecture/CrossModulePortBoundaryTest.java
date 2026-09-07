@@ -85,7 +85,7 @@ class CrossModulePortBoundaryTest {
         var backend = resolveBackendPath("");
 
         assertThat(Files.exists(backend.resolve(
-                "spectra-framework/src/main/java/com/devops00/spectra/framework/web/AuthenticationWebUtils.java")))
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/web/security/AuthenticationWebUtils.java")))
                 .as("HTTP 认证工具属于 framework 技术适配")
                 .isTrue();
         assertThat(Files.exists(backend.resolve(

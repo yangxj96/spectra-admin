@@ -20,8 +20,8 @@ import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import org.mapstruct.Mapper;
 
 import java.util.List;

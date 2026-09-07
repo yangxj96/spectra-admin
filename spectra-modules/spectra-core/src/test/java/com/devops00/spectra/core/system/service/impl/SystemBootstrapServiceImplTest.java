@@ -20,7 +20,7 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.service.ConfiguredService;
-import com.devops00.spectra.framework.web.CryptoKeyManager;
+import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

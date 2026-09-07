@@ -29,7 +29,7 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.common.port.scheduler.SchedulerTimeZonePort;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.contract.javabean.converter.ContractConverter;
 import com.devops00.spectra.oa.contract.javabean.constant.ContractMilestoneStatus;
 import com.devops00.spectra.oa.contract.javabean.constant.ContractStatus;

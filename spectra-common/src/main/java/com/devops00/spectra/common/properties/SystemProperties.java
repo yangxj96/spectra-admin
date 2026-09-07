@@ -43,9 +43,9 @@ public class SystemProperties {
      * 可以直接修改这个配置,在需要写死的地方会直接使用这里, 能使用拼接的位置都尽量进行了拼接,但是依旧会有一些位置无法拼接,则注明在下方列表,
      * 以下为没法直接使用这个属性进行修改的位置,
      * <ol>
-     * <li>com.devops00.spectra.framework.configure.MyBatisPlusConfiguration</li>
-     * <li>com.devops00.spectra.framework.web.ResponseEncryptAdvice</li>
-     * <li>com.devops00.spectra.framework.web.ResponseModifyAdvice</li>
+     * <li>com.devops00.spectra.framework.persistence.configuration.MyBatisPlusConfiguration</li>
+     * <li>com.devops00.spectra.framework.web.advice.crypto.ResponseEncryptAdvice</li>
+     * <li>com.devops00.spectra.framework.web.advice.crypto.ResponseModifyAdvice</li>
      * <li>com.devops00.spectra.launch.LaunchApplication</li>
      * </ol>
      */

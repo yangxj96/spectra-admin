@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.oa.calendar.javabean.converter;
 
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.calendar.javabean.entity.Calendar;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
 import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;

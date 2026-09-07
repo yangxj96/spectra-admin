@@ -18,8 +18,8 @@ package com.devops00.spectra.core.system.javabean.converter;
 
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -16,11 +16,8 @@
 
 package com.devops00.spectra.framework;
 
-import com.devops00.spectra.framework.configure.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 
 /**
  * 基础设施模块
@@ -30,11 +27,7 @@ import org.springframework.context.annotation.Import;
  * @since 2026/3/8 23:30
  */
 @AutoConfiguration
-@Import(SecurityAutoConfiguration.class)
-@ComponentScan(basePackageClasses = FrameworkModule.class, excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = "com\\.devops00\\.spectra\\.framework\\.security\\..*"),
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = "com\\.devops00\\.spectra\\.framework\\.configure\\.(Sec.*Configuration|Security.*Configuration)")
-})
+@ComponentScan(basePackageClasses = FrameworkModule.class)
 public class FrameworkModule {
 
 }

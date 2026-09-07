@@ -17,7 +17,7 @@ import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorDiagnosticTask
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorRuntimeDiagnosticVO;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorDiagnosticTaskMapper;
 import com.devops00.spectra.core.system.service.ServiceMonitorDiagnosticService;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;

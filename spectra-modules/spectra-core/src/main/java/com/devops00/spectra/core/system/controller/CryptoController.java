@@ -24,7 +24,7 @@ import com.devops00.spectra.core.system.javabean.vo.CryptoClientKeyVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoConfigVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoKeyPairVO;
 import com.devops00.spectra.core.system.service.ConfiguredService;
-import com.devops00.spectra.framework.web.CryptoKeyManager;
+import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
 import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

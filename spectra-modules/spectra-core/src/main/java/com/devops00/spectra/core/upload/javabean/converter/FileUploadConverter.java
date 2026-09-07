@@ -6,8 +6,8 @@
 package com.devops00.spectra.core.upload.javabean.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.upload.javabean.entity.FileAsset;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
 import com.devops00.spectra.core.upload.javabean.entity.FileType;

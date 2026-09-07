@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.oa.purchase.javabean.converter;
 
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseItem;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt;

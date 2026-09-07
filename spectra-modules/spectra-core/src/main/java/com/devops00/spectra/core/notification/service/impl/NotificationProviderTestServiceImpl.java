@@ -19,7 +19,7 @@ package com.devops00.spectra.core.notification.service.impl;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;

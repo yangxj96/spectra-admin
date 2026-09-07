@@ -25,7 +25,7 @@ import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetentionVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
 import com.devops00.spectra.core.security.audit.observability.SecurityAuditMetrics;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
 import com.devops00.spectra.core.security.audit.AuditVisibilityPolicy;
 import com.devops00.spectra.core.security.audit.SecurityAuditEvent;

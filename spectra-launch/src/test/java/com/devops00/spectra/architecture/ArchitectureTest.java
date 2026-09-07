@@ -43,13 +43,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AnalyzeClasses(packages = "com.devops00.spectra", importOptions = DoNotIncludeTests.class)
 class ArchitectureTest {
 
+    private static final String[] DATA_ACCESS_PACKAGES = {
+            "com.devops00.spectra.core..mapper..",
+            "com.devops00.spectra.core..repository..",
+            "com.devops00.spectra.oa..mapper..",
+            "com.devops00.spectra.oa..repository..",
+            "com.devops00.spectra.workflow..mapper..",
+            "com.devops00.spectra.workflow..repository.."};
+
     @ArchTest
     static final ArchRule CONTROLLERS_MUST_NOT_ACCESS_DATA_ACCESS = noClasses()
             .that()
             .resideInAnyPackage("..controller..")
             .should()
             .dependOnClassesThat()
-            .resideInAnyPackage("..mapper..", "..repository..");
+            .resideInAnyPackage(DATA_ACCESS_PACKAGES);
 
     @ArchTest
     static final ArchRule SERVICES_MUST_NOT_DEPEND_ON_CONTROLLERS = noClasses()
@@ -62,7 +70,7 @@ class ArchitectureTest {
     @ArchTest
     static final ArchRule DATA_ACCESS_MUST_NOT_DEPEND_ON_CONTROLLERS = noClasses()
             .that()
-            .resideInAnyPackage("..mapper..", "..repository..")
+            .resideInAnyPackage(DATA_ACCESS_PACKAGES)
             .should()
             .dependOnClassesThat()
             .resideInAnyPackage("..controller..");
@@ -204,7 +212,7 @@ class ArchitectureTest {
     static void frameworkMustOwnSecurityTechnicalMechanisms(JavaClasses classes) {
         Map<String, String> technicalPackages = Map.of(
                 "安全过滤器", "com.devops00.spectra.framework.security",
-                "安全运行时配置", "com.devops00.spectra.framework.configure",
+                "安全运行时配置", "com.devops00.spectra.framework.security",
                 "安全 Redis repository", "com.devops00.spectra.framework.security");
 
         var packageNames = classes.stream()

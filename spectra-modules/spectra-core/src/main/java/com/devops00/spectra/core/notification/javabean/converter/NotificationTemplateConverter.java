@@ -17,8 +17,8 @@
 package com.devops00.spectra.core.notification.javabean.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.framework.configure.GlobalMapperConfig;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplateVO;
 import org.mapstruct.Mapper;

@@ -15,4 +15,3 @@
 #
 
 com.devops00.spectra.framework.FrameworkModule
-com.devops00.spectra.framework.configure.SecurityAutoConfiguration

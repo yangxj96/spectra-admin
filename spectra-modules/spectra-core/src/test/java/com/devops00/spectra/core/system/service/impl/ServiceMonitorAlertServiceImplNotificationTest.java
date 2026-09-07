@@ -12,7 +12,7 @@ import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertEventMapper;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertRuleMapper;
 import com.devops00.spectra.core.system.service.ServiceMonitorRuleEvaluationResult;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

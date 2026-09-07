@@ -41,7 +41,7 @@ import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.mapper.OrganizationVersionMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.framework.serialization.TimeMapper;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
 import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
