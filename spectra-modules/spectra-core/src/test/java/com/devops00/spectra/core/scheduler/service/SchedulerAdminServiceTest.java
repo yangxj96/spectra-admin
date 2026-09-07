@@ -34,6 +34,10 @@ import com.devops00.spectra.core.scheduler.mapper.SchedulerLoopRuntimeMapper;
 import com.devops00.spectra.core.scheduler.mapper.SchedulerOperationAuditMapper;
 import com.devops00.spectra.core.scheduler.mapper.SchedulerOperationHistoryMapper;
 import com.devops00.spectra.core.scheduler.service.impl.SchedulerAdminServiceImpl;
+import com.devops00.spectra.core.scheduler.service.impl.SchedulerAdminServiceSupport;
+import com.devops00.spectra.core.scheduler.service.impl.SchedulerCatalogService;
+import com.devops00.spectra.core.scheduler.service.impl.SchedulerControlService;
+import com.devops00.spectra.core.scheduler.service.impl.SchedulerExecutionQueryService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -300,11 +304,12 @@ class SchedulerAdminServiceTest {
                                                      SchedulerOperationAuditMapper auditMapper,
                                                      SchedulerExecutionService executionService) {
         when(auditMapper.insert(any(SchedulerOperationAuditEntity.class))).thenReturn(1);
-        return new SchedulerAdminServiceImpl(jobMapper, mock(SchedulerExecutionMapper.class),
-                mock(SchedulerLoopRuntimeMapper.class), commandMapper,
-                mock(SchedulerLoopErrorMapper.class), registry, executionService,
-                mock(SchedulerControlCommandService.class), mock(SecurityContextAccessor.class), timeZoneResolver,
-                historyMapper, auditMapper);
+        var support = new SchedulerAdminServiceSupport(jobMapper, mock(SchedulerExecutionMapper.class),
+                mock(SchedulerLoopRuntimeMapper.class), commandMapper, mock(SchedulerLoopErrorMapper.class), registry,
+                executionService, mock(SchedulerControlCommandService.class), mock(SecurityContextAccessor.class),
+                timeZoneResolver, historyMapper, auditMapper);
+        return new SchedulerAdminServiceImpl(new SchedulerCatalogService(support), new SchedulerControlService(support),
+                new SchedulerExecutionQueryService(support));
     }
 
     private static SchedulerJobSaveFrom save(String key) {
