@@ -29,7 +29,7 @@ class ServiceMonitorServiceImplDependencyTest {
 
     @Test
     void monitorUsesCoreHealthAggregatorInsteadOfActuatorEndpoint() {
-        var constructor = Arrays.stream(ServiceMonitorServiceImpl.class.getDeclaredConstructors())
+        var constructor = Arrays.stream(ServiceMonitorServiceSupport.class.getDeclaredConstructors())
                 .filter(item -> item.getParameterCount() == 6)
                 .findFirst()
                 .orElseThrow();
@@ -40,13 +40,13 @@ class ServiceMonitorServiceImplDependencyTest {
                 .orElseThrow();
 
         assertThat(healthParameter)
-                .as("ServiceMonitorServiceImpl 应接收 CoreHealthAggregator")
+                .as("ServiceMonitorServiceSupport 应接收 CoreHealthAggregator")
                 .satisfies(parameter -> assertThat(parameter.isAnnotationPresent(Lazy.class))
                         .as("CoreHealthAggregator 必须惰性注入以打断启动期健康/调度循环依赖")
                         .isTrue());
         assertThat(Arrays.stream(constructor.getParameterTypes())
                 .anyMatch(type -> type.getTypeName().contains("HealthContributor")))
-                .as("ServiceMonitorServiceImpl 不应直接接收 contributor")
+                .as("ServiceMonitorServiceSupport 不应直接接收 contributor")
                 .isFalse();
     }
 }

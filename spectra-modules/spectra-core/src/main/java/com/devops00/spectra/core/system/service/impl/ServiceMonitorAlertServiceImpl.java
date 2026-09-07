@@ -32,6 +32,7 @@ import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorAlertSummaryVO
 import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertEventMapper;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertRuleMapper;
 import com.devops00.spectra.core.system.service.ServiceMonitorAlertService;
+import com.devops00.spectra.core.system.service.ServiceMonitorRuleEvaluationResult;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
@@ -44,6 +45,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -68,20 +70,30 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
 
     @Override
     public void evaluate(ServiceMonitorSample sample) {
+        evaluateWithResult(sample);
+    }
+
+    @Override
+    public ServiceMonitorRuleEvaluationResult evaluateWithResult(ServiceMonitorSample sample) {
         if (sample == null) {
-            return;
+            return ServiceMonitorRuleEvaluationResult.successful(0);
         }
         var rules = ruleMapper.selectList(new LambdaQueryWrapper<ServiceMonitorAlertRule>()
                 .isNull(ServiceMonitorAlertRule::getDeleted)
                 .eq(ServiceMonitorAlertRule::getEnabled, true)
                 .orderByAsc(ServiceMonitorAlertRule::getCode));
+        var failures = new ArrayList<ServiceMonitorRuleEvaluationResult.RuleFailure>();
+        var evaluatedRuleCount = 0;
         for (var rule : rules) {
+            evaluatedRuleCount++;
             try {
                 evaluateRule(rule, sample);
             } catch (RuntimeException exception) {
                 log.warn("服务监控告警规则评估失败: ruleCode={}", rule.getCode(), exception);
+                failures.add(new ServiceMonitorRuleEvaluationResult.RuleFailure(rule.getCode(), safeMessage(exception)));
             }
         }
+        return new ServiceMonitorRuleEvaluationResult(evaluatedRuleCount, failures);
     }
 
     /**
@@ -167,6 +179,14 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
      */
     private static String normalizeDependencyStatus(String status) {
         return status == null || status.isBlank() ? DependencyHealthStatus.UNKNOWN.name() : status;
+    }
+
+    private static String safeMessage(RuntimeException exception) {
+        var message = exception.getMessage();
+        if (message == null || message.isBlank()) {
+            return "规则评估失败";
+        }
+        return message.length() > 500 ? message.substring(0, 500) : message;
     }
 
     /**

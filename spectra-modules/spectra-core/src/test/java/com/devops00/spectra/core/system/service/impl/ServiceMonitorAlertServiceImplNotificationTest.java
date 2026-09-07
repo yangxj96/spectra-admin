@@ -10,6 +10,7 @@ import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertRule;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertEventMapper;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertRuleMapper;
+import com.devops00.spectra.core.system.service.ServiceMonitorRuleEvaluationResult;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.junit.jupiter.api.Test;
@@ -79,5 +80,34 @@ class ServiceMonitorAlertServiceImplNotificationTest {
         verify(eventMapper, never()).updateById(any(ServiceMonitorAlertEvent.class));
         verify(securityRoleMapper).selectOne(any());
         verify(notificationService, never()).send(any());
+    }
+
+    @Test
+    void shouldReturnRuleLevelFailureInsteadOfReportingSuccessfulEvaluation() {
+        var ruleMapper = mock(ServiceMonitorAlertRuleMapper.class);
+        var eventMapper = mock(ServiceMonitorAlertEventMapper.class);
+        var service = new ServiceMonitorAlertServiceImpl(
+                ruleMapper, eventMapper, mock(SecurityRoleMapper.class), mock(RoleAssignmentMapper.class),
+                mock(UserMapper.class), mock(TimeMapper.class), mock(NotificationService.class));
+        var failedRule = new ServiceMonitorAlertRule();
+        failedRule.setCode("CPU_USAGE_HIGH");
+        failedRule.setMetricCode("CPU_USAGE");
+        failedRule.setOperatorCode("GTE");
+        failedRule.setThresholdValue(80D);
+        failedRule.setEnabled(true);
+        var skippedRule = new ServiceMonitorAlertRule();
+        skippedRule.setCode("UNKNOWN_METRIC");
+        skippedRule.setMetricCode("NOT_A_METRIC");
+        skippedRule.setEnabled(true);
+        when(ruleMapper.selectList(any())).thenReturn(List.of(failedRule, skippedRule));
+        when(eventMapper.selectOne(any())).thenThrow(new IllegalStateException("event store unavailable"));
+
+        var result = service.evaluateWithResult(new ServiceMonitorSample());
+
+        assertThat(result.evaluatedRuleCount()).isEqualTo(2);
+        assertThat(result.failures())
+                .extracting(ServiceMonitorRuleEvaluationResult.RuleFailure::ruleCode)
+                .containsExactly("CPU_USAGE_HIGH");
+        assertThat(result.hasFailures()).isTrue();
     }
 }

@@ -17,6 +17,12 @@ public interface ServiceMonitorAlertService {
     /** 根据最新采样评估规则并推进事件状态。 */
     void evaluate(ServiceMonitorSample sample);
 
+    /** 根据最新采样评估规则，并返回规则级失败摘要。 */
+    default ServiceMonitorRuleEvaluationResult evaluateWithResult(ServiceMonitorSample sample) {
+        evaluate(sample);
+        return ServiceMonitorRuleEvaluationResult.successful(0);
+    }
+
     /** 查询规则。 */
     List<ServiceMonitorAlertRuleVO> listRules();
 
