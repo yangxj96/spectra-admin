@@ -15,6 +15,7 @@ import com.devops00.spectra.core.upload.service.UploadApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +35,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file/uploads")
 @RequiredArgsConstructor
+@Slf4j
 @Validated
 @PreAuthorize("isAuthenticated()")
 public class FileUploadController {
@@ -47,11 +49,13 @@ public class FileUploadController {
         return uploadService.create(request);
     }
 
+    @Audit("'查询文件上传状态'")
     @GetMapping(value = "/{uploadId}", version = "1.0.0")
     public UploadSessionVO status(@PathVariable UUID uploadId) {
         return uploadService.status(uploadId);
     }
 
+    @Audit("'获取文件分片上传地址'")
     @PostMapping(value = "/{uploadId}/parts/{partNumber}/target", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public PartTargetVO target(@PathVariable UUID uploadId, @PathVariable int partNumber,
@@ -82,6 +86,7 @@ public class FileUploadController {
         return url.matches("^[A-Za-z][A-Za-z0-9+.-]*:.*");
     }
 
+    @Audit("'上传文件分片'")
     @PutMapping(value = "/{uploadId}/parts/{partNumber}/content", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE, version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public ResponseEntity<Void> content(@PathVariable UUID uploadId, @PathVariable int partNumber,
@@ -91,6 +96,7 @@ public class FileUploadController {
         return ResponseEntity.noContent().build();
     }
 
+    @Audit("'确认文件分片'")
     @PostMapping(value = "/{uploadId}/parts/{partNumber}/confirm", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public ResponseEntity<Void> confirm(@PathVariable UUID uploadId, @PathVariable int partNumber,
@@ -99,12 +105,14 @@ public class FileUploadController {
         return ResponseEntity.noContent().build();
     }
 
+    @Audit("'完成文件上传'")
     @PostMapping(value = "/{uploadId}/complete", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public UploadSessionVO complete(@PathVariable UUID uploadId) {
         return uploadService.complete(uploadId);
     }
 
+    @Audit("'取消文件上传任务'")
     @DeleteMapping(value = "/{uploadId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public ResponseEntity<Void> cancel(@PathVariable UUID uploadId) {

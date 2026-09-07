@@ -40,6 +40,7 @@ public class SystemInitializationController {
     /**
      * 查询或获取目标数据（{@code status}）。
      */
+    @Audit(value = "'查询系统初始化状态'", category = AuditCategory.SECURITY)
     @GetMapping(value = "/status", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public SystemInitializationStatusVO status() {

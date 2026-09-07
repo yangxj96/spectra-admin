@@ -22,9 +22,10 @@ import com.devops00.spectra.core.notification.javabean.from.NotificationControll
 import com.devops00.spectra.core.notification.javabean.vo.NotificationControlledSendApplyVO;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationControlledSendPreviewVO;
 import com.devops00.spectra.core.notification.service.NotificationControlledSendService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/notification/admin/send")
 public class NotificationControlledSendController {
 
@@ -46,7 +48,7 @@ public class NotificationControlledSendController {
     @Audit("'预览受控通知发送'")
     @PostMapping(value = "/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:send:preview')")
-    public NotificationControlledSendPreviewVO preview(@Valid @RequestBody NotificationControlledSendFrom params) {
+    public NotificationControlledSendPreviewVO preview(@Validated @RequestBody NotificationControlledSendFrom params) {
         return service.preview(params);
     }
 
@@ -56,7 +58,7 @@ public class NotificationControlledSendController {
     @Audit("'应用受控通知发送'")
     @PostMapping(value = "/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:send:apply')")
-    public NotificationControlledSendApplyVO apply(@Valid @RequestBody NotificationControlledSendApplyFrom params) {
+    public NotificationControlledSendApplyVO apply(@Validated @RequestBody NotificationControlledSendApplyFrom params) {
         return service.apply(params);
     }
 }

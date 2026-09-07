@@ -8,6 +8,7 @@ package com.devops00.spectra.core.upload.controller;
 import com.devops00.spectra.common.port.file.FileReferenceCommand;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.upload.javabean.from.FileReferenceRequest;
 import com.devops00.spectra.core.upload.javabean.from.FileReferencePageRequest;
@@ -15,6 +16,7 @@ import com.devops00.spectra.core.upload.javabean.vo.FileReferenceAdminVO;
 import com.devops00.spectra.common.port.file.FileReferenceView;
 import com.devops00.spectra.core.upload.service.FileReferenceAdminService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +32,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file/references")
 @RequiredArgsConstructor
+@Slf4j
 @Validated
 public class FileReferenceController {
 
@@ -37,6 +40,7 @@ public class FileReferenceController {
 
     private final FileReferenceAdminService adminService;
 
+    @Audit("'登记文件引用'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:reference')")
     public FileReferenceView register(@Validated @RequestBody FileReferenceRequest request) {
@@ -44,12 +48,14 @@ public class FileReferenceController {
                 request.getReferenceId(), request.getPurpose(), request.getDisplayName()));
     }
 
+    @Audit("'删除文件引用'")
     @DeleteMapping(value = "/{referenceId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:reference')")
     public void remove(@PathVariable UUID referenceId) {
         referenceService.removeById(referenceId);
     }
 
+    @Audit("'查询文件引用'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileReferenceAdminVO> page(PageFrom page, FileReferencePageRequest request) {

@@ -5,12 +5,14 @@
  */
 package com.devops00.spectra.core.upload.controller;
 
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileAccessContext;
 import com.devops00.spectra.common.port.file.FileDownload;
 import com.devops00.spectra.core.upload.service.FileAssetApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -30,12 +32,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file/assets")
 @RequiredArgsConstructor
+@Slf4j
 @PreAuthorize("isAuthenticated()")
 public class FileAssetStreamController {
 
     private final FileAssetApplicationService assetService;
     private final SecurityContextAccessor securityContextAccessor;
 
+    @Audit("'预览文件'")
     @GetMapping(value = "/{fileAssetId}/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:read') or hasPermission(null, 'file:admin:read')")
     public ResponseEntity<InputStreamResource> preview(@PathVariable UUID fileAssetId,
@@ -45,6 +49,7 @@ public class FileAssetStreamController {
         return stream(fileAssetId, referenceType, referenceId, request, false);
     }
 
+    @Audit("'下载文件'")
     @GetMapping(value = "/{fileAssetId}/download", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:read') or hasPermission(null, 'file:admin:read')")
     public ResponseEntity<InputStreamResource> download(@PathVariable UUID fileAssetId,

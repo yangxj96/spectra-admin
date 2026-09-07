@@ -101,7 +101,7 @@ public class ReimbursementController {
     @Audit("'提交报销审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:update')")
-    public void submit(@PathVariable UUID id, @RequestBody(required = false) ReimbursementSubmitFrom from) {
+    public void submit(@PathVariable UUID id, @Validated @RequestBody(required = false) ReimbursementSubmitFrom from) {
         reimbursementService.submit(id, from);
     }
 
@@ -131,7 +131,7 @@ public class ReimbursementController {
     @Audit("'登记报销付款'")
     @PostMapping(value = "/{id}/payment", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:pay')")
-    public void payment(@PathVariable UUID id, @RequestBody(required = false) ReimbursementPaymentFrom from) {
+    public void payment(@PathVariable UUID id, @Validated @RequestBody(required = false) ReimbursementPaymentFrom from) {
         reimbursementService.markPaid(id, from);
     }
 }

@@ -15,6 +15,7 @@ import com.devops00.spectra.core.upload.javabean.vo.FileUploadAdminVO;
 import com.devops00.spectra.core.upload.service.FileUploadAdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,17 +37,20 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file/uploads")
 @RequiredArgsConstructor
+@Slf4j
 @Validated
 public class FileUploadAdminController {
 
     private final FileUploadAdminService adminService;
 
+    @Audit("'分页查询文件上传任务'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileUploadAdminVO> page(PageFrom page, FileUploadAdminPageRequest request) {
         return adminService.page(page.toPage(), request);
     }
 
+    @Audit("'查询文件上传任务详情'")
     @GetMapping(value = "/{uploadId}/admin-detail", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public FileUploadAdminDetailVO detail(@PathVariable UUID uploadId) {

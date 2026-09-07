@@ -10,6 +10,7 @@ import com.devops00.spectra.oa.supply.javabean.from.SupplySaveFrom;
 import com.devops00.spectra.oa.supply.javabean.vo.SupplyItemVO;
 import com.devops00.spectra.oa.supply.service.SupplyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/oa/supplies")
 @RequiredArgsConstructor
+@Slf4j
 public class SupplyController {
     private final SupplyService supplyService;
 

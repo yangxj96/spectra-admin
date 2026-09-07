@@ -21,6 +21,7 @@ import com.devops00.spectra.core.scheduler.javabean.vo.SchedulerOperationVO;
 import com.devops00.spectra.core.scheduler.service.SchedulerAdminService;
 import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,7 @@ import java.util.UUID;
 /** 单体调度管理接口。 */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/scheduler/admin")
 public class SchedulerAdminController {
 

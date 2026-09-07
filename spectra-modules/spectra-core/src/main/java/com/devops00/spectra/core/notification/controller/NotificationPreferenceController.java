@@ -21,6 +21,7 @@ import com.devops00.spectra.core.notification.javabean.entity.NotificationUserPr
 import com.devops00.spectra.core.notification.service.NotificationPreferenceService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,6 +41,7 @@ import java.util.UUID;
  */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/notification-center/preferences")
 public class NotificationPreferenceController {
 

@@ -6,6 +6,7 @@
 
 package com.devops00.spectra.core.security.authorization.controller;
 
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationContextVO;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
@@ -37,6 +38,7 @@ public class SecurityContextController {
     /**
      * 查询或获取目标数据（{@code current}）。
      */
+    @Audit("'查询授权上下文'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public AuthorizationContextVO current() {

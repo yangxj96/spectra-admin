@@ -16,10 +16,14 @@
 
 package com.devops00.spectra.core.notification.controller;
 
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationProviderCallbackVO;
 import com.devops00.spectra.core.notification.service.NotificationProviderCallbackService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/notification/provider/callback")
 public class NotificationProviderCallbackController {
 
@@ -47,10 +52,12 @@ public class NotificationProviderCallbackController {
     /**
      * 接收一个渠道的外部 Provider 回执。
      */
+    @Audit("'处理通知 Provider 回执'")
     @PostMapping(value = "/{channel}", version = "1.0.0")
+    @PreAuthorize("permitAll()")
     public NotificationProviderCallbackVO callback(@PathVariable NotificationChannel channel,
                                                    @RequestHeader(name = "X-Notification-Signature", required = false) String signature,
-                                                   @RequestBody String body) {
+                                                   @Validated @RequestBody String body) {
         return service.handle(channel, signature, body);
     }
 }

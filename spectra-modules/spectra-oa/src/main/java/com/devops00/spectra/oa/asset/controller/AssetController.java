@@ -13,6 +13,7 @@ import com.devops00.spectra.oa.asset.javabean.vo.AssetCategoryVO;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
 import com.devops00.spectra.oa.asset.service.AssetService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/oa/assets")
 @RequiredArgsConstructor
+@Slf4j
 public class AssetController {
 
     private final AssetService assetService;
@@ -116,7 +118,7 @@ public class AssetController {
     @Audit("'资产领用'")
     @PostMapping(value = "/{id}/assign", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
-    public void assign(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
+    public void assign(@PathVariable UUID id, @Validated @RequestBody(required = false) AssetOperationFrom from) {
         assetService.assign(id, from);
     }
 
@@ -126,7 +128,7 @@ public class AssetController {
     @Audit("'资产归还'")
     @PostMapping(value = "/{id}/return", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
-    public void returnAsset(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
+    public void returnAsset(@PathVariable UUID id, @Validated @RequestBody(required = false) AssetOperationFrom from) {
         assetService.returnAsset(id, from);
     }
 
@@ -136,7 +138,7 @@ public class AssetController {
     @Audit("'资产调拨'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
-    public void transfer(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
+    public void transfer(@PathVariable UUID id, @Validated @RequestBody(required = false) AssetOperationFrom from) {
         assetService.transfer(id, from);
     }
 
@@ -146,7 +148,7 @@ public class AssetController {
     @Audit("'资产维修'")
     @PostMapping(value = "/{id}/maintenance", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
-    public void maintenance(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
+    public void maintenance(@PathVariable UUID id, @Validated @RequestBody(required = false) AssetOperationFrom from) {
         assetService.maintenance(id, from);
     }
 
@@ -156,7 +158,7 @@ public class AssetController {
     @Audit("'资产报废'")
     @PostMapping(value = "/{id}/scrap", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
-    public void scrap(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
+    public void scrap(@PathVariable UUID id, @Validated @RequestBody(required = false) AssetOperationFrom from) {
         assetService.scrap(id, from);
     }
 

@@ -89,7 +89,7 @@ public class AuthenticationController {
     @PostMapping(value = "/logout", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("permitAll()")
-    public void logout(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
+    public void logout(@Validated @RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
                        HttpServletResponse response) {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
         String refreshToken = params != null ? params.getRefreshToken() : null;
@@ -153,7 +153,7 @@ public class AuthenticationController {
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", version = "1.0.0")
-    public SecurityToken refresh(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
+    public SecurityToken refresh(@Validated @RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
                                  HttpServletResponse response) {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
         if (AuthenticationWebUtils.isWebClient(clientType)) {

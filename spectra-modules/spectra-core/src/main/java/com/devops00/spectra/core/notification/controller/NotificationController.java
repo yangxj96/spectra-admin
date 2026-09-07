@@ -25,10 +25,10 @@ import com.devops00.spectra.core.notification.javabean.from.NotificationQueryFro
 import com.devops00.spectra.core.notification.javabean.vo.NotificationInboxVO;
 import com.devops00.spectra.core.notification.service.NotificationInboxService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -126,7 +126,7 @@ public class NotificationController {
     @Audit("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:delete')")
-    public void batchDelete(@Valid @RequestBody NotificationBatchDeleteFrom from) {
+    public void batchDelete(@Validated @RequestBody NotificationBatchDeleteFrom from) {
         service.batchDelete(from.getIds(), currentUserId());
     }
 

@@ -102,7 +102,7 @@ public class PurchaseController {
     @Audit("'提交采购申请审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
-    public void submit(@PathVariable UUID id, @RequestBody(required = false) PurchaseSubmitFrom from) {
+    public void submit(@PathVariable UUID id, @Validated @RequestBody(required = false) PurchaseSubmitFrom from) {
         purchaseService.submit(id, from);
     }
 
@@ -132,7 +132,7 @@ public class PurchaseController {
     @Audit("'登记采购执行'")
     @PostMapping(value = "/{id}/execute", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:execute')")
-    public void execute(@PathVariable UUID id, @RequestBody PurchaseExecuteFrom from) {
+    public void execute(@PathVariable UUID id, @Validated @RequestBody PurchaseExecuteFrom from) {
         purchaseService.execute(id, from);
     }
 

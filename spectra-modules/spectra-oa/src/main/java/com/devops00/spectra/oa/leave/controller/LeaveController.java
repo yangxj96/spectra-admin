@@ -99,7 +99,7 @@ public class LeaveController {
     @Audit("'提交请假申请'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:update')")
-    public void submit(@PathVariable UUID id, @RequestBody(required = false) LeaveSubmitFrom from) {
+    public void submit(@PathVariable UUID id, @Validated @RequestBody(required = false) LeaveSubmitFrom from) {
         leaveService.submit(id, from);
     }
 
