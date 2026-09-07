@@ -35,6 +35,41 @@
     </resultMap>
     <!-- @formatter:on -->
 
+    <resultMap id="RegionPathRowMap"
+               type="com.devops00.spectra.core.system.javabean.entity.RegionPathRow">
+        <result column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="name" property="name"/>
+        <result column="depth" property="depth"/>
+    </resultMap>
+
+    <select id="selectPath" resultMap="RegionPathRowMap">
+        WITH RECURSIVE region_path AS (
+            SELECT id,
+                   pid,
+                   name,
+                   0 AS depth,
+                   ARRAY[id] AS visited
+            FROM spectra_core.sys_region
+            WHERE id = #{id}
+              AND deleted IS NULL
+            UNION ALL
+            SELECT parent.id,
+                   parent.pid,
+                   parent.name,
+                   current.depth + 1 AS depth,
+                   current.visited || ARRAY[parent.id] AS visited
+            FROM spectra_core.sys_region parent
+            INNER JOIN region_path current ON current.pid = parent.id
+            WHERE parent.deleted IS NULL
+              AND current.depth &lt;= #{maxDepth}
+              AND NOT (parent.id = ANY (current.visited))
+        )
+        SELECT id, pid, name, depth
+        FROM region_path
+        ORDER BY depth ASC
+    </select>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         name, full_name, short_name, code, path, pid, level, status, sort,

@@ -23,9 +23,11 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.RegionLevel;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.system.javabean.converter.RegionConverter;
 import com.devops00.spectra.core.system.javabean.entity.Region;
+import com.devops00.spectra.core.system.javabean.entity.RegionPathRow;
 import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
@@ -36,7 +38,6 @@ import com.devops00.spectra.framework.assembler.NameLookup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +56,12 @@ import java.util.stream.Collectors;
 @Service
 public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService, NameLookup<UUID> {
 
+    private static final int MAX_PATH_DEPTH = 64;
+
     private final RegionConverter converter;
 
-    public RegionServiceImpl(RegionConverter converter) {
+    public RegionServiceImpl(RegionMapper mapper, RegionConverter converter) {
+        this.baseMapper = mapper;
         this.converter = converter;
     }
 
@@ -93,28 +97,18 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
     @Override
     public RegionPathVO getPath(UUID id) {
 
-        List<UUID> ids = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-
-        Region current = this.getBaseMapper().selectById(id);
-
-        while (current != null) {
-            ids.add(current.getId());
-            names.add(current.getName());
-
-            if (current.getPid() == null) {
-                break;
-            }
-
-            current = this.getBaseMapper().selectById(current.getPid());
+        List<RegionPathRow> rows = this.getBaseMapper().selectPath(id, MAX_PATH_DEPTH);
+        if (rows.stream().anyMatch(row -> row.getDepth() > MAX_PATH_DEPTH)) {
+            throw new DataSaveException("行政区划路径超过最大深度");
         }
 
-        // 因为是从子 -> 父，需要反转
-        Collections.reverse(ids);
-        Collections.reverse(names);
+        List<RegionPathRow> path = rows.stream()
+                .sorted((left, right) -> Integer.compare(right.getDepth(), left.getDepth()))
+                .toList();
 
         RegionPathVO vo = new RegionPathVO();
-        vo.setIds(ids);
+        vo.setIds(path.stream().map(RegionPathRow::getId).toList());
+        List<String> names = path.stream().map(RegionPathRow::getName).toList();
         vo.setNames(names);
         vo.setFullName(String.join("/", names));
 

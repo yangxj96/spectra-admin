@@ -17,8 +17,13 @@
 package com.devops00.spectra.core.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.devops00.spectra.core.system.javabean.entity.RegionPathRow;
 import com.devops00.spectra.core.system.javabean.entity.Region;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 行政区域Mapper
@@ -29,4 +34,13 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface RegionMapper extends BaseMapper<Region> {
+
+    /**
+     * 一次查询目标区域及其全部父级路径。
+     *
+     * @param id       目标区域 ID
+     * @param maxDepth 最大递归深度
+     * @return 从目标区域到根节点的路径行
+     */
+    List<RegionPathRow> selectPath(@Param("id") UUID id, @Param("maxDepth") int maxDepth);
 }
