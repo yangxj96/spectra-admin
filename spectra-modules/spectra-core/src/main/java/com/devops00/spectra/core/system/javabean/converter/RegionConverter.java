@@ -20,8 +20,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.system.javabean.entity.Region;
 import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.configure.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

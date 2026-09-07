@@ -21,7 +21,7 @@ import com.devops00.spectra.common.config.SystemConfigValueWriter;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfigDocument;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;

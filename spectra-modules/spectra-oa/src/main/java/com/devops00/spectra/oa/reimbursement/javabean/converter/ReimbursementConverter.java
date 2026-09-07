@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.oa.reimbursement.javabean.converter;
 
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.configure.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationAttachment;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem;

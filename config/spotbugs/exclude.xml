@@ -6,15 +6,15 @@
         injection rather than an externally mutable domain value.
     -->
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.mvc.advice.request.RequestDecryptAdvice"/>
+        <Class name="com.devops00.spectra.framework.web.RequestDecryptAdvice"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice"/>
+        <Class name="com.devops00.spectra.framework.web.ResponseEncryptAdvice"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager"/>
+        <Class name="com.devops00.spectra.framework.web.CryptoKeyManager"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -174,36 +174,36 @@
     </Match>
     <!-- ObjectMapper/RedisTemplate/configuration/Converter are private Spring collaborators. -->
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.redis.RedisSecurityVerificationStore"/>
+        <Class name="com.devops00.spectra.framework.security.RedisSecurityVerificationStore"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.redis.RedisSecurityInitializationTokenStore"/>
+        <Class name="com.devops00.spectra.framework.security.RedisSecurityInitializationTokenStore"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAccessDeniedHandler"/>
+        <Class name="com.devops00.spectra.framework.security.RestAccessDeniedHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAuthenticationEntryPoint"/>
+        <Class name="com.devops00.spectra.framework.security.RestAuthenticationEntryPoint"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.ratelimit.RequestRateLimitFilter"/>
+        <Class name="com.devops00.spectra.framework.security.RequestRateLimitFilter"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.strategy.RedisSecuritySessionRepository"/>
+        <Class name="com.devops00.spectra.framework.security.RedisSecuritySessionRepository"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <!-- These handlers serialize a fixed R body as application/json; PrintWriter is not an HTML sink. -->
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAccessDeniedHandler"/>
+        <Class name="com.devops00.spectra.framework.security.RestAccessDeniedHandler"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.configure.security.advice.RestAuthenticationEntryPoint"/>
+        <Class name="com.devops00.spectra.framework.security.RestAuthenticationEntryPoint"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
     <!-- Scheduler repositories/services retain Spring-managed collaborators by constructor injection. -->

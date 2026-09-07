@@ -44,8 +44,8 @@ public class SystemProperties {
      * 以下为没法直接使用这个属性进行修改的位置,
      * <ol>
      * <li>com.devops00.spectra.framework.configure.MyBatisPlusConfiguration</li>
-     * <li>com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice</li>
-     * <li>com.devops00.spectra.framework.configure.mvc.advice.response.ResponseModifyAdvice</li>
+     * <li>com.devops00.spectra.framework.web.ResponseEncryptAdvice</li>
+     * <li>com.devops00.spectra.framework.web.ResponseModifyAdvice</li>
      * <li>com.devops00.spectra.launch.LaunchApplication</li>
      * </ol>
      */

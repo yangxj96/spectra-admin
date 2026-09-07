@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.notification.support;
 
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 
 import static org.mockito.Mockito.mock;

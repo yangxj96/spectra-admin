@@ -26,7 +26,7 @@ import com.devops00.spectra.core.user.imports.javabean.vo.UserImportRowVO;
 import com.devops00.spectra.core.user.imports.javabean.vo.UserImportTaskVO;
 import com.devops00.spectra.core.user.imports.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

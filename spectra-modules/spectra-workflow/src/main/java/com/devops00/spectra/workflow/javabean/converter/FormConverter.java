@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.workflow.javabean.converter;
 
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.configure.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.workflow.javabean.entity.FormDefinition;
 import com.devops00.spectra.workflow.javabean.entity.FormVersion;
 import com.devops00.spectra.workflow.javabean.vo.FormDefinitionVO;

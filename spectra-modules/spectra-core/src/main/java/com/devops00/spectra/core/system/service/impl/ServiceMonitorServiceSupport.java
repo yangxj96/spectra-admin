@@ -31,7 +31,7 @@ import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorHistoryVO;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorSampleMapper;
 import com.devops00.spectra.core.system.service.ServiceMonitorAlertService;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;

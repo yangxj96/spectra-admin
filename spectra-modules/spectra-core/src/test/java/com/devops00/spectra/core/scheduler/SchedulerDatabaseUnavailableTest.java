@@ -1,7 +1,7 @@
 package com.devops00.spectra.core.scheduler;
 
 import com.devops00.spectra.common.exception.SchedulerDatabaseUnavailableException;
-import com.devops00.spectra.framework.configure.mvc.advice.exception.SqlExceptionAdvice;
+import com.devops00.spectra.framework.web.SqlExceptionAdvice;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;

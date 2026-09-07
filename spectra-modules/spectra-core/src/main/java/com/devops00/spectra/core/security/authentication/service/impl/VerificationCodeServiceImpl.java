@@ -27,7 +27,7 @@ import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.security.authentication.service.VerificationCodeService;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
-import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.SecurityProperties;
 import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import org.springframework.stereotype.Service;

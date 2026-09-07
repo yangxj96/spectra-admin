@@ -51,10 +51,10 @@ class SecurityModuleConsolidationTest {
     void frameworkMustOwnSecurityTechnicalPackages() {
         Path backend = resolveBackendPath("");
         List<String> technicalTypes = List.of(
-                "spectra-framework/src/main/java/com/devops00/spectra/framework/configure/security/autoconfiguration/SecurityAutoConfiguration.java",
-                "spectra-framework/src/main/java/com/devops00/spectra/framework/configure/security/configuration/SecurityConfiguration.java",
-                "spectra-framework/src/main/java/com/devops00/spectra/framework/configure/security/filter/TokenAuthenticationFilter.java",
-                "spectra-framework/src/main/java/com/devops00/spectra/framework/configure/security/strategy/RedisSecuritySessionRepository.java");
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/configure/SecurityAutoConfiguration.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/configure/SecurityConfiguration.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/TokenAuthenticationFilter.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/RedisSecuritySessionRepository.java");
 
         assertThat(technicalTypes)
                 .allMatch(type -> Files.exists(backend.resolve(type)),

@@ -25,7 +25,7 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 import com.devops00.spectra.common.notification.NotificationGateway;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.converter.NotificationAdminConverter;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationDeliveryStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationRequestStatus;

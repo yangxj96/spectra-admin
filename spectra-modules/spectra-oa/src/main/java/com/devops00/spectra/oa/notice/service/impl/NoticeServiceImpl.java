@@ -28,7 +28,7 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.oa.notice.javabean.converter.NoticeConverter;
 import com.devops00.spectra.oa.notice.javabean.constant.NoticeStatus;
 import com.devops00.spectra.oa.notice.javabean.entity.Notice;

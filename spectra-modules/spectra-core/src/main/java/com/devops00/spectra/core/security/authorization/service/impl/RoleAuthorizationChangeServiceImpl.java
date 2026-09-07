@@ -44,7 +44,7 @@ import com.devops00.spectra.core.security.authorization.service.RoleAuthorizatio
 import com.devops00.spectra.core.security.authorization.service.RoleChangeImpactAnalyzer;
 import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
 import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;

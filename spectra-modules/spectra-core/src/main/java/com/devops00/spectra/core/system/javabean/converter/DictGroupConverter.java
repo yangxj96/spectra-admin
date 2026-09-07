@@ -19,8 +19,8 @@ package com.devops00.spectra.core.system.javabean.converter;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;
 import com.devops00.spectra.core.system.javabean.from.DictGroupFrom;
 import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.configure.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import org.mapstruct.Mapper;
 
 import java.util.List;

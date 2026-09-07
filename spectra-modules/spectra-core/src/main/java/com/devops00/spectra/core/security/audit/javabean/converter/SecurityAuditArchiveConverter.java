@@ -18,8 +18,8 @@ package com.devops00.spectra.core.security.audit.javabean.converter;
 
 import com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveOrchestrator;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditArchiveManifestVO;
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.configure.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import org.mapstruct.Mapper;
 
 /**

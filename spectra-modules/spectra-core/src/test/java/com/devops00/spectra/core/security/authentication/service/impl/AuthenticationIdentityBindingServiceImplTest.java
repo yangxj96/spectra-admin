@@ -21,7 +21,7 @@ import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
-import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.SecurityProperties;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

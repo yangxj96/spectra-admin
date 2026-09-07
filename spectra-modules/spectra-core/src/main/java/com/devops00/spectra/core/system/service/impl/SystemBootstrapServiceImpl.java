@@ -23,7 +23,7 @@ import com.devops00.spectra.core.system.javabean.vo.SystemBootstrapVO;
 import com.devops00.spectra.core.system.javabean.vo.SystemPublicConfigVO;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.system.service.SystemBootstrapService;
-import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
+import com.devops00.spectra.framework.web.CryptoKeyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

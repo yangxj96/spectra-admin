@@ -22,7 +22,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.SecurityProperties;
 import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
 import org.junit.jupiter.api.Test;
 

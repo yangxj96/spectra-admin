@@ -59,10 +59,10 @@ class FileUploadConverterTest {
 
         SecurityContextAccessor accessor = mock(SecurityContextAccessor.class);
         when(accessor.currentUserZoneId()).thenReturn("Asia/Shanghai");
-        var timeMapper = new com.devops00.spectra.framework.configure.mapstruct.TimeMapper(accessor);
+        var timeMapper = new com.devops00.spectra.framework.serialization.TimeMapper(accessor);
         Class<?> implementationType = Class.forName(converterType.getName() + "Impl");
         var converter = implementationType.getConstructor(
-                com.devops00.spectra.framework.configure.mapstruct.TimeMapper.class).newInstance(timeMapper);
+                com.devops00.spectra.framework.serialization.TimeMapper.class).newInstance(timeMapper);
 
         FileAsset asset = new FileAsset();
         asset.setCreatedAt(Instant.parse("2026-08-30T16:24:30.765318Z"));

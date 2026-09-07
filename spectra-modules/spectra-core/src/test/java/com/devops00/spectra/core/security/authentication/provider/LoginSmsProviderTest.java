@@ -24,7 +24,7 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.framework.configure.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.configure.SecurityProperties;
 import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

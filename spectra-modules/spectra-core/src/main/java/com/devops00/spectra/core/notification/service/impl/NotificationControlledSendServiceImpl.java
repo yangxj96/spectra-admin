@@ -32,7 +32,7 @@ import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.common.utils.SHA256Utils;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationSendPreviewEntity;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationPreviewStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTemplateState;

@@ -17,8 +17,8 @@
 package com.devops00.spectra.oa.report.javabean.converter;
 
 import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
-import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.framework.configure.GlobalMapperConfig;
+import com.devops00.spectra.framework.serialization.TimeMapper;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

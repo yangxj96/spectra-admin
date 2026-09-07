@@ -203,9 +203,9 @@ class ArchitectureTest {
     @ArchTest
     static void frameworkMustOwnSecurityTechnicalMechanisms(JavaClasses classes) {
         Map<String, String> technicalPackages = Map.of(
-                "安全过滤器", "com.devops00.spectra.framework.configure.security.filter",
-                "安全运行时配置", "com.devops00.spectra.framework.configure.security.configuration",
-                "安全 Redis repository", "com.devops00.spectra.framework.configure.security.strategy");
+                "安全过滤器", "com.devops00.spectra.framework.security",
+                "安全运行时配置", "com.devops00.spectra.framework.configure",
+                "安全 Redis repository", "com.devops00.spectra.framework.security");
 
         var packageNames = classes.stream()
                 .map(JavaClass::getPackageName)
