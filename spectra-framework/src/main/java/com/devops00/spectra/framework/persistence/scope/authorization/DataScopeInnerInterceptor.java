@@ -28,9 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -59,25 +58,17 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     private final DataScopeEntityRegistry dataScopeEntityRegistry;
 
-    private final @Nullable SecurityContextAccessor securityContextAccessor;
+    private final SecurityContextAccessor securityContextAccessor;
 
-    /**
-     * 保留给框架单测和没有新授权模块的独立使用场景；正式应用使用三参数构造器。
-     */
-    public DataScopeInnerInterceptor(ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider,
-                                     DataScopeEntityRegistry dataScopeEntityRegistry) {
-        this.authorizationSnapshotProvider = authorizationSnapshotProvider;
-        this.dataScopeEntityRegistry = dataScopeEntityRegistry;
-        this.securityContextAccessor = null;
-    }
-
-    @Autowired
     public DataScopeInnerInterceptor(ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider,
                                      DataScopeEntityRegistry dataScopeEntityRegistry,
                                      SecurityContextAccessor securityContextAccessor) {
-        this.authorizationSnapshotProvider = authorizationSnapshotProvider;
-        this.dataScopeEntityRegistry = dataScopeEntityRegistry;
-        this.securityContextAccessor = securityContextAccessor;
+        this.authorizationSnapshotProvider = Objects.requireNonNull(authorizationSnapshotProvider,
+                "authorizationSnapshotProvider 不能为空");
+        this.dataScopeEntityRegistry = Objects.requireNonNull(dataScopeEntityRegistry,
+                "dataScopeEntityRegistry 不能为空");
+        this.securityContextAccessor = Objects.requireNonNull(securityContextAccessor,
+                "securityContextAccessor 不能为空");
     }
 
     @Override
@@ -105,14 +96,12 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         // 只有明确标注了 @DataScope 的业务表才需要登录上下文。
         // 认证流程会在登录前查询 authentication_identity/sys_user 等基础表，
         // 这些表不属于数据隔离范围，不能因为当前尚未建立用户上下文而失败。
-        UUID userId = securityContextAccessor == null ? null : securityContextAccessor.currentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             throw new DataScopeViolationException("数据权限 SQL 缺少当前用户上下文");
         }
 
-        AuthorizationSnapshotProvider snapshotProvider = authorizationSnapshotProvider == null
-                ? null
-                : authorizationSnapshotProvider.getIfAvailable();
+        AuthorizationSnapshotProvider snapshotProvider = authorizationSnapshotProvider.getIfAvailable();
         if (snapshotProvider == null) {
             throw new DataScopeViolationException("授权快照提供者未配置，已拒绝访问");
         }

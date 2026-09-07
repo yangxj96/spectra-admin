@@ -81,8 +81,10 @@ public class DataScopeEntityRegistry {
             if (!tableName.schema().isBlank()) {
                 scopes.put(tableName.schema() + "." + tableName.value(), dataScope);
             }
-        } catch (ClassNotFoundException | LinkageError ignored) {
-            // 单个可选模块缺少依赖不应阻断框架启动；该资源仍会在 SQL 解析阶段按类名处理。
+        } catch (ClassNotFoundException exception) {
+            throw new IllegalStateException("数据权限实体加载失败: " + className, exception);
+        } catch (LinkageError error) {
+            throw new IllegalStateException("数据权限实体依赖加载失败: " + className, error);
         }
     }
 }

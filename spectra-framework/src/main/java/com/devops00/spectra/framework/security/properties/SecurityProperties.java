@@ -189,6 +189,9 @@ public class SecurityProperties {
      * 校验安全 Redis 契约；不允许通过配置关闭 fail-closed 或改变已发布 Key 命名空间。
      */
     public void validateRedisContract() {
+        if (redis == null) {
+            throw new IllegalStateException("安全 Redis contract 不得为空");
+        }
         if (!SecurityRedisNamespace.PREFIX.equals(redis.getNamespace())) {
             throw new IllegalStateException("安全 Redis namespace 必须固定为 " + SecurityRedisNamespace.PREFIX);
         }
@@ -197,6 +200,40 @@ public class SecurityProperties {
         }
         if (redis.getWorkerBatchSize() < 1 || redis.getWorkerBatchSize() > 1000) {
             throw new IllegalStateException("安全 Redis worker 批量大小必须在 1 到 1000 之间");
+        }
+    }
+
+    /**
+     * 校验安全运行参数，在 Spring 容器启动阶段调用。
+     */
+    public void validate() {
+        validateRedisContract();
+        if (accessTokenExpire < 1) {
+            throw new IllegalStateException("accessTokenExpire 必须为正数");
+        }
+        if (refreshTokenExpire < 1) {
+            throw new IllegalStateException("refreshTokenExpire 必须为正数");
+        }
+        if (lockoutMaxAttempts < 1) {
+            throw new IllegalStateException("lockoutMaxAttempts 必须为正数");
+        }
+        if (lockoutSeconds < 0) {
+            throw new IllegalStateException("lockoutSeconds 不能为负数");
+        }
+        if (verificationCodeExpire < 1) {
+            throw new IllegalStateException("verificationCodeExpire 必须为正数");
+        }
+        if (verificationCodeMaxAttempts < 1) {
+            throw new IllegalStateException("verificationCodeMaxAttempts 必须为正数");
+        }
+        if (verificationCodeLength != 6) {
+            throw new IllegalStateException("verificationCodeLength 必须为 6");
+        }
+        if (minEffectiveDevOpsUsers < 1 || maxDevOpsUsers < minEffectiveDevOpsUsers) {
+            throw new IllegalStateException("DevOps Root 用户数量边界无效");
+        }
+        if (maxSessions < 1) {
+            throw new IllegalStateException("maxSessions 必须为正数");
         }
     }
 }

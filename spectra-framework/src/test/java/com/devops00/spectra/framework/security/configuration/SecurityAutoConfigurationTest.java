@@ -20,9 +20,11 @@ import com.devops00.spectra.framework.FrameworkModule;
 import com.devops00.spectra.framework.security.redis.store.RedisSecurityInitializationTokenStore;
 import com.devops00.spectra.framework.security.redis.store.RedisSecurityVerificationStore;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import java.util.Arrays;
@@ -60,5 +62,33 @@ class SecurityAutoConfigurationTest {
         assertThat(beanClassNames)
                 .contains(RedisSecurityVerificationStore.class.getName(),
                         RedisSecurityInitializationTokenStore.class.getName());
+    }
+
+    @Test
+    void securityAutoConfigurationMustNotMaintainASecondScanOrImportEntry() {
+        assertThat(SecurityAutoConfiguration.class.getAnnotation(ComponentScan.class)).isNull();
+        assertThat(SecurityAutoConfiguration.class.getAnnotation(Import.class)).isNull();
+    }
+
+    @Test
+    void invalidSecurityRedisContractMustFailDuringContextStartup() {
+        new ApplicationContextRunner()
+                .withUserConfiguration(SecurityAutoConfiguration.class)
+                .withPropertyValues("spectra.security.redis.namespace=")
+                .run(context -> assertThat(context).hasFailed()
+                        .getFailure()
+                        .hasRootCauseMessage("安全 Redis namespace 必须固定为 sec:"));
+    }
+
+    @Test
+    void invalidSecurityTtlAndAttemptsMustFailDuringContextStartup() {
+        new ApplicationContextRunner()
+                .withUserConfiguration(SecurityAutoConfiguration.class)
+                .withPropertyValues(
+                        "spectra.security.access-token-expire=0",
+                        "spectra.security.lockout-max-attempts=0")
+                .run(context -> assertThat(context).hasFailed()
+                        .getFailure()
+                        .hasRootCauseMessage("accessTokenExpire 必须为正数"));
     }
 }

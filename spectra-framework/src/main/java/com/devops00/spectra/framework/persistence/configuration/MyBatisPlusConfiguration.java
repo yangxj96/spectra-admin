@@ -30,7 +30,6 @@ import com.devops00.spectra.framework.persistence.scope.authorization.DataScopeI
 import com.devops00.spectra.framework.persistence.mybatis.MetaObjectHandlerImpl;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +39,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * MyBatisPlus配置
@@ -56,14 +56,21 @@ public class MyBatisPlusConfiguration {
     /**
      * 使用ObjectProvider自动收集所有InnerInterceptor类型的Bean
      */
-    @Resource
-    private ObjectProvider<InnerInterceptor> innerInterceptors;
+    private final ObjectProvider<InnerInterceptor> innerInterceptors;
 
-    @Resource
-    private ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider;
+    private final ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider;
 
-    @Resource
-    private DataScopeEntityRegistry dataScopeEntityRegistry;
+    private final DataScopeEntityRegistry dataScopeEntityRegistry;
+
+    public MyBatisPlusConfiguration(ObjectProvider<InnerInterceptor> innerInterceptors,
+                                    ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider,
+                                    DataScopeEntityRegistry dataScopeEntityRegistry) {
+        this.innerInterceptors = Objects.requireNonNull(innerInterceptors, "innerInterceptors 不能为空");
+        this.authorizationSnapshotProvider = Objects.requireNonNull(authorizationSnapshotProvider,
+                "authorizationSnapshotProvider 不能为空");
+        this.dataScopeEntityRegistry = Objects.requireNonNull(dataScopeEntityRegistry,
+                "dataScopeEntityRegistry 不能为空");
+    }
 
     /**
      * 添加审计字段自动填充处理器。

@@ -14,10 +14,10 @@ import com.devops00.spectra.common.security.authorization.ExecutionContext;
 import com.devops00.spectra.common.security.authorization.ScopeQuery;
 import com.devops00.spectra.common.security.authorization.ScopedAuthorization;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * 资源级 IDOR、批量和导出门禁。
@@ -30,24 +30,16 @@ public class ResourceAuthorizationGuard {
 
     private final ObjectProvider<AuthorizationSnapshotProvider> provider;
 
-    @Autowired
     public ResourceAuthorizationGuard(ObjectProvider<AuthorizationSnapshotProvider> provider) {
-        this.provider = provider;
+        this.provider = Objects.requireNonNull(provider, "authorizationSnapshotProvider 不能为空");
     }
 
     /**
      * 校验并确保数据满足当前约束（{@code assertAllowed}）。
      */
     public void assertAllowed(ExecutionContext context, ScopeQuery query) {
-        if (context == null || query == null) {
-            throw new DataScopeViolationException("资源授权上下文不完整");
-        }
-        AuthorizationSnapshotProvider snapshotProvider = provider.getIfAvailable();
-        if (snapshotProvider == null) {
-            throw new DataScopeViolationException("授权快照读取器不可用，拒绝资源访问");
-        }
-        AuthorizationSnapshot snapshot = snapshotProvider.load(context.subjectId());
-        assertAllowed(new ScopedAuthorization(context.subjectId(), snapshot), context, query);
+        requireContextAndQuery(context, query);
+        assertAllowed(loadAuthorization(context), context, query);
     }
 
     /**
@@ -57,8 +49,11 @@ public class ResourceAuthorizationGuard {
         if (queries == null || queries.isEmpty()) {
             throw new DataScopeViolationException("批量资源集合不能为空");
         }
+        requireContext(context);
+        queries.forEach(ResourceAuthorizationGuard::requireQuery);
+        var authorization = loadAuthorization(context);
         for (ScopeQuery query : queries) {
-            assertAllowed(context, query);
+            assertAllowed(authorization, context, query);
         }
     }
 
@@ -78,6 +73,32 @@ public class ResourceAuthorizationGuard {
     public static void assertAllowed(ScopedAuthorization authorization, ExecutionContext context, ScopeQuery query) {
         if (!authorization.allows(context, query)) {
             throw new DataScopeViolationException("资源不在当前 Permission 的 Access Boundary 内");
+        }
+    }
+
+    private ScopedAuthorization loadAuthorization(ExecutionContext context) {
+        AuthorizationSnapshotProvider snapshotProvider = provider.getIfAvailable();
+        if (snapshotProvider == null) {
+            throw new DataScopeViolationException("授权快照读取器不可用，拒绝资源访问");
+        }
+        AuthorizationSnapshot snapshot = snapshotProvider.load(context.subjectId());
+        return new ScopedAuthorization(context.subjectId(), snapshot);
+    }
+
+    private static void requireContextAndQuery(ExecutionContext context, ScopeQuery query) {
+        requireContext(context);
+        requireQuery(query);
+    }
+
+    private static void requireContext(ExecutionContext context) {
+        if (context == null) {
+            throw new DataScopeViolationException("资源授权上下文不完整");
+        }
+    }
+
+    private static void requireQuery(ScopeQuery query) {
+        if (query == null) {
+            throw new DataScopeViolationException("资源授权查询不完整");
         }
     }
 }

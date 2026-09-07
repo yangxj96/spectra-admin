@@ -20,6 +20,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.SocketOptions;
+import io.lettuce.core.resource.ClientResources;
 import io.lettuce.core.resource.DefaultClientResources;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,16 +56,17 @@ public class RedisConfiguration {
      * 配置原生 RedisClient Bean
      * 用于满足 LettuceClientAdapter.of() 的需求
      */
-    @Bean
-    public RedisClient redisClient() {
+    @Bean(destroyMethod = "shutdown")
+    public ClientResources redisClientResources() {
+        return DefaultClientResources.create();
+    }
+
+    @Bean(destroyMethod = "shutdown")
+    public RedisClient redisClient(ClientResources resources) {
         // 连接 URL 可能包含密码，日志中禁止输出完整地址。
         log.debug(LogPrefix.REDIS.f("正在构建原生 RedisClient"));
 
-        // 1. 构建 ClientResources (可选配置，如线程池、事件循环等)
-        // 如果不需要特殊定制，可以传 null 使用默认配置
-        DefaultClientResources resources = DefaultClientResources.create();
-
-        // 2. 使用配置文件中的 URL 创建 RedisClient
+        // 使用配置文件中的 URL 创建 RedisClient；ClientResources 由 Spring 单独管理生命周期。
         // 格式: redis://password@host:port/db
         RedisClient client = RedisClient.create(resources, redisProperties.getUrl());
 

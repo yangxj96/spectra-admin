@@ -19,6 +19,7 @@ package com.devops00.spectra.framework.security.configuration;
 import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.authorization.DefaultRootAuthorizationPolicy;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,20 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityAutoConfiguration {
+
+    private final SecurityProperties properties;
+
+    public SecurityAutoConfiguration(SecurityProperties properties) {
+        this.properties = properties;
+    }
+
+    /**
+     * 启动时校验所有安全运行参数，避免非法 TTL 或尝试次数进入 Redis 操作路径。
+     */
+    @PostConstruct
+    void validateSecurityProperties() {
+        properties.validate();
+    }
 
     /**
      * 统一 Root 判定入口。Root 仍必须经过审计、Session 和 DataScope 等其他安全边界。
