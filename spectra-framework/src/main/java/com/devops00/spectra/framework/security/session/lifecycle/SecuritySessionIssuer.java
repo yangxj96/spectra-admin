@@ -11,7 +11,7 @@ import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.security.SecurityToken;
 
-/** Security Session 签发与 Refresh Rotation 窄端口。 */
+/** Security Session 签发窄端口。 */
 public interface SecuritySessionIssuer {
 
     /** 按请求客户端签发会话令牌。 */
@@ -20,6 +20,4 @@ public interface SecuritySessionIssuer {
     /** 按指定客户端签发会话令牌。 */
     SecurityToken createToken(SecurityPrincipal user, ClientType clientType);
 
-    /** 消费 Refresh Token 并签发下一代令牌对。 */
-    SecurityToken refreshByRefreshToken(String refreshToken);
 }

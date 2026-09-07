@@ -54,7 +54,11 @@ class SecurityModuleConsolidationTest {
                 "spectra-framework/src/main/java/com/devops00/spectra/framework/security/configuration/SecurityAutoConfiguration.java",
                 "spectra-framework/src/main/java/com/devops00/spectra/framework/security/configuration/authentication/SecurityConfiguration.java",
                 "spectra-framework/src/main/java/com/devops00/spectra/framework/security/authentication/TokenAuthenticationFilter.java",
-                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/repository/RedisSecuritySessionRepository.java");
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionIssueService.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRefreshService.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecuritySessionRevocationService.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecurityOnlineUserQueryService.java",
+                "spectra-framework/src/main/java/com/devops00/spectra/framework/security/session/SecurityLoginFailureStore.java");
 
         assertThat(technicalTypes)
                 .allMatch(type -> Files.exists(backend.resolve(type)),

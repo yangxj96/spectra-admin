@@ -18,32 +18,23 @@ package com.devops00.spectra.framework.security.configuration.session;
 
 import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import com.devops00.spectra.common.port.security.SecurityAuthenticationPort;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.security.SecuritySessionQueryPort;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.port.security.SecurityToken;
 import com.devops00.spectra.common.port.security.SecurityUserLookupPort;
-import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.framework.security.session.lifecycle.SecurityLoginFailureTracker;
 import com.devops00.spectra.framework.security.session.lifecycle.SecuritySessionIssuer;
+import com.devops00.spectra.framework.security.session.lifecycle.SecuritySessionRefresher;
 import com.devops00.spectra.framework.security.session.query.SecuritySessionQuery;
 import com.devops00.spectra.framework.security.session.query.SecuritySessionReader;
 import com.devops00.spectra.framework.security.session.lifecycle.SecuritySessionRevoker;
 import com.devops00.spectra.framework.security.session.token.SecurityTokenAccessor;
-import com.devops00.spectra.common.port.security.SecurityUserLoader;
-import com.devops00.spectra.common.port.security.SecurityPrincipal;
-import com.devops00.spectra.common.port.security.SecurityToken;
-import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.framework.security.session.query.SecuritySessionContextAccessor;
-import com.devops00.spectra.framework.security.session.repository.RedisSecuritySessionRepository;
-import com.devops00.spectra.framework.security.converter.UserOnlineConverter;
-import com.devops00.spectra.framework.security.properties.SecurityProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
@@ -54,7 +45,6 @@ import java.util.UUID;
  * @version 1.0
  * @since 2026/2/19 22:37
  */
-@Slf4j
 @Configuration
 public class SecuritySessionPortConfiguration {
 
@@ -99,6 +89,7 @@ public class SecuritySessionPortConfiguration {
      */
     @Bean
     public SecurityAuthenticationPort securityAuthenticationPort(SecuritySessionIssuer sessionIssuer,
+                                                                 SecuritySessionRefresher sessionRefresher,
                                                                  SecuritySessionRevoker sessionRevoker,
                                                                  SecurityLoginFailureTracker loginFailureTracker) {
         return new SecurityAuthenticationPort() {
@@ -119,7 +110,7 @@ public class SecuritySessionPortConfiguration {
 
             @Override
             public SecurityToken refreshByRefreshToken(String refreshToken) {
-                return sessionIssuer.refreshByRefreshToken(refreshToken);
+                return sessionRefresher.refreshByRefreshToken(refreshToken);
             }
 
             @Override
@@ -145,28 +136,6 @@ public class SecuritySessionPortConfiguration {
     @Bean
     public SecurityUserLookupPort securityUserLookupPort(SecuritySessionReader sessionReader) {
         return token -> sessionReader.getCurrentUser(token);
-    }
-
-    /**
-     * 使用 Redis 提供安全会话和认证端口的具体实现。
-     *
-     * @param om                  Security使用的ObjectMapper
-     * @param redis               Security使用的RedisTemplate
-     * @param properties          安全配置
-     * @param userOnlineConverter 在线用户转换器
-     */
-    @Bean(name = "sec")
-    @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
-    public RedisSecuritySessionRepository redisSecuritySessionRepository(
-                                                                         @Qualifier("securityObjectMapper") ObjectMapper om,
-                                                                         @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-                                                                         SecurityProperties properties,
-                                                                         UserOnlineConverter userOnlineConverter,
-                                                                         ObjectProvider<SecuritySessionPolicyProvider> sessionPolicyProvider,
-                                                                         SecurityUserLoader securityUserLoader) {
-        return new RedisSecuritySessionRepository(om, redis, properties, userOnlineConverter,
-                sessionPolicyProvider.getIfAvailable(),
-                securityUserLoader);
     }
 
 }

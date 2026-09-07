@@ -14,23 +14,21 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.framework.security.session.repository;
+package com.devops00.spectra.framework.security.session;
 
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
-import com.devops00.spectra.common.port.security.SecurityUserLoader;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
-import com.devops00.spectra.framework.security.converter.UserOnlineConverter;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.mockito.ArgumentCaptor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +46,7 @@ import static org.mockito.Mockito.when;
 /**
  * Redis Security Session 撤销测试。
  */
-class RedisSecuritySessionRepositoryTest {
+class SecuritySessionLifecycleTest {
 
     @Test
     void shouldNotPersistAuthenticationAssuranceWhenCreatingSession() {
@@ -72,8 +70,8 @@ class RedisSecuritySessionRepositoryTest {
         SecuritySessionPolicyProvider policyProvider = mock();
         when(policyProvider.find("web")).thenReturn(SessionPolicy.defaults(900, 86400));
 
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), policyProvider, mock(SecurityUserLoader.class));
+        var store = new SecuritySessionStore(redis, new SecurityProperties(), provider(policyProvider));
+        var repository = new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store));
 
         repository.createToken(user, com.devops00.spectra.common.constant.ClientType.WEB);
 
@@ -107,8 +105,7 @@ class RedisSecuritySessionRepositoryTest {
         when(sets.members(SecurityRedisKey.REFRESH_FAMILY.format(familyId)))
                 .thenReturn(Set.of(refreshDigest, rotatedRefreshDigest));
 
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+        var repository = new SecuritySessionRevocationService(store(redis, null));
 
         repository.deleteByRefreshToken(refreshToken);
 
@@ -130,8 +127,7 @@ class RedisSecuritySessionRepositoryTest {
         when(redis.opsForHash()).thenReturn(hashes);
         when(hashes.entries(anyString())).thenReturn(Map.of());
 
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+        var repository = new SecuritySessionRevocationService(store(redis, null));
 
         repository.deleteByRefreshToken(refreshToken);
 
@@ -165,8 +161,7 @@ class RedisSecuritySessionRepositoryTest {
                 "familyId", familyId));
         when(values.get(anyString())).thenReturn(null);
 
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+        var repository = new SecuritySessionRevocationService(store(redis, null));
 
         repository.deleteByUserIdExceptToken(userId, currentToken);
 
@@ -201,8 +196,7 @@ class RedisSecuritySessionRepositoryTest {
         when(values.get(eq(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest)))).thenReturn(refreshDigest);
         when(sets.size(eq(userTokensKey))).thenReturn(0L);
 
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+        var repository = new SecuritySessionRevocationService(store(redis, null));
 
         repository.deleteByUserId(userId);
 
@@ -213,5 +207,16 @@ class RedisSecuritySessionRepositoryTest {
         verify(redis).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
         verify(redis).delete(SecurityRedisKey.REFRESH_FAMILY.format(familyId));
         verify(redis).delete(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest));
+    }
+
+    private static SecuritySessionStore store(RedisTemplate<String, Object> redis,
+                                              SecuritySessionPolicyProvider policyProvider) {
+        return new SecuritySessionStore(redis, new SecurityProperties(), provider(policyProvider));
+    }
+
+    private static ObjectProvider<SecuritySessionPolicyProvider> provider(SecuritySessionPolicyProvider policyProvider) {
+        ObjectProvider<SecuritySessionPolicyProvider> provider = mock();
+        when(provider.getIfAvailable()).thenReturn(policyProvider);
+        return provider;
     }
 }

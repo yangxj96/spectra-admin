@@ -16,17 +16,17 @@
 
 package com.devops00.spectra.framework.security.redis.store;
 
-import com.devops00.spectra.framework.security.converter.UserOnlineConverter;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisNamespace;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
-import com.devops00.spectra.framework.security.session.repository.RedisSecuritySessionRepository;
+import com.devops00.spectra.framework.security.session.SecurityLoginFailureStore;
+import com.devops00.spectra.framework.security.session.SecuritySessionStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.core.ValueOperations;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 
@@ -117,8 +117,8 @@ class RedisSecurityContractIntegrationTest {
 
         var properties = new SecurityProperties();
         properties.setLockoutSeconds(300L);
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis, properties,
-                mock(UserOnlineConverter.class), null, null);
+        var repository = new SecurityLoginFailureStore(new SecuritySessionStore(redis, properties,
+                mock(ObjectProvider.class)));
 
         repository.recordLoginFail(username);
 
@@ -133,8 +133,8 @@ class RedisSecurityContractIntegrationTest {
         when(values.get(SecurityRedisKey.LOGIN_FAIL.format("root@example.com")))
                 .thenThrow(new DataAccessResourceFailureException("redis unavailable"));
 
-        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+        var repository = new SecurityLoginFailureStore(new SecuritySessionStore(redis, new SecurityProperties(),
+                mock(ObjectProvider.class)));
 
         assertThrows(com.devops00.spectra.common.exception.SecurityRedisUnavailableException.class,
                 () -> repository.isLockedOut("root@example.com"));

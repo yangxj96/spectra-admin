@@ -46,6 +46,15 @@ public final class RefreshTokenRotationStore {
             return 1
             """, Long.class);
 
+    private static final RedisScript<Long> COMPARE_AND_DELETE_SCRIPT = RedisScript.of("""
+            local current = redis.call('GET', KEYS[1])
+            if current ~= false and current == ARGV[1] then
+              redis.call('DEL', KEYS[1])
+              return 1
+            end
+            return 0
+            """, Long.class);
+
     private RefreshTokenRotationStore() {
     }
 
@@ -79,5 +88,23 @@ public final class RefreshTokenRotationStore {
             case 0 -> ClaimResult.REPLAY;
             default -> ClaimResult.MISSING;
         };
+    }
+
+    /**
+     * 只有当前值仍与预期值一致时才删除映射，避免并发轮换误删新会话索引。
+     *
+     * @param redis         安全 Redis 模板
+     * @param key           待删除的映射 Key
+     * @param expectedValue 期望的当前值
+     * @return 是否完成删除
+     */
+    public static boolean compareAndDelete(RedisTemplate<String, Object> redis, String key,
+                                           String expectedValue) {
+        if (expectedValue == null || expectedValue.isBlank()) {
+            return false;
+        }
+        Long result = SecurityRedisExecutor.require("原子清理安全 Redis 映射",
+                () -> redis.execute(COMPARE_AND_DELETE_SCRIPT, List.of(key), expectedValue));
+        return Long.valueOf(1L).equals(result);
     }
 }

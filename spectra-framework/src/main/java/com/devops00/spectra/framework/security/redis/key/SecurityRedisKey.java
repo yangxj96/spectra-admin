@@ -39,6 +39,12 @@ public enum SecurityRedisKey implements RedisKey {
     /** 在线用户 ID 集合。 */
     ONLINE_USERS(SecurityRedisNamespace.PREFIX + "online"),
 
+    /** 在线会话摘要集合，在线查询使用该索引批量读取摘要。 */
+    ONLINE_SESSIONS(SecurityRedisNamespace.PREFIX + "online:sessions"),
+
+    /** 在线会话非敏感摘要，格式参数为 Access Token digest。 */
+    SESSION_SUMMARY(SecurityRedisNamespace.PREFIX + "summary:%s"),
+
     /** Token Family 下的 Access digest 集合。 */
     SESSION_FAMILY(SecurityRedisNamespace.PREFIX + "family:%s"),
 

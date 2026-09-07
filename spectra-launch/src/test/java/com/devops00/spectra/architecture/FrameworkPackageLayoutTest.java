@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Framework 包布局和 64 个历史 configure 类型迁移清单的架构测试。
+ * Framework 包布局和核心类型迁移清单的架构测试。
  *
  * @author yangxj96
  * @version 1.0
@@ -51,7 +51,7 @@ class FrameworkPackageLayoutTest {
             FRAMEWORK_PACKAGE + ".health");
 
     /**
-     * Task 11 的 64 个历史类型清单及其目标包。清单保持一类一个入口，防止迁移遗漏或重复。
+     * Framework 核心类型清单及其目标包。清单保持一类一个入口，防止迁移遗漏或重复。
      */
     private static final Map<String, String> MIGRATION_TARGETS = Map.ofEntries(
             Map.entry("CacheConfiguration", FRAMEWORK_PACKAGE + ".cache.configuration"),
@@ -117,7 +117,7 @@ class FrameworkPackageLayoutTest {
             Map.entry("SecurityRedisNamespace", FRAMEWORK_PACKAGE + ".security.redis.key"),
             Map.entry("TokenDigestService", FRAMEWORK_PACKAGE + ".security.redis.token"),
             Map.entry("DefaultRootAuthorizationPolicy", FRAMEWORK_PACKAGE + ".security.authorization"),
-            Map.entry("RedisSecuritySessionRepository", FRAMEWORK_PACKAGE + ".security.session.repository"));
+            Map.entry("SecuritySessionIssueService", FRAMEWORK_PACKAGE + ".security.session"));
 
     @Test
     void configurePackageMustBeRemoved() throws IOException {
@@ -181,10 +181,10 @@ class FrameworkPackageLayoutTest {
                 .collect(Collectors.groupingBy(SourceFile::className));
 
         assertThat(sourcesByClassName.keySet())
-                .as("Task 11 的 framework.configure 迁移清单必须完整")
+                .as("Framework 核心类型清单必须完整")
                 .containsAll(MIGRATION_TARGETS.keySet());
         assertThat(MIGRATION_TARGETS)
-                .as("Task 11 的迁移清单必须正好覆盖当前 64 个类型")
+                .as("Framework 核心类型清单必须正好覆盖当前 64 个基线类型")
                 .hasSize(64);
 
         MIGRATION_TARGETS.keySet()

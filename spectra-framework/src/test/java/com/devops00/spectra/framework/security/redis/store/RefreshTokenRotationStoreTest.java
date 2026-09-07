@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -65,5 +66,15 @@ class RefreshTokenRotationStoreTest {
 
         assertThrows(SecurityRedisUnavailableException.class,
                 () -> RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
+    }
+
+    @Test
+    void shouldCompareAndDeleteMappingAtomically() {
+        var redis = mock(RedisTemplate.class);
+        List<String> keys = List.of("sec:uc:user:web");
+        when(redis.execute(any(RedisScript.class), eq(keys), eq("access-digest")))
+                .thenReturn(1L);
+
+        assertTrue(RefreshTokenRotationStore.compareAndDelete(redis, keys.get(0), "access-digest"));
     }
 }
