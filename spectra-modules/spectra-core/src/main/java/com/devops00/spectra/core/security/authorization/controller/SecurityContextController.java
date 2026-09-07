@@ -37,7 +37,7 @@ public class SecurityContextController {
     /**
      * 查询或获取目标数据（{@code current}）。
      */
-    @GetMapping
+    @GetMapping(version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public AuthorizationContextVO current() {
         UUID userId = securityContextAccessor.currentUserId();

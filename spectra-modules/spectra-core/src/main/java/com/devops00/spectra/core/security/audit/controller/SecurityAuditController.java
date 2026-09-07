@@ -19,14 +19,16 @@ package com.devops00.spectra.core.security.audit.controller;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveOrchestrator;
 import com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveWorker;
-import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
+import com.devops00.spectra.core.security.audit.javabean.converter.SecurityAuditArchiveConverter;
 import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
-import com.devops00.spectra.core.security.audit.service.SecurityAuditQueryService;
+import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditArchiveManifestVO;
+import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetentionVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
-import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.core.security.authentication.util.AuthenticationContextUtils;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.security.audit.service.SecurityAuditQueryService;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ContentDisposition;
@@ -46,7 +48,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
- * Security Audit 只读查询与导出接口。
+ * Security Audit 查询、导出与归档运维接口。
  * <p>
  * Controller 只声明 Catalog 权限，具体 Root/SYSTEM_ADMIN/普通用户可见性统一由查询策略处理。
  *
@@ -65,6 +67,8 @@ public class SecurityAuditController {
     private final SecurityAuditArchiveOrchestrator archiveOrchestrator;
 
     private final SecurityAuditArchiveWorker archiveWorker;
+
+    private final SecurityAuditArchiveConverter archiveConverter;
 
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -113,44 +117,49 @@ public class SecurityAuditController {
     }
 
     /** 创建一个按分区唯一的安全审计归档计划。 */
+    @Audit("'创建安全审计归档计划'")
     @PostMapping(value = "/archive/plan", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public SecurityAuditArchiveOrchestrator.ManifestView planArchive(
-                                                                     @RequestParam String partitionName,
-                                                                     @RequestParam String rangeStart,
-                                                                     @RequestParam String rangeEnd) {
+    public SecurityAuditArchiveManifestVO planArchive(
+                                                      @RequestParam String partitionName,
+                                                      @RequestParam String rangeStart,
+                                                      @RequestParam String rangeEnd) {
         UUID operatorId = currentOperatorId();
-        return archiveOrchestrator.plan(partitionName,
+        return archiveConverter.toManifestVO(archiveOrchestrator.plan(partitionName,
                 SecurityAuditArchiveOrchestrator.parseInstant(rangeStart, "rangeStart"),
-                SecurityAuditArchiveOrchestrator.parseInstant(rangeEnd, "rangeEnd"), operatorId);
+                SecurityAuditArchiveOrchestrator.parseInstant(rangeEnd, "rangeEnd"), operatorId));
     }
 
     /** 查询归档 manifest 状态。 */
+    @Audit("'查询安全审计归档状态'")
     @GetMapping(value = "/archive/{manifestId}", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public SecurityAuditArchiveOrchestrator.ManifestView archive(@PathVariable UUID manifestId) {
-        return archiveOrchestrator.get(manifestId);
+    public SecurityAuditArchiveManifestVO archive(@PathVariable UUID manifestId) {
+        return archiveConverter.toManifestVO(archiveOrchestrator.get(manifestId));
     }
 
     /** 将 FAILED 归档计划清理旧对象元数据后重新排队。 */
+    @Audit("'重试安全审计归档'")
     @PostMapping(value = "/archive/{manifestId}/retry", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public SecurityAuditArchiveOrchestrator.ManifestView retryArchive(@PathVariable UUID manifestId) {
-        return archiveOrchestrator.retryFailed(manifestId, currentOperatorId());
+    public SecurityAuditArchiveManifestVO retryArchive(@PathVariable UUID manifestId) {
+        return archiveConverter.toManifestVO(archiveOrchestrator.retryFailed(manifestId, currentOperatorId()));
     }
 
     /** 对 VERIFIED 归档申请恢复校验；不会删除源安全审计事实。 */
+    @Audit("'申请安全审计归档恢复'")
     @PostMapping(value = "/archive/{manifestId}/restore", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public SecurityAuditArchiveOrchestrator.ManifestView requestArchiveRestore(@PathVariable UUID manifestId) {
-        return archiveOrchestrator.requestRestore(manifestId, currentOperatorId());
+    public SecurityAuditArchiveManifestVO requestArchiveRestore(@PathVariable UUID manifestId) {
+        return archiveConverter.toManifestVO(archiveOrchestrator.requestRestore(manifestId, currentOperatorId()));
     }
 
     /** 立即按 worker 租约执行一次归档对象和源范围校验。 */
+    @Audit("'校验安全审计归档'")
     @PostMapping(value = "/archive/{manifestId}/verify", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public SecurityAuditArchiveOrchestrator.ManifestView verifyArchive(@PathVariable UUID manifestId) {
-        return archiveWorker.verifyNow(manifestId, currentOperatorId());
+    public SecurityAuditArchiveManifestVO verifyArchive(@PathVariable UUID manifestId) {
+        return archiveConverter.toManifestVO(archiveWorker.verifyNow(manifestId, currentOperatorId()));
     }
 
     private UUID currentOperatorId() {
