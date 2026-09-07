@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.oa.report.mapper.DepartmentStatsQueryMapper">
+    <resultMap id="DepartmentStatsRowMap"
+               type="com.devops00.spectra.oa.report.javabean.entity.DepartmentStatsRow">
+        <result column="department_id" property="departmentId"/>
+        <result column="asset_count" property="assetCount"/>
+        <result column="asset_quantity" property="assetQuantity"/>
+        <result column="asset_value" property="assetValue"/>
+        <result column="supply_sku_count" property="supplySkuCount"/>
+        <result column="supply_stock" property="supplyStock"/>
+        <result column="supply_min_stock" property="supplyMinStock"/>
+        <result column="reimbursement_count" property="reimbursementCount"/>
+        <result column="reimbursement_amount" property="reimbursementAmount"/>
+        <result column="purchase_count" property="purchaseCount"/>
+        <result column="purchase_budget" property="purchaseBudget"/>
+    </resultMap>
+
+    <select id="selectByDepartmentIds" resultMap="DepartmentStatsRowMap">
+        SELECT
+            COALESCE(asset.department_id, supply.department_id, reimbursement.department_id, purchase.department_id)
+                AS department_id,
+            COALESCE(asset.asset_count, 0) AS asset_count,
+            COALESCE(asset.asset_quantity, 0) AS asset_quantity,
+            COALESCE(asset.asset_value, 0) AS asset_value,
+            COALESCE(supply.supply_sku_count, 0) AS supply_sku_count,
+            COALESCE(supply.supply_stock, 0) AS supply_stock,
+            COALESCE(supply.supply_min_stock, 0) AS supply_min_stock,
+            COALESCE(reimbursement.reimbursement_count, 0) AS reimbursement_count,
+            COALESCE(reimbursement.reimbursement_amount, 0) AS reimbursement_amount,
+            COALESCE(purchase.purchase_count, 0) AS purchase_count,
+            COALESCE(purchase.purchase_budget, 0) AS purchase_budget
+        FROM (
+            SELECT department_id,
+                   COUNT(*) AS asset_count,
+                   COALESCE(SUM(quantity), 0) AS asset_quantity,
+                   COALESCE(SUM(acquisition_amount), 0) AS asset_value
+            FROM spectra_oa.oa_asset
+            WHERE deleted IS NULL
+              AND department_id IS NOT NULL
+              AND department_id IN
+              <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+                  #{departmentId}
+              </foreach>
+            GROUP BY department_id
+        ) asset
+        FULL OUTER JOIN (
+            SELECT department_id,
+                   COUNT(*) AS supply_sku_count,
+                   COALESCE(SUM(current_stock), 0) AS supply_stock,
+                   COALESCE(SUM(min_stock), 0) AS supply_min_stock
+            FROM spectra_oa.oa_supply_item
+            WHERE deleted IS NULL
+              AND department_id IS NOT NULL
+              AND department_id IN
+              <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+                  #{departmentId}
+              </foreach>
+            GROUP BY department_id
+        ) supply USING (department_id)
+        FULL OUTER JOIN (
+            SELECT department_id,
+                   COUNT(*) AS reimbursement_count,
+                   COALESCE(SUM(total_amount), 0) AS reimbursement_amount
+            FROM spectra_oa.oa_reimbursement
+            WHERE deleted IS NULL
+              AND department_id IS NOT NULL
+              AND department_id IN
+              <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+                  #{departmentId}
+              </foreach>
+            GROUP BY department_id
+        ) reimbursement USING (department_id)
+        FULL OUTER JOIN (
+            SELECT department_id,
+                   COUNT(*) AS purchase_count,
+                   COALESCE(SUM(budget_amount), 0) AS purchase_budget
+            FROM spectra_oa.oa_purchase
+            WHERE deleted IS NULL
+              AND department_id IS NOT NULL
+              AND department_id IN
+              <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+                  #{departmentId}
+              </foreach>
+            GROUP BY department_id
+        ) purchase USING (department_id)
+        ORDER BY department_id
+    </select>
+</mapper>

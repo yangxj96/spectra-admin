@@ -16,22 +16,15 @@
 
 package com.devops00.spectra.oa.report.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
 import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
-import com.devops00.spectra.oa.asset.javabean.entity.Asset;
-import com.devops00.spectra.oa.asset.mapper.AssetMapper;
-import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
-import com.devops00.spectra.oa.purchase.mapper.PurchaseMapper;
-import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
-import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
 import com.devops00.spectra.oa.report.javabean.converter.DepartmentStatsConverter;
+import com.devops00.spectra.oa.report.javabean.entity.DepartmentStatsRow;
 import com.devops00.spectra.oa.report.javabean.from.DepartmentStatsFrom;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
+import com.devops00.spectra.oa.report.mapper.DepartmentStatsQueryMapper;
 import com.devops00.spectra.oa.report.service.DepartmentStatsService;
-import com.devops00.spectra.oa.supply.javabean.entity.SupplyItem;
-import com.devops00.spectra.oa.supply.mapper.SupplyItemMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -44,15 +37,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -70,10 +60,7 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     private static final String[] HEADERS = {"部门", "资产条目数", "资产数量", "资产金额", "办公用品 SKU 数", "当前库存", "最低库存", "报销单数", "报销金额", "采购申请数", "采购预算"};
 
     private final DirectoryQueryPort directoryQueryPort;
-    private final AssetMapper assetMapper;
-    private final SupplyItemMapper supplyItemMapper;
-    private final ReimbursementMapper reimbursementMapper;
-    private final PurchaseMapper purchaseMapper;
+    private final DepartmentStatsQueryMapper departmentStatsQueryMapper;
     private final DepartmentStatsConverter departmentStatsConverter;
 
     @Override
@@ -88,14 +75,11 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
                     return vo;
                 }, (left, right) -> left, HashMap::new));
 
-        if (result.isEmpty() && departmentId != null) {
+        if (result.isEmpty()) {
             return Collections.emptyList();
         }
-
-        mergeAssetStats(result, departmentId);
-        mergeSupplyStats(result, departmentId);
-        mergeReimbursementStats(result, departmentId);
-        mergePurchaseStats(result, departmentId);
+        departmentStatsQueryMapper.selectByDepartmentIds(result.keySet())
+                .forEach(row -> merge(result, row));
 
         return result.values()
                 .stream()
@@ -152,112 +136,22 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     }
 
     /**
-     * 处理内部业务逻辑（{@code mergeAssetStats}）。
+     * 合并统一报表查询返回的统计行。
      */
-    private void mergeAssetStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
-        QueryWrapper<Asset> wrapper = aggregateWrapper(departmentId);
-        wrapper.select("department_id", "COUNT(*) AS asset_count", "COALESCE(SUM(quantity), 0) AS asset_quantity",
-                "COALESCE(SUM(acquisition_amount), 0) AS asset_value").groupBy("department_id");
-        assetMapper.selectMaps(wrapper).forEach(row -> merge(result, row, stats -> {
-            stats.setAssetCount(number(row, "asset_count").longValue());
-            stats.setAssetQuantity(decimal(row, "asset_quantity"));
-            stats.setAssetValue(decimal(row, "asset_value"));
-        }));
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code mergeSupplyStats}）。
-     */
-    private void mergeSupplyStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
-        QueryWrapper<SupplyItem> wrapper = aggregateWrapper(departmentId);
-        wrapper.select("department_id", "COUNT(*) AS supply_sku_count", "COALESCE(SUM(current_stock), 0) AS supply_stock",
-                "COALESCE(SUM(min_stock), 0) AS supply_min_stock").groupBy("department_id");
-        supplyItemMapper.selectMaps(wrapper).forEach(row -> merge(result, row, stats -> {
-            stats.setSupplySkuCount(number(row, "supply_sku_count").longValue());
-            stats.setSupplyStock(decimal(row, "supply_stock"));
-            stats.setSupplyMinStock(decimal(row, "supply_min_stock"));
-        }));
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code mergeReimbursementStats}）。
-     */
-    private void mergeReimbursementStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
-        QueryWrapper<Reimbursement> wrapper = aggregateWrapper(departmentId);
-        wrapper.select("department_id", "COUNT(*) AS reimbursement_count", "COALESCE(SUM(total_amount), 0) AS reimbursement_amount")
-                .groupBy("department_id");
-        reimbursementMapper.selectMaps(wrapper).forEach(row -> merge(result, row, stats -> {
-            stats.setReimbursementCount(number(row, "reimbursement_count").longValue());
-            stats.setReimbursementAmount(decimal(row, "reimbursement_amount"));
-        }));
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code mergePurchaseStats}）。
-     */
-    private void mergePurchaseStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
-        QueryWrapper<Purchase> wrapper = aggregateWrapper(departmentId);
-        wrapper.select("department_id", "COUNT(*) AS purchase_count", "COALESCE(SUM(budget_amount), 0) AS purchase_budget").groupBy("department_id");
-        purchaseMapper.selectMaps(wrapper).forEach(row -> merge(result, row, stats -> {
-            stats.setPurchaseCount(number(row, "purchase_count").longValue());
-            stats.setPurchaseBudget(decimal(row, "purchase_budget"));
-        }));
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code aggregateWrapper}）。
-     */
-    private <T> QueryWrapper<T> aggregateWrapper(UUID departmentId) {
-        QueryWrapper<T> wrapper = new QueryWrapper<>();
-        wrapper.isNotNull("department_id");
-        if (departmentId != null) {
-            wrapper.eq("department_id", departmentId);
-        }
-        // BaseEntity 声明了 created_at 的默认排序；聚合查询必须显式按分组字段排序，
-        // 否则 PostgreSQL 会要求将 created_at 也加入 GROUP BY。
-        wrapper.orderByAsc("department_id");
-        return wrapper;
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code merge}）。
-     */
-    private void merge(Map<UUID, DepartmentStatsVO> result, Map<String, Object> row, Consumer<DepartmentStatsVO> consumer) {
-        UUID departmentId = uuid(row.get("department_id"));
-        DepartmentStatsVO stats = result.get(departmentId);
+    private void merge(Map<UUID, DepartmentStatsVO> result, DepartmentStatsRow row) {
+        DepartmentStatsVO stats = result.get(row.getDepartmentId());
         if (stats != null) {
-            consumer.accept(stats);
+            stats.setAssetCount(row.getAssetCount());
+            stats.setAssetQuantity(row.getAssetQuantity());
+            stats.setAssetValue(row.getAssetValue());
+            stats.setSupplySkuCount(row.getSupplySkuCount());
+            stats.setSupplyStock(row.getSupplyStock());
+            stats.setSupplyMinStock(row.getSupplyMinStock());
+            stats.setReimbursementCount(row.getReimbursementCount());
+            stats.setReimbursementAmount(row.getReimbursementAmount());
+            stats.setPurchaseCount(row.getPurchaseCount());
+            stats.setPurchaseBudget(row.getPurchaseBudget());
         }
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code uuid}）。
-     */
-    private static UUID uuid(Object value) {
-        return value instanceof UUID id ? id : value == null ? null : UUID.fromString(value.toString());
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code number}）。
-     */
-    private static Number number(Map<String, Object> row, String key) {
-        Object value = row.get(key);
-        if (value == null) {
-            value = row.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey().toLowerCase(Locale.ROOT).equals(key))
-                    .map(Map.Entry::getValue)
-                    .findFirst()
-                    .orElse(0L);
-        }
-        return value instanceof Number number ? number : new BigDecimal(value.toString());
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code decimal}）。
-     */
-    private static BigDecimal decimal(Map<String, Object> row, String key) {
-        return new BigDecimal(number(row, key).toString());
     }
 
     /**
