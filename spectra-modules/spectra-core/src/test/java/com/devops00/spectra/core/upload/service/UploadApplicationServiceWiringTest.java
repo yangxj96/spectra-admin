@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UploadApplicationServiceWiringTest {
 
@@ -28,5 +29,17 @@ class UploadApplicationServiceWiringTest {
 
         assertNotNull(qualifier);
         assertEquals("fileUploadTaskExecutor", qualifier.value());
+    }
+
+    @Test
+    void verificationMustUseAnIndependentWorkerDependency() {
+        Constructor<?> constructor = Arrays.stream(UploadApplicationService.class.getDeclaredConstructors())
+                .findFirst()
+                .orElseThrow();
+
+        assertTrue(Arrays.stream(constructor.getParameterTypes())
+                .anyMatch(parameterType -> parameterType.getSimpleName().equals("UploadVerificationWorker")));
+        assertTrue(Arrays.stream(constructor.getParameterTypes())
+                .noneMatch(parameterType -> parameterType.getName().equals("org.springframework.beans.factory.ObjectProvider")));
     }
 }

@@ -7,12 +7,14 @@ package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.common.port.file.FileReferenceCommand;
 import com.devops00.spectra.common.port.file.FileReferenceKey;
+import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.common.port.file.FileReferenceView;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.upload.api.FileErrorCode;
+import com.devops00.spectra.core.upload.api.FileUploadException;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
 import com.devops00.spectra.core.upload.mapper.FileReferenceMapper;
-import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
-import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +40,6 @@ public class FileReferenceApplicationService implements FileReferenceService {
         if (existing != null)
             return view(existing);
         var reference = new FileReference();
-        reference.setId(UUID.randomUUID());
         reference.setFileAssetId(command.fileAssetId());
         reference.setReferenceType(command.referenceType());
         reference.setReferenceId(command.referenceId());
@@ -83,9 +84,7 @@ public class FileReferenceApplicationService implements FileReferenceService {
                 || permissionCheckers.stream()
                         .noneMatch(checker -> checker.supports(referenceType)
                                 && checker.canRead(referenceType, referenceId, userId))) {
-            throw new com.devops00.spectra.core.upload.api.FileUploadException(
-                    com.devops00.spectra.core.upload.api.FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED,
-                    "business reference access denied");
+            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, "业务引用无权访问");
         }
     }
 }
