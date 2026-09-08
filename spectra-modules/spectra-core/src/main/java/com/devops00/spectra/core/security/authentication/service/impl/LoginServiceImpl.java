@@ -19,8 +19,8 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
 import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.common.port.security.SecurityAuthenticationPort;
 import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.core.security.authentication.exception.LoginException;
@@ -55,14 +55,17 @@ public class LoginServiceImpl implements LoginService {
     private final ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider;
     private final SecurityAuthenticationPort securityAuthenticationPort;
     private final SecurityContextAccessor securityContextAccessor;
+    private final SecurityAuditEventFactory securityAuditEventFactory;
 
     public LoginServiceImpl(LoginDispatcher loginDispatcher, ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider,
                             SecurityAuthenticationPort securityAuthenticationPort,
-                            SecurityContextAccessor securityContextAccessor) {
+                            SecurityContextAccessor securityContextAccessor,
+                            SecurityAuditEventFactory securityAuditEventFactory) {
         this.loginDispatcher = loginDispatcher;
         this.securityAuditWriterProvider = securityAuditWriterProvider;
         this.securityAuthenticationPort = securityAuthenticationPort;
         this.securityContextAccessor = securityContextAccessor;
+        this.securityAuditEventFactory = securityAuditEventFactory;
     }
 
     @Override
@@ -135,7 +138,7 @@ public class LoginServiceImpl implements LoginService {
             return;
         }
         AuditResult result = eventType.endsWith("_FAILED") ? AuditResult.FAILED : AuditResult.SUCCEEDED;
-        securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null,
+        securityAuditWriter.append(securityAuditEventFactory.create(UUID.randomUUID(), eventType, operatorId, null,
                 clientType.name(), null, null, Map.of(), Map.of(), reason, null, result,
                 RequestCorrelationContext.current().correlationId()));
     }

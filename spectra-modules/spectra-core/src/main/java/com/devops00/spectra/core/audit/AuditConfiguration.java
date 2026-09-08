@@ -23,7 +23,7 @@ public class AuditConfiguration {
     /** 默认统一审计脱敏器。 */
     @Bean
     public AuditSanitizer auditSanitizer() {
-        return DefaultAuditSanitizer.INSTANCE;
+        return new DefaultAuditSanitizer();
     }
 
     /** Core 必选的 Audit 切面；没有统一审计服务时不装配技术入口。 */

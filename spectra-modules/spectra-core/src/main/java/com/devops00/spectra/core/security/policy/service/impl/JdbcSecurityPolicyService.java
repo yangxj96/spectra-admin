@@ -27,6 +27,7 @@ import com.devops00.spectra.core.security.policy.javabean.vo.SecuritySessionPoli
 import com.devops00.spectra.core.security.policy.service.SecurityPolicyService;
 import com.devops00.spectra.core.security.audit.AuditResult;
 import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.policy.PasswordPolicy;
@@ -61,6 +62,8 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     private final SecurityChangeExecutor securityChangeExecutor;
 
     private final SecurityContextAccessor securityContextAccessor;
+
+    private final SecurityAuditEventFactory securityAuditEventFactory;
 
     @Override
     public List<SecuritySessionPolicyVO> sessionPolicies() {
@@ -264,8 +267,8 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
      */
     private SecurityAuditEvent auditEvent(String type, UUID targetId, Map<String, Object> before,
                                           Map<String, Object> after) {
-        return new SecurityAuditEvent(null, type, securityContextAccessor.currentUserId(), targetId, null, null, null,
-                before, after, "安全策略配置变更", null, AuditResult.STARTED,
+        return securityAuditEventFactory.create(null, type, securityContextAccessor.currentUserId(), targetId,
+                null, null, null, before, after, "安全策略配置变更", null, AuditResult.STARTED,
                 RequestCorrelationContext.current().correlationId());
     }
 

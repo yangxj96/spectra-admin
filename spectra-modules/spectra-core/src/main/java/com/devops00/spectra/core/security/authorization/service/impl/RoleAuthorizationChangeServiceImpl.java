@@ -46,8 +46,8 @@ import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProdu
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
@@ -111,6 +111,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
     private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityAuditEventFactory securityAuditEventFactory;
+
     private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final TimeMapper timeMapper;
@@ -167,7 +170,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("Role 授权变更请求已被修改，请重新生成预览");
         }
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, roleId,
+        var event = securityAuditEventFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, roleId,
                 null, null, null, Map.of("roleId", roleId.toString()),
                 Map.of("affectedUserCount", prepared.impact().affectedUserCount(),
                         "expandsEffectiveAuthority", prepared.impact().expandsEffectiveAuthority()),
@@ -441,7 +444,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
      */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+        var event = securityAuditEventFactory.create(null, eventType, operatorId, targetId, null, null, null,
                 before, after, reason, null, AuditResult.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);

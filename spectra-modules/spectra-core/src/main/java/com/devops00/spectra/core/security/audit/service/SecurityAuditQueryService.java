@@ -18,8 +18,9 @@ package com.devops00.spectra.core.security.audit.service;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.audit.AuditSanitizer;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetentionVO;
@@ -81,6 +82,10 @@ public class SecurityAuditQueryService {
     private final SecurityAuditMetrics metrics;
 
     private final TimeMapper timeMapper;
+
+    private final AuditSanitizer auditSanitizer;
+
+    private final SecurityAuditEventFactory securityAuditEventFactory;
 
     /**
      * 分页查询审计事件。
@@ -285,7 +290,7 @@ public class SecurityAuditQueryService {
             Map<?, ?> parsed = objectMapper.readValue(json, Map.class);
             var normalized = new LinkedHashMap<String, Object>();
             parsed.forEach((key, value) -> normalized.put(String.valueOf(key), value));
-            return DefaultAuditSanitizer.INSTANCE.sanitize(normalized);
+            return auditSanitizer.sanitize(normalized);
         } catch (Exception ignored) {
             return Map.of("_redacted", "invalid_snapshot");
         }
@@ -295,10 +300,9 @@ public class SecurityAuditQueryService {
      * 转换、解析或规范化数据（{@code toEvent}）。
      */
     private SecurityAuditEvent toEvent(SecurityAuditVO value) {
-        return new SecurityAuditEvent(value.eventId(), value.eventType(), value.operatorId(), value.targetId(), value.client(),
-                value.ip(), value.userAgent(), value.before(), value.after(), value.reason(), timeMapper.toInstant(value.occurredAt()),
-                value.result(),
-                value.correlationId());
+        return securityAuditEventFactory.create(value.eventId(), value.eventType(), value.operatorId(), value.targetId(),
+                value.client(), value.ip(), value.userAgent(), value.before(), value.after(), value.reason(),
+                timeMapper.toInstant(value.occurredAt()), value.result(), value.correlationId());
     }
 
     /**
@@ -342,8 +346,8 @@ public class SecurityAuditQueryService {
     private void recordOperation(Authentication viewer, String eventType, String operation) {
         metrics.recordQuery(operation, AuditResult.SUCCEEDED.name());
         var operatorId = visibilityPolicy.viewerId(viewer);
-        securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, null, null, null,
-                Map.of("operation", operation), Map.of(), null, null, AuditResult.SUCCEEDED,
+        securityAuditWriter.append(securityAuditEventFactory.create(UUID.randomUUID(), eventType, operatorId, null,
+                null, null, null, Map.of("operation", operation), Map.of(), null, null, AuditResult.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId()));
     }
 

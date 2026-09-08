@@ -38,9 +38,6 @@ import java.util.regex.Pattern;
  */
 public final class DefaultAuditSanitizer implements AuditSanitizer {
 
-    /** 默认共享实例。 */
-    public static final DefaultAuditSanitizer INSTANCE = new DefaultAuditSanitizer();
-
     private static final Set<String> SENSITIVE_KEYS = Set.of(
             "password",
             "passwd",
@@ -63,7 +60,10 @@ public final class DefaultAuditSanitizer implements AuditSanitizer {
 
     private static final Pattern BEARER_TOKEN = Pattern.compile("(?i)(\\bbearer\\s+)[A-Za-z0-9._~+/=-]+");
 
-    private DefaultAuditSanitizer() {
+    /**
+     * 创建无状态的默认审计脱敏器。
+     */
+    public DefaultAuditSanitizer() {
     }
 
     @Override

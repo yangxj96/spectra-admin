@@ -54,8 +54,8 @@ import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
@@ -126,6 +126,9 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
     private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityAuditEventFactory securityAuditEventFactory;
+
     private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final TimeMapper timeMapper;
@@ -168,7 +171,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("授权变更请求已被修改，请重新生成预览");
         }
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, targetUserId,
+        var event = securityAuditEventFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, targetUserId,
                 null, null, null, Map.of("assignmentId", String.valueOf(assignmentId)),
                 Map.of("roleId", prepared.role().getId().toString(), "permissionCount", prepared.requests().size()),
                 "通过 Grant Boundary Preview/Apply 提交", null, AuditResult.STARTED,
@@ -225,7 +228,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
                             targetSecurityVersion, List.of()));
         }
 
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
+        var event = securityAuditEventFactory.create(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
                 targetUserId, null, null, null,
                 Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
                 Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权", null,
@@ -557,7 +560,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
      */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+        var event = securityAuditEventFactory.create(null, eventType, operatorId, targetId, null, null, null,
                 before, after, reason, null, AuditResult.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);

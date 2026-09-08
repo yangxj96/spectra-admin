@@ -18,6 +18,7 @@ package com.devops00.spectra.common.audit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class DefaultAuditSanitizerTest {
                 "password", "plain-text",
                 "nested", List.of(Map.of("refresh_token", "refresh-value", "business_code", "OA-001")));
 
-        Map<String, Object> sanitized = DefaultAuditSanitizer.INSTANCE.sanitize(source);
+        Map<String, Object> sanitized = new DefaultAuditSanitizer().sanitize(source);
 
         assertEquals("***", sanitized.get("password"));
         @SuppressWarnings("unchecked")
@@ -43,7 +44,7 @@ class DefaultAuditSanitizerTest {
 
     @Test
     void shouldRedactCredentialVariantsAndEmbeddedTokens() {
-        Map<String, Object> sanitized = DefaultAuditSanitizer.INSTANCE.sanitize(Map.of(
+        Map<String, Object> sanitized = new DefaultAuditSanitizer().sanitize(Map.of(
                 "accessToken", "access-value",
                 "client_secret", "secret-value",
                 "private-key", "private-value",
@@ -57,5 +58,20 @@ class DefaultAuditSanitizerTest {
         assertEquals("public-value", sanitized.get("public_key"));
         assertEquals("https://s3.example/object?X-Amz-Signature=***", sanitized.get("url"));
         assertEquals("Authorization: Bearer ***", sanitized.get("header"));
+    }
+
+    @Test
+    void shouldRedactArraysAndKeepNullValues() {
+        Map<String, Object> source = new LinkedHashMap<>();
+        source.put("items", new Object[]{Map.of("apiKey", "secret"), null});
+        source.put("nullable", null);
+
+        Map<String, Object> sanitized = new DefaultAuditSanitizer().sanitize(source);
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> items = (List<Map<String, Object>>) sanitized.get("items");
+        assertEquals("***", items.getFirst().get("apiKey"));
+        assertEquals(null, items.get(1));
+        assertEquals(null, sanitized.get("nullable"));
     }
 }

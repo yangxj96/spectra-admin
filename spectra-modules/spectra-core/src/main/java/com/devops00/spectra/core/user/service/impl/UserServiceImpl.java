@@ -56,8 +56,8 @@ import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProdu
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecuritySessionQueryPort;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
@@ -119,6 +119,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final SecurityChangeExecutor securityChangeExecutor;
 
     private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityAuditEventFactory securityAuditEventFactory;
 
     private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
@@ -338,7 +340,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             return;
         }
 
-        var event = new SecurityAuditEvent(
+        var event = securityAuditEventFactory.create(
                 null,
                 lifecycleEventType(previous, target),
                 currentOperatorId(),
@@ -394,7 +396,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
      */
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
+        var event = securityAuditEventFactory.create(null, eventType, currentOperatorId(), targetId,
                 null, null, null, before, after, reason, null, AuditResult.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);

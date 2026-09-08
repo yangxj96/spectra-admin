@@ -43,8 +43,8 @@ import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
@@ -106,6 +106,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
     private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityAuditEventFactory securityAuditEventFactory;
+
     private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final TimeMapper timeMapper;
@@ -197,7 +200,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private void execute(PreparedChange prepared) {
         UUID operatorId = prepared.operatorId();
         UUID departmentId = prepared.departmentId();
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, departmentId,
+        var event = securityAuditEventFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, departmentId,
                 null, null, null, Map.of("organizationVersion", prepared.impact().beforeVersion()),
                 Map.of("organizationVersion", prepared.impact().afterVersion(), "operation",
                         prepared.changeType().name()),
@@ -409,7 +412,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
      */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+        var event = securityAuditEventFactory.create(null, eventType, operatorId, targetId, null, null, null,
                 before, after, reason, null, AuditResult.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);

@@ -56,6 +56,8 @@ public class CoreAuditService implements AuditService {
 
     private final AuditSanitizer auditSanitizer;
 
+    private final SecurityAuditEventFactory securityAuditEventFactory;
+
     /**
      * 清洗统一快照并路由到对应 sink。
      *
@@ -67,12 +69,12 @@ public class CoreAuditService implements AuditService {
     @Override
     @Transactional
     public void record(AuditRecord record) {
-        AuditRecord accepted = sanitize(record);
-        if (accepted.category() == AuditCategory.SECURITY) {
-            securityAuditWriter.append(toSecurityEvent(accepted));
+        Objects.requireNonNull(record, "统一审计记录不能为空");
+        if (record.category() == AuditCategory.SECURITY) {
+            securityAuditWriter.append(toSecurityEvent(record));
             return;
         }
-        operationLogService.record(accepted);
+        operationLogService.record(sanitize(record));
     }
 
     /**
@@ -99,7 +101,8 @@ public class CoreAuditService implements AuditService {
      */
     private SecurityAuditEvent toSecurityEvent(AuditRecord record) {
         AuditContext context = record.context();
-        return new SecurityAuditEvent(
+        Map<String, Object> metadata = metadata(record);
+        return securityAuditEventFactory.create(
                 record.eventId(),
                 record.eventType(),
                 context.operatorId(),
@@ -107,8 +110,8 @@ public class CoreAuditService implements AuditService {
                 context.client(),
                 context.ip(),
                 context.userAgent(),
-                record.before(),
-                record.after(),
+                withMetadata(record.before(), metadata),
+                withMetadata(record.after(), metadata),
                 record.reason(),
                 record.occurredAt(),
                 AuditResult.valueOf(record.result().name()),

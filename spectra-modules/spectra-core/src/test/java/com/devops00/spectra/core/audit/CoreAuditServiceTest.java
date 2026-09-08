@@ -59,7 +59,8 @@ class CoreAuditServiceTest {
     void operationCategoryRoutesToOperationSinkWithUnifiedContextAndSanitizedSnapshots() {
         var securitySink = new RecordingSecurityAuditWriter();
         var operationSink = mock(OperationLogService.class);
-        var service = new CoreAuditService(securitySink, operationSink, this::sanitize);
+        var service = new CoreAuditService(securitySink, operationSink, this::sanitize,
+                new SecurityAuditEventFactory(this::sanitize));
 
         service.record(operationRecord());
 
@@ -79,7 +80,8 @@ class CoreAuditServiceTest {
     void securityCategoryRoutesToSynchronousSecuritySinkAndPreservesDeniedResult() {
         var securitySink = new RecordingSecurityAuditWriter();
         var operationSink = mock(OperationLogService.class);
-        var service = new CoreAuditService(securitySink, operationSink, this::sanitize);
+        var service = new CoreAuditService(securitySink, operationSink, this::sanitize,
+                new SecurityAuditEventFactory(this::sanitize));
 
         service.record(securityRecord(AuditRecord.Result.DENIED));
 
@@ -98,7 +100,8 @@ class CoreAuditServiceTest {
         var securitySink = new RecordingSecurityAuditWriter();
         securitySink.failure = true;
         var operationSink = mock(OperationLogService.class);
-        var service = new CoreAuditService(securitySink, operationSink, this::sanitize);
+        var service = new CoreAuditService(securitySink, operationSink, this::sanitize,
+                new SecurityAuditEventFactory(this::sanitize));
 
         assertThrows(SecurityAuditUnavailableException.class, () -> service.record(securityRecord(AuditRecord.Result.FAILED)));
         verifyNoInteractions(operationSink);
@@ -117,7 +120,8 @@ class CoreAuditServiceTest {
 
         var securitySink = new RecordingSecurityAuditWriter();
         var operationSink = mock(OperationLogService.class);
-        var service = new CoreAuditService(securitySink, operationSink, this::sanitize);
+        var service = new CoreAuditService(securitySink, operationSink, this::sanitize,
+                new SecurityAuditEventFactory(this::sanitize));
         var record = operationRecord();
 
         service.record(record);
@@ -136,7 +140,8 @@ class CoreAuditServiceTest {
         doThrow(new AuditService.AuditRecordingException("operation sink unavailable"))
                 .when(operationSink)
                 .record(any(AuditRecord.class));
-        var service = new CoreAuditService(securitySink, operationSink, this::sanitize);
+        var service = new CoreAuditService(securitySink, operationSink, this::sanitize,
+                new SecurityAuditEventFactory(this::sanitize));
 
         var template = new TransactionTemplate(transactionManager);
         assertThrows(AuditService.AuditRecordingException.class,

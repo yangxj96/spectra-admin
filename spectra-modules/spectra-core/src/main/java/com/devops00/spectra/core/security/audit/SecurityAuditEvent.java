@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.audit;
 
+import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import java.time.Instant;
 import java.util.Collections;
@@ -60,6 +61,11 @@ public record SecurityAuditEvent(UUID eventId,
                                  AuditResult result,
                                  String correlationId) {
 
+    /**
+     * 脱离 Spring 管理或经过 Jackson 反序列化时的值对象边界兜底；业务服务必须使用工厂注入的策略。
+     */
+    private static final AuditSanitizer FALLBACK_SANITIZER = new DefaultAuditSanitizer();
+
     public SecurityAuditEvent {
         if (eventId == null) {
             eventId = UUID.randomUUID();
@@ -73,8 +79,8 @@ public record SecurityAuditEvent(UUID eventId,
         if (result == null) {
             throw new IllegalArgumentException("安全审计事件结果不能为空");
         }
-        before = immutableCopy(DefaultAuditSanitizer.INSTANCE.sanitize(before));
-        after = immutableCopy(DefaultAuditSanitizer.INSTANCE.sanitize(after));
+        before = immutableCopy(FALLBACK_SANITIZER.sanitize(before));
+        after = immutableCopy(FALLBACK_SANITIZER.sanitize(after));
     }
 
     @Override
@@ -88,14 +94,19 @@ public record SecurityAuditEvent(UUID eventId,
     }
 
     /**
-     * 创建高风险事务的审计预写入事件。
+     * 创建高风险事务的审计预写入事件，事件结果为 {@link AuditResult#STARTED}。
+     *
+     * @return 复用当前事件元数据和已脱敏快照、状态为 STARTED 的不可变事件副本
      */
     public SecurityAuditEvent started() {
         return withResult(AuditResult.STARTED);
     }
 
     /**
-     * 使用新的结果创建同一事件的副本。
+     * 使用新的结果创建同一事件的不可变副本；该过程只复用已脱敏快照，不重新读取 Spring 注入的脱敏器。
+     *
+     * @param nextResult 副本要记录的审计结果；不能为 null
+     * @return 保留当前事件元数据和快照、但使用指定结果的不可变事件副本
      */
     public SecurityAuditEvent withResult(AuditResult nextResult) {
         return new SecurityAuditEvent(null, eventType, operatorId, targetId, client, ip, userAgent, before, after,

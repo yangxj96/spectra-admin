@@ -23,6 +23,7 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import com.devops00.spectra.core.security.authentication.javabean.from.LoginFrom;
 import com.devops00.spectra.common.port.security.SecurityToken;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -109,7 +110,8 @@ class LoginServiceImplTest {
     private LoginServiceImpl service(LoginDispatcher dispatcher, SecurityAuthenticationPort authenticationPort) {
         ObjectProvider<SecurityAuditWriter> auditProvider = mock(ObjectProvider.class);
         when(auditProvider.getIfAvailable()).thenReturn(null);
-        return new LoginServiceImpl(dispatcher, auditProvider, authenticationPort, mock(SecurityContextAccessor.class));
+        return new LoginServiceImpl(dispatcher, auditProvider, authenticationPort, mock(SecurityContextAccessor.class),
+                mock(SecurityAuditEventFactory.class));
     }
 
     private static SecurityUser user(UUID id, String username, String role) {
