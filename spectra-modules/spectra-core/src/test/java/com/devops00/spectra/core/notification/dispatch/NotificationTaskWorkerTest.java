@@ -30,6 +30,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.sender.NotificationSender;
+import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.ObjectTypeHandler;
@@ -135,7 +136,7 @@ class NotificationTaskWorkerTest {
         when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
         when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(expired));
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
-        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
+        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of());
 
         assertEquals(1, worker.processPending(50));
 
@@ -218,7 +219,7 @@ class NotificationTaskWorkerTest {
         when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(0);
         when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(task));
-        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
+        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of());
 
         assertEquals(1, worker.processPending(50));
 
@@ -253,7 +254,7 @@ class NotificationTaskWorkerTest {
                                           NotificationDeliveryMapper deliveryMapper, NotificationRequestMapper requestMapper,
                                           List<NotificationSender> senders) {
         var worker = new NotificationTaskWorker(taskMapper, deliveryMapper,
-                new NotificationRequestStatusUpdater(taskMapper, requestMapper), senders);
+                new NotificationRequestStatusUpdater(taskMapper, requestMapper), new NotificationSenderRegistry(senders));
         setField(worker, "processingTimeoutSeconds", 300L);
         setField(worker, "retryBaseDelaySeconds", 1L);
         return worker;

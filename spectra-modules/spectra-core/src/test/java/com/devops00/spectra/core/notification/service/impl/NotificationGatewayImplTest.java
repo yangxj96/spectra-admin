@@ -37,6 +37,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner;
 import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -490,7 +491,8 @@ class NotificationGatewayImplTest {
         return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper,
                 new NotificationTaskBatchPlanner(protector()), preferenceMapper,
                 new NotificationTemplateRenderer(), new NotificationPolicy(),
-                new NotificationModuleProperties(true, "", "", List.of()), directory, protector(), List.of());
+                new NotificationModuleProperties(true, "", "", List.of()), directory, protector(),
+                new NotificationSenderRegistry(List.of()));
     }
 
     private NotificationGatewayImpl gateway(NotificationRequestMapper requestMapper,
@@ -502,7 +504,8 @@ class NotificationGatewayImplTest {
         return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper,
                 new NotificationTaskBatchPlanner(protector), preferenceMapper,
                 new NotificationTemplateRenderer(), new NotificationPolicy(),
-                new NotificationModuleProperties(true, "", "", List.of()), directory, protector, List.of());
+                new NotificationModuleProperties(true, "", "", List.of()), directory, protector,
+                new NotificationSenderRegistry(List.of()));
     }
 
     private void stubBatchSuccess(NotificationTaskMapper taskMapper) {

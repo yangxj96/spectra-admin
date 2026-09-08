@@ -22,12 +22,12 @@ import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.core.notification.sender.NotificationSender;
+import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
 /**
  * 通知模块健康 contributor；站内信是必需通道，外部通道按可选能力计算 DEGRADED。
@@ -40,7 +40,7 @@ public class NotificationHealthIndicator implements DependencyHealthContributor 
 
     private final NotificationModuleProperties properties;
 
-    private final List<NotificationSender> senders;
+    private final NotificationSenderRegistry senderRegistry;
 
     @Override
     public String contributorName() {
@@ -89,9 +89,7 @@ public class NotificationHealthIndicator implements DependencyHealthContributor 
     }
 
     private java.util.Optional<NotificationSender> sender(NotificationChannel channel) {
-        return senders.stream()
-                .filter(item -> item.channel() == channel)
-                .findFirst();
+        return senderRegistry.find(channel);
     }
 
     private DependencyHealthResult result(DependencyHealthStatus status, long start, Instant checkedAt,

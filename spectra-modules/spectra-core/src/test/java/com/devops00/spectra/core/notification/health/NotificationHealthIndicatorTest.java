@@ -20,6 +20,7 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.core.notification.sender.NotificationSender;
+import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendResult;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,7 @@ class NotificationHealthIndicatorTest {
     void shouldReportDownWhenInAppIsUnavailable() {
         var sender = sender(NotificationChannel.IN_APP, false);
         var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
-                List.of(sender));
+                new NotificationSenderRegistry(List.of(sender)));
 
         assertEquals(DependencyHealthStatus.DOWN, indicator.check().status());
         assertEquals("IN_APP_UNAVAILABLE", indicator.check().errorCode());
@@ -48,7 +49,7 @@ class NotificationHealthIndicatorTest {
     void shouldReportUpWhenInAppIsAvailable() {
         var sender = sender(NotificationChannel.IN_APP, true);
         var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
-                List.of(sender));
+                new NotificationSenderRegistry(List.of(sender)));
 
         assertEquals(DependencyHealthStatus.UP, indicator.check().status());
     }
@@ -56,7 +57,7 @@ class NotificationHealthIndicatorTest {
     @Test
     void shouldReportUnknownWhenModuleIsDisabled() {
         var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(false, "", "", List.of()),
-                List.of());
+                new NotificationSenderRegistry(List.of()));
 
         assertEquals(DependencyHealthStatus.UNKNOWN, indicator.check().status());
         assertEquals("MODULE_DISABLED", indicator.check().errorCode());
@@ -67,7 +68,7 @@ class NotificationHealthIndicatorTest {
         var inApp = sender(NotificationChannel.IN_APP, true);
         var email = sender(NotificationChannel.EMAIL, false);
         var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
-                List.of(inApp, email));
+                new NotificationSenderRegistry(List.of(inApp, email)));
 
         assertEquals(DependencyHealthStatus.DEGRADED, indicator.check().status());
         assertEquals("OPTIONAL_CHANNEL_UNAVAILABLE", indicator.check().errorCode());

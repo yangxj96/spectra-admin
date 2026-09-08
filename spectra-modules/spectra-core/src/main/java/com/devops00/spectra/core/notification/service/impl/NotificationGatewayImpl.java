@@ -43,7 +43,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.core.notification.observability.NotificationMetrics;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
-import com.devops00.spectra.core.notification.sender.NotificationSender;
+import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner;
 import com.devops00.spectra.core.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
@@ -127,7 +127,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
     /**
      * 已注册的渠道发送端。
      */
-    private final List<NotificationSender> senders;
+    private final NotificationSenderRegistry senderRegistry;
 
     /**
      * 可选指标门面；测试或精简运行时未注册 MeterRegistry 时保持业务路径可用。
@@ -153,11 +153,12 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (channel == null) {
             return new NotificationChannelAvailability(null, false, "CHANNEL_REQUIRED");
         }
-        return senders.stream()
-                .filter(sender -> sender.channel() == channel)
-                .findFirst()
-                .map(sender -> new NotificationChannelAvailability(channel, sender.available(),
-                        sender.available() ? "AVAILABLE" : sender.unavailableReason()))
+        return senderRegistry.find(channel)
+                .map(sender -> {
+                    var available = sender.available();
+                    return new NotificationChannelAvailability(channel, available,
+                            available ? "AVAILABLE" : sender.unavailableReason());
+                })
                 .orElseGet(() -> new NotificationChannelAvailability(channel, false, "CHANNEL_NOT_REGISTERED"));
     }
 

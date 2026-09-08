@@ -19,6 +19,7 @@ package com.devops00.spectra.core.notification.dispatch;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
@@ -27,7 +28,7 @@ import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEn
 import com.devops00.spectra.core.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.observability.NotificationMetrics;
-import com.devops00.spectra.core.notification.sender.NotificationSender;
+import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +90,7 @@ public class NotificationTaskWorker {
     /**
      * 已注册的渠道发送端。
      */
-    private final List<NotificationSender> senders;
+    private final NotificationSenderRegistry senderRegistry;
 
     /**
      * 可选指标门面；测试或精简运行时未注册 MeterRegistry 时保持 Worker 可用。
@@ -184,10 +185,7 @@ public class NotificationTaskWorker {
         if (claimed != 1) {
             return;
         }
-        var sender = senders.stream()
-                .filter(item -> item.channel().name().equals(task.getChannel()))
-                .findFirst()
-                .orElse(null);
+        var sender = senderRegistry.find(parseChannel(task.getChannel())).orElse(null);
         if (sender == null) {
             finish(task, ChannelSendResult.blocked("NONE", null, "CHANNEL_NOT_CONFIGURED"));
             requestStatusUpdater.refresh(task.getNotificationRequestId());
@@ -304,6 +302,23 @@ public class NotificationTaskWorker {
                 .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.EXPIRED.name())
                 .set(NotificationTaskEntity::getLockedBy, null)
                 .set(NotificationTaskEntity::getLockedAt, null));
+    }
+
+    /**
+     * 将任务中保存的渠道编码解析为枚举；非法编码返回 null，由 Registry 统一视为未注册渠道。
+     *
+     * @param value 任务中保存的渠道编码；可以为空
+     * @return 对应的通知渠道；为空或非法时返回 null
+     */
+    private static NotificationChannel parseChannel(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return NotificationChannel.valueOf(value);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 
 }
