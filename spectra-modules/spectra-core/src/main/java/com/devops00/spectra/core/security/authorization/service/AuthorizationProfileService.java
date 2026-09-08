@@ -36,51 +36,51 @@ public interface AuthorizationProfileService extends BaseService<AuthorizationPr
     /**
      * 创建授权方案。
      *
-     * @param params 创建参数
+     * @param params 授权方案编码、名称、说明、乐观锁版本及角色分配集合。
      */
     void created(AuthorizationProfileSaveFrom params);
 
     /**
      * 修改授权方案。
      *
-     * @param id     方案 ID
-     * @param params 修改参数
+     * @param id     待修改授权方案的唯一标识。
+     * @param params 授权方案编码、名称、说明、乐观锁版本及角色分配集合。
      */
     void modify(UUID id, AuthorizationProfileSaveFrom params);
 
     /**
      * 启用授权方案。
      *
-     * @param id 方案 ID
+     * @param id 待启用授权方案的唯一标识。
      */
     void enable(UUID id);
 
     /**
      * 停用授权方案。
      *
-     * @param id 方案 ID
+     * @param id 待停用授权方案的唯一标识。
      */
     void disable(UUID id);
 
     /**
      * 删除授权方案。
      *
-     * @param id 方案 ID
+     * @param id 待删除授权方案的唯一标识。
      */
     void deleteById(UUID id);
 
     /**
      * 查询可见授权方案。
      *
-     * @return 授权方案列表
+     * @return 返回当前用户可见的授权方案列表；没有可见方案时返回空列表，不返回 null。
      */
     List<AuthorizationProfileVO> all();
 
     /**
      * 查询授权方案详情。
      *
-     * @param id 方案 ID
-     * @return 授权方案详情
+     * @param id 要读取详情的授权方案唯一标识。
+     * @return 返回指定授权方案的详情；方案不存在或当前用户无权查看时抛出业务异常，不返回 null。
      */
     AuthorizationProfileVO detail(UUID id);
 }

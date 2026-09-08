@@ -45,76 +45,83 @@ public interface UserService extends BaseService<User> {
 
     /**
      * 按登录用户名查找用户资料，供通知和管理域使用；认证登录使用 identity hash，不直接信任该查询。
+     *
+     * @param username 登录用户名，用于查询用户身份资料。
+     * @return 返回与登录用户名匹配的用户实体；用户名为空、用户不存在或用户未启用时返回 null。
      */
     User getByUsername(String username);
 
     /**
      * 分页查询用户列表
      *
-     * @param page   分页参数
-     * @param params 查询条件参数
-     * @return 分页结果
+     * @param page   用户列表的页码、页大小及排序字段。
+     * @param params 用户名、状态、部门等用户列表筛选条件。
+     * @return 返回按筛选条件和分页排序查询的用户分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
+     * @throws IllegalAccessException 无法访问需要导出的字段时抛出。
      */
     IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException;
 
     /**
      * 获取管理员用户详情
      *
-     * @param userId 用户ID
-     * @return 用户详情
+     * @param userId 要查看的用户唯一标识；权限过滤仍按当前操作者执行。
+     * @return 返回符合条件的用户分页视图详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
+     * @throws IllegalAccessException 无法访问需要导出的字段时抛出。
      */
     UserPageVO detail(UUID userId) throws IllegalAccessException;
 
     /**
      * 创建用户
      *
-     * @param params 请求参数
-     * @return 新创建的用户信息
+     * @param params 待创建用户的账号、资料、部门和初始状态等字段。
+     * @return 返回新建用户的标识、用户名和初始状态；校验或写入失败时抛出业务异常，不返回 null。
      */
     UserCreatedVO create(UserSaveFrom params);
 
     /**
      * 根据用户ID更新用户
      *
-     * @param params 请求参数
+     * @param params 待修改用户的唯一标识及账号、资料、部门和状态等字段。
      */
     void modify(UserSaveFrom params);
 
     /**
      * 重置用户密码
      *
-     * @param uid 用户ID
+     * @param uid 需要重置密码的用户唯一标识。
+     * @return 返回密码重置结果；处理失败时抛出业务异常，不返回 null。
      */
     UserPasswordResetVO passwordResetById(UUID uid);
 
     /**
      * 分页获取在线用户
      *
-     * @return 获取到的数据
+     * @return 返回按分页条件查询的在线用户列表；没有在线用户时返回空列表，不返回 null。
+     * @param page 分页条件，包含页码、页大小和排序字段。
      */
     List<UserOnlineVO> online(PageFrom page);
 
     /**
      * 获取当前用户详情
      *
-     * @param userId 用户ID
-     * @return 用户详情
+     * @param userId 要读取资料的用户唯一标识；返回内容受当前操作者权限限制。
+     * @return 返回符合条件的用户个人资料视图详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
      */
     UserProfileVO getProfile(UUID userId);
 
     /**
      * 更新当前用户信息
      *
-     * @param userId 用户ID
-     * @param params 更新参数
+     * @param userId 要更新资料的用户唯一标识。
+     * @param params 待更新的用户资料字段及用户唯一标识。
      */
     void updateProfile(UUID userId, UserProfileFrom params);
 
     /**
      * 修改当前用户密码
      *
-     * @param userId 用户ID
-     * @param params 修改密码参数
+     * @param userId 要修改密码的用户唯一标识。
+     * @param params 旧密码、新密码及确认值，用于完成密码变更校验。
      */
     void changePassword(UUID userId, ChangePasswordFrom params);
 
@@ -123,7 +130,7 @@ public interface UserService extends BaseService<User> {
      *
      * @param userId 目标用户
      * @param target 目标状态
-     * @param reason 操作原因
+     * @param reason 本次启用、禁用或其他状态迁移的审计原因，将随状态变更记录保存。
      */
     void changeStatus(UUID userId, UserStatus target, String reason);
 }

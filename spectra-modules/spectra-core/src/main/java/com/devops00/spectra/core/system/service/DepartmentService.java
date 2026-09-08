@@ -38,14 +38,15 @@ public interface DepartmentService extends BaseService<Department> {
      * 计算组织机构路径
      *
      * @param id 组织机构ID
-     * @return 组织机构路径
+     * @return 返回从根部门到指定部门的组织机构路径字符串；部门不存在时抛出业务异常，不返回 null 或空字符串。
      */
     String generatePath(UUID id);
 
     /**
      * 组织机构树形结构
      *
-     * @return 组织机构树形结构数组
+     * @return 返回全部可见部门构成的树形结构；没有可见部门时按当前实现返回 null，调用方需要先判空。
+     * @throws IllegalAccessException 无法访问需要导出的字段时抛出。
      */
     @Nullable
     List<DepartmentTreeVo> tree() throws IllegalAccessException;
@@ -53,14 +54,16 @@ public interface DepartmentService extends BaseService<Department> {
     /**
      * 获取自己包含下级的节点的ID
      *
-     * @return id列表
+     * @return 返回包含指定部门自身及全部后代部门的 ID 集合；部门无后代时仍包含自身，不返回 null。
+     * @param departmentId 组织部门的唯一标识。
      */
     Collection<UUID> getSelfAndDescendantIds(UUID departmentId);
 
     /**
      * 获取所有下级部门 ID（不包含自己）
      *
-     * @return id列表
+     * @return 返回指定部门的全部后代部门 ID 集合；部门无后代时返回空集合，不返回 null。
+     * @param departmentId 组织部门的唯一标识。
      */
     Collection<UUID> getDescendantIds(UUID departmentId);
 }

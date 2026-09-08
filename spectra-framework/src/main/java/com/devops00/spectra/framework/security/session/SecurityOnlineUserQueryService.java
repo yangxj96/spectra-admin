@@ -49,6 +49,11 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
         this.userOnlineConverter = userOnlineConverter;
     }
 
+    /**
+     * 查询当前仍有有效会话的在线用户。
+     *
+     * @return 返回当前安全 Redis 中可解析的在线用户视图列表；没有在线用户或无法解析的记录时返回空列表，不返回 null。
+     */
     @Override
     public List<UserOnlineVO> listOnlineUsers() {
         return SecurityRedisExecutor.execute("查询在线用户", this::listOnlineUsersInternal);

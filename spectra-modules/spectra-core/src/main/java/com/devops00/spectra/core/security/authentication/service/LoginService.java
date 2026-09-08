@@ -29,12 +29,30 @@ import com.devops00.spectra.common.port.security.SecurityToken;
  */
 public interface LoginService {
 
-    /** 执行账号主认证并签发正式会话。 */
+    /**
+     * 执行账号主认证并签发正式会话。
+     *
+     * @param params     登录用户名、密码、验证码及登录来源等认证凭据；密码和验证码不得写入日志。
+     * @param clientType 客户端类型，用于选择对应会话策略。
+     * @return 返回已完成认证或轮换后的访问令牌和刷新令牌；认证失败、令牌无效或安全 Redis 不可用时抛出异常，不返回 null。
+     */
     SecurityToken login(LoginFrom params, ClientType clientType);
 
-    /** 撤销当前会话和刷新会话。 */
+    /**
+     * 撤销当前会话和刷新会话。
+     *
+     * @param token        待校验或撤销的访问令牌；不得写入日志。
+     * @param refreshToken 待轮换或撤销的刷新令牌；不得写入日志。
+     * @param clientType   客户端类型，用于选择对应会话策略。
+     */
     void logout(String token, String refreshToken, ClientType clientType);
 
-    /** 轮换刷新令牌并返回新会话。 */
+    /**
+     * 轮换刷新令牌并返回新会话。
+     *
+     * @param refreshToken 待轮换或撤销的刷新令牌；不得写入日志。
+     * @param clientType   客户端类型，用于选择对应会话策略。
+     * @return 返回已完成认证或轮换后的访问令牌和刷新令牌；认证失败、令牌无效或安全 Redis 不可用时抛出异常，不返回 null。
+     */
     SecurityToken refresh(String refreshToken, ClientType clientType);
 }

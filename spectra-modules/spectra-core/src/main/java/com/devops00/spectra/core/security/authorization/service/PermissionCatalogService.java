@@ -18,6 +18,8 @@ public interface PermissionCatalogService {
 
     /**
      * 按资源分组返回活动 Permission，供管理端展示。
+     *
+     * @return 返回符合查询条件的权限目录树列表；无匹配时返回空列表，不返回 null。
      */
     List<AuthorityTreeVO> tree();
 }

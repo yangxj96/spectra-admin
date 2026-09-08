@@ -46,7 +46,7 @@ public class KaptchaExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回验证码不匹配统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(KaptchaNotMatchException.class)
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
@@ -60,7 +60,7 @@ public class KaptchaExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回验证码过期统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(KaptchaExpiresException.class)
     public R<Object> kaptchaExpiresException(Exception e, HttpServletResponse response) {

@@ -34,26 +34,33 @@ public interface AuthorizationAssignmentChangeService {
 
     /**
      * 生成短期、绑定版本的变更预览。
+     *
+     * @param targetUserId 待变更角色分配的目标用户唯一标识。
+     * @param from         待授予角色、授权边界和有效期等变更字段。
+     * @return 返回授权变更预览的校验预览结果；输入不合法或当前用户无权操作时抛出业务异常，不返回 null。
      */
     AuthorizationChangePreviewVO preview(UUID targetUserId, AuthorizationAssignmentChangeFrom from);
 
     /**
      * 校验 Preview token 并原子应用 RoleAssignment 与其 Boundary。
+     *
+     * @param targetUserId 要应用角色分配变更的目标用户唯一标识。
+     * @param from         绑定预览令牌并确认授权版本的申请字段。
      */
     void apply(UUID targetUserId, AuthorizationAssignmentApplyFrom from);
 
     /**
      * 撤销目标用户的一个活动 RoleAssignment。
      *
-     * @param targetUserId 目标用户
-     * @param from         撤销请求
+     * @param targetUserId 要撤销角色分配的目标用户唯一标识。
+     * @param from         待撤销角色分配的唯一标识及撤销原因。
      */
     void revoke(UUID targetUserId, AuthorizationAssignmentRemovalFrom from);
 
     /**
      * 确保目标用户拥有系统自动维护的普通用户基础角色。
      *
-     * @param targetUserId 目标用户
+     * @param targetUserId 需要补齐系统默认普通用户角色的用户唯一标识。
      */
     void ensureDefaultUserRole(UUID targetUserId);
 }

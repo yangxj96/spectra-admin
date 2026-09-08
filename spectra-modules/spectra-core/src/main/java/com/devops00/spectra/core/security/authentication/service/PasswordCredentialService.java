@@ -26,17 +26,29 @@ public interface PasswordCredentialService {
 
     /**
      * 查询或获取目标数据（{@code getByUserId}）。
+     *
+     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @return 返回符合条件的密码凭据；未找到匹配记录时返回 null。
      */
     @Nullable
     PasswordCredential getByUserId(UUID userId);
 
     /**
      * 创建或构建目标数据（{@code createOrReplace}）。
+     *
+     * @param userId       目标用户的唯一标识，用于限定查询或变更范围。
+     * @param passwordHash 已按安全策略生成的密码哈希，不包含明文密码。
+     * @param mustChange   是否要求用户下次登录时修改密码。
      */
     void createOrReplace(UUID userId, String passwordHash, boolean mustChange);
 
     /**
      * 更新或推进目标状态（{@code updatePassword}）。
+     *
+     * @param userId       目标用户的唯一标识，用于限定查询或变更范围。
+     * @param passwordHash 已按安全策略生成的密码哈希，不包含明文密码。
+     * @param mustChange   是否要求用户下次登录时修改密码。
+     * @param expiresAt    新密码凭据的失效时间；为 null 表示凭据不设置独立失效时间。
      */
     void updatePassword(UUID userId, String passwordHash, boolean mustChange, @Nullable Instant expiresAt);
 }

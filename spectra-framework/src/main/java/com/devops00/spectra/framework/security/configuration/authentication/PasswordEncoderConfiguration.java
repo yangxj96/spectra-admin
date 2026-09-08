@@ -36,6 +36,8 @@ public class PasswordEncoderConfiguration {
 
     /**
      * 处理内部业务逻辑（{@code passwordEncoder}）。
+     *
+     * @return 返回用于密码凭据哈希和校验的 PasswordEncoder Bean；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public PasswordEncoder passwordEncoder() {

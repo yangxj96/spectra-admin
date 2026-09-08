@@ -34,21 +34,33 @@ public interface NotificationProviderAdminService {
 
     /**
      * 查询所有渠道的脱敏配置。
+     *
+     * @return 返回符合查询条件的通知 Provider 配置列表；无匹配时返回空列表，不返回 null。
      */
     List<NotificationProviderVO> list();
 
     /**
      * 查询指定渠道的脱敏配置。
+     *
+     * @param channel 通知投递渠道，用于选择站内信、短信或邮件等发送路径。
+     * @return 返回符合条件的通知 Provider 配置详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
      */
     NotificationProviderVO get(NotificationChannel channel);
 
     /**
      * 读取 Provider 运行时配置；Secret 仅供 Provider 内部使用。
+     *
+     * @param channel 通知投递渠道，用于选择站内信、短信或邮件等发送路径。
+     * @return 返回指定渠道的运行时 Provider 配置；配置不存在或渠道未启用时抛出业务异常，Secret 字段可能为 null，且不返回管理端脱敏视图。
      */
     NotificationProviderConfiguration resolve(NotificationChannel channel);
 
     /**
      * 保存指定渠道配置。
+     *
+     * @param channel 通知投递渠道，用于选择站内信、短信或邮件等发送路径。
+     * @param params  渠道启用状态、发件人/签名、Endpoint、模板配置和密钥等 Provider 字段；密钥不会写入日志或管理端响应。
+     * @return 返回保存后的渠道脱敏配置，包含可用状态而不包含明文 Secret；校验或写入失败时抛出业务异常，不返回 null。
      */
     NotificationProviderVO modify(NotificationChannel channel, NotificationProviderSaveFrom params);
 }

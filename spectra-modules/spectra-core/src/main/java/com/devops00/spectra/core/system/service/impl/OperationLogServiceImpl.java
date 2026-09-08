@@ -49,22 +49,14 @@ public class OperationLogServiceImpl extends BaseServiceImpl<OperationLogMapper,
     }
 
     /**
-     * 将统一操作审计记录写入 PostgreSQL outbox。
-     *
-     * <p>该调用和业务写入共享当前事务；只有 outbox 写入成功，业务事务才允许提交。</p>
-     *
-     * @param record 统一操作审计记录
+     * 操作审计与业务写入共享当前事务，outbox 写入失败时阻止业务提交。
      */
     @Override
     public void record(AuditRecord record) {
         outboxWriter.write(Objects.requireNonNull(record, "操作审计记录不能为空"));
     }
 
-    /**
-     * 将 outbox 中的操作审计记录幂等写入正式操作日志表。
-     *
-     * @param record 已从 outbox 读取的操作审计记录
-     */
+    /** 数据库唯一约束保障 outbox 重复消费的幂等性。 */
     @Override
     public void persist(AuditRecord record) {
         Objects.requireNonNull(record, "操作审计记录不能为空");

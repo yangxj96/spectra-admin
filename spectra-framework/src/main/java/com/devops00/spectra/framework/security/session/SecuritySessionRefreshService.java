@@ -62,6 +62,12 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         this.securityUserLoader = securityUserLoader;
     }
 
+    /**
+     * 初始化或配置 Framework 的 refreshByRefreshToken。
+     *
+     * @param refreshToken 待轮换或撤销的刷新令牌；不得写入日志。
+     * @return 返回轮换后的访问令牌和刷新令牌；刷新令牌缺失、过期、重放、所属用户不可用或 Redis 失败时抛出异常，不返回 null。
+     */
     @Override
     public SecurityToken refreshByRefreshToken(String refreshToken) {
         return SecurityRedisExecutor.execute("刷新安全会话", () -> refreshInternal(refreshToken));

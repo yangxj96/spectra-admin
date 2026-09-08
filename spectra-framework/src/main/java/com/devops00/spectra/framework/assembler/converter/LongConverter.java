@@ -25,11 +25,23 @@ package com.devops00.spectra.framework.assembler.converter;
  */
 public class LongConverter implements IdConverter<Long> {
 
+    /**
+     * 将业务标识转换为字符串表示。
+     *
+     * @param id 待转换的业务标识。
+     * @return 返回 Long 业务标识的十进制字符串；id 为 null 时返回 null，不返回空字符串。
+     */
     @Override
     public String toString(Long id) {
         return id == null ? null : id.toString();
     }
 
+    /**
+     * 将字符串解析为业务标识。
+     *
+     * @param value 待转换为 Long 业务标识的十进制文本。
+     * @return 返回字符串解析出的 Long 业务标识；value 为 null 时返回 null，非数字文本时抛出 NumberFormatException。
+     */
     @Override
     public Long fromString(String value) {
         return value == null ? null : Long.valueOf(value);

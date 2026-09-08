@@ -48,6 +48,10 @@ public class CacheConfiguration {
 
     /**
      * 缓存管理器
+     *
+     * @param om      用于 Redis 值序列化的 ObjectMapper，必须使用安全的类型白名单配置。
+     * @param factory Redis 连接工厂，用于创建缓存管理器的数据访问连接。
+     * @return 返回使用项目序列化器和默认 TTL 策略的 RedisCacheManager；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public RedisCacheManager redisCacheManager(@Qualifier("redisObjectMapper") ObjectMapper om, RedisConnectionFactory factory) {
@@ -72,6 +76,8 @@ public class CacheConfiguration {
 
     /**
      * 定义一个redis专用的ObjectMapper
+     *
+     * @return 返回供 Redis 缓存序列化使用、已注册时间模块的 ObjectMapper；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean("redisObjectMapper")
     public ObjectMapper redisObjectMapper() {

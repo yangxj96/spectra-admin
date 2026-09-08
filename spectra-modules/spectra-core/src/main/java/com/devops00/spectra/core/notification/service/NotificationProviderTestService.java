@@ -31,6 +31,10 @@ public interface NotificationProviderTestService {
 
     /**
      * 向明确指定的测试地址发送一次测试消息。
+     *
+     * @param channel 通知投递渠道，用于选择站内信、短信或邮件等发送路径。
+     * @param params  测试收件地址、标题、正文和确认字段；只用于向明确地址发送测试消息。
+     * @return 返回 Provider 测试投递的请求标识和投递状态；渠道未配置、参数非法或发送失败时抛出异常，不返回 null。
      */
     NotificationProviderTestVO send(NotificationChannel channel, NotificationProviderTestFrom params);
 }

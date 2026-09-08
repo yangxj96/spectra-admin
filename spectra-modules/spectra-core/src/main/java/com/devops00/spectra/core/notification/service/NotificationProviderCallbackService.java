@@ -34,7 +34,7 @@ public interface NotificationProviderCallbackService {
      * @param channel   回执所属渠道
      * @param signature HMAC 签名，格式为 {@code sha256=<hex>}
      * @param body      原始 JSON 请求体
-     * @return 脱敏处理结果
+     * @return 返回已验签且完成幂等落库的 Provider 回执结果，不包含原始签名和敏感内容；验签失败、报文非法或处理失败时抛出异常，不返回 null。
      */
     NotificationProviderCallbackVO handle(NotificationChannel channel, String signature, String body);
 }

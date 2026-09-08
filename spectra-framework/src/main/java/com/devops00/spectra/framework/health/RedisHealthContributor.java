@@ -39,26 +39,51 @@ public class RedisHealthContributor implements DependencyHealthContributor {
         this.connectionFactory = connectionFactory;
     }
 
+    /**
+     * 读取 contributorName 对应的依赖健康状态。
+     *
+     * @return 返回固定名称 {@code Redis}，用于健康快照中标识 Redis 依赖；结果始终为非空字符串。
+     */
     @Override
     public String contributorName() {
         return "Redis";
     }
 
+    /**
+     * 读取 moduleName 对应的依赖健康状态。
+     *
+     * @return 返回所属模块名称 {@code framework}；结果始终为非空字符串。
+     */
     @Override
     public String moduleName() {
         return "framework";
     }
 
+    /**
+     * 读取 dependencyType 对应的依赖健康状态。
+     *
+     * @return 返回依赖类型 {@code REDIS}；结果始终为非空字符串。
+     */
     @Override
     public String dependencyType() {
         return "REDIS";
     }
 
+    /**
+     * 读取 timeout 对应的依赖健康状态。
+     *
+     * @return 返回 Redis 健康检查超时时间 3 秒；结果始终为非 null 的固定 Duration。
+     */
     @Override
     public Duration timeout() {
         return TIMEOUT;
     }
 
+    /**
+     * 读取 check 对应的依赖健康状态。
+     *
+     * @return 返回 Redis PING 检查结果；连接可用且响应为 PONG 时状态为 UP，否则为 DOWN，结果对象始终非 null。
+     */
     @Override
     public DependencyHealthResult check() {
         var start = System.nanoTime();

@@ -33,36 +33,54 @@ public interface ProcessDefinitionService {
 
     /**
      * 获取所有流程定义
+     *
+     * @return 返回当前部署的全部流程定义；没有已部署定义时返回空列表，不返回 null。
      */
     List<ProcessDefinitionVO> listAll();
 
     /**
      * 获取流程定义详情
+     *
+     * @param id 要读取元数据和状态的流程定义唯一标识。
+     * @return 返回指定流程定义的元数据和当前状态；定义不存在时抛出业务异常，不返回 null。
      */
     ProcessDefinitionVO getDetail(String id);
 
     /**
      * 获取流程定义图（PNG）
+     *
+     * @param id 要生成 BPMN 图的流程定义唯一标识。
+     * @return 返回指定流程定义 BPMN 图的 PNG 字节数组；定义不存在或图生成失败时抛出业务异常，不返回 null 或空数组。
      */
     byte[] getDiagram(String id);
 
     /**
      * 挂起流程定义
+     *
+     * @param id 要挂起的流程定义唯一标识；挂起后不再允许启动新实例。
      */
     void suspend(String id);
 
     /**
      * 激活流程定义
+     *
+     * @param id 要激活的流程定义唯一标识。
      */
     void activate(String id);
 
     /**
      * 获取流程定义的 BPMN XML 源码
+     *
+     * @param id 要读取 BPMN XML 资源的流程定义唯一标识。
+     * @return 返回指定流程定义的 BPMN XML 资源；定义或资源不存在时抛出业务异常，不返回 null。
      */
     ProcessDefinitionResourceVO getResource(String id);
 
     /**
      * 部署流程定义
+     *
+     * @param from 待部署 BPMN 资源、流程定义键和名称等部署字段。
+     * @return 返回部署成功后的流程定义视图，包含定义标识和最新版本；校验或部署失败时抛出业务异常，不返回 null。
      */
     ProcessDefinitionVO deploy(DeployProcessFrom from);
 }

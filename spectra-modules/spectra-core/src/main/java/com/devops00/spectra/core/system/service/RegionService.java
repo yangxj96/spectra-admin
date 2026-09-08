@@ -40,39 +40,42 @@ public interface RegionService extends BaseService<Region> {
     /**
      * 懒加载树
      *
-     * @param level 层级
-     * @param id    父级ID
-     * @return 根据条件获取的下级的列表
+     * @param level 要展开的行政区划层级。
+     * @param id    父级区域 ID；为空时从顶级区域开始查询。
+     * @return 返回指定层级和父级下的行政区划列表；没有下级区域时返回空列表，不返回 null。
      */
     List<RegionVO> lazyTree(Integer level, String id);
 
     /**
      * 分页查询行政区划
      *
-     * @param page   分页信息
-     * @param params 过滤参数
-     * @return 分页响应信息
+     * @param page   行政区划列表的页码、页大小及排序字段。
+     * @param params 区域名称、编码、层级和父级等分页筛选条件。
+     * @return 返回按行政区划条件分页查询的区域结果；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
     /**
      * 查询或获取目标数据（{@code getPath}）。
+     *
+     * @param id 要查询组织路径的行政区划唯一标识。
+     * @return 返回从指定行政区划到根节点的编码、名称和层级路径；区域不存在时抛出业务异常，不返回 null。
      */
     RegionPathVO getPath(UUID id);
 
     /**
      * 新增行政区划
      *
-     * @param params 行政区划信息
-     * @return 新增后的行政区划信息
+     * @param params 行政区划编码、名称、层级、父级和排序等新建字段。
+     * @return 返回新增行政区划的视图，包含区域标识、名称和层级；校验或写入失败时抛出业务异常，不返回 null。
      */
     RegionVO created(RegionFrom params);
 
     /**
      * 修改行政区划
      *
-     * @param params 行政区划信息
-     * @return 修改后的行政区划信息
+     * @param params 待修改行政区划的唯一标识及编码、名称、层级、父级和排序字段。
+     * @return 返回修改后的行政区划视图；区域不存在、层级冲突或写入失败时抛出业务异常，不返回 null。
      */
     RegionVO modify(RegionFrom params);
 

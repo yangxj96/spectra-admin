@@ -33,6 +33,12 @@ public interface GrantBoundaryService {
 
     /**
      * 校验操作者是否能授予指定 Permission、Scope 和 authorityLevel。
+     *
+     * @param operatorSnapshot 操作者当前已解析的授权快照，用于判断其可授予的权限边界。
+     * @param operatorId       操作者的用户 ID，用于审计本次授权判断并排除自授权场景。
+     * @param targetUserId     被授予权限的目标用户 ID，用于校验目标用户的组织和授权范围。
+     * @param requests         待授予的权限、数据范围和授权等级请求列表；每项都会单独进行边界校验。
+     * @param root             是否以系统根权限执行；为 false 时必须完全受操作者授权快照约束。
      */
     void evaluate(AuthorizationSnapshot operatorSnapshot,
                   UUID operatorId,

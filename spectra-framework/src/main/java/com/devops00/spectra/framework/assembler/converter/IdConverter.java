@@ -26,16 +26,18 @@ package com.devops00.spectra.framework.assembler.converter;
 public interface IdConverter<ID> {
 
     /**
-     * 转换到字符串
+     * 将业务 ID 转换为可写入缓存键或传输数据的文本。
      *
-     * @param id 值
+     * @param id 要写入缓存键或响应数据的业务 ID；具体格式由 ID 类型实现决定。
+     * @return 返回业务 ID 的稳定文本表示；输入是否允许为 null 及 null 的返回语义由具体实现定义。
      */
     String toString(ID id);
 
     /**
-     * 转换到指定类型
+     * 将缓存键或传输数据中的文本恢复为业务 ID。
      *
-     * @param value 值
+     * @param value 从缓存键或请求数据读取的 ID 文本；具体解析规则由 ID 类型实现决定。
+     * @return 返回从文本解析出的业务 ID；输入是否允许为 null 及解析失败时的异常语义由具体实现定义。
      */
     ID fromString(String value);
 }

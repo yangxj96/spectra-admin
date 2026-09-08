@@ -45,6 +45,14 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         this.om = om;
     }
 
+    /**
+     * 将安全异常转换为统一的拒绝响应。
+     *
+     * @param request  当前 HTTP 请求或待处理的安全业务请求。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @param e        待转换为统一响应的异常对象。
+     * @throws IOException 依赖不可用或输入不满足组件约束时抛出。
+     */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

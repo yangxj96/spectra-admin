@@ -51,6 +51,8 @@ public class SecurityAutoConfiguration {
 
     /**
      * 统一 Root 判定入口。Root 仍必须经过审计、Session 和 DataScope 等其他安全边界。
+     *
+     * @return 返回根据安全配置识别 Root 角色的授权策略 Bean；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public RootAuthorizationPolicy rootAuthorizationPolicy() {

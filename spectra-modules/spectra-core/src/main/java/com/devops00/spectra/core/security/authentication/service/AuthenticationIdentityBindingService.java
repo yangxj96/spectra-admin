@@ -26,21 +26,35 @@ public interface AuthenticationIdentityBindingService {
 
     /**
      * 查询或获取目标数据（{@code listByUserId}）。
+     *
+     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @return 返回符合查询条件的认证身份列表；无匹配时返回空列表，不返回 null。
      */
     List<AuthenticationIdentity> listByUserId(UUID userId);
 
     /**
      * 更新或推进目标状态（{@code bindPhone}）。
+     *
+     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @param phone  待验证或匹配的手机号码。
+     * @param code   验证码或业务编码，用于匹配待处理记录。
      */
     void bindPhone(UUID userId, String phone, String code);
 
     /**
      * 更新或推进目标状态（{@code bindEmail}）。
+     *
+     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @param email  待验证或匹配的电子邮箱地址。
+     * @param code   验证码或业务编码，用于匹配待处理记录。
      */
     void bindEmail(UUID userId, String email, String code);
 
     /**
      * 更新或推进目标状态（{@code unbind}）。
+     *
+     * @param userId     目标用户的唯一标识，用于限定查询或变更范围。
+     * @param identityId 目标认证身份的唯一标识。
      */
     void unbind(UUID userId, UUID identityId);
 }

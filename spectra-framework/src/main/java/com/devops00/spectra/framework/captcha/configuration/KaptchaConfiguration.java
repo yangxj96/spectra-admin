@@ -60,8 +60,9 @@ public class KaptchaConfiguration {
      *
      * 图片验证码
      *
-     * @return {@code Producer}对象
+     * @return 返回按验证码长度、字符集和干扰参数配置的 Kaptcha Producer；配置非法时抛出异常，不返回 null。
      *
+     * @throws Exception 组件初始化或配置失败时抛出。
      */
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
@@ -99,8 +100,9 @@ public class KaptchaConfiguration {
      *
      * 算术验证码
      *
-     * @return {@code Producer}对象
+     * @return 返回注册到 Spring 容器的 DefaultKaptcha Bean；配置构建失败时抛出异常，不返回 null。
      *
+     * @throws Exception 组件初始化或配置失败时抛出。
      */
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")

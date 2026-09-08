@@ -31,6 +31,12 @@ import org.jspecify.annotations.Nullable;
  */
 public class DefaultRootAuthorizationPolicy implements RootAuthorizationPolicy {
 
+    /**
+     * 获取或判断 Framework 的 isRoot 结果。
+     *
+     * @param principal 待判断的当前安全主体；包含用户状态和权限编码。
+     * @return 返回主体是否为已启用且状态有效的 Root 用户；主体为 null、状态无效或缺少 Root 角色时返回 false。
+     */
     @Override
     public boolean isRoot(@Nullable SecurityPrincipal principal) {
         if (principal == null

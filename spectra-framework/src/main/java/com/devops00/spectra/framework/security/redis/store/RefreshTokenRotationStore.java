@@ -77,7 +77,7 @@ public final class RefreshTokenRotationStore {
      * @param refreshHashKey Refresh Token Hash Key
      * @param claimKey       一次性消费声明 Key
      * @param ttlSeconds     声明保留时间（秒）
-     * @return 消费结果；Redis 返回异常时直接抛出，由上层 fail-closed
+     * @return 返回 Refresh Token 的原子消费结果：首次消费为 {@code CLAIMED}、重复消费为 {@code REPLAY}、记录缺失或过期为 {@code MISSING}；Redis 异常直接抛出并由上层 fail-closed。
      */
     public static ClaimResult claim(RedisTemplate<String, Object> redis, String refreshHashKey, String claimKey,
                                     long ttlSeconds) {
@@ -95,8 +95,8 @@ public final class RefreshTokenRotationStore {
      *
      * @param redis         安全 Redis 模板
      * @param key           待删除的映射 Key
-     * @param expectedValue 期望的当前值
-     * @return 是否完成删除
+     * @param expectedValue 调用方提交的刷新令牌摘要；只有与 Redis 中当前摘要一致时才允许删除并完成消费。
+     * @return 仅当 Redis 中的值与 expectedValue 匹配并完成原子删除时返回 true；值缺失、不匹配或过期时返回 false，Redis 失败时抛出异常。
      */
     public static boolean compareAndDelete(RedisTemplate<String, Object> redis, String key,
                                            String expectedValue) {

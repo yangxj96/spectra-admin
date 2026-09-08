@@ -36,26 +36,42 @@ import java.util.UUID;
 public interface CalendarService extends BaseService<Calendar> {
     /**
      * 分页查询日程。
+     *
+     * @param page   分页条件，包含页码、页大小和排序字段。
+     * @param params 日程关键字和起止时间等分页筛选条件。
+     * @return 返回按分页条件查询的OA 日历事件分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
     IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params);
 
     /**
      * 查询日程详情。
+     *
+     * @param id 目标OA 业务记录的唯一标识。
+     * @return 返回符合条件的OA 日历事件详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
      */
     CalendarVO get(UUID id);
 
     /**
      * 创建日程。
+     *
+     * @param from 日程标题、内容、起止时间、全天标记、类型、可见范围和参与人等创建字段。
+     * @return 返回保存后的OA 日历事件；校验或写入失败时抛出业务异常，不返回 null。
      */
     CalendarVO create(CalendarSaveFrom from);
 
     /**
      * 修改日程。
+     *
+     * @param id   待修改日程的唯一标识。
+     * @param from 日程标题、内容、起止时间、全天标记、类型、可见范围和参与人等修改字段。
+     * @return 返回保存后的OA 日历事件；校验或写入失败时抛出业务异常，不返回 null。
      */
     CalendarVO update(UUID id, CalendarSaveFrom from);
 
     /**
      * 删除日程。
+     *
+     * @param id 待删除日程的唯一标识。
      */
     void delete(UUID id);
 }

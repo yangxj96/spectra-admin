@@ -85,23 +85,45 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
             this.formatted = new ConcurrentHashMap<>(copyParameterMap(formatted));
         }
 
+        /**
+         * 读取转换后的单值请求参数。
+         *
+         * @param name 要读取的请求参数名称；名称按过滤器转换后的驼峰形式匹配。
+         * @return 返回该参数的第一个值；参数不存在或没有值时返回 null。
+         */
         @Override
         public @Nullable String getParameter(String name) {
             var values = formatted.get(name);
             return values == null || values.length == 0 ? null : values[0];
         }
 
+        /**
+         * 获取或判断 Framework 的 getParameterNames 结果。
+         *
+         * @return 返回当前请求参数名的枚举；没有参数时返回空枚举，不返回 null。
+         */
         @Override
         public Enumeration<String> getParameterNames() {
             return Collections.enumeration(formatted.keySet());
         }
 
+        /**
+         * 获取或判断 Framework 的 getParameterValues 结果。
+         *
+         * @param name 要读取值数组的请求参数名称；名称按过滤器转换后的驼峰形式匹配。
+         * @return 返回指定参数值的防修改副本；参数不存在时返回 null，调用方修改返回数组不会影响请求快照。
+         */
         @Override
         public String[] getParameterValues(String name) {
             var values = formatted.get(name);
             return values == null ? null : values.clone();
         }
 
+        /**
+         * 获取或判断 Framework 的 getParameterMap 结果。
+         *
+         * @return 返回请求参数到值数组的只读快照；没有参数时返回空 Map，不返回 null。
+         */
         @Override
         public Map<String, String[]> getParameterMap() {
             return copyParameterMap(formatted);

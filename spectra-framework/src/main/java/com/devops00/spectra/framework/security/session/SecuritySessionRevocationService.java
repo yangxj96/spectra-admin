@@ -50,6 +50,11 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         this.store = store;
     }
 
+    /**
+     * 撤销访问令牌及其关联会话状态。
+     *
+     * @param token 待摘要、校验或撤销的访问令牌；不得写入日志。
+     */
     @Override
     public void deleteToken(String token) {
         run("撤销 Access Token", () -> deleteAccessDigest(TokenDigestService.digest(token)));
@@ -102,6 +107,11 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         }
     }
 
+    /**
+     * 按刷新令牌撤销关联的访问令牌和会话。
+     *
+     * @param refreshToken 待轮换或撤销的刷新令牌；不得写入日志。
+     */
     @Override
     public void deleteByRefreshToken(String refreshToken) {
         run("按 Refresh Token 撤销会话", () -> deleteByRefreshTokenInternal(refreshToken));
@@ -129,11 +139,22 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         store.redis().opsForSet().remove(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
     }
 
+    /**
+     * 撤销用户的全部登录会话。
+     *
+     * @param userId 目标用户的唯一标识，用于限定会话和授权范围。
+     */
     @Override
     public void deleteByUserId(UUID userId) {
         run("按用户撤销会话", () -> deleteByUserIdInternal(userId, null));
     }
 
+    /**
+     * 撤销用户除指定令牌外的全部登录会话。
+     *
+     * @param userId      目标用户的唯一标识，用于限定会话和授权范围。
+     * @param accessToken 待排除或撤销的访问令牌；不得写入日志。
+     */
     @Override
     public void deleteByUserIdExceptToken(UUID userId, String accessToken) {
         run("按用户撤销除当前会话外的其他会话", () -> deleteByUserIdInternal(userId, accessToken));
@@ -181,6 +202,12 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         store.redis().delete(accessRefreshKey);
     }
 
+    /**
+     * 按用户和客户端类型撤销登录会话。
+     *
+     * @param userId     目标用户的唯一标识，用于限定会话和授权范围。
+     * @param clientType 客户端类型，用于选择对应的安全会话策略。
+     */
     @Override
     public void deleteByUserIdAndClient(String userId, ClientType clientType) {
         run("按用户和客户端撤销会话", () -> {

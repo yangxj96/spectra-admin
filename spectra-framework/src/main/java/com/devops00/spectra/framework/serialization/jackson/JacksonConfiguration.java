@@ -66,6 +66,8 @@ public class JacksonConfiguration {
 
     /**
      * 处理内部业务逻辑（{@code jsonMapperBuilderCustomizer}）。
+     *
+     * @return 返回配置日期时间、时区和 JSR-310 模块的 Jackson Builder 定制器 Bean；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public JsonMapperBuilderCustomizer jsonMapperBuilderCustomizer() {

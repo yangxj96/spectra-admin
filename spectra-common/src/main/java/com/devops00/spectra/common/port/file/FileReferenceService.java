@@ -12,11 +12,33 @@ import java.util.UUID;
 /** 文件引用事务端口。 */
 public interface FileReferenceService {
 
+    /**
+     * 创建或保存文件引用数据，并返回接口约定的对象或回执。
+     *
+     * @param command 待登记的文件引用命令，包含文件标识、引用对象类型和引用对象 ID。
+     * @return 登记文件与业务对象的引用关系并返回引用视图；注册失败时抛出业务异常，不返回 null。
+     */
     FileReferenceView register(FileReferenceCommand command);
 
+    /**
+     * 删除、撤销或归档文件引用数据；重复调用按接口约定保持幂等。
+     *
+     * @param key 目标缓存或引用记录的键，用于定位存储数据。
+     */
     void remove(FileReferenceKey key);
 
+    /**
+     * 删除、撤销或归档文件引用数据；重复调用按接口约定保持幂等。
+     *
+     * @param referenceId 被引用资源的唯一标识。
+     */
     void removeById(UUID referenceId);
 
+    /**
+     * 删除、撤销或归档文件引用数据；重复调用按接口约定保持幂等。
+     *
+     * @param referenceType 被引用资源的类型编码，用于选择对应权限规则。
+     * @param referenceId   被引用资源的唯一标识。
+     */
     void removeByReference(String referenceType, UUID referenceId);
 }

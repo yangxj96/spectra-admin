@@ -60,6 +60,13 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         this.mapper = Objects.requireNonNull(mapper, "mapper").rebuild().build();
     }
 
+    /**
+     * 将对象序列化为 Redis 可存储的字节数组。
+     *
+     * @param value 待写入缓存的 UUID 到字符串 Map 或 UUID 集合；其他类型不属于当前缓存契约。
+     * @return 返回可写入 Redis 的 JSON 字节数组；value 为 null 时返回 null，序列化失败时抛出 {@code SerializationException}。
+     * @throws SerializationException 依赖不可用或输入不满足组件约束时抛出。
+     */
     @Override
     public byte[] serialize(Object value) throws SerializationException {
         if (value == null) {
@@ -82,6 +89,13 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         }
     }
 
+    /**
+     * 将 Redis 字节数组恢复为受控的业务对象。
+     *
+     * @param source 从 Redis 读取的缓存 JSON 字节数组。
+     * @return 返回从受控 envelope 恢复的 UUID 到字符串 Map 或 UUID 列表；source 为 null、空数组、旧格式或损坏内容时返回 null 作为 cache miss，不把异常 payload 交给调用方。
+     * @throws SerializationException 依赖不可用或输入不满足组件约束时抛出。
+     */
     @Override
     public Object deserialize(byte[] source) throws SerializationException {
         if (source == null || source.length == 0) {

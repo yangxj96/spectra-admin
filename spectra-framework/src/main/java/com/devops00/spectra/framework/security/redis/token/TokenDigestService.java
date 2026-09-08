@@ -26,14 +26,23 @@ public final class TokenDigestService {
     private TokenDigestService() {
     }
 
-    /** 生成 256 bit 的 URL-safe Opaque Token。 */
+    /**
+     * 生成 256 bit 的 URL-safe Opaque Token。
+     *
+     * @return 返回使用安全随机源生成的原始访问 token；结果始终为非空字符串，随机源失败时抛出异常。
+     */
     public static String generateToken() {
         byte[] bytes = new byte[TOKEN_BYTES];
         RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    /** 计算不可逆索引摘要。 */
+    /**
+     * 计算不可逆索引摘要。
+     *
+     * @param token 待摘要、校验或撤销的访问令牌；不得写入日志。
+     * @return 返回 token 的 SHA-256 十六进制摘要，用于 Redis 键或幂等比对；输入为空或摘要失败时抛出异常，不返回 null 或空字符串。
+     */
     public static String digest(String token) {
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException("token不能为空");

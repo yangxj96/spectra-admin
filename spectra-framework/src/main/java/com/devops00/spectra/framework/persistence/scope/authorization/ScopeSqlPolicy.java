@@ -43,6 +43,10 @@ public final class ScopeSqlPolicy {
 
     /**
      * 根据 MyBatis statement 名称选择本次 SQL 所需的 Permission。
+     *
+     * @param annotation        当前方法声明的数据权限配置。
+     * @param mappedStatementId MyBatis mapped statement 标识，用于选择数据权限规则。
+     * @return 返回数据权限注解声明的权限策略编码；INSERT/CREATE 等无需读取权限的操作返回 null，缺失映射配置时抛出异常。
      */
     public static String permissionFor(DataScope annotation, String mappedStatementId) {
         if (annotation == null) {
@@ -67,6 +71,12 @@ public final class ScopeSqlPolicy {
 
     /**
      * 将同一 Permission 的多个 Assignment Boundary 以 OR 合并；不同 Permission 不会进入此方法。
+     *
+     * @param table      当前 SQL 语句对应的表元数据，用于解析资源权限边界。
+     * @param annotation 当前方法声明的数据权限配置。
+     * @param boundaries 当前操作者可用的权限边界集合。
+     * @param subjectId  subject对象的唯一标识，用于定位待处理资源。
+     * @return 返回按边界 OR 合并后的 SQL 权限谓词；表、策略或边界缺失时返回 {@code 1 = 0}，无法构造安全谓词时不返回可放行的 null。
      */
     public static Expression build(Table table, DataScope annotation, List<PermissionBoundary> boundaries,
                                    UUID subjectId) {

@@ -34,7 +34,7 @@ public interface DepartmentStatsService {
      * 查询部门维度统计。
      *
      * @param from 查询条件
-     * @return 统计列表
+     * @return 返回按部门汇总的人员或业务统计列表；没有符合条件的部门时返回空列表，不返回 null。
      */
     List<DepartmentStatsVO> list(DepartmentStatsFrom from);
 
@@ -42,7 +42,7 @@ public interface DepartmentStatsService {
      * 导出部门维度统计 Excel。
      *
      * @param from 查询条件
-     * @return xlsx 文件内容
+     * @return 返回按统计条件生成的 XLSX 文件字节；没有可导出的数据时仍返回合法的空报表文件，生成失败时抛出异常，不返回 null 或空数组。
      */
     byte[] export(DepartmentStatsFrom from);
 }

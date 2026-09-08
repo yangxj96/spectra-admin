@@ -81,9 +81,9 @@ public final class RedisRateLimiter {
     /**
      * 尝试消费一次限流额度。
      *
-     * @param policy  限流策略
-     * @param subject 限流主体
-     * @return 限流决策
+     * @param policy  要匹配的接口限流窗口、最大请求数和主体维度。
+     * @param subject 当前请求的客户端地址及可选认证用户，用于生成隔离限流键。
+     * @return 返回本次请求是否获准、剩余额度和重试等待秒数；Redis 状态不可用或结果不可信时抛出异常，不返回 null。
      * @throws SecurityRedisUnavailableException Redis 状态不可用或不可信
      */
     public Decision tryAcquire(RateLimitPolicy policy, RateLimitPolicy.Subject subject) {

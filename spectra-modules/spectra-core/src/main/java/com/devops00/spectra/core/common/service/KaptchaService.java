@@ -29,11 +29,15 @@ public interface KaptchaService {
 
     /**
      * 生成验证码
+     *
+     * @throws IOException 读取或创建外部资源失败时抛出。
      */
     void generate() throws IOException;
 
     /**
      * 是否检查
+     *
+     * @return 返回验证码校验开关配置；配置项未设置时可能返回 null，调用方应按 Boolean.TRUE 判断是否开启。
      */
     Boolean isCheck();
 
@@ -41,7 +45,7 @@ public interface KaptchaService {
      * 校验并一次性消费当前会话验证码。
      *
      * @param code 用户提交的验证码
-     * @return 是否消费成功
+     * @return 返回验证码是否被成功校验并消费；验证码不存在、过期或已消费时返回 false，Redis 操作失败时抛出异常。
      */
     boolean consumeKaptchaCode(String code);
 

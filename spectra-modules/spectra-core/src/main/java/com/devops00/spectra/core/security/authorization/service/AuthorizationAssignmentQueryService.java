@@ -26,6 +26,9 @@ public interface AuthorizationAssignmentQueryService {
     /**
      * 查询用户的 RoleAssignment 历史，保留 Access/Grant Boundary 的 Assignment 绑定；
      * 引用已删除角色的历史记录不参与运行时视图。
+     *
+     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @return 返回符合查询条件的用户授权分配列表；无匹配时返回空列表，不返回 null。
      */
     List<AuthorizationAssignmentView> findByUserId(UUID userId);
 }

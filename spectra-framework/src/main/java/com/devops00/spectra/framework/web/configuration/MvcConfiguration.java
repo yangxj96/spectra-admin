@@ -46,6 +46,11 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     private final SystemProperties spectraProperties;
 
+    /**
+     * 初始化或配置 Framework 的 addCorsMappings。
+     *
+     * @param registry Spring MVC CORS 注册表，用于写入精确 Origin、方法和请求头白名单。
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         log.debug(LogPrefix.WEB.f("载入Cors"));
@@ -114,6 +119,11 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 || "::1".equals(host);
     }
 
+    /**
+     * 初始化或配置 Framework 的 configureApiVersioning。
+     *
+     * @param configurer API 版本配置器，用于声明请求头名称、默认版本和版本探测策略。
+     */
     @Override
     public void configureApiVersioning(@NonNull ApiVersionConfigurer configurer) {
         log.debug("{}配置API版本号,默认请求头为{},默认版本号为{}", LogPrefix.WEB.p(), spectraProperties.getMvc().getApiHeader(),

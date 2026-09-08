@@ -38,22 +38,42 @@ public class SecuritySessionContextAccessor implements SecurityContextAccessor {
         this.systemConfigValueProvider = systemConfigValueProvider;
     }
 
+    /**
+     * 读取当前登录主体。
+     *
+     * @return 返回当前安全 Session 对应的主体；未认证请求返回 null。
+     */
     @Override
     public @Nullable SecurityPrincipal currentUser() {
         return sessionReader.getCurrentUser();
     }
 
+    /**
+     * 读取当前登录主体 ID。
+     *
+     * @return 返回当前安全主体的用户 ID；未认证请求返回 null。
+     */
     @Override
     public @Nullable UUID currentUserId() {
         SecurityPrincipal user = currentUser();
         return user == null ? null : user.getId();
     }
 
+    /**
+     * 读取当前请求访问令牌。
+     *
+     * @return 返回当前请求携带的访问令牌；请求没有令牌时返回 null。
+     */
     @Override
     public @Nullable String currentToken() {
         return tokenAccessor.getCurrentToken();
     }
 
+    /**
+     * 读取当前用户时区；无法确认安全主体时按安全策略失败。
+     *
+     * @return 返回当前用户时区 ID；未认证、用户时区无效或系统配置缺失时依次回退到系统时区和 UTC，不返回 null。
+     */
     @Override
     public String currentUserZoneId() {
         SecurityPrincipal user = currentUser();
@@ -90,6 +110,11 @@ public class SecuritySessionContextAccessor implements SecurityContextAccessor {
         }
     }
 
+    /**
+     * 读取当前认证主体的用户名。
+     *
+     * @return 返回当前认证主体用户名；没有认证主体时返回固定占位文本“未找到用户名”，不返回 null。
+     */
     @Override
     public String currentUsername() {
         SecurityPrincipal user = currentUser();

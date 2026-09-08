@@ -164,7 +164,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
      * @param authentication     当前认证对象（@NullMarked → 必定非 null）
      * @param targetDomainObject 目标领域对象，可为 null（如业务不需要资源对象）
      * @param permission         表达式权限字符串（非 null）
-     * @return true: 拥有权限 false: 权限不足
+     * @return 返回主体是否拥有 permission 指定权限；Root/绝对权限或任一授权匹配时返回 true，权限不足时返回 false。
      */
     @Override
     public boolean hasPermission(Authentication authentication, @Nullable Object targetDomainObject, Object permission) {
@@ -205,6 +205,12 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
      * 基于资源 ID + 类型的权限判断。
      * <p>
      * 当前业务无需使用targetId/targetType,因此委托给第一个方法。
+     *
+     * @param authentication 当前认证上下文，用于读取主体和授权信息。
+     * @param targetId       target对象的唯一标识，用于定位待处理资源。
+     * @param targetType     请求体要反序列化成的目标类型。
+     * @param permission     待匹配的权限表达式字符串，支持绝对权限和通配符权限。
+     * @return 返回主体是否拥有 permission 指定权限；当前实现忽略 targetId 和 targetType，权限不足时返回 false。
      */
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {

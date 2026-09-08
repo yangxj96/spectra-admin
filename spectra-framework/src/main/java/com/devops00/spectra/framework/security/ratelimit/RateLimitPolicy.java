@@ -83,9 +83,9 @@ public record RateLimitPolicy(
     /**
      * 从固定目录解析请求策略。
      *
-     * @param method HTTP 方法
-     * @param path   去除 context path 后的请求路径
-     * @return 匹配到的策略
+     * @param method 待查找策略的 HTTP 方法，例如 {@code GET} 或 {@code POST}。
+     * @param path   去除 context path 后、用于匹配内置 Endpoint 的请求路径。
+     * @return 返回首个匹配 HTTP 方法和路径的内置限流策略；没有命中时返回 Optional.empty()，不会返回 null。
      */
     public static Optional<RateLimitPolicy> resolve(String method, String path) {
         Objects.requireNonNull(method, "HTTP 方法不能为空");
@@ -96,7 +96,7 @@ public record RateLimitPolicy(
     /**
      * 返回不可变的默认策略目录。
      *
-     * @return 默认策略
+     * @return 返回不可变的内置限流策略列表；策略目录固定且始终非空，不返回 null。
      */
     public static List<RateLimitPolicy> defaults() {
         return DEFAULT_POLICIES;
@@ -104,6 +104,10 @@ public record RateLimitPolicy(
 
     /**
      * 判断请求是否命中策略。
+     *
+     * @param method 当前请求的 HTTP 方法。
+     * @param path   当前请求去除 context path 后的路径。
+     * @return 返回请求是否命中该策略的任一 Endpoint；方法或路径不匹配时返回 false。
      */
     public boolean matches(String method, String path) {
         return endpoints.stream().anyMatch(endpoint -> endpoint.matches(method, path));
@@ -143,6 +147,10 @@ public record RateLimitPolicy(
 
         /**
          * 匹配固定路径或末尾 {@code /**} 路径。
+         *
+         * @param requestMethod 待匹配请求的 HTTP 方法。
+         * @param requestPath   待匹配请求去除 context path 后的路径。
+         * @return 返回请求方法和路径是否命中该 Endpoint；方法或路径不匹配时返回 false。
          */
         public boolean matches(String requestMethod, String requestPath) {
             if (!"*".equals(method) && !method.equalsIgnoreCase(requestMethod)) {
@@ -183,6 +191,9 @@ public record RateLimitPolicy(
 
         /**
          * 返回主体维度的原始组合值，调用方不得直接持久化该值。
+         *
+         * @param dimension 限流维度，用于选择 IP、用户或组合限流键。
+         * @return 返回按指定维度拼接的限流主体键；匿名用户使用客户端地址区分，结果始终为非空字符串且不得直接持久化。
          */
         public String key(SubjectDimension dimension) {
             return switch (dimension) {

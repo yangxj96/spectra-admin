@@ -55,6 +55,13 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
 
     private static final Pattern PATTERN = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller.*");
 
+    /**
+     * 获取或判断 Framework 的 supports 结果。
+     *
+     * @param returnType    控制器方法返回类型，用于判断响应加密规则。
+     * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @return 返回当前控制器响应是否需要统一结构包装；流式、资源和二进制响应返回 false，其余匹配的控制器响应返回 true。
+     */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         log.debug(LogPrefix.WEB.f("进入修改"));
@@ -83,6 +90,17 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
         return PATTERN.matcher(declaringClass.getPackageName()).matches();
     }
 
+    /**
+     * 在响应写出前执行响应加密或结构转换。
+     *
+     * @param body          待加密、解密或转换的请求/响应体。
+     * @param returnType    控制器方法返回类型，用于判断响应加密规则。
+     * @param contentType   响应媒体类型，用于选择序列化和加密策略。
+     * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @param request       当前 HTTP 请求或待处理的安全业务请求。
+     * @param response      当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 流式、资源、String、byte[] 响应原样返回；普通对象包装为 {@code R.success(body)}，body 为 null 时返回按 HTTP 方法生成的空响应对象，不返回 null。
+     */
     @Override
     public Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
                                   Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request, ServerHttpResponse response) {
@@ -119,7 +137,7 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
      *
      * @param request  请求
      * @param response 响应
-     * @return 结果
+     * @return 返回与当前 HTTP 状态和方法匹配的空响应对象；已知状态沿用原状态，POST 使用 201、PUT 使用 204，其余请求使用成功响应，不返回 null。
      */
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
         R<Object> r;

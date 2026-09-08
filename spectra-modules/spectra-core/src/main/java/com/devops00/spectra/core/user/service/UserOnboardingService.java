@@ -31,8 +31,8 @@ public interface UserOnboardingService {
     /**
      * 在同一事务中提交用户资料和多角色授权变更。
      *
-     * @param params 用户资料与授权配置
-     * @return 提交后的用户标识
+     * @param params 待保存的用户基本资料、组织归属和角色授权集合；各项变更在同一事务中提交。
+     * @return 返回完成资料写入和角色授权后的用户视图，包含用户唯一标识；校验或事务提交失败时抛出业务异常，不返回 null。
      */
     UserOnboardingVO submit(UserOnboardingFrom params);
 }

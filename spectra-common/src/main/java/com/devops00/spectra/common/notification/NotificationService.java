@@ -40,8 +40,8 @@ public interface NotificationService {
      * @param recipientUserIds  收件用户 ID
      * @param channels          投递渠道，可传一个或多个
      * @param templateGroupCode 模板组编码
-     * @param parameters        普通模板参数
-     * @return 通知入队回执
+     * @param parameters        用于渲染标题、正文和链接的普通模板参数，不应放入密码、验证码等敏感值。
+     * @return 返回包含幂等键和请求标识的通知入队回执；已存在相同幂等键时返回原有回执，校验或入队失败时抛出异常，不返回 null。
      */
     default NotificationReceipt sendToUsers(String idempotencyKey, NotificationPurpose purpose,
                                             Collection<UUID> recipientUserIds,
@@ -64,8 +64,8 @@ public interface NotificationService {
      * @param purpose           通知用途
      * @param recipientUserIds  收件用户 ID
      * @param templateGroupCode 模板组编码
-     * @param parameters        普通模板参数
-     * @return 通知入队回执
+     * @param parameters        用于渲染站内信标题、正文和链接的普通模板参数，不应放入敏感值。
+     * @return 返回站内信的通知入队回执；已存在相同幂等键时返回原有回执，校验或入队失败时抛出异常，不返回 null。
      */
     default NotificationReceipt sendInApp(String idempotencyKey, NotificationPurpose purpose,
                                           Collection<UUID> recipientUserIds, String templateGroupCode,
@@ -81,8 +81,8 @@ public interface NotificationService {
      * @param purpose           通知用途
      * @param recipientUserIds  收件用户 ID
      * @param templateGroupCode 模板组编码
-     * @param parameters        普通模板参数
-     * @return 通知入队回执
+     * @param parameters        用于渲染短信正文的普通模板参数，不应放入未受控的敏感值。
+     * @return 返回短信通知的入队回执；收件人没有已验证手机号或入队失败时抛出异常，不返回 null。
      */
     default NotificationReceipt sendSms(String idempotencyKey, NotificationPurpose purpose,
                                         Collection<UUID> recipientUserIds, String templateGroupCode,
@@ -98,8 +98,8 @@ public interface NotificationService {
      * @param purpose           通知用途
      * @param recipientUserIds  收件用户 ID
      * @param templateGroupCode 模板组编码
-     * @param parameters        普通模板参数
-     * @return 通知入队回执
+     * @param parameters        用于渲染邮件标题和正文的普通模板参数，不应放入未受控的敏感值。
+     * @return 返回邮件通知的入队回执；收件人没有已验证邮箱或入队失败时抛出异常，不返回 null。
      */
     default NotificationReceipt sendEmail(String idempotencyKey, NotificationPurpose purpose,
                                           Collection<UUID> recipientUserIds, String templateGroupCode,
@@ -115,9 +115,9 @@ public interface NotificationService {
      * @param purpose             通知用途
      * @param directAddresses     渠道与直接地址，可传一个或多个
      * @param templateGroupCode   模板组编码
-     * @param parameters          普通模板参数
-     * @param sensitiveParameters 敏感模板参数
-     * @return 通知入队回执
+     * @param parameters          用于渲染标题、正文和链接的普通模板参数。
+     * @param sensitiveParameters 仅供受控模板渲染使用的敏感参数；不会作为普通通知字段记录或写入日志。
+     * @return 返回按直接地址生成的通知入队回执；地址或模板校验失败时抛出异常，不返回 null。
      */
     default NotificationReceipt sendDirect(String idempotencyKey, NotificationPurpose purpose,
                                            Collection<NotificationDirectAddress> directAddresses,
@@ -133,7 +133,7 @@ public interface NotificationService {
      * 发送通知并返回入队回执。
      *
      * @param request 快捷通知请求
-     * @return 通知入队回执
+     * @return 返回统一通知网关生成的入队回执，包含请求标识和幂等处理结果；请求校验或入队失败时抛出异常，不返回 null。
      */
     NotificationReceipt send(NotificationSendRequest request);
 }

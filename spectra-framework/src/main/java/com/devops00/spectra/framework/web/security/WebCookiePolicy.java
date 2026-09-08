@@ -17,6 +17,8 @@ public final class WebCookiePolicy {
 
     /**
      * 校验并确保数据满足当前约束（{@code validate}）。
+     *
+     * @param properties 安全运行时配置，提供会话、Cookie 和 CSRF 策略。
      */
     public static void validate(SecurityProperties properties) {
         if (properties == null) {

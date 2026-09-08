@@ -34,26 +34,40 @@ public interface OrganizationChangeService {
 
     /**
      * 查询或获取目标数据（{@code currentOrganizationVersion}）。
+     *
+     * @return 返回当前组织结构版本号；尚未发生组织变更时返回初始版本值 0，不返回 null。
      */
     long currentOrganizationVersion();
 
     /**
      * 处理内部业务逻辑（{@code preview}）。
+     *
+     * @param departmentId 待变更组织节点的唯一标识。
+     * @param from         部门名称、父部门、负责人和组织属性等变更字段。
+     * @return 返回组织变更预览的校验预览结果；输入不合法或当前用户无权操作时抛出业务异常，不返回 null。
      */
     OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from);
 
     /**
      * 更新或推进目标状态（{@code apply}）。
+     *
+     * @param departmentId 待应用组织变更的部门唯一标识。
+     * @param from         绑定预览令牌并确认组织变更版本的申请字段。
      */
     void apply(UUID departmentId, OrganizationChangeApplyFrom from);
 
     /**
      * 处理内部业务逻辑（{@code previewCreate}）。
+     *
+     * @param from 待新建组织节点的名称、父部门、负责人和组织属性等字段。
+     * @return 返回组织变更预览的校验预览结果；输入不合法或当前用户无权操作时抛出业务异常，不返回 null。
      */
     OrganizationChangePreviewVO previewCreate(OrganizationChangeFrom from);
 
     /**
      * 更新或推进目标状态（{@code applyCreate}）。
+     *
+     * @param from 绑定预览令牌并确认新建组织版本的申请字段。
      */
     void applyCreate(OrganizationCreateApplyFrom from);
 }

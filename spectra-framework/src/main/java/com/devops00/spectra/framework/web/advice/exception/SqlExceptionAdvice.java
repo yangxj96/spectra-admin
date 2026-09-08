@@ -54,7 +54,7 @@ public class SqlExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回数据重复统一失败响应；响应对象始终非 null且不向客户端暴露数据库原始信息。
      */
     @ExceptionHandler(DuplicateKeyException.class)
     public R<Object> handleDuplicateKeyException(DuplicateKeyException e, HttpServletResponse response) {
@@ -78,7 +78,7 @@ public class SqlExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 SQL 查询失败统一失败响应；响应对象始终非 null且不向客户端暴露 SQL 文本。
      */
     @ExceptionHandler(BadSqlGrammarException.class)
     public R<Object> handleBadSqlGrammarException(BadSqlGrammarException e, HttpServletResponse response) {
@@ -89,6 +89,10 @@ public class SqlExceptionAdvice {
 
     /**
      * 处理其他数据完整性违规（如外键、非空等）
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回数据完整性校验失败统一响应；响应对象始终非 null且不暴露约束细节。
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public R<Object> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletResponse response) {
@@ -99,6 +103,10 @@ public class SqlExceptionAdvice {
 
     /**
      * 处理未分类的 JDBC 异常（如连接问题、驱动错误等）
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回数据库操作异常统一响应；响应对象始终非 null且不暴露 SQL 状态或错误码。
      */
     @ExceptionHandler(UncategorizedSQLException.class)
     public R<Object> handleUncategorizedSQLException(UncategorizedSQLException e, HttpServletResponse response) {
@@ -115,6 +123,10 @@ public class SqlExceptionAdvice {
 
     /**
      * 【兜底】捕获所有Spring数据访问异常（包括未显式处理的）
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回 Spring 数据访问异常统一响应；响应对象始终非 null且不暴露底层异常细节。
      */
     @ExceptionHandler(DataAccessException.class)
     public R<Object> handleDataAccessException(DataAccessException e, HttpServletResponse response) {
@@ -123,7 +135,13 @@ public class SqlExceptionAdvice {
         return R.failure("系统内部错误,请联系管理员");
     }
 
-    /** 调度内核数据库不可用时必须明确返回 503，不能被普通 SQL 兜底吞掉。 */
+    /**
+     * 调度内核数据库不可用时必须明确返回 503，不能被普通 SQL 兜底吞掉。
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回 HTTP 503 的调度数据库不可用响应，错误码为 {@code SCHEDULER_DATABASE_UNAVAILABLE}；响应对象始终非 null。
+     */
     @ExceptionHandler(SchedulerDatabaseUnavailableException.class)
     public R<Object> handleSchedulerDatabaseUnavailable(SchedulerDatabaseUnavailableException e,
                                                         HttpServletResponse response) {
@@ -134,6 +152,10 @@ public class SqlExceptionAdvice {
 
     /**
      * 安全 Redis 不可用时必须停止 Token、Session、验证码和防重放相关请求，不能返回普通 500 或继续降级。
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回 HTTP 503 的安全 Redis 暂不可用响应；响应对象始终非 null且不允许请求继续按普通失败降级。
      */
     @ExceptionHandler(SecurityRedisUnavailableException.class)
     public R<Object> handleSecurityRedisUnavailable(SecurityRedisUnavailableException e, HttpServletResponse response) {
@@ -146,6 +168,10 @@ public class SqlExceptionAdvice {
      * 【兜底】捕获原始SQLException（如未通过Spring异常翻译的场景）
      * <p>
      * 注意：大多数情况下,Spring会将SQLException翻译为DataAccessException
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回数据库操作失败统一响应；响应对象始终非 null且不暴露 SQL 状态、错误码或原始消息。
      */
     @ExceptionHandler(SQLException.class)
     public R<Object> handleSQLException(SQLException e, HttpServletResponse response) {

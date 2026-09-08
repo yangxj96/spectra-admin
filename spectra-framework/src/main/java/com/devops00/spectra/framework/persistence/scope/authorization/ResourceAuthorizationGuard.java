@@ -36,6 +36,9 @@ public class ResourceAuthorizationGuard {
 
     /**
      * 校验并确保数据满足当前约束（{@code assertAllowed}）。
+     *
+     * @param context 资源授权上下文，包含操作者、目标资源和权限范围。
+     * @param query   待校验的单条资源范围查询。
      */
     public void assertAllowed(ExecutionContext context, ScopeQuery query) {
         requireContextAndQuery(context, query);
@@ -44,6 +47,9 @@ public class ResourceAuthorizationGuard {
 
     /**
      * 校验并确保数据满足当前约束（{@code assertBatchAllowed}）。
+     *
+     * @param context 资源授权上下文，包含操作者、目标资源和权限范围。
+     * @param queries 待批量校验的资源范围查询集合。
      */
     public void assertBatchAllowed(ExecutionContext context, Collection<ScopeQuery> queries) {
         if (queries == null || queries.isEmpty()) {
@@ -59,6 +65,9 @@ public class ResourceAuthorizationGuard {
 
     /**
      * 校验并确保数据满足当前约束（{@code assertExportAllowed}）。
+     *
+     * @param context 资源授权上下文，包含操作者、目标资源和权限范围。
+     * @param queries 待批量校验的资源范围查询集合。
      */
     public void assertExportAllowed(ExecutionContext context, Collection<ScopeQuery> queries) {
         if (context == null || context.operation() != ResourceOperation.EXPORT) {
@@ -69,6 +78,10 @@ public class ResourceAuthorizationGuard {
 
     /**
      * 校验并确保数据满足当前约束（{@code assertAllowed}）。
+     *
+     * @param authorization 待校验的资源授权声明。
+     * @param context       资源授权上下文，包含操作者、目标资源和权限范围。
+     * @param query         待校验的单条资源范围查询。
      */
     public static void assertAllowed(ScopedAuthorization authorization, ExecutionContext context, ScopeQuery query) {
         if (!authorization.allows(context, query)) {

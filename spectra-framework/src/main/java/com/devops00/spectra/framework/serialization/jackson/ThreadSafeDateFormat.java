@@ -64,6 +64,14 @@ final class ThreadSafeDateFormat extends DateFormat {
         this.formatter = baseFormatter.withZone(zoneId);
     }
 
+    /**
+     * 使用当前线程安全日期格式写入日期文本。
+     *
+     * @param date          待格式化的日期对象。
+     * @param buffer        用于写入格式化结果的字符缓冲区。
+     * @param fieldPosition 由 Java 日期格式 API 使用的字段位置状态。
+     * @return 返回写入格式化日期文本后的同一个 {@code buffer}；输入日期或缓冲区无效时按 JDK 约定抛出异常，不返回 null。
+     */
     @Override
     public StringBuffer format(Date date, StringBuffer buffer, FieldPosition fieldPosition) {
         Objects.requireNonNull(date, "date");
@@ -71,6 +79,13 @@ final class ThreadSafeDateFormat extends DateFormat {
         return buffer;
     }
 
+    /**
+     * 从文本解析日期，并更新解析位置。
+     *
+     * @param source   待解析的日期文本或待复制的格式对象。
+     * @param position 日期解析位置状态，用于报告解析进度。
+     * @return 返回按当前格式和时区解析出的日期；文本无效时返回 null，并通过 {@code position} 标记解析错误。
+     */
     @Override
     public Date parse(String source, ParsePosition position) {
         int start = position.getIndex();
@@ -89,6 +104,11 @@ final class ThreadSafeDateFormat extends DateFormat {
         }
     }
 
+    /**
+     * 设置日期格式使用的时区。
+     *
+     * @param timeZone 日期格式使用的时区；变更会影响序列化结果。
+     */
     @Override
     public void setTimeZone(TimeZone timeZone) {
         ZoneId newZone = Objects.requireNonNull(timeZone, "timeZone").toZoneId();
@@ -96,11 +116,21 @@ final class ThreadSafeDateFormat extends DateFormat {
         this.formatter = baseFormatter.withZone(newZone);
     }
 
+    /**
+     * 获取或判断 Framework 的 getTimeZone 结果。
+     *
+     * @return 返回当前日期格式使用的时区；未显式设置时返回格式对象的默认时区，不返回 null。
+     */
     @Override
     public TimeZone getTimeZone() {
         return TimeZone.getTimeZone(zoneId);
     }
 
+    /**
+     * 创建当前日期格式的独立副本。
+     *
+     * @return 返回包含相同格式、时区和 Locale 配置的独立日期格式副本；副本与原对象互不共享可变状态，不返回 null。
+     */
     @Override
     public Object clone() {
         return new ThreadSafeDateFormat(pattern, zoneId);

@@ -98,6 +98,14 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         log.info(LogPrefix.WEB.f("请求解密 Advice 已注册（运行时由 CryptoKeyManager 控制启用/禁用）"));
     }
 
+    /**
+     * 获取或判断 Framework 的 supports 结果。
+     *
+     * @param methodParameter 控制器方法参数元数据。
+     * @param targetType      请求体要反序列化成的目标类型。
+     * @param converterType   当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @return 返回请求是否需要进入解密 Advice；加密明确关闭或二进制转换器请求返回 false，启用加密且未显式关闭时返回 true。
+     */
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
         // 明确关闭时不注册 Advice；配置故障时仍保留 Advice，防止加密请求静默降级为明文。
@@ -134,6 +142,16 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         return true;
     }
 
+    /**
+     * 读取并解密请求体后交给控制器反序列化。
+     *
+     * @param inputMessage  已读取请求头和请求体的 HTTP 输入消息。
+     * @param parameter     控制器方法参数，用于确定请求解密目标。
+     * @param targetType    请求体要反序列化成的目标类型。
+     * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @return 返回原始或解密后的 HTTP 输入消息；明文和非 JSON 请求体按界限读取后返回重建消息，加密校验失败或超限时抛出异常，不返回 null。
+     * @throws IOException 依赖不可用或输入不满足组件约束时抛出。
+     */
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                            Class<? extends HttpMessageConverter<?>> converterType)
@@ -194,12 +212,32 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         }
     }
 
+    /**
+     * 处理已反序列化的请求体并执行必要的安全校验。
+     *
+     * @param body          待加密、解密或转换的请求/响应体。
+     * @param inputMessage  已读取请求头和请求体的 HTTP 输入消息。
+     * @param parameter     控制器方法参数，用于确定请求解密目标。
+     * @param targetType    请求体要反序列化成的目标类型。
+     * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @return 返回已完成安全校验的反序列化请求体；当前实现原样返回 {@code body}，不会把正常请求转换为 null。
+     */
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
 
+    /**
+     * 处理空请求体，并按请求契约返回安全结果。
+     *
+     * @param body          待加密、解密或转换的请求/响应体。
+     * @param inputMessage  已读取请求头和请求体的 HTTP 输入消息。
+     * @param parameter     控制器方法参数，用于确定请求解密目标。
+     * @param targetType    请求体要反序列化成的目标类型。
+     * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @return 返回空请求体的原始值；没有请求体时返回 null，Advice 不用空对象替代调用方声明的空值语义。
+     */
     @Override
     public Object handleEmptyBody(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                   Class<? extends HttpMessageConverter<?>> converterType) {
@@ -388,11 +426,21 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
             this.body = new ByteArrayInputStream(bodyBytes);
         }
 
+        /**
+         * 获取或判断 Framework 的 getHeaders 结果。
+         *
+         * @return 返回被包装请求的 HTTP 请求头快照；结果始终为非 null 的 {@code HttpHeaders}。
+         */
         @Override
         public HttpHeaders getHeaders() {
             return HttpHeaders.readOnlyHttpHeaders(headers);
         }
 
+        /**
+         * 获取或判断 Framework 的 getBody 结果。
+         *
+         * @return 返回解密或重建后的请求体输入流；输入消息无法提供流时抛出 IOException，不返回 null。
+         */
         @Override
         public InputStream getBody() {
             return body;

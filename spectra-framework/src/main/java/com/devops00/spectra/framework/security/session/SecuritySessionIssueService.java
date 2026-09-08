@@ -70,11 +70,24 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         this.revocationService = revocationService;
     }
 
+    /**
+     * 创建并持久化访问令牌及刷新令牌对应的安全状态。
+     *
+     * @param user 当前认证用户资料，不包含可记录的敏感凭据。
+     * @return 返回新建会话的访问令牌和刷新令牌；会话状态写入 Redis 或策略校验失败时抛出异常，不返回 null。
+     */
     @Override
     public SecurityToken createToken(SecurityPrincipal user) {
         return SecurityRedisExecutor.execute("签发安全会话", () -> createToken(user, resolveClientType(), UUID.randomUUID().toString()));
     }
 
+    /**
+     * 创建并持久化访问令牌及刷新令牌对应的安全状态。
+     *
+     * @param user       当前认证用户资料，不包含可记录的敏感凭据。
+     * @param clientType 客户端类型，用于选择对应的安全会话策略。
+     * @return 返回按指定客户端策略新建的访问令牌和刷新令牌；策略、令牌状态或 Redis 写入失败时抛出异常，不返回 null。
+     */
     @Override
     public SecurityToken createToken(SecurityPrincipal user, ClientType clientType) {
         return SecurityRedisExecutor.execute("签发安全会话",

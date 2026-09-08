@@ -32,7 +32,7 @@ public interface ServiceMonitorService {
     /**
      * 获取服务监控总览。
      *
-     * @return 服务监控总览
+     * @return 返回当前实例的 CPU、内存、磁盘和运行时监控总览；采集失败时抛出异常，不返回 null。
      */
     ServiceMonitorOverviewVO getOverview();
 
@@ -40,7 +40,7 @@ public interface ServiceMonitorService {
      * 查询服务监控历史趋势。
      *
      * @param from 查询条件
-     * @return 历史趋势
+     * @return 返回指定时间范围内的服务监控历史趋势数据；没有采样点时返回空列表，不返回 null，查询失败时抛出异常。
      */
     ServiceMonitorHistoryVO getHistory(ServiceMonitorHistoryFrom from);
 }

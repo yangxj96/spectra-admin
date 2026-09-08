@@ -54,6 +54,9 @@ public class DataScopeEntityRegistry {
 
     /**
      * 根据表名或带 schema 的表名查找数据权限元数据。
+     *
+     * @param tableName SQL 中待查找数据权限元数据的表名，可包含 schema 前缀和引号。
+     * @return 返回指定表名对应的 {@link DataScope} 元数据；表名为空、未注册或仅存在格式不匹配时返回 null。
      */
     public DataScope find(String tableName) {
         if (tableName == null) {

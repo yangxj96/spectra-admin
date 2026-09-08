@@ -55,7 +55,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为权限不足响应
+     * @return 返回 HTTP 403 的统一失败响应，消息为“权限不足”；响应对象始终非 null。
      */
     @ExceptionHandler(AccessDeniedException.class)
     public R<Object> accessDeniedException(AccessDeniedException e, HttpServletResponse response) {
@@ -66,6 +66,10 @@ public class CommonExceptionAdvice {
 
     /**
      * 数据范围缺失或越权异常，统一返回 403，避免被兜底处理成 500。
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回 HTTP 403 的统一失败响应，消息为“数据范围不足”；响应对象始终非 null。
      */
     @ExceptionHandler(DataScopeViolationException.class)
     public R<Object> dataScopeViolationException(DataScopeViolationException e, HttpServletResponse response) {
@@ -79,7 +83,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 500 的“未找到资源”统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
@@ -93,7 +97,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 500 的“功能暂未实现”统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
@@ -107,7 +111,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 409 的数据冲突统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(DataExistException.class)
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
@@ -121,7 +125,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 404 的数据不存在统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
@@ -135,7 +139,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 400 的参数校验统一失败响应，优先携带第一个校验错误消息；响应对象始终非 null。
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
@@ -154,7 +158,13 @@ public class CommonExceptionAdvice {
         }
     }
 
-    /** 客户端加密请求格式错误统一返回 400，不暴露密文、签名或底层密码异常。 */
+    /**
+     * 客户端加密请求格式错误统一返回 400，不暴露密文、签名或底层密码异常。
+     *
+     * @param e        待转换为统一响应的异常对象。
+     * @param response 当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @return 返回 HTTP 400 的请求加密数据无效统一失败响应，不包含密文或密钥；响应对象始终非 null。
+     */
     @ExceptionHandler(RequestCryptoException.class)
     public R<Object> requestCryptoException(RequestCryptoException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -167,7 +177,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 400 的请求体格式错误统一失败响应；响应对象始终非 null。
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
@@ -181,7 +191,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 500 的通用系统内部错误统一失败响应；响应对象始终非 null且不暴露异常细节。
      */
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
@@ -195,7 +205,7 @@ public class CommonExceptionAdvice {
      *
      * @param e        错误信息
      * @param response 响应
-     * @return 格式化为正常响应返回
+     * @return 返回 HTTP 500 的兜底系统内部错误统一失败响应；响应对象始终非 null且不暴露异常细节。
      */
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {

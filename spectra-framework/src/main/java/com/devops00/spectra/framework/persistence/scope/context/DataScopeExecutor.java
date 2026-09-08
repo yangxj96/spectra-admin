@@ -32,6 +32,9 @@ public class DataScopeExecutor {
 
     /**
      * 在系统运维权限校验通过后执行有返回值的隔离绕过任务。
+     *
+     * @param action 待在临时关闭数据权限的上下文中执行的受信任内部操作。
+     * @return 返回临时关闭数据隔离后由 {@code action} 产生的业务结果；{@code action} 返回 null 时原样返回 null，权限不足或 action 抛异常时不吞掉异常，并保证上下文恢复。
      */
     public <T> T withoutScope(Supplier<T> action) {
         requireSystemOperator();
@@ -40,6 +43,8 @@ public class DataScopeExecutor {
 
     /**
      * 在系统运维权限校验通过后执行无返回值的隔离绕过任务。
+     *
+     * @param action 待在临时关闭数据权限的上下文中执行的受信任内部操作。
      */
     public void withoutScope(Runnable action) {
         requireSystemOperator();

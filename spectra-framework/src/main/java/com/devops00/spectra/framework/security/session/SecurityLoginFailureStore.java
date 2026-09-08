@@ -43,6 +43,11 @@ public class SecurityLoginFailureStore implements SecurityLoginFailureTracker {
         this.store = store;
     }
 
+    /**
+     * 记录登录失败次数并在达到阈值时锁定登录。
+     *
+     * @param username 发生登录失败的用户名；用于生成失败计数键，不写入日志。
+     */
     @Override
     public void recordLoginFail(String username) {
         SecurityRedisExecutor.run("记录登录失败次数", () -> {
@@ -55,6 +60,12 @@ public class SecurityLoginFailureStore implements SecurityLoginFailureTracker {
         });
     }
 
+    /**
+     * 获取或判断 Framework 的 isLockedOut 结果。
+     *
+     * @param username 要查询登录失败锁定状态的用户名；用于读取失败计数键，不写入日志。
+     * @return 返回用户名当前是否达到登录失败锁定阈值；未锁定或锁定已过期时返回 false，Redis 无法确认状态时抛出异常。
+     */
     @Override
     public boolean isLockedOut(String username) {
         return SecurityRedisExecutor.execute("读取登录失败锁定状态", () -> {
@@ -73,6 +84,11 @@ public class SecurityLoginFailureStore implements SecurityLoginFailureTracker {
         });
     }
 
+    /**
+     * 清除已成功认证用户的登录失败计数。
+     *
+     * @param username 已成功认证并需要清除失败计数的用户名。
+     */
     @Override
     public void clearLoginFail(String username) {
         SecurityRedisExecutor.run("清理登录失败次数",

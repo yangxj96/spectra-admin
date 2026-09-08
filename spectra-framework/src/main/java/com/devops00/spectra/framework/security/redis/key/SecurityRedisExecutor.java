@@ -39,7 +39,7 @@ public final class SecurityRedisExecutor {
      * @param operation 操作描述
      * @param action    Redis 操作
      * @param <T>       返回值类型
-     * @return 操作结果
+     * @return 返回 Redis 操作的原始结果；操作返回 null 时原样返回 null，Redis 异常统一转换为安全 Redis 不可用异常。
      * @throws SecurityRedisUnavailableException Redis 不可用
      */
     public static <T> T execute(String operation, Supplier<T> action) {
@@ -58,7 +58,7 @@ public final class SecurityRedisExecutor {
      * @param operation 操作描述
      * @param action    Redis 操作
      * @param <T>       返回值类型
-     * @return 非空操作结果
+     * @return 返回 Redis 操作的非 null 结果；操作返回 null 或 Redis 异常时抛出安全 Redis 不可用异常。
      */
     public static <T> T require(String operation, Supplier<T> action) {
         T result = execute(operation, action);

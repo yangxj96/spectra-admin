@@ -25,7 +25,7 @@ public interface SystemGuideService {
     /**
      * 查询当前用户的引导状态。
      *
-     * @return 引导状态
+     * @return 返回当前用户的首次进入引导状态及尚未完成的设置项；系统状态读取失败时抛出业务异常，不返回 null。
      */
     SystemGuideStatusVO status();
 

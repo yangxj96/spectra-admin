@@ -24,7 +24,7 @@ public interface SystemBootstrapService {
     /**
      * 获取启动阶段所需的公开配置。
      *
-     * @return 启动配置
+     * @return 返回系统启动状态、初始化阶段和可用能力的引导视图；状态读取失败时抛出业务异常，不返回 null。
      */
     SystemBootstrapVO get();
 }

@@ -75,6 +75,11 @@ public enum SecurityRedisKey implements RedisKey {
         this.pattern = pattern;
     }
 
+    /**
+     * 获取或判断 Framework 的 getPattern 结果。
+     *
+     * @return 返回该安全 Redis 键的格式化模式字符串；模式包含必要的安全命名空间，结果始终为非空字符串。
+     */
     @Override
     public String getPattern() {
         return pattern;

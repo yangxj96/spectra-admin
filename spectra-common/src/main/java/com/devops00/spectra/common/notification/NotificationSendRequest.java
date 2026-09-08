@@ -37,8 +37,8 @@ import java.util.UUID;
  * @param recipientUserIds    收件用户 ID
  * @param directAddresses     直接投递地址，仅安全用途允许使用
  * @param templateGroupCode   模板组编码
- * @param parameters          普通模板参数
- * @param sensitiveParameters 敏感模板参数
+ * @param parameters          用于渲染通知标题、正文和链接的普通模板参数，不应放入密码或验证码。
+ * @param sensitiveParameters 仅供受控模板渲染使用的敏感参数，不应写入日志或普通审计字段。
  * @param businessType        业务类型
  * @param businessId          业务 ID
  * @param sourceModule        来源模块
@@ -73,7 +73,7 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
     /**
      * 创建请求构造器。
      *
-     * @return 请求构造器
+     * @return 返回可继续设置通知字段的构造器；构造器初始集合和参数均为空，不返回 null。
      */
     public static Builder builder() {
         return new Builder();
@@ -86,7 +86,7 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
      * @param purpose           通知用途
      * @param recipientUserIds  收件用户 ID
      * @param templateGroupCode 模板组编码
-     * @return 已设置站内信渠道的构造器
+     * @return 返回已预置站内信渠道、收件用户和模板组的构造器；后续仍可补充幂等键和模板参数，不返回 null。
      */
     public static Builder inApp(String idempotencyKey, NotificationPurpose purpose,
                                 Collection<UUID> recipientUserIds, String templateGroupCode) {
@@ -106,7 +106,7 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
      * @param channel           投递渠道
      * @param address           直接投递地址
      * @param templateGroupCode 模板组编码
-     * @return 已设置直接地址和渠道的构造器
+     * @return 返回已预置直接投递渠道、地址和模板组的构造器；后续仍可补充幂等键及模板参数，不返回 null。
      */
     public static Builder direct(String idempotencyKey, NotificationPurpose purpose, NotificationChannel channel,
                                  String address, String templateGroupCode) {
@@ -125,7 +125,7 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
      * @param purpose           通知用途
      * @param directAddresses   渠道与直接地址集合
      * @param templateGroupCode 模板组编码
-     * @return 已设置多渠道直接地址的构造器
+     * @return 返回已预置多个直接投递地址和模板组的构造器；后续仍可补充渠道参数，不返回 null。
      */
     public static Builder direct(String idempotencyKey, NotificationPurpose purpose,
                                  Collection<NotificationDirectAddress> directAddresses, String templateGroupCode) {

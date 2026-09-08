@@ -43,7 +43,7 @@ public class LoginExceptionAdvice {
      *
      * @param e        登录认证错误信息
      * @param response [HttpServletResponse]响应对象
-     * @return 通用响应对象
+     * @return 返回 HTTP 401 的登录认证失败统一响应；响应对象始终非 null，客户端只收到认证失败信息。
      */
     @ExceptionHandler(BadCredentialsException.class)
     public R<Object> handleLoginException(BadCredentialsException e, HttpServletResponse response) {

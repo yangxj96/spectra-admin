@@ -43,7 +43,9 @@ public class SecRedisConfiguration {
      * 自定义redisTemplate
      *
      * @param factory redis连接工程
-     * @return 自定义配置的[RedisTemplate]
+     * @return 返回安全 Redis 专用模板，使用安全状态所需的序列化和连接配置；Bean 创建失败时启动失败，不返回 null。
+     * @param om                 用于 Redis 值序列化的 ObjectMapper，必须使用安全的类型白名单配置。
+     * @param securityProperties 提供安全 Redis 命名空间、序列化和故障处理约束的安全配置。
      */
     @Bean("securityRedisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory,

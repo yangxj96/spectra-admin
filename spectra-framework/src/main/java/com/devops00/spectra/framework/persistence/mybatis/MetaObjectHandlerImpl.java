@@ -70,6 +70,11 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
      */
     private static final String DEPARTMENT_ID = "departmentId";
 
+    /**
+     * 为新增实体填充创建者和创建时间等审计字段。
+     *
+     * @param metaObject MyBatis 当前待填充的实体元数据。
+     */
     @Override
     public void insertFill(MetaObject metaObject) {
         log.debug(LogPrefix.PERSISTENCE.f("insertFill"));
@@ -102,6 +107,11 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
         }
     }
 
+    /**
+     * 为修改实体填充更新者和更新时间等审计字段。
+     *
+     * @param metaObject MyBatis 当前待填充的实体元数据。
+     */
     @Override
     public void updateFill(MetaObject metaObject) {
         log.debug(LogPrefix.PERSISTENCE.f("updateFill"));

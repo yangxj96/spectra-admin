@@ -83,6 +83,8 @@ public class SecurityConfiguration {
 
     /**
      * SpringSecurity 自定义的权限评估器
+     *
+     * @return 返回支持 Root 权限和通配权限匹配的 PermissionEvaluator Bean；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public SpectraPermissionEvaluator spectraPermissionEvaluator() {
@@ -91,6 +93,9 @@ public class SecurityConfiguration {
 
     /**
      * 主认证管理器
+     *
+     * @param providersProvider Spring 容器中按顺序注册的认证 Provider 集合，用于构建统一认证管理器。
+     * @return 返回由已注册 AuthenticationProvider 组成的认证管理器；没有可用 Provider 或构建失败时启动失败，不返回 null。
      */
     @Bean
     @Primary
@@ -102,6 +107,8 @@ public class SecurityConfiguration {
 
     /**
      * 注解方法中的EL表达式认证处理器
+     *
+     * @return 返回接入项目 PermissionEvaluator 的方法安全表达式处理器；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
@@ -114,8 +121,8 @@ public class SecurityConfiguration {
     /**
      * Redis API 限流器。
      *
-     * @param redis 安全 Redis Template
-     * @return Redis 限流器
+     * @param redis 安全 Redis Template，用于执行限流计数和窗口过期操作。
+     * @return 返回使用安全 Redis 执行原子计数的 API 限流器；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public RedisRateLimiter redisRateLimiter(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis) {
@@ -125,8 +132,13 @@ public class SecurityConfiguration {
     /**
      * Spring Security核心过滤器
      *
-     * @param http {@code HttpSecurity}
-     * @return Security过滤器链
+     * @param http                    {@code HttpSecurity} 构建器，用于声明无状态认证和请求授权规则。
+     * @param authenticationManager   执行登录凭据认证的统一认证管理器。
+     * @param securityContextAccessor 安全上下文访问器，用于取得当前操作者并填充持久化审计字段。
+     * @param securityUserLookupPort  按访问令牌读取当前用户资料的端口。
+     * @param redisRateLimiter        执行 API 限流判定的安全 Redis 限流器。
+     * @param objectMapper            安全请求日志和限流响应使用的受控 JSON 映射器。
+     * @param meterRegistryProvider   提供限流指标注册表；没有外部注册表时使用临时注册表。
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager,
@@ -169,6 +181,12 @@ public class SecurityConfiguration {
                 // 权限匹配
                 .authorizeHttpRequests(auth -> auth
                         .withObjectPostProcessor(new ObjectPostProcessor<AuthorizationFilter>() {
+                            /**
+                             * 为安全 Bean 后处理器注册必要的生命周期处理。
+                             *
+                             * @param filter Spring Security 授权过滤器实例，将被补充异步 dispatch 处理配置。
+                             * @return 返回完成项目安全异常处理器注入后的原过滤器；过滤器对象始终原样返回，不返回 null。
+                             */
                             @Override
                             public <O extends AuthorizationFilter> O postProcess(O filter) {
                                 filter.setFilterAsyncDispatch(true);

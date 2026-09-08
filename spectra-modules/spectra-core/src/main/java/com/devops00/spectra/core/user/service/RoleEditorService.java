@@ -31,8 +31,8 @@ public interface RoleEditorService {
     /**
      * 原子提交角色基本信息、授权和菜单。
      *
-     * @param params 编辑器提交参数
-     * @return 保存后的角色
+     * @param params 角色基本信息、权限边界和菜单 ID 集合；各项变更在同一事务中提交。
+     * @return 返回已完成角色基本信息、权限和菜单绑定的角色视图；校验或事务提交失败时抛出业务异常，不返回 null。
      */
     RoleVO save(RoleEditorSaveFrom params);
 }

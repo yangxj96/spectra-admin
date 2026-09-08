@@ -39,6 +39,11 @@ public class KaptchaTextCreator extends DefaultTextCreator {
      */
     private static final SecureRandom RANDOM = new SecureRandom();
 
+    /**
+     * 获取或判断 Framework 的 getText 结果。
+     *
+     * @return 返回由随机数字运算生成的验证码文本；结果为非空数字字符串，随机数或运算状态异常时抛出异常，不返回 null。
+     */
     @Override
     public String getText() {
 

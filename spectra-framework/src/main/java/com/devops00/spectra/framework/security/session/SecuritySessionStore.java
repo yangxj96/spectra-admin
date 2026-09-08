@@ -54,17 +54,30 @@ public final class SecuritySessionStore {
         this.policyProvider = policyProvider;
     }
 
-    /** 返回安全 Redis 模板。 */
+    /**
+     * 返回安全 Redis 模板。
+     *
+     * @return 返回安全 Redis 专用模板；该 Bean 由 Spring 注入并始终非 null。
+     */
     public RedisTemplate<String, Object> redis() {
         return redis;
     }
 
-    /** 返回安全配置。 */
+    /**
+     * 返回安全配置。
+     *
+     * @return 返回安全会话和 Cookie 配置；该配置由 Spring 注入并始终非 null。
+     */
     public SecurityProperties properties() {
         return properties;
     }
 
-    /** 读取数据库会话策略；策略不可用时拒绝签发和刷新。 */
+    /**
+     * 读取数据库会话策略；策略不可用时拒绝签发和刷新。
+     *
+     * @param clientCode 客户端编码，用于读取对应的会话策略。
+     * @return 返回指定客户端的会话 TTL、并发限制和刷新策略；Provider 缺失或未配置该客户端时抛出异常，不返回 null。
+     */
     public SessionPolicy sessionPolicy(String clientCode) {
         SecuritySessionPolicyProvider provider = policyProvider.getIfAvailable();
         if (provider == null) {
@@ -77,28 +90,58 @@ public final class SecuritySessionStore {
         return policy;
     }
 
-    /** 读取安全 Hash；Redis 不可用或返回 null 时 fail-closed。 */
+    /**
+     * 读取安全 Hash；Redis 不可用或返回 null 时 fail-closed。
+     *
+     * @param operation 安全 Redis 操作标识，用于诊断并统一处理存储失败。
+     * @param key       已按安全命名空间生成的 Redis 键。
+     * @return 返回指定安全 Hash 的字段快照；Hash 不存在时返回空 Map，Redis 无法确认状态时抛出异常，不返回 null。
+     */
     public Map<Object, Object> hash(String operation, String key) {
         return SecurityRedisExecutor.require(operation, () -> redis.opsForHash().entries(key));
     }
 
-    /** 读取安全值；Redis 不可用时 fail-closed。 */
+    /**
+     * 读取安全值；Redis 不可用时 fail-closed。
+     *
+     * @param operation 安全 Redis 操作标识，用于诊断并统一处理存储失败。
+     * @param key       已按安全命名空间生成的 Redis 键。
+     * @return 返回指定安全 Redis Key 的值；Key 不存在时返回 null，Redis 命令失败时抛出异常，不以空值掩盖故障。
+     */
     public Object value(String operation, String key) {
         return SecurityRedisExecutor.execute(operation, () -> redis.opsForValue().get(key));
     }
 
-    /** 读取安全 Set；不存在的索引按空集合处理。 */
+    /**
+     * 读取安全 Set；不存在的索引按空集合处理。
+     *
+     * @param operation 安全 Redis 操作标识，用于诊断并统一处理存储失败。
+     * @param key       已按安全命名空间生成的 Redis 键。
+     * @return 返回指定安全 Set 的成员；Set 不存在时返回空 Set，不返回 null，Redis 命令失败时抛出异常。
+     */
     public Set<Object> members(String operation, String key) {
         Set<Object> members = SecurityRedisExecutor.execute(operation, () -> redis.opsForSet().members(key));
         return members == null ? Set.of() : members;
     }
 
-    /** 批量读取安全值；Redis 不可用或返回 null 时 fail-closed。 */
+    /**
+     * 批量读取安全值；Redis 不可用或返回 null 时 fail-closed。
+     *
+     * @param operation 安全 Redis 操作标识，用于诊断并统一处理存储失败。
+     * @param keys      待处理的对象集合。
+     * @return 返回按 keys 顺序排列的安全 Redis 值列表；没有匹配值时列表中对应位置为 null，Redis 返回 null 结果或命令失败时抛出异常。
+     */
     public List<Object> multiGet(String operation, List<String> keys) {
         return SecurityRedisExecutor.require(operation, () -> redis.opsForValue().multiGet(keys));
     }
 
-    /** 检查安全 Key 是否存在；Redis 无法返回结果时 fail-closed。 */
+    /**
+     * 检查安全 Key 是否存在；Redis 无法返回结果时 fail-closed。
+     *
+     * @param operation 安全 Redis 操作标识，用于诊断并统一处理存储失败。
+     * @param key       已按安全命名空间生成的 Redis 键。
+     * @return 返回指定安全 Redis Key 是否存在；不存在时返回 false，Redis 无法确认状态时抛出异常，不返回 null。
+     */
     public boolean hasKey(String operation, String key) {
         return Boolean.TRUE.equals(SecurityRedisExecutor.require(operation, () -> redis.hasKey(key)));
     }

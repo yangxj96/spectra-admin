@@ -40,26 +40,51 @@ public class DataSourceHealthContributor implements DependencyHealthContributor 
         this.dataSource = dataSource;
     }
 
+    /**
+     * 读取 contributorName 对应的依赖健康状态。
+     *
+     * @return 返回固定名称 {@code PostgreSQL}，用于健康快照中标识数据库依赖；结果始终为非空字符串。
+     */
     @Override
     public String contributorName() {
         return "PostgreSQL";
     }
 
+    /**
+     * 读取 moduleName 对应的依赖健康状态。
+     *
+     * @return 返回所属模块名称 {@code framework}；结果始终为非空字符串。
+     */
     @Override
     public String moduleName() {
         return "framework";
     }
 
+    /**
+     * 读取 dependencyType 对应的依赖健康状态。
+     *
+     * @return 返回依赖类型 {@code DATABASE}；结果始终为非空字符串。
+     */
     @Override
     public String dependencyType() {
         return "DATABASE";
     }
 
+    /**
+     * 读取 timeout 对应的依赖健康状态。
+     *
+     * @return 返回数据库健康检查超时时间 3 秒；结果始终为非 null 的固定 Duration。
+     */
     @Override
     public Duration timeout() {
         return TIMEOUT;
     }
 
+    /**
+     * 读取 check 对应的依赖健康状态。
+     *
+     * @return 返回数据库连接检查结果；连接有效时状态为 UP，连接无效或检查异常时为 DOWN，结果对象始终非 null。
+     */
     @Override
     public DependencyHealthResult check() {
         var start = System.nanoTime();

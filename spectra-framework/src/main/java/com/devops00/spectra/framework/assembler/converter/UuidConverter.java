@@ -27,11 +27,23 @@ import java.util.UUID;
  */
 public class UuidConverter implements IdConverter<UUID> {
 
+    /**
+     * 将业务标识转换为字符串表示。
+     *
+     * @param id 待转换的业务标识。
+     * @return 返回 UUID 业务标识的标准字符串；id 为 null 时返回 null，不返回空字符串。
+     */
     @Override
     public String toString(UUID id) {
         return id == null ? null : id.toString();
     }
 
+    /**
+     * 将字符串解析为业务标识。
+     *
+     * @param value 待转换为 UUID 业务标识的标准 UUID 文本。
+     * @return 返回字符串解析出的 UUID 业务标识；value 为 null 时返回 null，格式非法时抛出 IllegalArgumentException。
+     */
     @Override
     public UUID fromString(String value) {
         return value == null ? null : UUID.fromString(value);

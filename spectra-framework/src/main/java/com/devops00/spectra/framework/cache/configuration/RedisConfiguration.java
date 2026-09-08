@@ -55,12 +55,20 @@ public class RedisConfiguration {
     /**
      * 配置原生 RedisClient Bean
      * 用于满足 LettuceClientAdapter.of() 的需求
+     *
+     * @return 返回由 Spring 生命周期管理的共享 Lettuce 客户端资源；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean(destroyMethod = "shutdown")
     public ClientResources redisClientResources() {
         return DefaultClientResources.create();
     }
 
+    /**
+     * 创建复用客户端资源的 Redis 客户端。
+     *
+     * @param resources 共享 Lettuce 客户端资源，供 Redis 客户端复用并在容器销毁时释放。
+     * @return 返回复用共享 ClientResources 的 Redis 客户端 Bean；Bean 创建失败时启动失败，不返回 null。
+     */
     @Bean(destroyMethod = "shutdown")
     public RedisClient redisClient(ClientResources resources) {
         // 连接 URL 可能包含密码，日志中禁止输出完整地址。
@@ -101,7 +109,7 @@ public class RedisConfiguration {
      * 自定义redisTemplate
      *
      * @param factory redis连接工程
-     * @return {@code RedisTemplate<String, Object>}
+     * @return 返回使用项目 Redis 序列化策略的通用 RedisTemplate；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     @Primary

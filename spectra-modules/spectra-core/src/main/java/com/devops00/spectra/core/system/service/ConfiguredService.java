@@ -39,26 +39,26 @@ public interface ConfiguredService extends BaseService<Configured> {
     /**
      * 修改系统配置的值和说明
      *
-     * @param params 修改入参
+     * @param params 待修改配置项的键、值、值类型和备注说明。
      */
     void modify(ConfiguredFrom params);
 
     /**
      * 分页查询系统配置项
      *
-     * @param page   分页信息
-     * @param params 过滤参数
-     * @return 分页响应信息
+     * @param page   配置项列表的页码、页大小及排序字段。
+     * @param params 配置键、配置类型和关键字等筛选条件。
+     * @return 返回按配置键、类型等条件分页查询的系统配置项；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
     IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params);
 
     /**
      * 保存或更新配置（按 key 去重）
      *
-     * @param key     配置键
-     * @param value   配置值
-     * @param type    值类型
-     * @param remarks 备注说明
+     * @param key     要保存的稳定配置键，用于后续按键读取和去重。
+     * @param value   配置键对应的文本值；具体解析方式由 {@code type} 决定。
+     * @param type    配置值的业务类型，用于约束读取方的转换方式。
+     * @param remarks 面向管理端展示的配置说明，帮助操作者理解该配置的用途。
      */
     void upsert(String key, String value, ConfiguredValueType type, String remarks);
 
@@ -66,7 +66,7 @@ public interface ConfiguredService extends BaseService<Configured> {
      * 按配置键读取非空配置值。
      *
      * @param key 配置键
-     * @return 配置值
+     * @return 返回配置键对应的非空配置值；键不存在或值为空时返回 Optional.empty()，不返回 null。
      */
     Optional<String> findValue(String key);
 }

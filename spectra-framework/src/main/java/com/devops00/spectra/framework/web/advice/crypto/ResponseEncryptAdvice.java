@@ -77,6 +77,24 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         log.info(LogPrefix.WEB.f("接口加密 Advice 已注册（运行时由 CryptoKeyManager 控制启用/禁用）"));
     }
 
+    /**
+     * 获取或判断 Framework 的 supports 结果。
+     *
+     * @param returnType    控制器方法返回类型，用于判断响应加密规则。
+     * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
+     * @return 返回响应是否满足加密条件；加密开关未就绪、显式关闭或响应类型不支持时返回 false，满足条件时返回 true。
+     */
+    /**
+     * 按响应内容和加密策略生成加密响应。
+     *
+     * @param body          控制器返回的原始响应体；null 表示控制器没有响应内容。
+     * @param returnType    控制器方法返回类型，用于识别流式和资源响应。
+     * @param contentType   当前响应的媒体类型，用于排除流式内容。
+     * @param converterType 当前 HTTP 消息转换器类型，用于保持二进制和资源响应原样返回。
+     * @param request       当前 HTTP 请求，用于读取请求关联信息和加密上下文。
+     * @param response      当前 HTTP 响应，用于写入加密响应所需的响应头。
+     * @return 流式、资源、二进制或 null 响应原样返回；普通响应成功时返回包含密文、密钥摘要和签名的 JSON 字符串；密钥缺失或加密失败时抛出加密异常，不以空字符串掩盖失败。
+     */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         // 忽略流式

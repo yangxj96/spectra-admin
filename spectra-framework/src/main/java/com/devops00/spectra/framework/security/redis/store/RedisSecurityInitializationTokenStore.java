@@ -42,6 +42,12 @@ public class RedisSecurityInitializationTokenStore implements SecurityInitializa
         this.redis = redis;
     }
 
+    /**
+     * 仅在安全 Redis 键不存在时写入初始化令牌。
+     *
+     * @param digest 初始化令牌的不可逆摘要；Redis 只保存摘要，不保存初始化令牌明文。
+     * @return 首次写入系统初始化令牌摘要时返回 true，令牌已存在时返回 false；Redis 操作失败时抛出异常。
+     */
     @Override
     public boolean putIfAbsent(String digest) {
         Boolean created = SecurityRedisExecutor.require("写入系统初始化令牌",
@@ -49,6 +55,11 @@ public class RedisSecurityInitializationTokenStore implements SecurityInitializa
         return Boolean.TRUE.equals(created);
     }
 
+    /**
+     * 获取或判断 Framework 的 getDigest 结果。
+     *
+     * @return 返回 Redis 中保存的初始化令牌摘要；令牌缺失或类型不正确时返回 Optional.empty()，Redis 失败时抛出异常，不返回 null。
+     */
     @Override
     public Optional<String> getDigest() {
         Object value = SecurityRedisExecutor.execute("读取系统初始化令牌",
@@ -56,6 +67,9 @@ public class RedisSecurityInitializationTokenStore implements SecurityInitializa
         return value instanceof String digest ? Optional.of(digest) : Optional.empty();
     }
 
+    /**
+     * 清理安全 Redis 中指定范围的状态。
+     */
     @Override
     public void clear() {
         SecurityRedisExecutor.run("删除系统初始化令牌", () -> redis.delete(key()));

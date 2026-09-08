@@ -78,6 +78,9 @@ public class MyBatisPlusConfiguration {
      * <p>安全上下文访问器的实现会读取安全会话，而安全会话的用户加载器又会使用
      * MyBatis。这里延迟注入只把访问器的解析推迟到实际填充审计字段时，避免
      * MyBatis 基础设施初始化阶段形成反向依赖；不会改变运行期的当前用户解析行为。</p>
+     *
+     * @param securityContextAccessor 安全上下文访问器，用于取得当前操作者并填充持久化审计字段。
+     * @return 返回填充 createdBy、createdAt、updatedBy、updatedAt 审计字段的 MyBatis 元对象处理器 Bean；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public MetaObjectHandler metaObjectHandler(@Lazy SecurityContextAccessor securityContextAccessor) {
@@ -91,6 +94,9 @@ public class MyBatisPlusConfiguration {
      * <p>数据权限拦截器只在 SQL 执行时读取当前用户。使用延迟代理可以让数据库与
      * 安全会话基础设施先完成初始化，避免出现
      * {@code SecurityContextAccessor -> sec -> SecurityUserLoader -> MyBatis} 的启动环。</p>
+     *
+     * @param securityContextAccessor 安全上下文访问器，用于取得当前操作者并填充持久化审计字段。
+     * @return 返回按数据权限、分页、防全表更新和乐观锁顺序组装的 MyBatis-Plus 拦截器链；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(@Lazy SecurityContextAccessor securityContextAccessor) {

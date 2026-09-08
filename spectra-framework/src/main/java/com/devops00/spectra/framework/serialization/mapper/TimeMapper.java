@@ -67,7 +67,7 @@ public class TimeMapper {
     /**
      * 当前用户时区
      *
-     * @return 时区
+     * @return 返回当前用户时区；没有用户时使用系统配置时区，配置无效或缺失时回退到 UTC，不返回 null。
      */
     public ZoneId getUserZoneId() {
         return ZoneId.of(securityContextAccessor.currentUserZoneId());
@@ -78,7 +78,7 @@ public class TimeMapper {
      * Instant 转 LocalDateTime
      *
      * @param instant {@link Instant}
-     * @return {@link LocalDateTime}
+     * @return 返回按当前用户时区换算的本地日期时间；输入为 null 时返回 null。
      */
     public @Nullable LocalDateTime toLocalDateTime(@Nullable Instant instant) {
         return instant == null ? null : LocalDateTime.ofInstant(instant, getUserZoneId());
@@ -88,7 +88,7 @@ public class TimeMapper {
      * Unix 时间戳转 LocalDateTime。
      *
      * @param epochMilli Unix 毫秒时间戳
-     * @return {@link LocalDateTime}
+     * @return 返回按当前用户时区换算的毫秒时间戳对应本地日期时间；输入为 null 时返回 null。
      */
     public @Nullable LocalDateTime toLocalDateTime(@Nullable Long epochMilli) {
         return epochMilli == null ? null : toLocalDateTime(Instant.ofEpochMilli(epochMilli));
@@ -98,7 +98,7 @@ public class TimeMapper {
      * Date 转 LocalDateTime
      *
      * @param date {@link Date}
-     * @return {@link LocalDateTime}
+     * @return 返回按当前用户时区换算的 Date 本地日期时间；输入为 null 时返回 null。
      */
     public @Nullable LocalDateTime toLocalDateTime(@Nullable Date date) {
         return date == null ? null : toLocalDateTime(date.toInstant());
@@ -108,7 +108,7 @@ public class TimeMapper {
      * LocalDateTime 转 Instant
      *
      * @param localDateTime {@link LocalDateTime}
-     * @return {@link Instant}
+     * @return 返回按当前用户时区将本地日期时间转换出的 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable LocalDateTime localDateTime) {
         return localDateTime == null ? null : localDateTime.atZone(getUserZoneId()).toInstant();
@@ -118,7 +118,7 @@ public class TimeMapper {
      * Instant 转 LocalDate
      *
      * @param instant {@link Instant}
-     * @return {@link LocalDate}
+     * @return 返回按当前用户时区从 Instant 提取的日期；输入为 null 时返回 null。
      */
     public @Nullable LocalDate toLocalDate(@Nullable Instant instant) {
         return instant == null ? null : instant.atZone(getUserZoneId()).toLocalDate();
@@ -128,7 +128,7 @@ public class TimeMapper {
      * LocalDate 转 Instant
      *
      * @param localDate {@link LocalDate}
-     * @return {@link Instant}
+     * @return 返回当前用户时区当天开始时刻对应的 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable LocalDate localDate) {
         return localDate == null ? null : localDate.atStartOfDay(getUserZoneId()).toInstant();
@@ -138,7 +138,7 @@ public class TimeMapper {
      * Instant 转 LocalTime
      *
      * @param instant {@link Instant}
-     * @return {@link LocalTime}
+     * @return 返回按当前用户时区从 Instant 提取的时间；输入为 null 时返回 null。
      */
     public @Nullable LocalTime toLocalTime(@Nullable Instant instant) {
         return instant == null ? null : instant.atZone(getUserZoneId()).toLocalTime();
@@ -149,7 +149,7 @@ public class TimeMapper {
      * Instant 需要日期，这里默认用今天
      *
      * @param localTime {@link LocalTime}
-     * @return {@link Instant}
+     * @return 返回以当前用户时区当天承载 LocalTime 后得到的 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable LocalTime localTime) {
         return localTime == null ? null : LocalDate.now(getUserZoneId()).atTime(localTime).atZone(getUserZoneId()).toInstant();
@@ -159,7 +159,7 @@ public class TimeMapper {
      * Instant 转 ZonedDateTime
      *
      * @param instant {@link Instant}
-     * @return {@link ZonedDateTime}
+     * @return 返回按当前用户时区构造的 ZonedDateTime；输入为 null 时返回 null。
      */
     public @Nullable ZonedDateTime toZonedDateTime(@Nullable Instant instant) {
         return instant == null ? null : instant.atZone(getUserZoneId());
@@ -169,7 +169,7 @@ public class TimeMapper {
      * ZonedDateTime 转 Instant
      *
      * @param zonedDateTime {@link ZonedDateTime}
-     * @return {@link Instant}
+     * @return 返回 ZonedDateTime 表示的绝对时刻 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable ZonedDateTime zonedDateTime) {
         return zonedDateTime == null ? null : zonedDateTime.toInstant();
@@ -179,7 +179,7 @@ public class TimeMapper {
      * Instant 转 OffsetDateTime
      *
      * @param instant {@link Instant}
-     * @return {@link OffsetDateTime}
+     * @return 返回按当前用户时区构造的 OffsetDateTime；输入为 null 时返回 null。
      */
     public @Nullable OffsetDateTime toOffsetDateTime(@Nullable Instant instant) {
         return instant == null ? null : instant.atZone(getUserZoneId()).toOffsetDateTime();
@@ -189,7 +189,7 @@ public class TimeMapper {
      * OffsetDateTime 转 Instant
      *
      * @param offsetDateTime {@link OffsetDateTime}
-     * @return {@link Instant}
+     * @return 返回 OffsetDateTime 表示的绝对时刻 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable OffsetDateTime offsetDateTime) {
         return offsetDateTime == null ? null : offsetDateTime.toInstant();
@@ -199,7 +199,7 @@ public class TimeMapper {
      * Instant 转 Date
      *
      * @param instant {@link Instant}
-     * @return {@link Date}
+     * @return 返回表示同一绝对时刻的 Date；输入为 null 时返回 null。
      */
     public @Nullable Date toDate(@Nullable Instant instant) {
         return instant == null ? null : Date.from(instant);
@@ -209,7 +209,7 @@ public class TimeMapper {
      * Date 转 Instant
      *
      * @param date {@link Date}
-     * @return {@link Instant}
+     * @return 返回 Date 表示的绝对时刻 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable Date date) {
         return date == null ? null : date.toInstant();
@@ -219,7 +219,7 @@ public class TimeMapper {
      * Instant 转 Timestamp
      *
      * @param instant {@link Instant}
-     * @return {@link Timestamp}
+     * @return 返回表示同一绝对时刻的 SQL Timestamp；输入为 null 时返回 null。
      */
     public @Nullable Timestamp toTimestamp(@Nullable Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
@@ -229,7 +229,7 @@ public class TimeMapper {
      * Timestamp 转 Instant
      *
      * @param timestamp {@link Timestamp}
-     * @return {@link Instant}
+     * @return 返回 Timestamp 表示的绝对时刻 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toInstant();
@@ -239,7 +239,7 @@ public class TimeMapper {
      * Instant 转时间戳
      *
      * @param instant {@link Instant}
-     * @return 时间戳
+     * @return 返回 Instant 的 Unix 毫秒时间戳；输入为 null 时返回 null。
      */
     public @Nullable Long toEpochMilli(@Nullable Instant instant) {
         return instant == null ? null : instant.toEpochMilli();
@@ -249,7 +249,7 @@ public class TimeMapper {
      * 时间戳转 Instant
      *
      * @param epochMilli 时间戳
-     * @return {@link Instant}
+     * @return 返回 Unix 毫秒时间戳对应的 Instant；输入为 null 时返回 null。
      */
     public @Nullable Instant toInstant(@Nullable Long epochMilli) {
         return epochMilli == null ? null : Instant.ofEpochMilli(epochMilli);
@@ -259,7 +259,7 @@ public class TimeMapper {
      * Instant转换为 ISO 8601 格式字符串
      *
      * @param instant {@link Instant}
-     * @return ISO 8601 格式字符串时间
+     * @return 返回按当前用户时区格式化的 ISO 8601 字符串；输入为 null 时返回 null。
      */
     public @Nullable String toString(@Nullable Instant instant) {
         return instant == null ? null : ISO_FORMATTER.format(instant.atZone(getUserZoneId()));
@@ -272,7 +272,7 @@ public class TimeMapper {
      * 无时区字符串按当前用户时区解释；日期默认当天开始，时间默认当前用户时区的当天。
      *
      * @param text IOS 8601 格式的字符串
-     * @return Instant
+     * @return 返回解析后的 Instant；输入为空白时返回 null，文本不是支持的 ISO 8601 格式时抛出 DateTimeParseException。
      */
     public @Nullable Instant toInstant(@Nullable String text) {
         if (text == null || text.isBlank())

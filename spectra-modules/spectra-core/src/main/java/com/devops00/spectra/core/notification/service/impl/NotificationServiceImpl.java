@@ -38,12 +38,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationGateway notificationGateway;
 
-    /**
-     * 转换请求并提交统一通知网关。
-     *
-     * @param request 快捷通知请求
-     * @return 通知入队回执
-     */
     @Override
     public NotificationReceipt send(NotificationSendRequest request) {
         if (request == null) {

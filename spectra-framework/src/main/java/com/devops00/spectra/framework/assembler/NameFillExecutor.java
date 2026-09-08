@@ -76,6 +76,7 @@ public class NameFillExecutor {
      *
      * @param list 需要填充的lies
      * @param <T>  ID类型
+     * @throws IllegalAccessException 无法访问需要填充的实体字段时抛出。
      */
     public <T> void fill(List<T> list) throws IllegalAccessException {
         if (list == null || list.isEmpty()) {
@@ -144,7 +145,7 @@ public class NameFillExecutor {
      *
      * @param rawMap 行map
      * @param lookup lookup
-     * @return 转换后的map
+     * @return 返回已将缓存或远程查询得到的字符串键转换回 ID 类型的名称映射；输入映射为空时按调用约定不进入此方法，正常处理不返回 null。
      */
     @SuppressWarnings("unchecked")
     private Map<Object, String> normalizeKeyType(Map<Object, String> rawMap, NameLookup<?> lookup) {
@@ -188,8 +189,8 @@ public class NameFillExecutor {
     /**
      * 读取字段值
      *
-     * @param field  字段
-     * @param target 目标对象
+     * @param field  需要读取值的源字段反射对象。
+     * @param target 当前正在组装、且包含源字段值的对象实例。
      */
     private Object getValue(@NonNull Field field, Object target) {
         try {

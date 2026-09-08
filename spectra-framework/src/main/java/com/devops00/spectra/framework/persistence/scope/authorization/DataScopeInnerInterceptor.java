@@ -71,6 +71,14 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
                 "securityContextAccessor 不能为空");
     }
 
+    /**
+     * 获取或判断 Framework 的 getSqlSegment 结果。
+     *
+     * @param table             当前 SQL 语句对应的表元数据，用于解析资源权限边界。
+     * @param where             原始 SQL 的条件表达式，将在保留业务条件的基础上叠加数据权限。
+     * @param mappedStatementId MyBatis mapped statement 标识，用于选择数据权限规则。
+     * @return 返回在原始 SQL 条件上叠加数据权限后的 SQL 表达式；绕过隔离或无法识别受保护表时按 MyBatis 约定返回 null，否则缺少权限时返回拒绝谓词。
+     */
     @Override
     public Expression getSqlSegment(Table table, Expression where, String mappedStatementId) {
         if (DataScopeContextHolder.isBypassed()) {

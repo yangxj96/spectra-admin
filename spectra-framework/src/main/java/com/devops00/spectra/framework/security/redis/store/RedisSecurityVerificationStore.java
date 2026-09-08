@@ -55,17 +55,39 @@ public class RedisSecurityVerificationStore implements SecurityVerificationCodeS
         this.redis = redis;
     }
 
+    /**
+     * 保存验证码状态，并按照安全策略设置过期时间。
+     *
+     * @param key   已按安全命名空间生成的 Redis 键。
+     * @param value 待保存的验证码或验证码相关安全状态值，不得写入日志。
+     * @param ttl   安全 Redis 条目的存活时间，过期后不可继续作为安全状态使用。
+     */
     @Override
     public void save(String key, String value, Duration ttl) {
         SecurityRedisExecutor.run("写入验证码", () -> redis.opsForValue().set(key, value, ttl));
     }
 
+    /**
+     * 仅在验证码状态不存在时原子写入，避免重复消费。
+     *
+     * @param key   已按安全命名空间生成的 Redis 键。
+     * @param value 待在键不存在时保存的验证码安全状态值，不得写入日志。
+     * @param ttl   安全 Redis 条目的存活时间，过期后不可继续作为安全状态使用。
+     * @return 首次写入验证码状态时返回 true，键已存在时返回 false；Redis 操作失败时抛出异常，不把失败降级为 false。
+     */
     @Override
     public boolean saveIfAbsent(String key, String value, Duration ttl) {
         Boolean stored = SecurityRedisExecutor.require("写入验证码", () -> redis.opsForValue().setIfAbsent(key, value, ttl));
         return Boolean.TRUE.equals(stored);
     }
 
+    /**
+     * 仅在值匹配时原子删除验证码状态，防止重放。
+     *
+     * @param key           已按安全命名空间生成的 Redis 键。
+     * @param expectedValue 调用方提交的验证码状态值；只有与 Redis 当前值完全一致时才允许消费。
+     * @return 仅当 Redis 中的验证码值与 expectedValue 匹配并完成原子删除时返回 true；值缺失、过期或不匹配时返回 false，Redis 失败时抛出异常。
+     */
     @Override
     public boolean compareAndDelete(String key, String expectedValue) {
         if (expectedValue == null || expectedValue.isBlank()) {
@@ -76,11 +98,23 @@ public class RedisSecurityVerificationStore implements SecurityVerificationCodeS
         return Long.valueOf(1L).equals(result);
     }
 
+    /**
+     * 删除已消费或已撤销的安全 Redis 状态。
+     *
+     * @param key 已按安全命名空间生成的 Redis 键。
+     */
     @Override
     public void delete(String key) {
         SecurityRedisExecutor.run("清理验证码", () -> redis.delete(key));
     }
 
+    /**
+     * 原子增加安全 Redis 计数并返回当前计数。
+     *
+     * @param key 已按安全命名空间生成的 Redis 键。
+     * @param ttl 安全 Redis 条目的存活时间，过期后不可继续作为安全状态使用。
+     * @return 返回增加后的验证码失败尝试次数；首次计数会设置 TTL，Redis 失败时抛出异常，不返回 null。
+     */
     @Override
     public long increment(String key, Duration ttl) {
         Long attempts = SecurityRedisExecutor.require("记录验证码失败次数",

@@ -151,6 +151,8 @@ public class CryptoKeyManager {
 
     /**
      * 是否启用接口加解密（需 enabled=true 且密钥完整）
+     *
+     * @return 返回当前四个 RSA 密钥是否完整可用；只有开关开启且服务端/客户端公私钥均解析成功时返回 true，否则返回 false。
      */
     public boolean isEnabled() {
         return keys.isComplete();
@@ -161,7 +163,7 @@ public class CryptoKeyManager {
      *
      * <p>Advice 使用该状态区分“明确关闭”与“配置故障”，避免在密钥故障时静默返回明文。</p>
      *
-     * @return 加密开关是否开启
+     * @return 返回数据库配置是否明确开启接口加解密；配置读取失败或密钥不完整时仍返回 true，具体可用性由 {@link #isEnabled()} 表示。
      */
     public boolean isConfiguredEnabled() {
         return keys.state() != State.DISABLED;
@@ -170,7 +172,7 @@ public class CryptoKeyManager {
     /**
      * 获取当前加密状态。
      *
-     * @return 当前状态
+     * @return 返回当前密钥运行态：{@code DISABLED} 表示明确关闭，{@code READY} 表示可用，{@code UNAVAILABLE} 表示开启但配置故障；状态值始终非 null。
      */
     public State getState() {
         return keys.state();
@@ -188,42 +190,54 @@ public class CryptoKeyManager {
     }
 
     /**
-     * 获取服务端公钥
+     * 获取服务端公钥。
+     *
+     * @return 返回当前已加载的服务端 RSA 公钥；密钥状态不是 READY 时返回 null。
      */
     public @Nullable PublicKey getServerPublicKey() {
         return keys.isComplete() ? keys.serverPublicKey() : null;
     }
 
     /**
-     * 获取服务端私钥
+     * 获取服务端私钥。
+     *
+     * @return 返回当前已加载的服务端 RSA 私钥；密钥状态不是 READY 时返回 null。
      */
     public @Nullable PrivateKey getServerPrivateKey() {
         return keys.isComplete() ? keys.serverPrivateKey() : null;
     }
 
     /**
-     * 获取客户端公钥
+     * 获取客户端公钥。
+     *
+     * @return 返回当前已加载的客户端 RSA 公钥；密钥状态不是 READY 时返回 null。
      */
     public @Nullable PublicKey getClientPublicKey() {
         return keys.isComplete() ? keys.clientPublicKey() : null;
     }
 
     /**
-     * 获取客户端私钥
+     * 获取客户端私钥。
+     *
+     * @return 返回当前已加载的客户端 RSA 私钥；密钥状态不是 READY 时返回 null。
      */
     public @Nullable PrivateKey getClientPrivateKey() {
         return keys.isComplete() ? keys.clientPrivateKey() : null;
     }
 
     /**
-     * 获取服务端公钥 Base64 字符串
+     * 获取服务端公钥 Base64 字符串。
+     *
+     * @return 返回当前已加载的服务端公钥原始 Base64 配置；密钥状态不是 READY 时返回 null。
      */
     public @Nullable String getServerPublicKeyBase64() {
         return keys.isComplete() ? keys.serverPublicKeyBase64() : null;
     }
 
     /**
-     * 获取客户端私钥 Base64 字符串
+     * 获取客户端私钥 Base64 字符串。
+     *
+     * @return 返回当前已加载的客户端私钥原始 Base64 配置；密钥状态不是 READY 时返回 null。
      */
     public @Nullable String getClientPrivateKeyBase64() {
         return keys.isComplete() ? keys.clientPrivateKeyBase64() : null;

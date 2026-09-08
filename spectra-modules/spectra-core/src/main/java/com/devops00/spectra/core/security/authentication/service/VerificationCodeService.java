@@ -25,15 +25,31 @@ package com.devops00.spectra.core.security.authentication.service;
  */
 public interface VerificationCodeService {
 
-    /** 发送短信登录验证码。 */
+    /**
+     * 发送短信登录验证码。
+     *
+     * @param phone 待验证或匹配的手机号码。
+     */
     void sendSmsCode(String phone);
 
-    /** 发送邮箱登录验证码。 */
+    /**
+     * 发送邮箱登录验证码。
+     *
+     * @param email 待验证或匹配的电子邮箱地址。
+     */
     void sendEmailCode(String email);
 
-    /** 发送绑定手机号验证码。 */
+    /**
+     * 发送绑定手机号验证码。
+     *
+     * @param phone 待验证或匹配的手机号码。
+     */
     void sendBindingSmsCode(String phone);
 
-    /** 发送绑定邮箱验证码。 */
+    /**
+     * 发送绑定邮箱验证码。
+     *
+     * @param email 待验证或匹配的电子邮箱地址。
+     */
     void sendBindingEmailCode(String email);
 }

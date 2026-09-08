@@ -37,21 +37,21 @@ public interface MenuService extends BaseService<Menu> {
     /**
      * 创建菜单
      *
-     * @param params 菜单信息
+     * @param params 待创建菜单的名称、路由、父菜单、权限编码和显示状态。
      */
     void created(MenuSaveFrom params);
 
     /**
      * 修改菜单信息
      *
-     * @param params 修改参数
+     * @param params 待修改菜单的唯一标识及需要更新的路由、权限和显示字段。
      */
     void modify(MenuSaveFrom params);
 
     /**
      * 生成树形菜单
      *
-     * @return 生成的树形菜单
+     * @return 返回全部已启用菜单组装的树形菜单；没有可用菜单时按当前实现返回 null，调用方需要先判空。
      */
     @Nullable
     List<MenuTreeVO> tree();
@@ -59,16 +59,16 @@ public interface MenuService extends BaseService<Menu> {
     /**
      * 获取当前用户的授权菜单树
      *
-     * @param userId 用户ID
-     * @return 当前用户授权菜单树
+     * @param userId 用于解析授权菜单的用户唯一标识。
+     * @return 返回用户当前拥有权限的菜单树；没有授权菜单时返回空列表，不返回 null。
      */
     List<MenuTreeVO> current(UUID userId);
 
     /**
      * 根据角色ID获取角色关联的菜单
      *
-     * @param id 角色ID
-     * @return 关联的菜单
+     * @param id 用于查询菜单关联关系的角色唯一标识。
+     * @return 返回角色关联的菜单实体列表；角色没有关联菜单时返回空列表，不返回 null。
      */
     List<Menu> getByRelRoleId(UUID id);
 

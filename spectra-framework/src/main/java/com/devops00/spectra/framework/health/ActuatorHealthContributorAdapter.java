@@ -44,6 +44,11 @@ public class ActuatorHealthContributorAdapter implements HealthIndicator {
         this.snapshotProvider = snapshotProvider;
     }
 
+    /**
+     * 读取 health 对应的依赖健康状态。
+     *
+     * @return 返回由依赖健康快照转换出的 Spring {@code Health}；快照为空或依赖不健康时仍返回包含 DOWN 状态的非 null 对象。
+     */
     @Override
     public Health health() {
         try {

@@ -34,16 +34,26 @@ public interface RoleAuthorizationChangeService {
 
     /**
      * 查询或获取目标数据（{@code current}）。
+     *
+     * @param roleId 要读取授权状态的角色唯一标识。
+     * @return 返回符合条件的角色授权状态详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
      */
     RoleAuthorizationStateVO current(UUID roleId);
 
     /**
      * 处理内部业务逻辑（{@code preview}）。
+     *
+     * @param roleId 待预览授权变更的角色唯一标识。
+     * @param from   待授予或撤销的权限、数据范围和授权等级字段。
+     * @return 返回角色授权变更预览的校验预览结果；输入不合法或当前用户无权操作时抛出业务异常，不返回 null。
      */
     RoleAuthorizationChangePreviewVO preview(UUID roleId, RoleAuthorizationChangeFrom from);
 
     /**
      * 更新或推进目标状态（{@code apply}）。
+     *
+     * @param roleId 待应用授权变更的角色唯一标识。
+     * @param from   绑定预览令牌并确认角色授权版本的申请字段。
      */
     void apply(UUID roleId, RoleAuthorizationApplyFrom from);
 }

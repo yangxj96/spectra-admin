@@ -33,7 +33,7 @@ public interface DictGroupService extends BaseService<DictGroup> {
      * 根据字典类型编码获取字典类型
      *
      * @param code 字典类型编码
-     * @return 字典类型
+     * @return 返回编码匹配的字典组实体；编码不存在时返回 null。
      */
     @Nullable
     DictGroup getByCode(String code);

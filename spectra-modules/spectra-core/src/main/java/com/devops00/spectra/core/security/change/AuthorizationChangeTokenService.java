@@ -27,11 +27,17 @@ public interface AuthorizationChangeTokenService {
 
     /**
      * 签发短期 token。
+     *
+     * @param token 待校验或撤销的访问令牌；不得写入日志。
+     * @return 返回经过签名保护的短期授权变更 token 字符串；签发失败时抛出异常，不返回 null 或空字符串。
      */
     String issue(AuthorizationChangeToken token);
 
     /**
      * 校验并解析 token；过期、篡改或格式错误必须拒绝。
+     *
+     * @param encodedToken 待验签和解析的授权变更 token 字符串；不得记录到日志或返回给无关调用方。
+     * @return 返回校验通过后解析出的授权变更 token；token 过期、篡改或格式错误时抛出异常，不返回 null。
      */
     AuthorizationChangeToken verify(String encodedToken);
 }

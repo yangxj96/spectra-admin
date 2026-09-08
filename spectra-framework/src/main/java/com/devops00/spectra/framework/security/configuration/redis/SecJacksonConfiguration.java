@@ -37,6 +37,8 @@ public class SecJacksonConfiguration {
 
     /**
      * 创建只处理字符串、数字和 Map/Collection 基础值的安全 Redis mapper。
+     *
+     * @return 返回安全 Redis 使用的受控 ObjectMapper，避免将安全状态按通用业务格式序列化；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean("securityObjectMapper")
     public ObjectMapper redisObjectMapper() {

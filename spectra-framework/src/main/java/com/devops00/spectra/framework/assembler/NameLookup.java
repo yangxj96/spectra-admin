@@ -57,7 +57,7 @@ public interface NameLookup<ID> {
      * 若使用其他类型（如 Long），
      * 实现类应显式覆写该方法。
      *
-     * @return ID 的 Class 类型
+     * @return 返回该 Lookup 支持的 ID 类型 Class；默认实现使用 UUID.class，实现类覆盖时不得返回 null。
      */
     default Class<ID> idType() {
         @SuppressWarnings("unchecked")
@@ -84,7 +84,7 @@ public interface NameLookup<ID> {
      * </ul>
      *
      * @param ids ID 集合（不为空）
-     * @return ID → Name 的映射关系
+     * @return 返回每个输入 ID 对应的展示名称映射；没有匹配名称时返回空 Map，不返回 null。
      */
     Map<ID, String> getNameMap(Set<ID> ids);
 }

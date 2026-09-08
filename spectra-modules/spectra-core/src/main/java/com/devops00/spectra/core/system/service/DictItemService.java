@@ -34,8 +34,8 @@ public interface DictItemService extends BaseService<DictItem> {
     /**
      * 根据字典组ID查询字典数据列表
      *
-     * @param gid 字典组ID
-     * @return 字典数据列表
+     * @param gid 需要读取字典项的字典组唯一标识。
+     * @return 返回指定字典组下的字典项实体列表；字典组不存在或没有字典项时返回空列表，不返回 null。
      */
     List<DictItem> listByGid(UUID gid);
 }

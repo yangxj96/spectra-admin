@@ -27,14 +27,35 @@ public final class AuthenticationWebUtils {
     private AuthenticationWebUtils() {
     }
 
+    /**
+     * 执行 Framework 的 clientType 处理流程。
+     *
+     * @param request 当前 HTTP 请求或待处理的安全业务请求。
+     * @return 返回请求头 {@code X-Client-Type} 解析出的客户端类型；缺失或未知值按 {@code ClientType.fromName} 的约定回退到 WEB，不返回 null。
+     */
     public static ClientType clientType(HttpServletRequest request) {
         return ClientType.fromName(request.getHeader("X-Client-Type"));
     }
 
+    /**
+     * 获取或判断 Framework 的 isWebClient 结果。
+     *
+     * @param clientType 客户端类型，用于选择对应的安全会话策略。
+     * @return 返回客户端是否为浏览器 Web 类型；仅 {@code ClientType.WEB} 返回 true，其余类型和 null 返回 false。
+     */
     public static boolean isWebClient(ClientType clientType) {
         return clientType == ClientType.WEB;
     }
 
+    /**
+     * 执行 Framework 的 writeWebToken 处理流程。
+     *
+     * @param response           当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @param token              待摘要、校验或撤销的访问令牌；不得写入日志。
+     * @param securityProperties Web 会话 Cookie 名称、SameSite 属性和过期时间等安全配置。
+     * @param clientType         客户端类型，用于选择对应的安全会话策略。
+     * @return 返回写入 Web Cookie 后的访问令牌；Web 客户端会清除返回对象中的 refreshToken，非 Web 客户端保留原令牌，不返回 null。
+     */
     public static SecurityToken writeWebToken(HttpServletResponse response, SecurityToken token,
                                               SecurityProperties securityProperties, ClientType clientType) {
         issueWebCookies(response, token.getRefreshToken(), securityProperties, clientType);
@@ -44,6 +65,14 @@ public final class AuthenticationWebUtils {
         return token;
     }
 
+    /**
+     * 获取或判断 Framework 的 issueWebCookies 结果。
+     *
+     * @param response           当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @param refreshToken       待轮换或撤销的刷新令牌；不得写入日志。
+     * @param securityProperties 用于确定刷新令牌和 CSRF Cookie 属性的安全配置。
+     * @param clientType         客户端类型，用于选择对应的安全会话策略。
+     */
     public static void issueWebCookies(HttpServletResponse response, String refreshToken,
                                        SecurityProperties securityProperties, ClientType clientType) {
         if (!isWebClient(clientType) || StrUtils.isBlank(refreshToken)) {
@@ -55,6 +84,12 @@ public final class AuthenticationWebUtils {
                 false, securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire());
     }
 
+    /**
+     * 执行 Framework 的 clearWebCookies 处理流程。
+     *
+     * @param response           当前 HTTP 响应，用于写入状态、响应头和统一响应体。
+     * @param securityProperties 用于确定要清除的刷新令牌和 CSRF Cookie 名称及属性的安全配置。
+     */
     public static void clearWebCookies(HttpServletResponse response, SecurityProperties securityProperties) {
         addCookie(response, securityProperties, securityProperties.getRefreshCookieName(), "", true,
                 securityProperties.getRefreshCookieSameSite(), 0);
@@ -62,6 +97,12 @@ public final class AuthenticationWebUtils {
                 securityProperties.getRefreshCookieSameSite(), 0);
     }
 
+    /**
+     * 执行 Framework 的 validateCsrf 处理流程。
+     *
+     * @param request            当前 HTTP 请求或待处理的安全业务请求。
+     * @param securityProperties 提供 CSRF Header 和 Cookie 名称的安全配置。
+     */
     public static void validateCsrf(HttpServletRequest request, SecurityProperties securityProperties) {
         String header = request.getHeader(securityProperties.getCsrfHeaderName());
         String cookie = readCookie(request, securityProperties.getCsrfCookieName());
@@ -73,6 +114,13 @@ public final class AuthenticationWebUtils {
         }
     }
 
+    /**
+     * 获取或判断 Framework 的 readCookie 结果。
+     *
+     * @param request 当前 HTTP 请求或待处理的安全业务请求。
+     * @param name    要读取的 Cookie 名称。
+     * @return 返回指定名称 Cookie 的值；请求没有 Cookie 或名称不存在时返回 null。
+     */
     public static String readCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {

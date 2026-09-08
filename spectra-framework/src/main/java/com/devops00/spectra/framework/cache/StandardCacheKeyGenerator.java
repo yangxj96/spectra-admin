@@ -42,6 +42,14 @@ import java.util.stream.Collectors;
 @Component
 public class StandardCacheKeyGenerator implements KeyGenerator {
 
+    /**
+     * 根据目标方法和调用参数生成稳定、可复现的缓存键。
+     *
+     * @param target 被调用缓存方法所属的目标对象；仅用于确定调用上下文。
+     * @param method 被调用的业务方法，用于把方法名写入缓存键。
+     * @param params 业务方法的实参；集合和 Map 会先规范化，null 参数保留为固定文本。
+     * @return 返回由目标类、方法名和参数稳定摘要组成的缓存键；无参数时使用 {@code noargs}，结果始终为非空字符串。
+     */
     @Override
     public String generate(Object target, Method method, @Nullable Object... params) {
         String methodName = method.getName();
