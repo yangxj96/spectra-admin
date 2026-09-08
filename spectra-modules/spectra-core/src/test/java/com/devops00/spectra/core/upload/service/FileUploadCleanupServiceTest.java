@@ -5,7 +5,6 @@
  */
 package com.devops00.spectra.core.upload.service;
 
-import com.devops00.spectra.core.upload.configure.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.javabean.constant.FileAssetStatus;
 import com.devops00.spectra.core.upload.javabean.constant.StorageProviderType;
 import com.devops00.spectra.core.upload.javabean.constant.TransportMode;
@@ -14,6 +13,7 @@ import com.devops00.spectra.core.upload.javabean.entity.FileAsset;
 import com.devops00.spectra.core.upload.javabean.entity.FileUploadSession;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
+import com.devops00.spectra.core.upload.storage.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.storage.StorageMultipart;
 import org.junit.jupiter.api.Test;
 

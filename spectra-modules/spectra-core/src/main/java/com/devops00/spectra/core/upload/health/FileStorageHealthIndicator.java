@@ -20,14 +20,12 @@ import com.devops00.spectra.common.health.DependencyHealthContributor;
 import com.devops00.spectra.common.health.DependencyHealthResult;
 import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
-import com.devops00.spectra.core.upload.storage.FileStorageProvider;
+import com.devops00.spectra.core.upload.storage.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.storage.StorageHealth;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
 /**
  * 文件存储健康检查。
@@ -35,13 +33,24 @@ import java.util.List;
  * <p>本地存储检查上传目录和临时目录是否可写；其他存储类型由对应 Provider 自身负责连通性检查。</p>
  */
 @Component("fileStorage")
-@RequiredArgsConstructor
 public class FileStorageHealthIndicator implements DependencyHealthContributor {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(5);
 
     private final FileUploadProperties uploadProperties;
-    private final List<FileStorageProvider> providers;
+    private final FileStorageProviderRegistry providerRegistry;
+
+    /**
+     * 创建文件存储健康检查器。
+     *
+     * @param uploadProperties 提供默认存储类型，用于确定本次健康检查的目标 Provider
+     * @param providerRegistry 按存储类型解析 Provider，并在目标不存在时返回空查询结果
+     */
+    public FileStorageHealthIndicator(FileUploadProperties uploadProperties,
+                                      FileStorageProviderRegistry providerRegistry) {
+        this.uploadProperties = uploadProperties;
+        this.providerRegistry = providerRegistry;
+    }
 
     @Override
     public String contributorName() {
@@ -67,7 +76,7 @@ public class FileStorageHealthIndicator implements DependencyHealthContributor {
     public DependencyHealthResult check() {
         var start = System.nanoTime();
         var checkedAt = Instant.now();
-        var provider = providers.stream().filter(value -> value.type() == uploadProperties.getDefaultStorage()).findFirst();
+        var provider = providerRegistry.find(uploadProperties.getDefaultStorage());
         if (provider.isEmpty()) {
             return result(DependencyHealthStatus.DOWN, start, checkedAt,
                     "STORAGE_PROVIDER_NOT_REGISTERED", "默认对象存储 Provider 未注册");

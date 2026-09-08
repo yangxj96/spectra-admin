@@ -7,7 +7,6 @@ package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.core.upload.api.FileErrorCode;
 import com.devops00.spectra.core.upload.api.FileUploadException;
-import com.devops00.spectra.core.upload.configure.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.javabean.constant.FileAssetStatus;
 import com.devops00.spectra.core.upload.javabean.constant.UploadSessionStatus;
 import com.devops00.spectra.core.upload.javabean.entity.FileAsset;
@@ -20,6 +19,7 @@ import com.devops00.spectra.core.upload.mapper.FileUploadPartMapper;
 import com.devops00.spectra.core.upload.mapper.FileUploadSessionMapper;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
+import com.devops00.spectra.core.upload.storage.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.storage.StorageMultipart;
 import com.devops00.spectra.core.upload.storage.StorageObject;
 import com.devops00.spectra.core.upload.storage.StoredPart;

@@ -20,10 +20,11 @@ import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.core.upload.javabean.constant.StorageProviderType;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
+import com.devops00.spectra.core.upload.storage.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.storage.StorageHealth;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -38,8 +39,10 @@ class FileStorageHealthIndicatorTest {
         var provider = mock(FileStorageProvider.class);
         when(provider.type()).thenReturn(StorageProviderType.LOCAL);
         when(provider.health()).thenReturn(StorageHealth.available("LOCAL_STORAGE_REACHABLE"));
+        var registry = mock(FileStorageProviderRegistry.class);
+        when(registry.find(StorageProviderType.LOCAL)).thenReturn(Optional.of(provider));
 
-        var indicator = new FileStorageHealthIndicator(properties, List.of(provider));
+        var indicator = new FileStorageHealthIndicator(properties, registry);
 
         var result = indicator.check();
         assertEquals(DependencyHealthStatus.UP, result.status());
@@ -52,12 +55,43 @@ class FileStorageHealthIndicatorTest {
         var provider = mock(FileStorageProvider.class);
         when(provider.type()).thenReturn(StorageProviderType.LOCAL);
         when(provider.health()).thenReturn(StorageHealth.unavailable("LOCAL_STORAGE_UNAVAILABLE"));
+        var registry = mock(FileStorageProviderRegistry.class);
+        when(registry.find(StorageProviderType.LOCAL)).thenReturn(Optional.of(provider));
 
-        var indicator = new FileStorageHealthIndicator(properties, List.of(provider));
+        var indicator = new FileStorageHealthIndicator(properties, registry);
 
         var result = indicator.check();
         assertEquals(DependencyHealthStatus.DOWN, result.status());
         assertEquals("LOCAL_STORAGE_UNAVAILABLE", result.errorCode());
         assertEquals("OBJECT_STORAGE_UNAVAILABLE", result.safeSummary());
+    }
+
+    @Test
+    void shouldReportMissingDefaultProvider() {
+        var properties = new FileUploadProperties();
+        var registry = mock(FileStorageProviderRegistry.class);
+        when(registry.find(StorageProviderType.LOCAL)).thenReturn(Optional.empty());
+
+        var indicator = new FileStorageHealthIndicator(properties, registry);
+
+        var result = indicator.check();
+        assertEquals(DependencyHealthStatus.DOWN, result.status());
+        assertEquals("STORAGE_PROVIDER_NOT_REGISTERED", result.errorCode());
+    }
+
+    @Test
+    void shouldConvertProviderHealthFailureToSafeResult() {
+        var properties = new FileUploadProperties();
+        var provider = mock(FileStorageProvider.class);
+        when(provider.health()).thenThrow(new IllegalStateException("provider details"));
+        var registry = mock(FileStorageProviderRegistry.class);
+        when(registry.find(StorageProviderType.LOCAL)).thenReturn(Optional.of(provider));
+
+        var indicator = new FileStorageHealthIndicator(properties, registry);
+
+        var result = indicator.check();
+        assertEquals(DependencyHealthStatus.DOWN, result.status());
+        assertEquals("STORAGE_CHECK_FAILED", result.errorCode());
+        assertEquals("对象存储检查失败", result.safeSummary());
     }
 }

@@ -154,6 +154,10 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
+        <Class name="com.devops00.spectra.core.upload.health.FileStorageHealthIndicator"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
         <Class name="com.devops00.spectra.core.upload.storage.s3.S3FileStorageProvider"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>

@@ -5,7 +5,6 @@
  */
 package com.devops00.spectra.core.upload.service;
 
-import com.devops00.spectra.core.upload.configure.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.javabean.constant.StorageProviderType;
 import com.devops00.spectra.core.upload.javabean.constant.UploadPartStatus;
 import com.devops00.spectra.core.upload.javabean.constant.UploadSessionStatus;
@@ -19,6 +18,7 @@ import com.devops00.spectra.core.upload.mapper.FileUploadPartMapper;
 import com.devops00.spectra.core.upload.mapper.FileUploadSessionMapper;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
+import com.devops00.spectra.core.upload.storage.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.storage.StorageMultipart;
 import com.devops00.spectra.core.upload.storage.StorageObject;
 import com.devops00.spectra.core.upload.storage.StorageObjectMetadata;
