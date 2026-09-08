@@ -63,6 +63,9 @@ public enum SecurityRedisKey implements RedisKey {
     /** Refresh Token 一次性消费声明。 */
     REFRESH_CLAIM(SecurityRedisNamespace.PREFIX + "rt:claim:%s"),
 
+    /** Web 加密请求 nonce 摘要的一次性消费声明。 */
+    CRYPTO_NONCE(SecurityRedisNamespace.PREFIX + "replay:crypto:%s"),
+
     /** 首次系统初始化令牌的 SHA-256 摘要；不保存令牌明文。 */
     INITIALIZATION_TOKEN(SecurityRedisNamespace.PREFIX + "init:token");
 

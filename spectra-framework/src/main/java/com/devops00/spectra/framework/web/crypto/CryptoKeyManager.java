@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.web.crypto;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.RSAUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -56,21 +57,36 @@ public class CryptoKeyManager {
     /**
      * 不可变密钥容器，volatile 原子替换保证线程安全
      */
-    private record CryptoKeys(boolean enabled, @Nullable PublicKey serverPublicKey, @Nullable PrivateKey serverPrivateKey,
-                              @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey) {
+    /** 加密配置运行态。 */
+    public enum State {
+        /** 已明确关闭接口加解密。 */
+        DISABLED,
+        /** 四个 RSA 密钥均已加载，可用于请求和响应加解密。 */
+        READY,
+        /** 已开启加解密但配置读取或密钥解析失败，必须拒绝加密路径。 */
+        UNAVAILABLE
+    }
+
+    private record CryptoKeys(State state, @Nullable PublicKey serverPublicKey, @Nullable PrivateKey serverPrivateKey,
+                              @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey,
+                              @Nullable String serverPublicKeyBase64, @Nullable String clientPrivateKeyBase64) {
 
         /**
          * 检查密钥完整性（启用时四个密钥必须全部存在）
          */
         boolean isComplete() {
-            return enabled && serverPublicKey != null && serverPrivateKey != null && clientPublicKey != null && clientPrivateKey != null;
+            return state == State.READY
+                    && serverPublicKey != null
+                    && serverPrivateKey != null
+                    && clientPublicKey != null
+                    && clientPrivateKey != null;
         }
     }
 
     /**
      * 当前密钥缓存（volatile 原子替换）
      */
-    private volatile CryptoKeys keys = new CryptoKeys(false, null, null, null, null);
+    private volatile CryptoKeys keys = new CryptoKeys(State.DISABLED, null, null, null, null, null, null);
 
     public CryptoKeyManager(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -90,10 +106,18 @@ public class CryptoKeyManager {
      */
     public synchronized void refresh() {
         try {
-            boolean enabled = Boolean.parseBoolean(getConfigValue(CONFIG_ENABLED).orElse("false"));
+            String enabledValue = getConfigValue(CONFIG_ENABLED).orElse("false");
+            boolean enabled;
+            if ("true".equalsIgnoreCase(enabledValue)) {
+                enabled = true;
+            } else if ("false".equalsIgnoreCase(enabledValue)) {
+                enabled = false;
+            } else {
+                throw new CryptoConfigurationException("crypto.enabled 配置值无效");
+            }
 
             if (!enabled) {
-                this.keys = new CryptoKeys(false, null, null, null, null);
+                this.keys = new CryptoKeys(State.DISABLED, null, null, null, null, null, null);
                 log.info(LogPrefix.WEB.f("加解密已关闭 (crypto.enabled=false)"));
                 return;
             }
@@ -108,16 +132,20 @@ public class CryptoKeyManager {
             PublicKey clientPub = clientPubBase64 != null ? RSAUtils.restorePublicKey(clientPubBase64) : null;
             PrivateKey clientPri = clientPriBase64 != null ? RSAUtils.restorePrivateKey(clientPriBase64) : null;
 
-            this.keys = new CryptoKeys(true, serverPub, serverPri, clientPub, clientPri);
+            State state = serverPub != null && serverPri != null && clientPub != null && clientPri != null
+                    ? State.READY
+                    : State.UNAVAILABLE;
+            this.keys = new CryptoKeys(state, serverPub, serverPri, clientPub, clientPri,
+                    serverPubBase64, clientPriBase64);
 
             if (keys.isComplete()) {
                 log.info(LogPrefix.WEB.f("密钥加载完成，加解密已就绪"));
             } else {
-                log.warn(LogPrefix.WEB.f("密钥不完整，加解密将跳过（缺少密钥配置）"));
+                log.warn(LogPrefix.WEB.f("密钥不完整，加解密状态为 UNAVAILABLE"));
             }
         } catch (Exception e) {
-            log.error(LogPrefix.WEB.f("密钥加载失败: {}"), e.getMessage(), e);
-            this.keys = new CryptoKeys(false, null, null, null, null);
+            log.error(LogPrefix.WEB.f("密钥加载失败，加解密状态为 UNAVAILABLE"), e);
+            this.keys = new CryptoKeys(State.UNAVAILABLE, null, null, null, null, null, null);
         }
     }
 
@@ -129,45 +157,76 @@ public class CryptoKeyManager {
     }
 
     /**
+     * 判断加密开关是否已开启，包括密钥暂不可用的状态。
+     *
+     * <p>Advice 使用该状态区分“明确关闭”与“配置故障”，避免在密钥故障时静默返回明文。</p>
+     *
+     * @return 加密开关是否开启
+     */
+    public boolean isConfiguredEnabled() {
+        return keys.state() != State.DISABLED;
+    }
+
+    /**
+     * 获取当前加密状态。
+     *
+     * @return 当前状态
+     */
+    public State getState() {
+        return keys.state();
+    }
+
+    /**
+     * 要求加密密钥已就绪。
+     *
+     * @throws EncryptException 密钥未就绪
+     */
+    public void requireReady() {
+        if (!keys.isComplete()) {
+            throw new EncryptException("加密密钥不可用");
+        }
+    }
+
+    /**
      * 获取服务端公钥
      */
     public @Nullable PublicKey getServerPublicKey() {
-        return keys.serverPublicKey();
+        return keys.isComplete() ? keys.serverPublicKey() : null;
     }
 
     /**
      * 获取服务端私钥
      */
     public @Nullable PrivateKey getServerPrivateKey() {
-        return keys.serverPrivateKey();
+        return keys.isComplete() ? keys.serverPrivateKey() : null;
     }
 
     /**
      * 获取客户端公钥
      */
     public @Nullable PublicKey getClientPublicKey() {
-        return keys.clientPublicKey();
+        return keys.isComplete() ? keys.clientPublicKey() : null;
     }
 
     /**
      * 获取客户端私钥
      */
     public @Nullable PrivateKey getClientPrivateKey() {
-        return keys.clientPrivateKey();
+        return keys.isComplete() ? keys.clientPrivateKey() : null;
     }
 
     /**
      * 获取服务端公钥 Base64 字符串
      */
     public @Nullable String getServerPublicKeyBase64() {
-        return getConfigValue(CONFIG_SERVER_PUBLIC_KEY).orElse(null);
+        return keys.isComplete() ? keys.serverPublicKeyBase64() : null;
     }
 
     /**
      * 获取客户端私钥 Base64 字符串
      */
     public @Nullable String getClientPrivateKeyBase64() {
-        return getConfigValue(CONFIG_CLIENT_PRIVATE_KEY).orElse(null);
+        return keys.isComplete() ? keys.clientPrivateKeyBase64() : null;
     }
 
     /**
@@ -179,8 +238,7 @@ public class CryptoKeyManager {
                     String.class, key);
             return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
         } catch (Exception e) {
-            log.warn(LogPrefix.WEB.f("读取配置失败: {}"), key, e);
-            return Optional.empty();
+            throw new CryptoConfigurationException("读取加密配置失败: " + key, e);
         }
     }
 }

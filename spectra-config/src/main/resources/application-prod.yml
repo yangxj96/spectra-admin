@@ -13,6 +13,8 @@ spectra:
     refresh-cookie-domain: ${SPECTRA_SECURITY_REFRESH_COOKIE_DOMAIN:}
     csrf-cookie-name: ${SPECTRA_SECURITY_CSRF_COOKIE_NAME:XSRF-TOKEN}
     csrf-header-name: ${SPECTRA_SECURITY_CSRF_HEADER_NAME:X-XSRF-TOKEN}
+    crypto-request-max-body-bytes: ${SPECTRA_SECURITY_CRYPTO_REQUEST_MAX_BODY_BYTES:1048576}
+    crypto-replay-window-seconds: ${SPECTRA_SECURITY_CRYPTO_REPLAY_WINDOW_SECONDS:300}
     redis:
       namespace: "sec:"
       fail-closed: true

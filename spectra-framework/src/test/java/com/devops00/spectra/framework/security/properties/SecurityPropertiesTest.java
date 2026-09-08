@@ -18,9 +18,11 @@ package com.devops00.spectra.framework.security.properties;
 
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisNamespace;
 import org.junit.jupiter.api.Test;
+import org.springframework.validation.annotation.Validated;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -64,5 +66,23 @@ class SecurityPropertiesTest {
         properties.getRedis().setFailClosed(false);
 
         assertThrows(IllegalStateException.class, properties::validateRedisContract);
+    }
+
+    @Test
+    void shouldValidateSecurityPropertiesAtBindingBoundary() {
+        assertNotNull(SecurityProperties.class.getAnnotation(Validated.class));
+
+        var properties = new SecurityProperties();
+        properties.setWhitelists(java.util.List.of("/**"));
+
+        assertThrows(IllegalStateException.class, properties::validate);
+    }
+
+    @Test
+    void shouldRejectOutOfRangeRuntimeSecurityValues() {
+        var properties = new SecurityProperties();
+        properties.setCryptoRequestMaxBodyBytes(10_485_761L);
+
+        assertThrows(IllegalStateException.class, properties::validate);
     }
 }

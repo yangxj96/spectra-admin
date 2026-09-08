@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.web.advice.crypto;
 
 import com.devops00.spectra.common.annotation.Encrypt;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.AESUtils;
@@ -64,7 +65,7 @@ import java.util.regex.Pattern;
 @NullMarked
 public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
-    private static final Pattern PATTERN = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller.*");
+    private static final Pattern CONTROLLER_PACKAGE = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller(?:\\..*)?");
 
     private final ObjectMapper om;
 
@@ -78,26 +79,20 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // 检查加解密是否启用
-        if (!cryptoKeyManager.isEnabled()) {
-            log.debug(LogPrefix.WEB.f("加密已禁用"));
-            return false;
-        }
-
         // 忽略流式
-        if (returnType.getParameterType().isAssignableFrom(Flux.class)) {
+        if (Flux.class.isAssignableFrom(returnType.getParameterType())) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: 流式返回类型"));
             return false;
         }
 
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
-        if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
+        if (ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: 字节数组转换器"));
             return false;
         }
 
         // 忽略 ResourceHttpMessageConverter（避免把文件下载响应序列化并加密）
-        if (converterType.isAssignableFrom(ResourceHttpMessageConverter.class)) {
+        if (ResourceHttpMessageConverter.class.isAssignableFrom(converterType)) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: Resource 转换器"));
             return false;
         }
@@ -115,7 +110,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
                     log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), methodAnno.value(), methodAnno.response(),
                             method.getName());
                 }
-                return methodAnno.value() && methodAnno.response();
+                return methodAnno.value() && methodAnno.response() && encryptionConfigured();
             }
 
             Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
@@ -124,13 +119,18 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
                     log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), classAnno.value(), classAnno.response(),
                             method.getDeclaringClass().getSimpleName());
                 }
-                return classAnno.value() && classAnno.response();
+                return classAnno.value() && classAnno.response() && encryptionConfigured();
             }
+        }
+
+        if (!encryptionConfigured()) {
+            log.debug(LogPrefix.WEB.f("加密已禁用"));
+            return false;
         }
 
         // 兜底：包名匹配
         var declaringClass = returnType.getContainingClass();
-        boolean matched = PATTERN.matcher(declaringClass.getPackageName()).matches();
+        boolean matched = CONTROLLER_PACKAGE.matcher(declaringClass.getPackageName()).matches();
         if (!matched) {
             log.debug("{}跳过响应加密: 包名不匹配 {}", LogPrefix.WEB.p(), declaringClass.getPackageName());
         }
@@ -168,8 +168,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             PublicKey clientPublicKey = cryptoKeyManager.getClientPublicKey();
             PrivateKey serverPrivateKey = cryptoKeyManager.getServerPrivateKey();
             if (clientPublicKey == null || serverPrivateKey == null) {
-                log.warn(LogPrefix.WEB.f("密钥不完整，跳过加密"));
-                return body;
+                throw new EncryptException("加密密钥不可用");
             }
 
             // 随机生成AES密钥和IV
@@ -208,9 +207,21 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
             log.debug("{}响应加密完成, 返回字段={data,key,iv,nonce,timestamp,signature}", LogPrefix.WEB.p());
             return result;
-        } catch (Exception e) {
-            log.error("响应加密失败: {}", e.getMessage(), e);
-            throw new EncryptException("响应加密失败", e);
+        } catch (EncryptException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            log.warn("响应加密失败，correlationId={}", correlationId());
+            throw new EncryptException("响应加密失败", exception);
         }
+    }
+
+    /** 返回全局开关状态，区分明确关闭和密钥暂不可用。 */
+    private boolean encryptionConfigured() {
+        return cryptoKeyManager.isConfiguredEnabled();
+    }
+
+    private static String correlationId() {
+        String correlationId = RequestCorrelationContext.current().correlationId();
+        return correlationId == null ? "unknown" : correlationId;
     }
 }

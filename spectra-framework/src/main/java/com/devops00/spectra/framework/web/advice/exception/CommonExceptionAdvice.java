@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.framework.web.advice.exception;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
@@ -23,6 +24,7 @@ import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.NotImplementedException;
 import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.framework.web.advice.crypto.RequestCryptoException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -152,6 +154,14 @@ public class CommonExceptionAdvice {
         }
     }
 
+    /** 客户端加密请求格式错误统一返回 400，不暴露密文、签名或底层密码异常。 */
+    @ExceptionHandler(RequestCryptoException.class)
+    public R<Object> requestCryptoException(RequestCryptoException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        log.warn("{}请求加密校验失败，correlationId={}", LogPrefix.WEB.p(), correlationId());
+        return R.failure(HttpStatus.BAD_REQUEST, "请求加密数据无效");
+    }
+
     /**
      * 运行时异常
      *
@@ -161,9 +171,9 @@ public class CommonExceptionAdvice {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}JSON 反序列化失败: {}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure("请求数据格式错误，请检查JSON格式和字段类型");
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        log.warn("{}请求体不可读，correlationId={}", LogPrefix.WEB.p(), correlationId());
+        return R.failure(HttpStatus.BAD_REQUEST, "请求数据格式错误，请检查请求体");
     }
 
     /**
@@ -176,8 +186,8 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}运行时异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure(e.getMessage());
+        log.error("{}运行时异常，correlationId={}", LogPrefix.WEB.p(), correlationId(), e);
+        return R.failure("系统内部错误,请联系管理员");
     }
 
     /**
@@ -190,7 +200,12 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}兜底异常处理,{}", LogPrefix.WEB.p(), e.getMessage(), e);
+        log.error("{}兜底异常处理，correlationId={}", LogPrefix.WEB.p(), correlationId(), e);
         return R.failure("系统内部错误,请联系管理员");
+    }
+
+    private static String correlationId() {
+        String correlationId = RequestCorrelationContext.current().correlationId();
+        return correlationId == null ? "unknown" : correlationId;
     }
 }

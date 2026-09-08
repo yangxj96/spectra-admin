@@ -85,10 +85,10 @@ class SecurityAutoConfigurationTest {
         new ApplicationContextRunner()
                 .withUserConfiguration(SecurityAutoConfiguration.class)
                 .withPropertyValues(
-                        "spectra.security.access-token-expire=0",
-                        "spectra.security.lockout-max-attempts=0")
+                        "spectra.security.min-effective-dev-ops-users=4",
+                        "spectra.security.max-dev-ops-users=3")
                 .run(context -> assertThat(context).hasFailed()
                         .getFailure()
-                        .hasRootCauseMessage("accessTokenExpire 必须为正数"));
+                        .hasRootCauseMessage("DevOps Root 用户数量边界无效"));
     }
 }

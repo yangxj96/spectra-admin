@@ -94,7 +94,6 @@ public class AuthenticationController {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
         String refreshToken = params != null ? params.getRefreshToken() : null;
         if (AuthenticationWebUtils.isWebClient(clientType)) {
-            AuthenticationWebUtils.validateCsrf(request, securityProperties);
             if (refreshToken == null || refreshToken.isBlank()) {
                 refreshToken = AuthenticationWebUtils.readCookie(request, securityProperties.getRefreshCookieName());
             }
@@ -156,9 +155,6 @@ public class AuthenticationController {
     public SecurityToken refresh(@Validated @RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
                                  HttpServletResponse response) {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
-        if (AuthenticationWebUtils.isWebClient(clientType)) {
-            AuthenticationWebUtils.validateCsrf(request, securityProperties);
-        }
         String cookieRefreshToken = AuthenticationWebUtils.readCookie(request, securityProperties.getRefreshCookieName());
         String refreshToken = AuthenticationWebUtils.isWebClient(clientType)
                 ? cookieRefreshToken

@@ -25,7 +25,7 @@ import com.devops00.spectra.framework.security.authentication.TokenAuthenticatio
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.ratelimit.RedisRateLimiter;
 import com.devops00.spectra.framework.security.ratelimit.RequestRateLimitFilter;
-import jakarta.servlet.DispatcherType;
+import com.devops00.spectra.framework.web.security.WebCookieCsrfFilter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +43,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -52,6 +53,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tools.jackson.databind.ObjectMapper;
 
@@ -157,16 +159,22 @@ public class SecurityConfiguration {
                 // SESSION 规则
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 注册过滤器
+                .addFilterBefore(new WebCookieCsrfFilter(properties, restAccessDeniedHandler),
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new TokenAuthenticationFilter(securityContextAccessor, securityUserLookupPort),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(requestRateLimitFilter, TokenAuthenticationFilter.class)
                 // 允许同源iframe
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 // 权限匹配
                 .authorizeHttpRequests(auth -> auth
-                        // 允许 ASYNC 调度
-                        .dispatcherTypeMatchers(DispatcherType.ASYNC)
-                        .permitAll()
+                        .withObjectPostProcessor(new ObjectPostProcessor<AuthorizationFilter>() {
+                            @Override
+                            public <O extends AuthorizationFilter> O postProcess(O filter) {
+                                filter.setFilterAsyncDispatch(true);
+                                return filter;
+                            }
+                        })
                         // 预检请求必须放行
                         .requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()

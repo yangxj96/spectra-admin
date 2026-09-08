@@ -6,15 +6,15 @@
         injection rather than an externally mutable domain value.
     -->
     <Match>
-        <Class name="com.devops00.spectra.framework.web.RequestDecryptAdvice"/>
+        <Class name="com.devops00.spectra.framework.web.advice.crypto.RequestDecryptAdvice"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.web.ResponseEncryptAdvice"/>
+        <Class name="com.devops00.spectra.framework.web.advice.crypto.ResponseEncryptAdvice"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.web.CryptoKeyManager"/>
+        <Class name="com.devops00.spectra.framework.web.crypto.CryptoKeyManager"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -145,11 +145,6 @@
         <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceLocalImpl"/>
         <Bug pattern="PATH_TRAVERSAL_IN"/>
     </Match>
-    <!-- Spring-managed upload collaborators are intentionally retained by technical adapters/services. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.upload.configure.FileUploadBinarySecurityFilter"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
     <Match>
         <Class name="com.devops00.spectra.core.upload.service.FileUploadCleanupService"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
@@ -174,32 +169,32 @@
     </Match>
     <!-- ObjectMapper/RedisTemplate/configuration/Converter are private Spring collaborators. -->
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RedisSecurityVerificationStore"/>
+        <Class name="com.devops00.spectra.framework.security.redis.store.RedisSecurityVerificationStore"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RedisSecurityInitializationTokenStore"/>
+        <Class name="com.devops00.spectra.framework.security.redis.store.RedisSecurityInitializationTokenStore"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RestAccessDeniedHandler"/>
+        <Class name="com.devops00.spectra.framework.security.advice.RestAccessDeniedHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RestAuthenticationEntryPoint"/>
+        <Class name="com.devops00.spectra.framework.security.advice.RestAuthenticationEntryPoint"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RequestRateLimitFilter"/>
+        <Class name="com.devops00.spectra.framework.security.ratelimit.RequestRateLimitFilter"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <!-- These handlers serialize a fixed R body as application/json; PrintWriter is not an HTML sink. -->
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RestAccessDeniedHandler"/>
+        <Class name="com.devops00.spectra.framework.security.advice.RestAccessDeniedHandler"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.framework.security.RestAuthenticationEntryPoint"/>
+        <Class name="com.devops00.spectra.framework.security.advice.RestAuthenticationEntryPoint"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
     <!-- Scheduler repositories/services retain Spring-managed collaborators by constructor injection. -->
@@ -290,5 +285,71 @@
     <Match>
         <Class name="com.devops00.spectra.core.system.health.CoreHealthRegistry"/>
         <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <!-- Current framework package layout: Spring collaborators and deliberate fail-fast validation. -->
+    <Match>
+        <Class name="com.devops00.spectra.framework.persistence.configuration.MyBatisPlusConfiguration"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.persistence.scope.authorization.DataScopeInnerInterceptor"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.persistence.scope.authorization.ResourceAuthorizationGuard"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.security.configuration.SecurityAutoConfiguration"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.security.session.SecuritySessionIssueService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.security.session.SecuritySessionRefreshService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.security.session.SecuritySessionStore"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.security.session.SecuritySessionStore"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.web.security.WebCookieCsrfFilter"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- Current core package layout: Spring collaborators and internal task drafts. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.directory.DirectoryQueryAdapter"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner$TaskDraft"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner$TaskDraft"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.service.impl.RegionServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.upload.service.UploadPartService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.upload.service.UploadSessionService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.upload.service.UploadVerificationWorker"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 </FindBugsFilter>

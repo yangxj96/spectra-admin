@@ -18,8 +18,14 @@ package com.devops00.spectra.framework.security.properties;
 
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisNamespace;
 import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,13 +39,16 @@ import java.util.List;
  * @since 2025/12/4 10:39
  */
 @Data
+@Validated
 @ConfigurationProperties(prefix = "spectra.security")
 public class SecurityProperties {
 
     /**
      * 验证白名单
      */
-    private List<String> whitelists = new ArrayList<>(Arrays.asList(
+    @NotEmpty
+    @Size(max = 64)
+    private List<@NotBlank @Size(max = 200) String> whitelists = new ArrayList<>(Arrays.asList(
             // 生成图形验证码
             "/common/kaptcha",
             // 用户登陆
@@ -67,11 +76,15 @@ public class SecurityProperties {
     /**
      * accessToken有效期（秒），默认5分钟
      */
+    @Min(1)
+    @Max(31_536_000)
     private long accessTokenExpire = 300L;
 
     /**
      * refreshToken有效期（秒），默认7天
      */
+    @Min(1)
+    @Max(31_536_000)
     private long refreshTokenExpire = 604800L;
 
     /**
@@ -82,16 +95,22 @@ public class SecurityProperties {
     /**
      * 登录失败锁定：最大尝试次数
      */
+    @Min(1)
+    @Max(100)
     private int lockoutMaxAttempts = 5;
 
     /**
      * 登录失败锁定：锁定时长（秒），0=不锁定
      */
+    @Min(0)
+    @Max(86_400)
     private long lockoutSeconds = 300L;
 
     /**
      * 验证码有效期（秒）。
      */
+    @Min(1)
+    @Max(86_400)
     private long verificationCodeExpire = 300L;
 
     /**
@@ -102,21 +121,29 @@ public class SecurityProperties {
     /**
      * 单个验证码窗口允许的最大校验尝试次数。
      */
+    @Min(1)
+    @Max(100)
     private int verificationCodeMaxAttempts = 5;
 
     /**
      * 验证码长度。当前只允许 6 位数字。
      */
+    @Min(6)
+    @Max(6)
     private int verificationCodeLength = 6;
 
     /**
      * Root 最少有效用户数；首版始终保护最后一个有效 Root。
      */
+    @Min(1)
+    @Max(100)
     private int minEffectiveDevOpsUsers = 1;
 
     /**
      * Root 最大用户数，默认 3（推荐 2 个日常 Root + 1 个 break-glass）。
      */
+    @Min(1)
+    @Max(100)
     private int maxDevOpsUsers = 3;
 
     /**
@@ -128,7 +155,19 @@ public class SecurityProperties {
     private SessionConcurrencyMode sessionConcurrencyMode = SessionConcurrencyMode.ALLOW;
 
     /** v2 用户最大活动会话数。 */
+    @Min(1)
+    @Max(100)
     private int maxSessions = 5;
+
+    /** 加密请求体的最大字节数，防止在 JSON 解析前无界占用内存。 */
+    @Min(1_024)
+    @Max(10_485_760)
+    private long cryptoRequestMaxBodyBytes = 1_048_576L;
+
+    /** 加密请求时间戳和 nonce 的防重放窗口。 */
+    @Min(1)
+    @Max(3_600)
+    private long cryptoReplayWindowSeconds = 300L;
 
     /** Web Refresh Token 的 Host-only Cookie 名称。 */
     private String refreshCookieName = "__Host-spectra-refresh";
@@ -208,32 +247,53 @@ public class SecurityProperties {
      */
     public void validate() {
         validateRedisContract();
-        if (accessTokenExpire < 1) {
-            throw new IllegalStateException("accessTokenExpire 必须为正数");
-        }
-        if (refreshTokenExpire < 1) {
-            throw new IllegalStateException("refreshTokenExpire 必须为正数");
-        }
-        if (lockoutMaxAttempts < 1) {
-            throw new IllegalStateException("lockoutMaxAttempts 必须为正数");
-        }
-        if (lockoutSeconds < 0) {
-            throw new IllegalStateException("lockoutSeconds 不能为负数");
-        }
-        if (verificationCodeExpire < 1) {
-            throw new IllegalStateException("verificationCodeExpire 必须为正数");
-        }
-        if (verificationCodeMaxAttempts < 1) {
-            throw new IllegalStateException("verificationCodeMaxAttempts 必须为正数");
-        }
-        if (verificationCodeLength != 6) {
-            throw new IllegalStateException("verificationCodeLength 必须为 6");
-        }
-        if (minEffectiveDevOpsUsers < 1 || maxDevOpsUsers < minEffectiveDevOpsUsers) {
+        validateWhitelist();
+        requireRange(accessTokenExpire, 1, 31_536_000, "accessTokenExpire 必须在 1 到 31536000 之间");
+        requireRange(refreshTokenExpire, 1, 31_536_000, "refreshTokenExpire 必须在 1 到 31536000 之间");
+        requireRange(lockoutMaxAttempts, 1, 100, "lockoutMaxAttempts 必须在 1 到 100 之间");
+        requireRange(lockoutSeconds, 0, 86_400, "lockoutSeconds 必须在 0 到 86400 之间");
+        requireRange(verificationCodeExpire, 1, 86_400, "verificationCodeExpire 必须在 1 到 86400 之间");
+        requireRange(verificationCodeMaxAttempts, 1, 100,
+                "verificationCodeMaxAttempts 必须在 1 到 100 之间");
+        requireExact(verificationCodeLength, 6, "verificationCodeLength 必须为 6");
+        requireRange(minEffectiveDevOpsUsers, 1, 100, "minEffectiveDevOpsUsers 必须在 1 到 100 之间");
+        requireRange(maxDevOpsUsers, 1, 100, "maxDevOpsUsers 必须在 1 到 100 之间");
+        if (maxDevOpsUsers < minEffectiveDevOpsUsers) {
             throw new IllegalStateException("DevOps Root 用户数量边界无效");
         }
-        if (maxSessions < 1) {
-            throw new IllegalStateException("maxSessions 必须为正数");
+        requireRange(maxSessions, 1, 100, "maxSessions 必须在 1 到 100 之间");
+        requireRange(cryptoRequestMaxBodyBytes, 1_024, 10_485_760,
+                "cryptoRequestMaxBodyBytes 必须在 1024 到 10485760 之间");
+        requireRange(cryptoReplayWindowSeconds, 1, 3_600,
+                "cryptoReplayWindowSeconds 必须在 1 到 3600 之间");
+    }
+
+    /** 校验匿名路径必须保持窄匹配，禁止使用覆盖全部请求的通配路径。 */
+    private void validateWhitelist() {
+        if (whitelists == null || whitelists.isEmpty() || whitelists.size() > 64) {
+            throw new IllegalStateException("安全白名单不能为空");
+        }
+        if (whitelists.stream()
+                .anyMatch(path -> path == null
+                        || path.isBlank()
+                        || !path.startsWith("/")
+                        || path.length() > 200
+                        || "/**".equals(path.trim()))) {
+            throw new IllegalStateException("安全白名单必须是以 / 开头的窄路径，禁止 /**");
+        }
+    }
+
+    /** 校验数值配置的闭区间边界。 */
+    private static void requireRange(long value, long minimum, long maximum, String message) {
+        if (value < minimum || value > maximum) {
+            throw new IllegalStateException(message);
+        }
+    }
+
+    /** 校验只能取单一允许值的配置。 */
+    private static void requireExact(long value, long expected, String message) {
+        if (value != expected) {
+            throw new IllegalStateException(message);
         }
     }
 }
