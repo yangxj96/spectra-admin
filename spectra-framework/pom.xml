@@ -71,10 +71,6 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
         <!-- UUIDv7 生成器由 framework 的 MyBatis 元对象处理器使用。 -->
         <dependency>
             <groupId>com.github.f4b6a3</groupId>

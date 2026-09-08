@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.controller;
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.utils.RSAUtils;
+import com.devops00.spectra.core.system.security.SystemKeyMaterial;
 import com.devops00.spectra.core.system.javabean.vo.CryptoClientKeyVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoConfigVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoKeyPairVO;
@@ -91,13 +91,13 @@ public class CryptoController {
     @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public CryptoKeyPairVO generateKeyPair() {
         try {
-            KeyPair serverPair = RSAUtils.generateKeyPair();
-            KeyPair clientPair = RSAUtils.generateKeyPair();
+            KeyPair serverPair = SystemKeyMaterial.generateKeyPair();
+            KeyPair clientPair = SystemKeyMaterial.generateKeyPair();
 
-            String serverPublicKey = RSAUtils.getPublicKeyBase64(serverPair.getPublic());
-            String serverPrivateKey = RSAUtils.getPrivateKeyBase64(serverPair.getPrivate());
-            String clientPublicKey = RSAUtils.getPublicKeyBase64(clientPair.getPublic());
-            String clientPrivateKey = RSAUtils.getPrivateKeyBase64(clientPair.getPrivate());
+            String serverPublicKey = SystemKeyMaterial.publicKeyBase64(serverPair.getPublic());
+            String serverPrivateKey = SystemKeyMaterial.privateKeyBase64(serverPair.getPrivate());
+            String clientPublicKey = SystemKeyMaterial.publicKeyBase64(clientPair.getPublic());
+            String clientPrivateKey = SystemKeyMaterial.privateKeyBase64(clientPair.getPrivate());
 
             String remarks = "RSA密钥对自动生成";
             configuredService.upsert("crypto.server.public-key", serverPublicKey, ConfiguredValueType.TEXT, remarks);

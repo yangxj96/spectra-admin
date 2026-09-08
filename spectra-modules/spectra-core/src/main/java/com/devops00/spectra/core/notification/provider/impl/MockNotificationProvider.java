@@ -23,7 +23,7 @@ import com.devops00.spectra.core.notification.javabean.domain.NotificationProvid
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.core.notification.provider.NotificationProvider;
-import com.devops00.spectra.core.notification.utils.NotificationMaskingUtils;
+import com.devops00.spectra.core.notification.policy.NotificationAddressMasker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -84,7 +84,7 @@ public class MockNotificationProvider implements NotificationProvider {
         var taskId = task.getId() == null ? "none" : task.getId().toString();
         var recipientMasked = task.getRecipientMasked();
         if (recipientMasked == null || recipientMasked.isBlank()) {
-            recipientMasked = NotificationMaskingUtils.maskAddressOrPlaceholder(recipient);
+            recipientMasked = NotificationAddressMasker.maskAddressOrPlaceholder(recipient);
         }
         log.info("通知模拟发送: channel={}, taskId={}, recipient={}, title={}, content={}",
                 task.getChannel(), taskId, recipientMasked, task.getTitle(), task.getContent());

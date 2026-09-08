@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;

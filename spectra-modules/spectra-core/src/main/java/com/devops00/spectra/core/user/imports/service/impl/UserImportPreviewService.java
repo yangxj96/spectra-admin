@@ -19,7 +19,7 @@ package com.devops00.spectra.core.user.imports.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.user.imports.security.PreviewTokenDigest;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
@@ -191,7 +191,7 @@ public class UserImportPreviewService {
         task.setAccessBoundaryCount(accessBoundaryCount);
         task.setGrantBoundaryCount(grantBoundaryCount);
         var token = issuePreviewToken();
-        task.setPreviewTokenHash(SHA256Utils.hash(token));
+        task.setPreviewTokenHash(PreviewTokenDigest.hash(token));
         task.setPreviewExpiresAt(Instant.now().plusSeconds(10 * 60));
         if (taskMapper.updateById(task) != 1) {
             throw new DataException("更新用户导入 Preview 状态失败");
@@ -209,8 +209,7 @@ public class UserImportPreviewService {
         if (task.getPreviewExpiresAt() == null
                 || now.isAfter(task.getPreviewExpiresAt())
                 || task.getPreviewConsumedAt() != null
-                || !MessageDigest.isEqual(SHA256Utils.hash(params.getPreviewToken()).getBytes(StandardCharsets.UTF_8),
-                        task.getPreviewTokenHash().getBytes(StandardCharsets.UTF_8))) {
+                || !PreviewTokenDigest.matches(params.getPreviewToken(), task.getPreviewTokenHash())) {
             throw new DataException("用户导入 Preview token 无效或已过期");
         }
         var rows = rowMapper.selectList(new LambdaQueryWrapper<UserImportRow>()
@@ -270,7 +269,7 @@ public class UserImportPreviewService {
             throw new DataException("用户导入任务已过期，请使用新的幂等键");
         }
         var token = issuePreviewToken();
-        task.setPreviewTokenHash(SHA256Utils.hash(token));
+        task.setPreviewTokenHash(PreviewTokenDigest.hash(token));
         task.setPreviewExpiresAt(Instant.now().plusSeconds(10 * 60));
         task.setPreviewConsumedAt(null);
         taskMapper.updateById(task);
@@ -347,7 +346,7 @@ public class UserImportPreviewService {
     }
 
     private String generateEmployeeNo(String generationSeed, int rowIndex) {
-        return "EMP-" + SHA256Utils.hash(trim(generationSeed) + '\u001f' + rowIndex)
+        return "EMP-" + PreviewTokenDigest.hash(trim(generationSeed) + '\u001f' + rowIndex)
                 .substring(0, 32)
                 .toUpperCase(Locale.ROOT);
     }
@@ -390,7 +389,7 @@ public class UserImportPreviewService {
             canonical.append('\u001e');
             toMap(row.source()).values().forEach(value -> canonical.append('\u001f').append(value == null ? "" : value));
         }
-        return SHA256Utils.hash(canonical.toString());
+        return PreviewTokenDigest.hash(canonical.toString());
     }
 
     private String profileVersionHash(List<NormalizedRow> rows, Map<String, AuthorizationProfileVO> profiles) {
@@ -407,7 +406,7 @@ public class UserImportPreviewService {
                     .collect(Collectors.joining(","));
             return code + "|" + profile.getState() + "|" + profile.getVersion() + "|" + assignments;
         }).collect(Collectors.joining("\u001f"));
-        return SHA256Utils.hash(canonical);
+        return PreviewTokenDigest.hash(canonical);
     }
 
     private String issuePreviewToken() {

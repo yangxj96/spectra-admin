@@ -22,10 +22,10 @@ import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
-import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
+import com.devops00.spectra.core.security.authentication.application.SecurityUserAssembler;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
-import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
+import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +66,7 @@ class LoginSmsProviderTest {
         properties.setVerificationCodeHmacKey(HMAC_KEY);
         provider = new LoginSmsProvider(verificationCodeStore, verificationAttemptStore, mock(UserService.class),
                 mock(AuthenticationIdentityService.class), mock(PasswordCredentialService.class),
-                mock(SecurityUserHelper.class), properties);
+                mock(SecurityUserAssembler.class), properties);
     }
 
     @Test

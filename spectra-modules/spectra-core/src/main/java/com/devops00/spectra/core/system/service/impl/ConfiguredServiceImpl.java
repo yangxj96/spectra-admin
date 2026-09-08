@@ -22,7 +22,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.system.javabean.converter.ConfiguredConverter;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;

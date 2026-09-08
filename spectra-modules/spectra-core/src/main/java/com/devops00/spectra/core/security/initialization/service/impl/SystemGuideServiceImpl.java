@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.utils.RSAUtils;
+import com.devops00.spectra.core.system.security.SystemKeyMaterial;
 import com.devops00.spectra.core.security.authorization.service.SystemGuideAuthorization;
 import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
 import com.devops00.spectra.core.security.initialization.javabean.entity.SystemState;
@@ -266,13 +266,13 @@ public class SystemGuideServiceImpl implements SystemGuideService {
      */
     private void saveKeyPair(KeyPair serverPair, KeyPair clientPair) {
         String remarks = "系统设置引导自动生成 RSA 密钥对";
-        configuredService.upsert("crypto.server.public-key", RSAUtils.getPublicKeyBase64(serverPair.getPublic()),
+        configuredService.upsert("crypto.server.public-key", SystemKeyMaterial.publicKeyBase64(serverPair.getPublic()),
                 ConfiguredValueType.TEXT, remarks);
-        configuredService.upsert("crypto.server.private-key", RSAUtils.getPrivateKeyBase64(serverPair.getPrivate()),
+        configuredService.upsert("crypto.server.private-key", SystemKeyMaterial.privateKeyBase64(serverPair.getPrivate()),
                 ConfiguredValueType.TEXT, remarks);
-        configuredService.upsert("crypto.client.public-key", RSAUtils.getPublicKeyBase64(clientPair.getPublic()),
+        configuredService.upsert("crypto.client.public-key", SystemKeyMaterial.publicKeyBase64(clientPair.getPublic()),
                 ConfiguredValueType.TEXT, remarks);
-        configuredService.upsert("crypto.client.private-key", RSAUtils.getPrivateKeyBase64(clientPair.getPrivate()),
+        configuredService.upsert("crypto.client.private-key", SystemKeyMaterial.privateKeyBase64(clientPair.getPrivate()),
                 ConfiguredValueType.TEXT, remarks);
     }
 
@@ -281,7 +281,7 @@ public class SystemGuideServiceImpl implements SystemGuideService {
      */
     private KeyPair generateRsaKeyPair() {
         try {
-            return RSAUtils.generateKeyPair();
+            return SystemKeyMaterial.generateKeyPair();
         } catch (Exception exception) {
             throw new DataSaveException("生成接口加解密密钥失败", exception);
         }

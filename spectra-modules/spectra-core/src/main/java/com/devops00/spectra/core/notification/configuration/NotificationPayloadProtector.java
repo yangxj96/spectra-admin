@@ -18,7 +18,7 @@ package com.devops00.spectra.core.notification.configuration;
 
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EncryptException;
-import com.devops00.spectra.common.utils.AESUtils;
+import com.devops00.spectra.core.notification.security.NotificationPayloadCipher;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -143,7 +143,7 @@ public class NotificationPayloadProtector {
                 throw new DataSaveException(name + "密文格式不正确");
             }
             var keyBytes = decodeKey(encodedKey, name);
-            return AESUtils.decrypt(parts[2], new SecretKeySpec(keyBytes, "AES"), AESUtils.hexToIv(parts[1]));
+            return NotificationPayloadCipher.decrypt(parts[2], new SecretKeySpec(keyBytes, "AES"), NotificationPayloadCipher.hexToIv(parts[1]));
         } catch (DataSaveException | EncryptException exception) {
             throw exception;
         } catch (Exception exception) {
@@ -157,9 +157,9 @@ public class NotificationPayloadProtector {
     private String protect(String plainText, String encodedKey, String name) {
         try {
             var keyBytes = decodeKey(encodedKey, name);
-            var iv = AESUtils.generateIv();
-            var cipherText = AESUtils.encrypt(plainText, new SecretKeySpec(keyBytes, "AES"), iv);
-            return VERSION + ":" + AESUtils.getIvHex(iv) + ":" + cipherText;
+            var iv = NotificationPayloadCipher.generateIv();
+            var cipherText = NotificationPayloadCipher.encrypt(plainText, new SecretKeySpec(keyBytes, "AES"), iv);
+            return VERSION + ":" + NotificationPayloadCipher.getIvHex(iv) + ":" + cipherText;
         } catch (RuntimeException exception) {
             if (exception instanceof DataSaveException || exception instanceof EncryptException) {
                 throw exception;

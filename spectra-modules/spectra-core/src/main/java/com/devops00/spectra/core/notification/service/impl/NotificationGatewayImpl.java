@@ -29,7 +29,7 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationRequestStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
@@ -508,6 +508,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var key = target.recipientUserId() == null
                 ? target.channel().name() + ":" + target.address()
                 : target.recipientUserId().toString();
-        return taskKey(SHA256Utils.hash(key), target.channel().name());
+        return taskKey(NotificationDigest.hash(key), target.channel().name());
     }
 }

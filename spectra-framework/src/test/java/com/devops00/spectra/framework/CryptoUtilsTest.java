@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.framework;
 
-import com.devops00.spectra.common.utils.AESUtils;
-import com.devops00.spectra.common.utils.RSAUtils;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.common.security.crypto.symmetric.AESUtils;
+import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
+import com.devops00.spectra.common.security.crypto.digest.SHA256Utils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import javax.crypto.SecretKey;

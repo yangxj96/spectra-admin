@@ -17,8 +17,8 @@
 package com.devops00.spectra.framework.web.advice.crypto;
 
 import com.devops00.spectra.common.exception.EncryptException;
-import com.devops00.spectra.common.utils.AESUtils;
-import com.devops00.spectra.common.utils.RSAUtils;
+import com.devops00.spectra.common.security.crypto.symmetric.AESUtils;
+import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
 import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import org.junit.jupiter.api.BeforeAll;

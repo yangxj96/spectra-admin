@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;
@@ -162,11 +162,11 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
             var canonicalHeaders = "content-type:application/json; charset=utf-8\n" + "host:" + host + "\n";
             var signedHeaders = "content-type;host";
             var canonicalRequest = "POST\n/\n\n" + canonicalHeaders + "\n" + signedHeaders + "\n"
-                    + SHA256Utils.hash(body);
+                    + NotificationDigest.hash(body);
             var date = UTC_SECOND.format(Instant.ofEpochSecond(timestamp)).substring(0, 10);
             var credentialScope = date + "/" + SERVICE + "/tc3_request";
             var stringToSign = "TC3-HMAC-SHA256\n" + timestamp + "\n" + credentialScope + "\n"
-                    + SHA256Utils.hash(canonicalRequest);
+                    + NotificationDigest.hash(canonicalRequest);
             var secretDate = hmac(("TC3" + configuration.secret()).getBytes(StandardCharsets.UTF_8), date);
             var secretService = hmac(secretDate, SERVICE);
             var secretSigning = hmac(secretService, "tc3_request");

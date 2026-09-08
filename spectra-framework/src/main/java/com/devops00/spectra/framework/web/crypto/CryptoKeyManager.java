@@ -18,7 +18,7 @@ package com.devops00.spectra.framework.web.crypto;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.EncryptException;
-import com.devops00.spectra.common.utils.RSAUtils;
+import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;

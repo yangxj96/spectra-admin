@@ -58,7 +58,7 @@ class NotificationCallerMigrationContractTest {
             assertTrue(source.contains("\"oa:"), caller);
             assertFalse(source.contains("com.devops00.spectra.core.notification"), caller);
         }
-        var support = readSource("application/support/OaApplicationWorkflowSupport.java");
+        var support = readSource("application/workflow/OaApplicationWorkflowSupport.java");
         assertTrue(support.contains("NotificationSendRequest.inApp("));
         assertTrue(support.contains("\"oa:"));
         assertTrue(support.contains("businessReference("));

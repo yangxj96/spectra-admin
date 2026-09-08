@@ -7,7 +7,7 @@
 
 package com.devops00.spectra.framework.web.security;
 
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.common.port.security.SecurityToken;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;

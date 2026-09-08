@@ -17,8 +17,8 @@
 package com.devops00.spectra.core.security.authentication.javabean.entity;
 
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
-import com.devops00.spectra.common.utils.CollUtils;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.collection.CollUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

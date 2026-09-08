@@ -18,11 +18,11 @@ package com.devops00.spectra.core.notification.service;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationRequest;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.core.notification.utils.NotificationMaskingUtils;
+import com.devops00.spectra.core.notification.policy.NotificationAddressMasker;
 import com.github.f4b6a3.uuid.UuidCreator;
 import org.springframework.stereotype.Component;
 
@@ -76,7 +76,7 @@ public class NotificationTaskBatchPlanner {
             task.setNotificationRequestId(requestId);
             task.setReceiverUserId(target.recipientUserId());
             task.setRecipientKeyHash(recipientKeyHash);
-            task.setRecipientMasked(NotificationMaskingUtils.maskAddress(target.address()));
+            task.setRecipientMasked(NotificationAddressMasker.maskAddress(target.address()));
             task.setRecipientCiphertext(target.address() == null ? null : payloadProtector.protectAddress(target.address()));
             task.setChannel(target.channel().name());
             task.setPurpose(request.purpose().name());
@@ -111,7 +111,7 @@ public class NotificationTaskBatchPlanner {
 
     private String recipientKeyHash(UUID recipientUserId, NotificationChannel channel, String address) {
         var key = recipientUserId == null ? channel.name() + ":" + address : recipientUserId.toString();
-        return SHA256Utils.hash(key);
+        return NotificationDigest.hash(key);
     }
 
     private int normalizePriority(Integer priority) {

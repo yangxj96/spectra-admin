@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.framework.security.authentication;
 
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.port.security.SecurityUserLookupPort;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;

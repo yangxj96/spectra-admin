@@ -288,7 +288,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
     }
 
     private String resolveClientIp() {
-        return com.devops00.spectra.common.utils.IpUtils.getClientIP(getHttpServletRequest());
+        return com.devops00.spectra.framework.web.request.IpUtils.getClientIP(getHttpServletRequest());
     }
 
     private @Nullable HttpServletRequest getHttpServletRequest() {

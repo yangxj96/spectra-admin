@@ -26,7 +26,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.SpectraException;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;

@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.common.service.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.common.service.IpLocationService;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;

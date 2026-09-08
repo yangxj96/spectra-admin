@@ -17,7 +17,7 @@
 package com.devops00.spectra.framework.web.filter;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

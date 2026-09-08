@@ -26,7 +26,7 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
-import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
+import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;

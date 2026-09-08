@@ -25,7 +25,7 @@ import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditArchive
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetentionVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
-import com.devops00.spectra.core.security.authentication.util.AuthenticationContextUtils;
+import com.devops00.spectra.core.security.authentication.context.AuthenticationContextUtils;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.core.security.audit.service.SecurityAuditQueryService;
 import com.devops00.spectra.common.audit.Audit;

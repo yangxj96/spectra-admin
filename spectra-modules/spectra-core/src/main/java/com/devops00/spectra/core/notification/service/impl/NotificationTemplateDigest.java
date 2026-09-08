@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.notification.service.impl;
 
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ final class NotificationTemplateDigest {
         payload.put("parameter_schema", canonicalize(template.getParameterSchema()));
         payload.put("provider_template_code", template.getProviderTemplateCode());
         try {
-            return SHA256Utils.hash(canonicalize(payload).toString());
+            return NotificationDigest.hash(canonicalize(payload).toString());
         } catch (Exception exception) {
             throw new DataSaveException("生成通知模板版本摘要失败", exception);
         }

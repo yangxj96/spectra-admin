@@ -24,7 +24,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.RegionLevel;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.system.javabean.converter.RegionConverter;
 import com.devops00.spectra.core.system.javabean.entity.Region;
 import com.devops00.spectra.core.system.javabean.entity.RegionPathRow;

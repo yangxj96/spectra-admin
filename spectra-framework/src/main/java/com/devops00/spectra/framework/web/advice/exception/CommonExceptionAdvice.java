@@ -23,7 +23,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.NotImplementedException;
 import com.devops00.spectra.common.response.R;
-import com.devops00.spectra.common.utils.StrUtils;
+import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.framework.web.advice.crypto.RequestCryptoException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

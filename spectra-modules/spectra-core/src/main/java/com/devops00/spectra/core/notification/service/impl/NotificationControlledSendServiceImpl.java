@@ -31,7 +31,7 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationSendPreviewEntity;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationPreviewStatus;
@@ -49,7 +49,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.core.notification.service.NotificationControlledSendService;
-import com.devops00.spectra.core.notification.utils.NotificationMaskingUtils;
+import com.devops00.spectra.core.notification.policy.NotificationAddressMasker;
 import com.devops00.spectra.core.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
@@ -288,7 +288,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                     eligible++;
                     if (samples.size() < MAX_SAMPLE_COUNT) {
                         samples.add(new NotificationControlledSendSampleVO(channel.name(),
-                                NotificationMaskingUtils.maskAddressOrPlaceholder(channel == NotificationChannel.IN_APP
+                                NotificationAddressMasker.maskAddressOrPlaceholder(channel == NotificationChannel.IN_APP
                                         ? "站内消息"
                                         : recipient.addressFor(channel))));
                     }
@@ -475,7 +475,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
      * 判断条件是否满足（{@code hash}）。
      */
     private String hash(String value) {
-        return SHA256Utils.hash(value);
+        return NotificationDigest.hash(value);
     }
 
     /**

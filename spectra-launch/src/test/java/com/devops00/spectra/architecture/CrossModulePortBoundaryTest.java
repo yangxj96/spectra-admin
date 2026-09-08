@@ -37,7 +37,7 @@ class CrossModulePortBoundaryTest {
         var source = readJavaSources("spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/upload");
 
         assertThat(source).noneMatch(content -> content.contains(
-                "import com.devops00.spectra.core.security.authentication.util.AuthenticationWebUtils;"));
+                "import com.devops00.spectra.core.security.authentication.context.AuthenticationWebUtils;"));
         assertThat(source).noneMatch(content -> content.contains(
                 "import com.devops00.spectra.core.security.audit."));
     }

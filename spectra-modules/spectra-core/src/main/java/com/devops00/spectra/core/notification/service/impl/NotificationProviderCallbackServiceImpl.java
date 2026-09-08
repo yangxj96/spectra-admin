@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationCallbackStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
@@ -241,7 +241,7 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
      * 转换、解析或规范化数据（{@code digest}）。
      */
     private String digest(String body) {
-        return SHA256Utils.hash(body);
+        return NotificationDigest.hash(body);
     }
 
     /**

@@ -24,7 +24,7 @@ import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.utils.IpUtils;
+import com.devops00.spectra.framework.web.request.IpUtils;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

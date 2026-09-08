@@ -18,7 +18,7 @@ package com.devops00.spectra.common.base.javabean.from;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.common.utils.CollUtils;
+import com.devops00.spectra.common.foundation.collection.CollUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

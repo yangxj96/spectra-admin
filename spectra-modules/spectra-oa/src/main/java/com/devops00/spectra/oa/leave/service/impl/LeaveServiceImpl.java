@@ -30,7 +30,7 @@ import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
-import com.devops00.spectra.oa.application.support.OaApplicationWorkflowSupport;
+import com.devops00.spectra.oa.application.workflow.OaApplicationWorkflowSupport;
 import com.devops00.spectra.oa.leave.javabean.converter.LeaveConverter;
 import com.devops00.spectra.oa.leave.javabean.entity.AttendanceRecord;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication;

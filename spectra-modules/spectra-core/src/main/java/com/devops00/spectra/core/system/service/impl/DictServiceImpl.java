@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.utils.TreeBuilder;
+import com.devops00.spectra.common.foundation.tree.TreeBuilder;
 import com.devops00.spectra.core.system.javabean.converter.DictGroupConverter;
 import com.devops00.spectra.core.system.javabean.converter.DictItemConverter;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;

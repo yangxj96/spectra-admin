@@ -20,7 +20,7 @@ import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
-import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
+import com.devops00.spectra.core.security.authentication.application.SecurityUserAssembler;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.core.security.authentication.exception.LoginException;
@@ -53,18 +53,18 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
 
     private final PasswordEncoder passwordEncoder;
 
-    private final SecurityUserHelper securityUserHelper;
+    private final SecurityUserAssembler securityUserAssembler;
 
     public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService,
                                          AuthenticationIdentityService authenticationIdentityService,
                                          PasswordCredentialService passwordCredentialService,
-                                         PasswordEncoder passwordEncoder, SecurityUserHelper securityUserHelper) {
+                                         PasswordEncoder passwordEncoder, SecurityUserAssembler securityUserAssembler) {
         this.kaptchaService = kaptchaService;
         this.userService = userService;
         this.authenticationIdentityService = authenticationIdentityService;
         this.passwordCredentialService = passwordCredentialService;
         this.passwordEncoder = passwordEncoder;
-        this.securityUserHelper = securityUserHelper;
+        this.securityUserAssembler = securityUserAssembler;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
         if (user == null) {
             throw new LoginException("账号或密码错误");
         }
-        var su = securityUserHelper.toSecurityUser(LoginType.PASSWORD, identity, credential, user);
+        var su = securityUserAssembler.toSecurityUser(LoginType.PASSWORD, identity, credential, user);
         return new UsernamePasswordAuthenticationToken(su, null, su.getAuthorities());
     }
 

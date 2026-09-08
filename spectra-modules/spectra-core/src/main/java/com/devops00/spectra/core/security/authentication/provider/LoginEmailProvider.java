@@ -21,13 +21,13 @@ import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
-import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
+import com.devops00.spectra.core.security.authentication.application.SecurityUserAssembler;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.core.security.authentication.exception.LoginException;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.core.security.authentication.strategy.provider.EmailAuthenticationProvider;
-import com.devops00.spectra.common.security.crypto.VerificationCodeDigest;
+import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import org.jspecify.annotations.NullMarked;
@@ -59,7 +59,7 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     private final PasswordCredentialService passwordCredentialService;
 
-    private final SecurityUserHelper securityUserHelper;
+    private final SecurityUserAssembler securityUserAssembler;
 
     private final SecurityProperties securityProperties;
 
@@ -68,13 +68,13 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
                               UserService userService,
                               AuthenticationIdentityService identityService,
                               PasswordCredentialService passwordCredentialService,
-                              SecurityUserHelper securityUserHelper, SecurityProperties securityProperties) {
+                              SecurityUserAssembler securityUserAssembler, SecurityProperties securityProperties) {
         this.verificationCodeStore = verificationCodeStore;
         this.verificationAttemptStore = verificationAttemptStore;
         this.userService = userService;
         this.identityService = identityService;
         this.passwordCredentialService = passwordCredentialService;
-        this.securityUserHelper = securityUserHelper;
+        this.securityUserAssembler = securityUserAssembler;
         this.securityProperties = securityProperties;
     }
 
@@ -89,7 +89,7 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
         if (user == null || credential == null) {
             throw new LoginException("账号或验证码错误");
         }
-        var su = securityUserHelper.toSecurityUser(LoginType.EMAIL, identity, credential, user);
+        var su = securityUserAssembler.toSecurityUser(LoginType.EMAIL, identity, credential, user);
         return new UsernamePasswordAuthenticationToken(su, null, su.getAuthorities());
     }
 
