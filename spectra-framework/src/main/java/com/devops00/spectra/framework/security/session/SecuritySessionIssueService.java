@@ -19,13 +19,13 @@ package com.devops00.spectra.framework.security.session;
 import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.security.SecurityToken;
-import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import com.devops00.spectra.framework.security.redis.value.SecurityRedisValueParser;
 import com.devops00.spectra.framework.security.session.lifecycle.SecuritySessionIssuer;
+import com.devops00.spectra.framework.security.session.concurrency.SessionConcurrencyStrategyResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -64,10 +64,14 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
 
     private final SecuritySessionRevocationService revocationService;
 
+    private final SessionConcurrencyStrategyResolver concurrencyStrategyResolver;
+
     public SecuritySessionIssueService(SecuritySessionStore store,
-                                       SecuritySessionRevocationService revocationService) {
+                                       SecuritySessionRevocationService revocationService,
+                                       SessionConcurrencyStrategyResolver concurrencyStrategyResolver) {
         this.store = store;
         this.revocationService = revocationService;
+        this.concurrencyStrategyResolver = concurrencyStrategyResolver;
     }
 
     /**
@@ -104,23 +108,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         String clientCode = clientType.getName();
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
         SessionPolicy policy = store.sessionPolicy(clientCode);
-        Set<Object> activeTokens = activeTokenDigests(userId);
-        if (policy.concurrencyMode() == SessionConcurrencyMode.KICK_OLD) {
-            for (Object activeToken : activeTokens) {
-                String activeDigest = SecurityRedisValueParser.requiredText(activeToken,
-                        "UserTokens.accessDigest");
-                Map<Object, Object> activeSession = store.hash("读取活动安全会话",
-                        SecurityRedisKey.SESSION.format(activeDigest));
-                if (!activeSession.isEmpty()
-                        && clientCode.equals(SecurityRedisValueParser.requiredText(activeSession.get("clientType"),
-                                "Session.clientType"))) {
-                    revocationService.deleteAccessDigest(activeDigest);
-                }
-            }
-        } else if (policy.concurrencyMode() == SessionConcurrencyMode.REJECT_NEW
-                && activeTokens.size() >= policy.maxSessions()) {
-            throw new IllegalStateException("已达到该账号的最大并发会话数");
-        }
+        Set<String> activeTokens = activeTokenDigests(userId);
+        concurrencyStrategyResolver.resolve(policy.concurrencyMode())
+                .enforce(policy, clientCode, activeTokens, revocationService::deleteAccessDigest);
 
         Duration accessTtl = Duration.ofSeconds(policy.accessTtlSeconds());
         Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
@@ -221,9 +211,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         }
     }
 
-    private Set<Object> activeTokenDigests(String userId) {
+    private Set<String> activeTokenDigests(String userId) {
         Set<Object> tokens = store.members("读取用户会话索引", SecurityRedisKey.USER_TOKENS.format(userId));
-        Set<Object> active = new java.util.LinkedHashSet<>();
+        Set<String> active = new java.util.LinkedHashSet<>();
         for (Object token : tokens) {
             String digest = SecurityRedisValueParser.requiredText(token, "UserTokens.accessDigest");
             if (store.hasKey("检查活动安全会话", SecurityRedisKey.SESSION.format(digest))) {

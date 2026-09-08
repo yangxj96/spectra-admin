@@ -21,6 +21,10 @@ import com.devops00.spectra.framework.security.converter.UserOnlineConverter;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
+import com.devops00.spectra.framework.security.session.concurrency.AllowSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.KickOldSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.RejectNewSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.SessionConcurrencyStrategyResolver;
 import com.devops00.spectra.common.port.security.SecurityUserLoader;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -30,6 +34,7 @@ import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,7 +70,7 @@ class SecuritySessionMalformedDataTest {
 
         var store = new SecuritySessionStore(redis, new SecurityProperties(), mock(ObjectProvider.class));
         var repository = new SecuritySessionRefreshService(store,
-                new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store)),
+                new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store), resolver(store)),
                 new SecuritySessionRevocationService(store), mock(SecurityUserLoader.class));
 
         assertThrows(SecurityRedisUnavailableException.class,
@@ -97,5 +102,12 @@ class SecuritySessionMalformedDataTest {
                 mock(UserOnlineConverter.class));
 
         assertThrows(SecurityRedisUnavailableException.class, repository::listOnlineUsers);
+    }
+
+    private static SessionConcurrencyStrategyResolver resolver(SecuritySessionStore store) {
+        return new SessionConcurrencyStrategyResolver(List.of(
+                new AllowSessionConcurrencyStrategy(),
+                new KickOldSessionConcurrencyStrategy(store),
+                new RejectNewSessionConcurrencyStrategy()));
     }
 }

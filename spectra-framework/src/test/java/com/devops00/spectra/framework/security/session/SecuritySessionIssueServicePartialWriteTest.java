@@ -20,6 +20,10 @@ import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
+import com.devops00.spectra.framework.security.session.concurrency.AllowSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.KickOldSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.RejectNewSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.SessionConcurrencyStrategyResolver;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
@@ -67,7 +71,11 @@ class SecuritySessionIssueServicePartialWriteTest {
         when(policies.getIfAvailable()).thenReturn(policyProvider);
         var store = new SecuritySessionStore(redis, new com.devops00.spectra.framework.security.properties.SecurityProperties(),
                 policies);
-        var issuer = new SecuritySessionIssueService(store, mock(SecuritySessionRevocationService.class));
+        var issuer = new SecuritySessionIssueService(store, mock(SecuritySessionRevocationService.class),
+                new SessionConcurrencyStrategyResolver(List.of(
+                        new AllowSessionConcurrencyStrategy(),
+                        new KickOldSessionConcurrencyStrategy(store),
+                        new RejectNewSessionConcurrencyStrategy())));
         SecurityPrincipal user = mock(SecurityPrincipal.class);
         UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
         when(user.getId()).thenReturn(userId);

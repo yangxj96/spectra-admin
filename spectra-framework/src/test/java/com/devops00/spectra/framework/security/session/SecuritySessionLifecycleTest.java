@@ -20,6 +20,10 @@ import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
+import com.devops00.spectra.framework.security.session.concurrency.AllowSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.KickOldSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.RejectNewSessionConcurrencyStrategy;
+import com.devops00.spectra.framework.security.session.concurrency.SessionConcurrencyStrategyResolver;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import org.junit.jupiter.api.Test;
@@ -71,7 +75,7 @@ class SecuritySessionLifecycleTest {
         when(policyProvider.find("web")).thenReturn(SessionPolicy.defaults(900, 86400));
 
         var store = new SecuritySessionStore(redis, new SecurityProperties(), provider(policyProvider));
-        var repository = new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store));
+        var repository = new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store), resolver(store));
 
         repository.createToken(user, com.devops00.spectra.common.constant.ClientType.WEB);
 
@@ -218,5 +222,12 @@ class SecuritySessionLifecycleTest {
         ObjectProvider<SecuritySessionPolicyProvider> provider = mock();
         when(provider.getIfAvailable()).thenReturn(policyProvider);
         return provider;
+    }
+
+    private static SessionConcurrencyStrategyResolver resolver(SecuritySessionStore store) {
+        return new SessionConcurrencyStrategyResolver(List.of(
+                new AllowSessionConcurrencyStrategy(),
+                new KickOldSessionConcurrencyStrategy(store),
+                new RejectNewSessionConcurrencyStrategy()));
     }
 }
