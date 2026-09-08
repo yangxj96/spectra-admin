@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.foundation.collection.CollUtils;
@@ -28,7 +27,6 @@ import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
-import com.devops00.spectra.framework.assembler.NameLookup;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cache.annotation.CacheConfig;
@@ -44,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 组织机构业务层-实现
@@ -56,7 +53,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "core:dept", keyGenerator = "standardCacheKeyGenerator")
-public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<UUID> {
+public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Department> implements DepartmentService {
 
     private final OrganizationConverter organizationConverter;
 
@@ -65,15 +62,6 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
     public DepartmentServiceImpl(OrganizationConverter organizationConverter, NameFillExecutor nameFillExecutor) {
         this.organizationConverter = organizationConverter;
         this.nameFillExecutor = nameFillExecutor;
-    }
-
-    @Override
-    @Cacheable
-    public Map<UUID, String> getNameMap(Set<UUID> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return lambdaQuery().in(BaseEntity::getId, ids).list().stream().collect(Collectors.toMap(BaseEntity::getId, Department::getPath));
     }
 
     @Override

@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.user.javabean.vo;
 
 import com.devops00.spectra.core.security.authorization.domain.UserAuthorizationStatus;
-import com.devops00.spectra.core.system.service.impl.DepartmentServiceImpl;
+import com.devops00.spectra.core.system.lookup.DepartmentNameLookup;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.framework.assembler.NameFill;
 import lombok.AllArgsConstructor;
@@ -113,7 +113,7 @@ public class UserPageVO implements Serializable {
     /**
      * 组织机构名称
      */
-    @NameFill(lookup = DepartmentServiceImpl.class, sourceField = "departmentId")
+    @NameFill(lookup = DepartmentNameLookup.class, sourceField = "departmentId")
     private String departmentName;
 
     /**

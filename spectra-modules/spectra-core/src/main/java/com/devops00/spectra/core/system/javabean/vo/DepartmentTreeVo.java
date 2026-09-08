@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.system.javabean.vo;
 
 import com.devops00.spectra.common.base.javabean.vo.Tree;
-import com.devops00.spectra.core.system.service.impl.RegionServiceImpl;
+import com.devops00.spectra.core.system.lookup.RegionNameLookup;
 import com.devops00.spectra.framework.assembler.NameFill;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -76,7 +76,7 @@ public class DepartmentTreeVo implements Tree<DepartmentTreeVo>, Serializable {
     /**
      * 行政区划名称
      */
-    @NameFill(lookup = RegionServiceImpl.class, sourceField = "regionId")
+    @NameFill(lookup = RegionNameLookup.class, sourceField = "regionId")
     private String regionName;
 
     /**

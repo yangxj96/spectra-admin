@@ -17,7 +17,6 @@
 package com.devops00.spectra.framework.assembler;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -25,9 +24,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * NameFill 注解契约和执行器局部状态测试。
@@ -42,51 +38,111 @@ class NameFillExecutorTest {
     void executorMustBatchLookupAndFillOnlyTheAnnotatedDisplayField() throws IllegalAccessException {
         UUID firstId = UUID.randomUUID();
         UUID secondId = UUID.randomUUID();
-        var lookup = mock(FixtureLookup.class);
-        var context = mock(ApplicationContext.class);
-        when(context.getBean(FixtureLookup.class)).thenReturn(lookup);
-        when(lookup.idType()).thenReturn(UUID.class);
-        when(lookup.getNameMap(Set.of(firstId, secondId)))
-                .thenReturn(Map.of(firstId, "部门一", secondId, "部门二"));
+        var lookup = new FixtureLookup(Map.of(firstId, "部门一", secondId, "部门二"));
 
         var first = new FixtureView(firstId);
         var second = new FixtureView(secondId);
-        new NameFillExecutor(context).fill(List.of(first, second));
+        var duplicate = new FixtureView(firstId);
+        new NameFillExecutor(new NameLookupRegistry(List.of(lookup))).fill(List.of(first, second, duplicate));
 
         assertThat(first.name).isEqualTo("部门一");
         assertThat(second.name).isEqualTo("部门二");
-        verify(lookup).getNameMap(Set.of(firstId, secondId));
+        assertThat(duplicate.name).isEqualTo("部门一");
+        assertThat(lookup.calls).isEqualTo(1);
+        assertThat(lookup.queriedIds).containsExactlyInAnyOrder(firstId, secondId);
     }
 
     @Test
     void executorMustIgnoreNullAndWronglyTypedSourceValues() throws IllegalAccessException {
-        var lookup = mock(FixtureLookup.class);
-        var context = mock(ApplicationContext.class);
-        when(context.getBean(FixtureLookup.class)).thenReturn(lookup);
-        when(lookup.idType()).thenReturn(UUID.class);
+        var lookup = new FixtureLookup(Map.of());
 
         var view = new FixtureView(null);
-        new NameFillExecutor(context).fill(List.of(view));
+        var wrongTypeView = new FixtureView("not-a-uuid");
+        new NameFillExecutor(new NameLookupRegistry(List.of(lookup))).fill(List.of(view, wrongTypeView));
 
         assertThat(view.name).isNull();
+        assertThat(wrongTypeView.name).isNull();
+        assertThat(lookup.calls).isZero();
+    }
+
+    @Test
+    void executorMustReturnWithoutLookupForEmptyInput() throws IllegalAccessException {
+        var lookup = new FixtureLookup(Map.of());
+
+        new NameFillExecutor(new NameLookupRegistry(List.of(lookup))).fill(List.of());
+
+        assertThat(lookup.calls).isZero();
+    }
+
+    @Test
+    void executorMustConvertStringKeysBackToUuidKeysBeforeFilling() throws IllegalAccessException {
+        UUID departmentId = UUID.randomUUID();
+        var lookup = new StringKeyFixtureLookup(departmentId, "部门一");
+        var view = new StringKeyFixtureView(departmentId);
+
+        new NameFillExecutor(new NameLookupRegistry(List.of(lookup))).fill(List.of(view));
+
+        assertThat(view.name).isEqualTo("部门一");
+        assertThat(lookup.calls).isEqualTo(1);
     }
 
     static final class FixtureLookup implements NameLookup<UUID> {
 
+        private final Map<UUID, String> names;
+        private Set<UUID> queriedIds = Set.of();
+        private int calls;
+
+        FixtureLookup(Map<UUID, String> names) {
+            this.names = names;
+        }
+
         @Override
         public Map<UUID, String> getNameMap(Set<UUID> ids) {
-            return Map.of();
+            calls++;
+            queriedIds = Set.copyOf(ids);
+            return names;
         }
     }
 
-    private static final class FixtureView {
+    static final class StringKeyFixtureLookup implements NameLookup<UUID> {
 
         private final UUID departmentId;
+        private final String name;
+        private int calls;
+
+        StringKeyFixtureLookup(UUID departmentId, String name) {
+            this.departmentId = departmentId;
+            this.name = name;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public Map<UUID, String> getNameMap(Set<UUID> ids) {
+            calls++;
+            return (Map<UUID, String>) (Map<?, ?>) Map.of(departmentId.toString(), name);
+        }
+    }
+
+    static final class FixtureView {
+
+        private final Object departmentId;
 
         @NameFill(lookup = FixtureLookup.class, sourceField = "departmentId")
         private String name;
 
-        private FixtureView(UUID departmentId) {
+        FixtureView(Object departmentId) {
+            this.departmentId = departmentId;
+        }
+    }
+
+    static final class StringKeyFixtureView {
+
+        private final UUID departmentId;
+
+        @NameFill(lookup = StringKeyFixtureLookup.class, sourceField = "departmentId")
+        private String name;
+
+        StringKeyFixtureView(UUID departmentId) {
             this.departmentId = departmentId;
         }
     }

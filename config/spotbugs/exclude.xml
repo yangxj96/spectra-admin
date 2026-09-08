@@ -222,6 +222,15 @@
         <Class name="com.devops00.spectra.core.system.service.impl.OperationLogServiceImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
+    <!-- MyBatis Mapper is a Spring-managed collaborator retained by the name lookup adapters. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.system.lookup.DepartmentNameLookup"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.lookup.RegionNameLookup"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
     <Match>
         <Class name="com.devops00.spectra.core.system.service.scheduler.ServiceMonitorDiagnosticCleanupHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>

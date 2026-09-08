@@ -18,7 +18,6 @@ package com.devops00.spectra.framework.assembler;
 
 import com.devops00.spectra.framework.assembler.converter.IdConverter;
 import org.jspecify.annotations.NonNull;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -62,20 +61,22 @@ import java.util.Set;
 @Component
 public class NameFillExecutor {
 
-    /**
-     * Spring 上下文，用于按类型获取 NameLookup 实现
-     */
-    private final ApplicationContext applicationContext;
+    private final NameLookupRegistry lookupRegistry;
 
-    public NameFillExecutor(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    /**
+     * 创建名称填充执行器。
+     *
+     * @param lookupRegistry 按 Lookup 实现类型解析名称查询 Bean 的注册表
+     */
+    public NameFillExecutor(NameLookupRegistry lookupRegistry) {
+        this.lookupRegistry = lookupRegistry;
     }
 
     /**
      * 对 VO 列表执行 NameFill 注解填充
      *
-     * @param list 需要填充的lies
-     * @param <T>  ID类型
+     * @param list 需要根据其中 ID 字段批量补充展示名称的 VO 列表；null 或空列表不会触发查询
+     * @param <T>  VO 类型
      * @throws IllegalAccessException 无法访问需要填充的实体字段时抛出。
      */
     public <T> void fill(List<T> list) throws IllegalAccessException {
@@ -100,8 +101,8 @@ public class NameFillExecutor {
             targetField.setAccessible(true);
             sourceField.setAccessible(true);
 
-            // 获取 Lookup Bean
-            NameLookup<?> lookup = applicationContext.getBean(fillName.lookup());
+            // 按注解声明的实现类型取得 Lookup Bean
+            NameLookup<?> lookup = lookupRegistry.require(fillName.lookup());
 
             Class<?> idType = lookup.idType();
 
@@ -143,9 +144,9 @@ public class NameFillExecutor {
      * 统一 Map key 类型：
      * 如果缓存导致 key 变成 String，则转回 ID 类型
      *
-     * @param rawMap 行map
-     * @param lookup lookup
-     * @return 返回已将缓存或远程查询得到的字符串键转换回 ID 类型的名称映射；输入映射为空时按调用约定不进入此方法，正常处理不返回 null。
+     * @param rawMap Lookup 返回的名称映射；key 可能是 ID 类型或缓存序列化后的 String
+     * @param lookup 提供目标 ID 类型转换器的名称查询 Bean
+     * @return 已将 String key 转换回 ID 类型的名称映射；原映射使用 ID key 时直接返回原映射
      */
     @SuppressWarnings("unchecked")
     private Map<Object, String> normalizeKeyType(Map<Object, String> rawMap, NameLookup<?> lookup) {
@@ -175,8 +176,10 @@ public class NameFillExecutor {
     /**
      * 获取字段
      *
-     * @param clazz     clz
-     * @param fieldName 字段名称
+     * @param clazz     需要读取源字段的 VO 类型
+     * @param fieldName 注解声明的源 ID 字段名称
+     * @return VO 类型中声明的源字段
+     * @throws IllegalStateException 当 VO 中不存在指定源字段时抛出
      */
     private @NonNull Field getField(@NonNull Class<?> clazz, String fieldName) {
         try {
@@ -189,8 +192,10 @@ public class NameFillExecutor {
     /**
      * 读取字段值
      *
-     * @param field  需要读取值的源字段反射对象。
-     * @param target 当前正在组装、且包含源字段值的对象实例。
+     * @param field  需要读取值的源字段反射对象
+     * @param target 当前正在组装、且包含源字段值的 VO 实例
+     * @return 源字段当前保存的 ID 值；字段值为 null 时返回 null
+     * @throws IllegalStateException 当字段无法访问时抛出
      */
     private Object getValue(@NonNull Field field, Object target) {
         try {

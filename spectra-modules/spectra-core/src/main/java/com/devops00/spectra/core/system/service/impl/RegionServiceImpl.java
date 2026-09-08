@@ -18,7 +18,6 @@ package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.RegionLevel;
@@ -34,16 +33,11 @@ import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import com.devops00.spectra.core.system.mapper.RegionMapper;
 import com.devops00.spectra.core.system.service.RegionService;
-import com.devops00.spectra.framework.assembler.NameLookup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 行政区域实现Service
@@ -54,7 +48,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService, NameLookup<UUID> {
+public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService {
 
     private static final int MAX_PATH_DEPTH = 64;
 
@@ -63,14 +57,6 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
     public RegionServiceImpl(RegionMapper mapper, RegionConverter converter) {
         this.baseMapper = mapper;
         this.converter = converter;
-    }
-
-    @Override
-    public Map<UUID, String> getNameMap(Set<UUID> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return lambdaQuery().in(BaseEntity::getId, ids).list().stream().collect(Collectors.toMap(BaseEntity::getId, Region::getFullName));
     }
 
     @Override
