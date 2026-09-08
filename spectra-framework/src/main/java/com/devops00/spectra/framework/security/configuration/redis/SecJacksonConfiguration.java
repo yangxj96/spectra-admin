@@ -17,16 +17,12 @@
 package com.devops00.spectra.framework.security.configuration.redis;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SystemProperties;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.jackson.SecurityJacksonModules;
-import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Security配置Jackson
@@ -39,24 +35,15 @@ import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 @Configuration
 public class SecJacksonConfiguration {
 
-    @Resource
-    private SystemProperties spectraSystemProperties;
-
     /**
-     * 处理内部业务逻辑（{@code redisObjectMapper}）。
+     * 创建只处理字符串、数字和 Map/Collection 基础值的安全 Redis mapper。
      */
     @Bean("securityObjectMapper")
-    public ObjectMapper redisObjectMapper(ObjectMapper om) {
+    public ObjectMapper redisObjectMapper() {
         log.debug(LogPrefix.SECURITY.f("开始配置Security使用的ObjectMapper"));
-        return om.rebuild()
-                .addModules(SecurityJacksonModules.getModules(getClass().getClassLoader(),
-                        BasicPolymorphicTypeValidator.builder()
-                                .allowIfSubType(spectraSystemProperties.getPackagePrefix())
-                                .allowIfSubType("java.util")))
-                .activateDefaultTyping(BasicPolymorphicTypeValidator.builder()
-                        .allowIfSubType(spectraSystemProperties.getPackagePrefix())
-                        .allowIfSubType("java.util")
-                        .build(), DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
+        return JsonMapper.builder()
+                .configureForJackson2()
+                .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
     }
 }

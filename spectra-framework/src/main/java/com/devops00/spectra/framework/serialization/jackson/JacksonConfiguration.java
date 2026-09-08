@@ -33,11 +33,11 @@ import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
 import tools.jackson.databind.ext.javatime.ser.LocalTimeSerializer;
 import tools.jackson.databind.module.SimpleModule;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.ZoneOffset;
 import java.util.TimeZone;
 
 /**
@@ -88,11 +88,9 @@ public class JacksonConfiguration {
             javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(localDateFormat)));
             javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(localTimeFormat)));
 
-            // 旧时间的序列化
-            // 理论上是非线程安全的,如果用不到传统time类,可以注释掉
+            // 旧时间的序列化：使用 Java Time formatter，避免共享 SimpleDateFormat 的可变状态。
             log.debug(LogPrefix.SERIALIZATION.f("传统time进行处理"));
-            var sdf = new SimpleDateFormat(localDateTimeFormat);
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            var dateFormat = new ThreadSafeDateFormat(localDateTimeFormat, ZoneOffset.UTC);
 
             log.debug(LogPrefix.SERIALIZATION.f("NON_NULL,SNAKE_CASE,MixIn"));
             // 构建详情
@@ -103,7 +101,7 @@ public class JacksonConfiguration {
             // .configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, false)
 
             builder.propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-            builder.defaultDateFormat(sdf);
+            builder.defaultDateFormat(dateFormat);
             builder.addModule(javaTimeModule);
             builder.defaultTimeZone(TimeZone.getTimeZone("UTC"));
             builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

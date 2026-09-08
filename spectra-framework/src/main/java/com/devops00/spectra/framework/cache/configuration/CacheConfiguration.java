@@ -17,9 +17,7 @@
 package com.devops00.spectra.framework.cache.configuration;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SystemProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.RequiredArgsConstructor;
+import com.devops00.spectra.framework.cache.serialization.CacheValueRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.EnableCaching;
@@ -28,13 +26,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Duration;
 
@@ -48,10 +44,7 @@ import java.time.Duration;
 @Slf4j
 @EnableCaching
 @Configuration
-@RequiredArgsConstructor
 public class CacheConfiguration {
-
-    private final SystemProperties systemProperties;
 
     /**
      * 缓存管理器
@@ -60,7 +53,7 @@ public class CacheConfiguration {
     public RedisCacheManager redisCacheManager(@Qualifier("redisObjectMapper") ObjectMapper om, RedisConnectionFactory factory) {
         log.debug(LogPrefix.CACHE.f("配置RedisCacheManager"));
         // value 序列化
-        var valueSerializer = new JacksonJsonRedisSerializer<>(om, Object.class);
+        var valueSerializer = new CacheValueRedisSerializer(om);
 
         // key 序列化（String）
         var keyPair = RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer());
@@ -81,23 +74,11 @@ public class CacheConfiguration {
      * 定义一个redis专用的ObjectMapper
      */
     @Bean("redisObjectMapper")
-    public ObjectMapper redisObjectMapper(ObjectMapper om) {
+    public ObjectMapper redisObjectMapper() {
         log.debug(LogPrefix.SERIALIZATION.f("开始配置缓存使用的ObjectMapper"));
-
-        var ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(systemProperties.getPackagePrefix())
-                .allowIfSubType("java.util")
-                .allowIfSubType("java.time")
-                .allowIfSubType("java.lang")
-                .build();
-
-        return om.rebuild()
-                // 替代 serializationInclusion
-                .changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.ALWAYS))
-                // 防止缓存结构变化炸掉
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                // 替代 activateDefaultTyping
-                .activateDefaultTypingAsProperty(ptv, DefaultTyping.NON_FINAL_AND_RECORDS, "@class")
+        return JsonMapper.builder()
+                .configureForJackson2()
+                .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
     }
 }
