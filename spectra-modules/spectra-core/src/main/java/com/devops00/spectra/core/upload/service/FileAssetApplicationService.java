@@ -14,7 +14,6 @@ import com.devops00.spectra.common.port.file.FileAssetSnapshot;
 import com.devops00.spectra.common.port.file.FileDownload;
 import com.devops00.spectra.core.upload.api.FileErrorCode;
 import com.devops00.spectra.core.upload.api.FileUploadException;
-import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
 import com.devops00.spectra.core.upload.javabean.constant.FileAssetStatus;
 import com.devops00.spectra.core.upload.javabean.entity.FileAsset;
@@ -26,6 +25,7 @@ import com.devops00.spectra.core.upload.mapper.FileReferenceMapper;
 import com.devops00.spectra.core.upload.mapper.FileTypeMapper;
 import com.devops00.spectra.core.upload.configure.FileStorageProviderRegistry;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
+import com.devops00.spectra.core.upload.security.FileReferencePermissionResolver;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
 import com.devops00.spectra.core.upload.storage.StorageObject;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,7 +46,7 @@ public class FileAssetApplicationService implements FileAssetPort {
     private final FileStorageProviderRegistry providerRegistry;
     private final FileUploadProperties uploadProperties;
     private final SecurityContextAccessor securityContextAccessor;
-    private final List<FileReferencePermissionChecker> permissionCheckers;
+    private final FileReferencePermissionResolver permissionResolver;
     private final FileUploadConverter fileUploadConverter;
 
     @Override
@@ -150,12 +149,8 @@ public class FileAssetApplicationService implements FileAssetPort {
             if (reference == null) {
                 throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, "business reference does not point to asset");
             }
-            for (FileReferencePermissionChecker checker : permissionCheckers) {
-                if (checker.supports(context.referenceType()) && checker.canRead(context.referenceType(), context.referenceId(), context.userId())) {
-                    return;
-                }
-            }
-            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, "business reference access denied");
+            permissionResolver.requireReadable(context.referenceType(), context.referenceId(), context.userId());
+            return;
         }
         if (asset.getCreatedBy() != null
                 && asset.getCreatedBy().equals(context.userId())

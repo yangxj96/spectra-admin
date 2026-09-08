@@ -7,19 +7,16 @@ package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.common.port.file.FileReferenceCommand;
 import com.devops00.spectra.common.port.file.FileReferenceKey;
-import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.common.port.file.FileReferenceView;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.core.upload.api.FileErrorCode;
-import com.devops00.spectra.core.upload.api.FileUploadException;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
 import com.devops00.spectra.core.upload.mapper.FileReferenceMapper;
+import com.devops00.spectra.core.upload.security.FileReferencePermissionResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,7 +26,7 @@ public class FileReferenceApplicationService implements FileReferenceService {
     private final FileReferenceMapper referenceMapper;
     private final FileAssetApplicationService assetService;
     private final SecurityContextAccessor securityContextAccessor;
-    private final List<FileReferencePermissionChecker> permissionCheckers;
+    private final FileReferencePermissionResolver permissionResolver;
 
     @Override
     @Transactional
@@ -80,11 +77,6 @@ public class FileReferenceApplicationService implements FileReferenceService {
 
     private void requireBusinessPermission(String referenceType, UUID referenceId) {
         UUID userId = securityContextAccessor.currentUserId();
-        if (userId == null
-                || permissionCheckers.stream()
-                        .noneMatch(checker -> checker.supports(referenceType)
-                                && checker.canRead(referenceType, referenceId, userId))) {
-            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, "业务引用无权访问");
-        }
+        permissionResolver.requireReadable(referenceType, referenceId, userId);
     }
 }
