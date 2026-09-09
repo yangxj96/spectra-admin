@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.service;
 
-import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.framework.persistence.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import org.jspecify.annotations.Nullable;

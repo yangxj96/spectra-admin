@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.vo;
 
-import com.devops00.spectra.common.constant.RegionLevel;
+import com.devops00.spectra.core.system.javabean.enums.RegionLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

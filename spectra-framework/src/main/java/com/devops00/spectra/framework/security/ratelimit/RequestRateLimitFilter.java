@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.framework.security.ratelimit;
 
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;

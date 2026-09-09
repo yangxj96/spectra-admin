@@ -17,9 +17,9 @@
 package com.devops00.spectra.core.system.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.common.constant.ConfiguredValueType;
+import com.devops00.spectra.framework.persistence.base.BaseService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;

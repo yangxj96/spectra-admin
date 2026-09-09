@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.system.javabean.from;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.constant.RegionLevel;
+import com.devops00.spectra.core.system.javabean.enums.RegionLevel;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;

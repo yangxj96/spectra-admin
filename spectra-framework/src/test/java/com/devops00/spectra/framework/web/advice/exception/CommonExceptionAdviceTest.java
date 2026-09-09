@@ -18,7 +18,7 @@ package com.devops00.spectra.framework.web.advice.exception;
 
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.DataExistException;
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpInputMessage;

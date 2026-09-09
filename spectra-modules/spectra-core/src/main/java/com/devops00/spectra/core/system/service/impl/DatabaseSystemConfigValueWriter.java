@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
-import com.devops00.spectra.common.config.SystemConfigValueWriter;
-import com.devops00.spectra.common.constant.ConfiguredValueType;
+import com.devops00.spectra.core.system.port.SystemConfigValueWriter;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -17,8 +17,8 @@
 package com.devops00.spectra.oa.meeting.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.base.BaseService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;

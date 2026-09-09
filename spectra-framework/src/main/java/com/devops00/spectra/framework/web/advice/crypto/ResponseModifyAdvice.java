@@ -17,7 +17,7 @@
 package com.devops00.spectra.framework.web.advice.crypto;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

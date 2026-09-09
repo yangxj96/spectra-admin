@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.notification.controller;
 
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.javabean.from.NotificationAdminQueryFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationOverviewFrom;

@@ -14,17 +14,19 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.base;
+package com.devops00.spectra.framework.persistence.base;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * RESTFul 接口公用service层
+ * 通用持久化 Service 的默认实现。
  *
- * @param <M> 子类对应的mapper
- * @param <O> 子类对应的实体
+ * <p>通过 MyBatis-Plus Mapper 委托基础 CRUD；业务实现类只需指定 Mapper 和实体类型并补充领域操作。</p>
+ *
+ * @param <M> 该 Service 使用的 MyBatis-Plus Mapper 类型
+ * @param <O> 该 Service 管理的持久化实体类型；必须是 {@link BaseEntity} 的子类型
  * @author yangxj96
  * @version 1.0
  * @since 2025-6-14 00:00

@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.audit.controller;
 
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveOrchestrator;
 import com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveWorker;
 import com.devops00.spectra.core.security.audit.javabean.converter.SecurityAuditArchiveConverter;

@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
-import com.devops00.spectra.common.constant.ConfiguredValueType;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.system.security.SystemKeyMaterial;
 import com.devops00.spectra.core.system.javabean.vo.CryptoClientKeyVO;

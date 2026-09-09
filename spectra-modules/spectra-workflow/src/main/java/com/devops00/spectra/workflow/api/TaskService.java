@@ -8,7 +8,7 @@
 package com.devops00.spectra.workflow.api;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 
 /** 工作流待办任务公共调用端口。 */

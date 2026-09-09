@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
-import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.SysConfig;
 import com.devops00.spectra.core.system.mapper.SysConfigMapper;
 import com.devops00.spectra.core.system.service.SysConfigService;

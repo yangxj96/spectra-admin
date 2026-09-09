@@ -18,7 +18,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.entity.AuthorizationProfile;

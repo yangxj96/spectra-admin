@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.upload.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.common.mybatis.PgJsonbNodeTypeHandler;
+import com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler;
 import com.devops00.spectra.core.upload.javabean.entity.FileType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

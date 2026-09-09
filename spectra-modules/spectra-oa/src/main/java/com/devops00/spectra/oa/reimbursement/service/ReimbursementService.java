@@ -17,8 +17,8 @@
 package com.devops00.spectra.oa.reimbursement.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.base.BaseService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPageFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPaymentFrom;

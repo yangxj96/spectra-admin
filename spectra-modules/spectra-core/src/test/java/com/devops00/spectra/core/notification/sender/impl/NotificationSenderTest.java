@@ -19,7 +19,7 @@ package com.devops00.spectra.core.notification.sender.impl;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
+import com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationInboxEntity;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;

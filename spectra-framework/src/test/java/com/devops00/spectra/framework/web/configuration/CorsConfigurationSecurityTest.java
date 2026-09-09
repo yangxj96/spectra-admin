@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.framework.web.configuration;
 
-import com.devops00.spectra.common.properties.SystemProperties;
+import com.devops00.spectra.framework.properties.SystemProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

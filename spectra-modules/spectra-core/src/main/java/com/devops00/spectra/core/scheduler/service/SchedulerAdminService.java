@@ -37,7 +37,7 @@ public interface SchedulerAdminService {
      * @param from 任务键、任务类型、定义状态和期望运行状态等调度任务筛选条件。
      * @return 返回按分页条件查询的调度任务分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
-    IPage<SchedulerJobVO> jobs(com.devops00.spectra.common.base.javabean.from.PageFrom page,
+    IPage<SchedulerJobVO> jobs(com.devops00.spectra.framework.persistence.pagination.PageFrom page,
                                SchedulerJobPageFrom from);
 
     /**
@@ -100,7 +100,7 @@ public interface SchedulerAdminService {
      * @param from 任务 ID、执行状态和触发键等执行记录筛选条件。
      * @return 返回按分页条件查询的调度执行记录分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
-    IPage<SchedulerExecutionVO> executions(com.devops00.spectra.common.base.javabean.from.PageFrom page,
+    IPage<SchedulerExecutionVO> executions(com.devops00.spectra.framework.persistence.pagination.PageFrom page,
                                            SchedulerExecutionPageFrom from);
 
     /**
@@ -145,7 +145,7 @@ public interface SchedulerAdminService {
      * @param from 任务 ID、实例 ID 和运行状态等循环运行记录筛选条件。
      * @return 返回按分页条件查询的调度执行循环状态分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
-    IPage<SchedulerLoopRuntimeVO> loops(com.devops00.spectra.common.base.javabean.from.PageFrom page,
+    IPage<SchedulerLoopRuntimeVO> loops(com.devops00.spectra.framework.persistence.pagination.PageFrom page,
                                         SchedulerLoopPageFrom from);
 
     /**
@@ -165,7 +165,7 @@ public interface SchedulerAdminService {
      * @return 返回该任务的控制命令分页，包含命令类型、目标和状态；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
     IPage<SchedulerControlCommandVO> commands(UUID jobId,
-                                              com.devops00.spectra.common.base.javabean.from.PageFrom page);
+                                              com.devops00.spectra.framework.persistence.pagination.PageFrom page);
 
     /**
      * 查询调度运维操作记录。
@@ -175,7 +175,7 @@ public interface SchedulerAdminService {
      * @return 返回该任务的启停、归档、触发等运维操作分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
     IPage<SchedulerOperationVO> operations(UUID jobId,
-                                           com.devops00.spectra.common.base.javabean.from.PageFrom page);
+                                           com.devops00.spectra.framework.persistence.pagination.PageFrom page);
 
     /**
      * 查询调度失败记录。
@@ -185,6 +185,6 @@ public interface SchedulerAdminService {
      * @param from  执行实例、错误状态等失败记录筛选条件。
      * @return 返回该任务的循环失败记录分页，包含错误阶段、原因和处理状态；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
-    IPage<SchedulerLoopErrorVO> errors(UUID jobId, com.devops00.spectra.common.base.javabean.from.PageFrom page,
+    IPage<SchedulerLoopErrorVO> errors(UUID jobId, com.devops00.spectra.framework.persistence.pagination.PageFrom page,
                                        SchedulerLoopErrorPageFrom from);
 }

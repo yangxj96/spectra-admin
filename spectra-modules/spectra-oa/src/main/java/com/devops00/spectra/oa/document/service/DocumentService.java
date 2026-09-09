@@ -17,8 +17,8 @@
 package com.devops00.spectra.oa.document.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.base.BaseService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.oa.document.javabean.entity.Document;
 import com.devops00.spectra.oa.document.javabean.from.DocumentFolderSaveFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;

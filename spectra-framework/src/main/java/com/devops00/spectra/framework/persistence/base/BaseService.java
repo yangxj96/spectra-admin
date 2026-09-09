@@ -14,42 +14,20 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.constant;
+package com.devops00.spectra.framework.persistence.base;
 
-import com.baomidou.mybatisplus.annotation.IEnum;
-import lombok.Getter;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
- * 系统配置值类型
+ * 以持久化实体为边界的通用 Service 契约。
  *
+ * <p>业务 Service 继承本接口后获得 MyBatis-Plus 的基础持久化操作，同时保留在业务层声明专用查询和命令的空间。</p>
+ *
+ * @param <O> 该 Service 管理的持久化实体类型；必须是 {@link BaseEntity} 的子类型
  * @author yangxj96
  * @version 1.0
- * @since 2025/12/25 16:25
+ * @since 2025-6-14 00:00
  */
-@Getter
-public enum ConfiguredValueType implements IEnum<Integer> {
+public interface BaseService<O extends BaseEntity> extends IService<O> {
 
-    TEXT(0, "文本"),
-    BOOL(1, "是否"),
-    SELECT(2, "选择");
-
-    /**
-     * 值(存数据库用的)
-     */
-    private final Integer value;
-
-    /**
-     * 说明(展示用的)
-     */
-    private final String name;
-
-    ConfiguredValueType(int type, String name) {
-        this.value = type;
-        this.name = name;
-    }
-
-    @Override
-    public Integer getValue() {
-        return this.value;
-    }
 }

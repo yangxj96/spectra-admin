@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;

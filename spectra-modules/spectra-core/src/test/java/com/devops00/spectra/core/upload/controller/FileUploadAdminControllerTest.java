@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.core.upload.controller;
 
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.upload.javabean.from.FileAdminOperationFrom;
 import com.devops00.spectra.core.upload.javabean.from.FileUploadAdminPageRequest;
 import com.devops00.spectra.core.upload.service.FileUploadAdminService;

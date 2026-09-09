@@ -18,8 +18,8 @@ package com.devops00.spectra.core.upload.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.base.BaseEntity;
-import com.devops00.spectra.common.mybatis.PgJsonbNodeTypeHandler;
+import com.devops00.spectra.framework.persistence.base.BaseEntity;
+import com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

@@ -247,7 +247,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 .set(
                         NotificationRequestEntity::getTemplateSnapshot,
                         templateSnapshot,
-                        "typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"));
+                        "typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"));
         return new NotificationReceipt(requestId, NotificationRequestStatus.ACCEPTED.name(), taskCount, false);
     }
 

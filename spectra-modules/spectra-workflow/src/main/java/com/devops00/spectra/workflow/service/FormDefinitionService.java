@@ -17,8 +17,8 @@
 package com.devops00.spectra.workflow.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.base.BaseService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.workflow.javabean.entity.FormDefinition;
 import com.devops00.spectra.workflow.javabean.from.FormDefinitionSaveFrom;
 import com.devops00.spectra.workflow.javabean.from.FormPageFrom;

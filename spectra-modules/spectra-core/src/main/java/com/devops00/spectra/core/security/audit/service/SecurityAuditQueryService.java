@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.security.audit.service;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.core.audit.SecurityAuditEventFactory;

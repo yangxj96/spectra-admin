@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.vo;
 
-import com.devops00.spectra.common.constant.ConfiguredValueType;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -17,7 +17,7 @@
 package com.devops00.spectra.framework.security.advice;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

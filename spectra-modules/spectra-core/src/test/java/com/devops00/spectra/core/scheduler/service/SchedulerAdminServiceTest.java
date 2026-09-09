@@ -2,7 +2,7 @@ package com.devops00.spectra.core.scheduler.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.scheduler.ScheduledEffectType;
 import com.devops00.spectra.common.scheduler.ScheduledJobDescriptor;

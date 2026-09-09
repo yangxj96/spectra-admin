@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;
 import com.devops00.spectra.core.system.mapper.DictGroupMapper;
 import com.devops00.spectra.core.system.service.DictGroupService;

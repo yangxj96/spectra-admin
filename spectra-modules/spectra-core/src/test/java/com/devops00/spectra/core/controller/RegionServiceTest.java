@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.common.constant.RegionLevel;
+import com.devops00.spectra.core.system.javabean.enums.RegionLevel;
 import com.devops00.spectra.core.system.javabean.entity.Region;
 import com.devops00.spectra.core.system.service.RegionService;
 import com.devops00.test.spectra.RegionImportTestApplication;

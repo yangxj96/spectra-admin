@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.common.runner;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SystemProperties;
+import com.devops00.spectra.framework.properties.SystemProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.ApplicationArguments;

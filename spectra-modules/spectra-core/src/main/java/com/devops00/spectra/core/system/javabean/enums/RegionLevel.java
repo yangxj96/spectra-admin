@@ -14,13 +14,13 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.constant;
+package com.devops00.spectra.core.system.javabean.enums;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
 /**
- * 行政区划层级
+ * 行政区划节点的业务层级。
  *
  * @author yangxj96
  * @version 1.0
@@ -50,8 +50,10 @@ public enum RegionLevel implements IEnum<Integer> {
      */
     VILLAGES(5, "村级");
 
+    /** 持久化到区域表的层级编码。 */
     private final Integer level;
 
+    /** 管理端展示的层级名称。 */
     private final String name;
 
     RegionLevel(Integer level, String name) {
@@ -60,7 +62,10 @@ public enum RegionLevel implements IEnum<Integer> {
     }
 
     /**
-     * 创建或构建目标数据（{@code of}）。
+     * 按持久化层级编码解析行政区划层级。
+     *
+     * @param level 区域表中的层级编码；为 null 或未知编码时返回 null
+     * @return 与编码匹配的枚举值；输入为 null 或没有匹配项时返回 null
      */
     public static RegionLevel of(Integer level) {
         if (level == null) {

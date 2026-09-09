@@ -19,7 +19,7 @@ package com.devops00.spectra.core.user.imports.service.impl;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
+import com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler;
 import com.devops00.spectra.core.user.imports.entity.UserImportRow;
 import com.devops00.spectra.core.user.imports.entity.UserImportTask;
 import com.devops00.spectra.core.user.imports.javabean.enums.UserImportRowState;

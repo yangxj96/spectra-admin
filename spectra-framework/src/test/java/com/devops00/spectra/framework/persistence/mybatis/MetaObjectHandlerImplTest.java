@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.framework.persistence.mybatis;
 
-import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.framework.persistence.base.BaseEntity;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import org.apache.ibatis.reflection.SystemMetaObject;

@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.notification.service.impl;
 
 import com.devops00.spectra.common.config.SystemConfigValueProvider;
-import com.devops00.spectra.common.config.SystemConfigValueWriter;
+import com.devops00.spectra.core.system.port.SystemConfigValueWriter;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealth;

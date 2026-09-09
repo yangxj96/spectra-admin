@@ -18,7 +18,7 @@ package com.devops00.spectra.framework.web.advice.exception;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.SchedulerDatabaseUnavailableException;
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

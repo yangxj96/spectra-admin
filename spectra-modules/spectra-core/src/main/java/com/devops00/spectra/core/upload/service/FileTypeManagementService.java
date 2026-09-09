@@ -8,7 +8,7 @@ package com.devops00.spectra.core.upload.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.core.upload.api.FileErrorCode;
 import com.devops00.spectra.core.upload.api.FileUploadException;
 import com.devops00.spectra.core.upload.javabean.converter.FileUploadConverter;

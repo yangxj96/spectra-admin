@@ -1,7 +1,7 @@
 package com.devops00.spectra.core.scheduler.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.scheduler.javabean.from.SchedulerExecutionActionFrom;
 import com.devops00.spectra.core.scheduler.javabean.from.SchedulerExecutionPageFrom;
 import com.devops00.spectra.core.scheduler.javabean.from.SchedulerJobPageFrom;

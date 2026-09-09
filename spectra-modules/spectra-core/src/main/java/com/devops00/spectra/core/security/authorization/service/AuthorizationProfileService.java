@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization.service;
 
-import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.framework.persistence.base.BaseService;
 import com.devops00.spectra.core.security.authorization.entity.AuthorizationProfile;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationProfileSaveFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;

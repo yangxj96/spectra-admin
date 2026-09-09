@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.framework.security.advice;
 
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;

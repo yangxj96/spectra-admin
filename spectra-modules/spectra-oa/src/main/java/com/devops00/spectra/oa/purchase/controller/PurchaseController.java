@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.purchase.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.purchase.javabean.from.PurchaseExecuteFrom;
 import com.devops00.spectra.oa.purchase.javabean.from.PurchasePageFrom;

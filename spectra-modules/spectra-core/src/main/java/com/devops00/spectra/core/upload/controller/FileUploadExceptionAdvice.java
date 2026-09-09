@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.core.upload.controller;
 
-import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.framework.web.response.R;
 import com.devops00.spectra.core.upload.api.FileUploadException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

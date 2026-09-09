@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
+import com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRecipient;

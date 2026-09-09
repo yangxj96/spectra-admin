@@ -4,7 +4,7 @@ import com.devops00.spectra.core.scheduler.javabean.from.SchedulerExecutionActio
 import com.devops00.spectra.core.scheduler.javabean.from.SchedulerLoopCommandFrom;
 import com.devops00.spectra.core.scheduler.javabean.from.SchedulerOperationFrom;
 import com.devops00.spectra.core.scheduler.javabean.from.SchedulerTriggerFrom;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -48,7 +48,7 @@ class SchedulerAdminControllerRoleMatrixTest {
     private static void assertPermission(String name, String permission) throws Exception {
         var method = switch (name) {
             case "catalog" -> method(name);
-            case "jobs" -> method(name, com.devops00.spectra.common.base.javabean.from.PageFrom.class,
+            case "jobs" -> method(name, com.devops00.spectra.framework.persistence.pagination.PageFrom.class,
                     com.devops00.spectra.core.scheduler.javabean.from.SchedulerJobPageFrom.class);
             case "create" -> method(name, com.devops00.spectra.core.scheduler.javabean.from.SchedulerJobSaveFrom.class);
             case "enable" -> method(name, java.util.UUID.class, SchedulerOperationFrom.class);

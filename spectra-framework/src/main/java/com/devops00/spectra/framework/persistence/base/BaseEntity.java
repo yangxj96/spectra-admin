@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.base;
+package com.devops00.spectra.framework.persistence.base;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -32,7 +32,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * 基础实体类
+ * 供数据库实体复用的持久化基类。
+ *
+ * <p>该类集中声明 UUID 主键、审计字段、软删除字段和乐观锁字段；新增实体只需继承本类并补充自身表字段，
+ * 主键和审计字段的自动填充由 framework 的 MyBatis-Plus 配置负责。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -53,26 +56,26 @@ public class BaseEntity implements Serializable {
     private UUID id;
 
     /**
-     * 创建人
+     * 创建该记录的用户 ID；新增时由持久化填充器从当前安全上下文写入。
      */
     @TableField(value = "created_by", fill = FieldFill.INSERT)
     private UUID createdBy;
 
     /**
-     * 创建时间
+     * 记录首次持久化的时间；新增时由持久化填充器写入，按升序作为默认排序字段。
      */
     @OrderBy(asc = true, sort = 1)
     @TableField(value = "created_at", fill = FieldFill.INSERT)
     private Instant createdAt;
 
     /**
-     * 更新人
+     * 最近一次修改该记录的用户 ID；新增和更新时由持久化填充器维护。
      */
     @TableField(value = "updated_by", fill = FieldFill.INSERT_UPDATE)
     private UUID updatedBy;
 
     /**
-     * 更新时间
+     * 最近一次修改记录的时间；新增和更新时由持久化填充器维护。
      */
     @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
     private Instant updatedAt;
@@ -84,7 +87,7 @@ public class BaseEntity implements Serializable {
     private Instant deleted;
 
     /**
-     * 乐观锁版本号
+     * 乐观锁版本号；每次成功更新由 MyBatis-Plus 按版本条件递增，用于阻止并发覆盖。
      */
     @Version
     @TableField(value = "version")

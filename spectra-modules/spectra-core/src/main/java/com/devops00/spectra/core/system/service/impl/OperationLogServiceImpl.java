@@ -18,7 +18,7 @@ package com.devops00.spectra.core.system.service.impl;
 
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
-import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 import com.devops00.spectra.core.system.javabean.enums.SysLogType;
 import com.devops00.spectra.core.system.mapper.OperationLogMapper;

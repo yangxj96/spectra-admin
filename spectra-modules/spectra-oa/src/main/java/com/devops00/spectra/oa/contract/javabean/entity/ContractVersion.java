@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.contract.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.framework.persistence.base.BaseEntity;
 import lombok.Getter;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;

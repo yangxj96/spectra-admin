@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.notification.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationTemplateActionFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationTemplatePageFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationTemplatePreviewFrom;

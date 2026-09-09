@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.properties;
+package com.devops00.spectra.framework.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,7 +23,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 光谱平台相关配置
+ * 光谱平台运行参数绑定。
+ *
+ * <p>属性来自 {@code spectra.system} 配置前缀，供 framework 的 Web 配置和 Core 的文件目录检查使用；
+ * 该类只描述运行参数，不承载系统配置表中的业务 Key-Value。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -34,14 +37,13 @@ import java.util.List;
 public class SystemProperties {
 
     /**
-     * 基础文件位置,所有文件都会在这个目录下面进行存放
+     * 文件存储根目录；上传文件及其临时/派生文件都以此目录作为默认父目录。
      */
     private String baseDir = "files";
 
     /**
-     * 指定包前缀,一部分地方在使用的时候<b>不得不固定写死代码</b>, 导致如果克隆代码后需要修改包名为自己公司或者自己使用的时候,
-     * 可以直接修改这个配置,在需要写死的地方会直接使用这里, 能使用拼接的位置都尽量进行了拼接,但是依旧会有一些位置无法拼接,则注明在下方列表,
-     * 以下为没法直接使用这个属性进行修改的位置,
+     * 平台 Java 包前缀；用于仍需生成或匹配完整类名的少数技术场景，不能改变源码实际包名。
+     * 以下位置仍包含固定类名，修改该属性不会替换这些源码引用：
      * <ol>
      * <li>com.devops00.spectra.framework.persistence.configuration.MyBatisPlusConfiguration</li>
      * <li>com.devops00.spectra.framework.web.advice.crypto.ResponseEncryptAdvice</li>
@@ -52,40 +54,40 @@ public class SystemProperties {
     private String packagePrefix = "com.devops00.spectra";
 
     /**
-     * mvc配置
+     * MVC 运行参数，包括 API 版本请求头和默认版本号。
      */
     private SpectraMvc mvc = new SpectraMvc();
 
     /**
-     * cors配置
+     * CORS 运行参数，包括允许的来源、方法、请求头和预检缓存策略。
      */
     private SpectraCors cors = new SpectraCors();
 
     /**
-     * MVC相关配置
+     * MVC 相关运行参数。
      */
     @Data
     public static class SpectraMvc {
 
         /**
-         * api版本号请求头
+         * 客户端传递 API 版本的请求头名称。
          */
         private String apiHeader = "Api-Version";
 
         /**
-         * 默认API版本号
+         * 未显式传递版本时使用的 API 契约版本号。
          */
         private String apiVersion = "1.0.0";
     }
 
     /**
-     * CORS相关配置
+     * CORS 相关运行参数。
      */
     @Data
     public static class SpectraCors {
 
         /**
-         * 指定的路径
+         * 应用 CORS 规则的请求路径模式。
          */
         private String mapping = "/**";
 
@@ -100,25 +102,23 @@ public class SystemProperties {
         private boolean required;
 
         /**
-         * 指定允许的方法
+         * 预检请求允许声明的 HTTP 方法列表。
          */
         private List<String> methods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
 
         /**
-         * 指定运行的头信息
+         * 跨源请求允许携带的请求头名称列表。
          */
         private List<String> headers = List.of("Accept", "Authorization", "Content-Type", "Api-Version", "X-Client-Type",
                 "X-CSRF-Token", "X-XSRF-TOKEN", "X-Requested-With", "X-Spectra-Initialization-Token");
 
         /**
-         * 是否支持凭证
+         * 是否允许跨源请求携带 Cookie 或其他凭证。
          */
         private Boolean credentials = Boolean.TRUE;
 
         /**
-         * 预检后缓存策略时长,单位为妙
-         * <p>
-         * 默认一小时
+         * 浏览器缓存预检结果的时长，单位为秒；默认缓存一小时。
          */
         private Long maxAge = 3600L;
     }
