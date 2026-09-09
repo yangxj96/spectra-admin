@@ -9,14 +9,6 @@ package com.devops00.spectra.core.security.audit.archive;
 import com.devops00.spectra.common.port.audit.SecurityAuditArchiveBackend;
 import com.devops00.spectra.common.port.audit.SecurityAuditArchiveIntegrity;
 import com.devops00.spectra.common.port.audit.SecurityAuditArchiveReceipt;
-import com.devops00.spectra.common.scheduler.ScheduledEffectType;
-import com.devops00.spectra.common.scheduler.ScheduledJobDescriptor;
-import com.devops00.spectra.common.scheduler.ScheduledJobType;
-import com.devops00.spectra.common.scheduler.ScheduledLoopContext;
-import com.devops00.spectra.common.scheduler.ScheduledLoopCycleResult;
-import com.devops00.spectra.common.scheduler.ScheduledLoopHandler;
-import com.devops00.spectra.common.scheduler.ScheduledRunScope;
-import com.devops00.spectra.common.scheduler.ScheduledScheduleKind;
 import com.devops00.spectra.core.security.audit.service.SecurityAuditArchiveAuditTrail;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -37,8 +29,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,32 +39,13 @@ import java.util.concurrent.ScheduledFuture;
 /** 安全审计归档 manifest 的租约 worker。外部对象存储调用不持有数据库事务。 */
 @Slf4j
 @Component
-public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
+public class SecurityAuditArchiveWorker {
 
     private static final int BATCH_SIZE = 20;
     private static final int MAX_ATTEMPTS = 10;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(60);
     private static final Duration LEASE_RENEWAL_INTERVAL = Duration.ofSeconds(20);
     private static final long MAX_BACKOFF_SECONDS = 900;
-
-    private static final ScheduledJobDescriptor DESCRIPTOR = ScheduledJobDescriptor.builder()
-            .jobKey("security.security-audit.archive")
-            .handlerKey("security.security-audit.archive")
-            .name("安全审计归档")
-            .module("security")
-            .jobType(ScheduledJobType.LOOP)
-            .runScope(ScheduledRunScope.SINGLETON)
-            .scheduleKind(ScheduledScheduleKind.FIXED_DELAY)
-            .effectType(ScheduledEffectType.EXTERNAL_IDEMPOTENT)
-            .parameterSchema(Map.of())
-            .supportedActions(Set.of("VIEW", "START", "DRAIN_STOP"))
-            .executionPolicy(Map.of(
-                    "heartbeatIntervalMs", 5000L,
-                    "leaseDurationMs", LEASE_DURATION.toMillis(),
-                    "errorLogIntervalMs", 60000L,
-                    "batchSize", BATCH_SIZE,
-                    "maxAttempts", MAX_ATTEMPTS))
-            .build();
 
     private final SecurityAuditArchiveManifestRepository manifestRepository;
     private final SecurityAuditArchiveDataRepository dataRepository;
@@ -146,11 +117,6 @@ public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
                 .register(meterRegistry);
     }
 
-    @Override
-    public ScheduledJobDescriptor descriptor() {
-        return DESCRIPTOR;
-    }
-
     @PreDestroy
     void shutdownLeaseRenewal() {
         leaseRenewalExecutor.shutdownNow();
@@ -159,21 +125,6 @@ public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
     /** 直接执行一批归档或恢复校验，供测试和统一调度器调用。 */
     public BatchResult processBatch() {
         return processBatch(defaultOwner, BATCH_SIZE);
-    }
-
-    @Override
-    public ScheduledLoopCycleResult runCycle(ScheduledLoopContext context) {
-        BatchResult result = processBatch(owner(context), BATCH_SIZE);
-        boolean failed = result.failed() > 0;
-        return ScheduledLoopCycleResult.builder()
-                .processed(result.processed())
-                .failed(result.failed())
-                .errorCode(failed ? "SECURITY_AUDIT_ARCHIVE_FAILURE" : null)
-                .sanitizedMessage(failed ? "安全审计归档存在处理失败事件" : null)
-                .context(Map.of(
-                        "claimed", result.claimed(),
-                        "pending", result.pending()))
-                .build();
     }
 
     BatchResult processBatch(String owner, int batchSize) {
@@ -427,13 +378,6 @@ public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
         String normalized = message.replaceAll("[\\r\\n\\t]+", " ").trim();
         String combined = type + ": " + normalized;
         return combined.length() <= 2000 ? combined : combined.substring(0, 2000);
-    }
-
-    private static String owner(ScheduledLoopContext context) {
-        if (context == null || context.instanceId() == null || context.runtimeId() == null) {
-            return "security-audit-archive";
-        }
-        return context.instanceId() + ":" + context.runtimeId();
     }
 
     private static SecurityAuditArchiveOrchestrator.ManifestView toView(

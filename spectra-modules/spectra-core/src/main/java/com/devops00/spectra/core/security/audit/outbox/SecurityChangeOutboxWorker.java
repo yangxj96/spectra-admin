@@ -7,14 +7,6 @@
 package com.devops00.spectra.core.security.audit.outbox;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
-import com.devops00.spectra.common.scheduler.ScheduledEffectType;
-import com.devops00.spectra.common.scheduler.ScheduledJobDescriptor;
-import com.devops00.spectra.common.scheduler.ScheduledJobType;
-import com.devops00.spectra.common.scheduler.ScheduledLoopContext;
-import com.devops00.spectra.common.scheduler.ScheduledLoopCycleResult;
-import com.devops00.spectra.common.scheduler.ScheduledLoopHandler;
-import com.devops00.spectra.common.scheduler.ScheduledRunScope;
-import com.devops00.spectra.common.scheduler.ScheduledScheduleKind;
 import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -32,8 +24,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.Executors;
@@ -43,32 +33,13 @@ import java.util.concurrent.ScheduledFuture;
 /** 安全变更 outbox 的租约消费与下游动作分发器。 */
 @Slf4j
 @Component
-public class SecurityChangeOutboxWorker implements ScheduledLoopHandler {
+public class SecurityChangeOutboxWorker {
 
     private static final int BATCH_SIZE = 100;
     private static final int MAX_ATTEMPTS = 10;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final Duration LEASE_RENEWAL_INTERVAL = Duration.ofSeconds(10);
     private static final long MAX_BACKOFF_SECONDS = 300;
-
-    private static final ScheduledJobDescriptor DESCRIPTOR = ScheduledJobDescriptor.builder()
-            .jobKey("security.security-change.outbox")
-            .handlerKey("security.security-change.outbox")
-            .name("安全变更 Outbox")
-            .module("security")
-            .jobType(ScheduledJobType.LOOP)
-            .runScope(ScheduledRunScope.SINGLETON)
-            .scheduleKind(ScheduledScheduleKind.FIXED_DELAY)
-            .effectType(ScheduledEffectType.DB_ONLY)
-            .parameterSchema(Map.of())
-            .supportedActions(Set.of("VIEW", "START", "DRAIN_STOP"))
-            .executionPolicy(Map.of(
-                    "heartbeatIntervalMs", 3000L,
-                    "leaseDurationMs", LEASE_DURATION.toMillis(),
-                    "errorLogIntervalMs", 60000L,
-                    "batchSize", BATCH_SIZE,
-                    "maxAttempts", MAX_ATTEMPTS))
-            .build();
 
     private final SecurityChangeOutboxRepository repository;
     private final ObjectMapper objectMapper;
@@ -128,11 +99,6 @@ public class SecurityChangeOutboxWorker implements ScheduledLoopHandler {
                 .register(meterRegistry);
     }
 
-    @Override
-    public ScheduledJobDescriptor descriptor() {
-        return DESCRIPTOR;
-    }
-
     @PreDestroy
     void shutdownLeaseRenewal() {
         leaseRenewalExecutor.shutdownNow();
@@ -141,22 +107,6 @@ public class SecurityChangeOutboxWorker implements ScheduledLoopHandler {
     /** 直接执行一批消费，供测试和运维调用。 */
     public BatchResult processBatch() {
         return processBatch(defaultOwner, BATCH_SIZE);
-    }
-
-    @Override
-    public ScheduledLoopCycleResult runCycle(ScheduledLoopContext context) {
-        BatchResult result = processBatch(owner(context), BATCH_SIZE);
-        boolean failed = result.failed() > 0;
-        return ScheduledLoopCycleResult.builder()
-                .processed(result.processed())
-                .failed(result.failed())
-                .errorCode(failed ? "SECURITY_CHANGE_OUTBOX_FAILURE" : null)
-                .sanitizedMessage(failed ? "安全变更 outbox 存在处理失败事件" : null)
-                .context(Map.of(
-                        "claimed", result.claimed(),
-                        "pending", result.pending(),
-                        "deadLetter", result.deadLetter()))
-                .build();
     }
 
     BatchResult processBatch(String owner, int batchSize) {
@@ -294,13 +244,6 @@ public class SecurityChangeOutboxWorker implements ScheduledLoopHandler {
         String normalized = message.replaceAll("[\\r\\n\\t]+", " ").trim();
         String combined = type + ": " + normalized;
         return combined.length() <= 2000 ? combined : combined.substring(0, 2000);
-    }
-
-    private static String owner(ScheduledLoopContext context) {
-        if (context == null || context.instanceId() == null || context.runtimeId() == null) {
-            return "security-change-outbox";
-        }
-        return context.instanceId() + ":" + context.runtimeId();
     }
 
     /** 一批安全变更 outbox 的处理统计。 */

@@ -39,6 +39,11 @@
     </properties>
 
     <dependencies>
+        <!-- Quartz JDBC Cluster 是平台调度的唯一运行时实现。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
         <!-- 统一通知 Provider 的邮件渠道依赖。 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

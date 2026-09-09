@@ -26,15 +26,7 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.core.notification.dispatch.NotificationTaskLoopHandler"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
         <Class name="com.devops00.spectra.core.notification.service.NotificationCleanupService"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.notification.service.NotificationCleanupScheduledHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -201,15 +193,6 @@
         <Class name="com.devops00.spectra.framework.security.advice.RestAuthenticationEntryPoint"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
-    <!-- Scheduler repositories/services retain Spring-managed collaborators by constructor injection. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.ExecutionLeaseService"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.SchedulerBootstrapService"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
     <Match>
         <Class name="com.devops00.spectra.core.system.outbox.OperationLogOutboxRepository"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
@@ -233,10 +216,6 @@
     </Match>
     <Match>
         <Class name="com.devops00.spectra.core.system.lookup.RegionNameLookup"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.system.service.scheduler.ServiceMonitorDiagnosticCleanupHandler"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -264,36 +243,10 @@
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
     </Match>
     <!-- JdbcTemplate owns PreparedStatements returned by PreparedStatementCreator callbacks. -->
-    <!-- These are deliberate value-carrier records/internal mutable persistence objects. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.LoopErrorAggregator$LoopErrorOccurrence"/>
-        <Bug pattern="EI_EXPOSE_REP"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.LoopErrorAggregator$LoopErrorOccurrence"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.SchedulerDatabaseUnavailableEvent"/>
-        <Bug pattern="EI_EXPOSE_REP"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.SchedulerDatabaseUnavailableEvent"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
     <!-- ThreadLocalRandom is appropriate for non-security retry backoff jitter. -->
     <Match>
         <Class name="com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveWorker"/>
         <Bug pattern="PREDICTABLE_RANDOM"/>
-    </Match>
-    <!-- Constructor validation intentionally fails fast before these components are published. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.service.impl.ScheduledJobRegistryImpl"/>
-        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.scheduler.worker.SchedulerInstanceIdentity"/>
-        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
     </Match>
     <Match>
         <Class name="com.devops00.spectra.core.system.health.CoreHealthRegistry"/>
@@ -364,5 +317,15 @@
     <Match>
         <Class name="com.devops00.spectra.core.upload.service.UploadVerificationWorker"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- Quartz Scheduler is a framework-managed mutable collaborator; the lifecycle wrapper deliberately retains it
+         and exposes it only after the JDBC readiness gate to the Quartz management service. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.scheduler.quartz.configuration.QuartzSchedulerLifecycle"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.scheduler.quartz.configuration.QuartzSchedulerLifecycle"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
 </FindBugsFilter>

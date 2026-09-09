@@ -21,7 +21,7 @@ import com.devops00.spectra.common.health.DependencyHealthContributor;
 import com.devops00.spectra.framework.FrameworkModule;
 import com.devops00.spectra.oa.OaModule;
 import com.devops00.spectra.oa.application.controller.ApplicationController;
-import com.devops00.spectra.oa.contract.service.job.ContractReminderScheduledHandler;
+import com.devops00.spectra.oa.contract.service.job.ContractReminderQuartzJob;
 import com.devops00.spectra.workflow.WorkflowModule;
 import com.devops00.spectra.workflow.controller.TaskController;
 import com.devops00.spectra.launch.configuration.ModuleAssembly;
@@ -159,7 +159,7 @@ class OptionalModuleAssemblyTest {
     @Test
     void disabledOptionalModulesMustNotRegisterControllersSchedulersOrHealthContributors() {
         assertDisabled(OaModule.class, "spectra.modules.oa.enabled", ApplicationController.class,
-                ContractReminderScheduledHandler.class);
+                ContractReminderQuartzJob.class);
         assertDisabled(WorkflowModule.class, "spectra.modules.workflow.enabled", TaskController.class, null);
     }
 

@@ -30,7 +30,6 @@ import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
@@ -42,7 +41,6 @@ class OperationLogOutboxWorkerTest {
 
     private static final Instant NOW = Instant.parse("2026-08-31T04:05:06Z");
     private static final UUID EVENT_ID = UUID.fromString("018f0a6f-3b6f-7b2f-8e4f-4e6a7d9c1234");
-    private static final UUID RUNTIME_ID = UUID.fromString("018f0a6f-3b6f-7b2f-8e4f-4e6a7d9c9999");
 
     private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
 
@@ -124,39 +122,6 @@ class OperationLogOutboxWorkerTest {
         verify(repository).markDeadLetter(EVENT_ID, "worker-a", NOW,
                 "AuditRecordingException: permanent failure");
         assertEquals(1.0, meterRegistry.get("operation_log_outbox_dead_letter_total").counter().count());
-    }
-
-    @Test
-    void schedulerCycleExposesFailureAndBacklogWithoutLeakingPayload() throws Exception {
-        var repository = mock(OperationLogOutboxRepository.class);
-        var operationLogService = mock(OperationLogService.class);
-        var record = record(EVENT_ID);
-        var event = event(record, 1);
-        when(repository.claimBatch("instance-a:" + RUNTIME_ID, NOW, NOW.plusSeconds(30), 100, 10))
-                .thenReturn(List.of(event));
-        when(repository.markRetry(eq(EVENT_ID), eq("instance-a:" + RUNTIME_ID), eq(NOW),
-                eq(NOW.plusSeconds(1)), any(String.class))).thenReturn(1);
-        when(repository.pendingCount()).thenReturn(1L);
-        doThrow(new IllegalStateException("database unavailable"))
-                .when(operationLogService)
-                .persist(record);
-
-        var worker = worker(repository, operationLogService, transactionTemplate(), "unused");
-        var cycle = worker.runCycle(com.devops00.spectra.common.scheduler.ScheduledLoopContext.builder()
-                .runtimeId(RUNTIME_ID)
-                .jobKey("system.operation-log.outbox")
-                .handlerKey("system.operation-log.outbox")
-                .sessionKey("session-a")
-                .instanceId("instance-a")
-                .startedAt(NOW)
-                .build());
-
-        assertEquals(0, cycle.processed());
-        assertEquals(1, cycle.failed());
-        assertEquals("OPERATION_LOG_OUTBOX_FAILURE", cycle.errorCode());
-        assertEquals(1, cycle.context().get("claimed"));
-        assertEquals(1L, cycle.context().get("pending"));
-        assertEquals(0, cycle.context().get("deadLetter"));
     }
 
     private OperationLogOutboxWorker worker(OperationLogOutboxRepository repository,

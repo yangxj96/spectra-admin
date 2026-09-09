@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,9 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/** 高耦合应用服务拆分契约，防止职责抽取后重新堆回公开入口。 */
 class ServiceSplitContractTest {
 
     private static final Path JAVA_ROOT = Path.of("src", "main", "java", "com", "devops00", "spectra", "core");
@@ -34,7 +32,7 @@ class ServiceSplitContractTest {
     @Test
     void publicEntryServicesMustKeepAThinDependencySurface() throws IOException {
         assertDependencyCountAtMost("user/imports/service/impl/UserImportServiceImpl.java", 8);
-        assertDependencyCountAtMost("scheduler/service/impl/SchedulerAdminServiceImpl.java", 8);
+        assertDependencyCountAtMost("scheduler/quartz/service/impl/QuartzJobManagementServiceImpl.java", 8);
         assertDependencyCountAtMost("system/service/impl/ServiceMonitorServiceImpl.java", 8);
         assertDependencyCountAtMost("security/authorization/service/impl/AuthorizationAssignmentChangeServiceImpl.java", 8);
     }
@@ -45,9 +43,8 @@ class ServiceSplitContractTest {
                 "user/imports/service/impl/UserImportPreviewService.java",
                 "user/imports/service/impl/UserImportExecutionService.java",
                 "user/imports/service/impl/UserImportResultService.java",
-                "scheduler/service/impl/SchedulerCatalogService.java",
-                "scheduler/service/impl/SchedulerControlService.java",
-                "scheduler/service/impl/SchedulerExecutionQueryService.java",
+                "scheduler/quartz/service/QuartzJobManagementService.java",
+                "scheduler/history/service/QuartzJobExecutionHistoryService.java",
                 "system/service/impl/ServiceMonitorEvaluationService.java",
                 "system/service/impl/ServiceMonitorQueryService.java",
                 "security/authorization/service/impl/AuthorizationImpactService.java",
@@ -56,36 +53,39 @@ class ServiceSplitContractTest {
 
     @Test
     void asynchronousAndTransactionalBoundariesMustBeVisibleInDedicatedBeans() throws IOException {
-        var execution = readSource("user/imports/service/impl/UserImportExecutionService.java");
-        var worker = readSource("user/imports/service/impl/UserImportExecutionWorker.java");
-        var control = readSource("scheduler/service/impl/SchedulerControlService.java");
-
-        assertThat(execution).contains("userImportTaskExecutor");
-        assertThat(worker).contains("@Transactional");
-        assertThat(worker).contains("CHUNK_SIZE");
-        assertThat(control).contains("@Transactional");
+        String execution = readSource("user/imports/service/impl/UserImportExecutionService.java");
+        String worker = readSource("user/imports/service/impl/UserImportExecutionWorker.java");
+        String control = readSource("scheduler/quartz/service/QuartzJobManagementService.java");
+        Assertions.assertThat(execution).contains("userImportTaskExecutor");
+        Assertions.assertThat(worker).contains("@Transactional");
+        Assertions.assertThat(worker).contains("CHUNK_SIZE");
+        Assertions.assertThat(control).contains("QuartzJobManagementService");
     }
 
     private void assertDependencyCountAtMost(String relativePath, int maximum) throws IOException {
-        var source = readSource(relativePath);
-        var dependencies = source.lines()
+        String source = readSource(relativePath);
+        long dependencies = source.lines()
                 .filter(line -> line.stripLeading().startsWith("private final "))
                 .count();
-        assertThat(dependencies)
+        Assertions.assertThat(dependencies)
                 .as("公开入口依赖过多: %s", relativePath)
                 .isLessThanOrEqualTo(maximum);
     }
 
     private void assertFilesExist(List<String> relativePaths) {
-        for (var relativePath : relativePaths) {
-            var path = JAVA_ROOT.resolve(relativePath);
-            assertThat(Files.isRegularFile(path)).as("缺少拆分后的职责 Service: %s", path).isTrue();
+        for (String relativePath : relativePaths) {
+            Path path = JAVA_ROOT.resolve(relativePath);
+            Assertions.assertThat(Files.isRegularFile(path))
+                    .as("缺少拆分后的职责 Service: %s", path)
+                    .isTrue();
         }
     }
 
     private String readSource(String relativePath) throws IOException {
-        var path = JAVA_ROOT.resolve(relativePath);
-        assertThat(Files.isRegularFile(path)).as("缺少服务实现: %s", path).isTrue();
+        Path path = JAVA_ROOT.resolve(relativePath);
+        Assertions.assertThat(Files.isRegularFile(path))
+                .as("缺少服务实现: %s", path)
+                .isTrue();
         return Files.readString(path, StandardCharsets.UTF_8);
     }
 }

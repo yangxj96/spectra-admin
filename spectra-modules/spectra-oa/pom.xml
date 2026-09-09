@@ -39,6 +39,11 @@
     </properties>
 
     <dependencies>
+        <!-- 合同提醒 Quartz Job 直接使用 Quartz Job API。 -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+        </dependency>
         <!-- === 项目模块 === -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>

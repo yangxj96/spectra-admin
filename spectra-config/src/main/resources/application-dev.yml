@@ -67,6 +67,18 @@ spectra:
       fixed-delay-ms: 3600000
       batch-size: 100
       retention-seconds: 86400
+  scheduler:
+    quartz:
+      enabled: true
+      table-prefix: spectra_quartz.QRTZ_
+      clustered: true
+      jdbc-store: true
+      job-store-class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+      thread-count: 10
+      history-retention-days: 90
+      history-cleanup-batch-size: 500
+      history-running-timeout: 24h
+      database-retry-interval: 10s
 
 # ==================== 服务器配置 ====================
 server:
@@ -89,6 +101,22 @@ server:
 
 # ==================== Spring 配置 ====================
 spring:
+  quartz:
+    job-store-type: jdbc
+    auto-startup: false
+    wait-for-jobs-to-complete-on-shutdown: true
+    overwrite-existing-jobs: false
+    properties:
+      org.quartz.scheduler.instanceId: AUTO
+      org.quartz.scheduler.instanceName: spectraQuartzScheduler
+      org.quartz.jobStore.isClustered: true
+      org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.tablePrefix: spectra_quartz.QRTZ_
+      org.quartz.jobStore.misfireThreshold: 60000
+      org.quartz.threadPool.threadCount: 10
+      org.quartz.threadPool.threadPriority: 5
+      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
   servlet:
     multipart:
       enabled: true

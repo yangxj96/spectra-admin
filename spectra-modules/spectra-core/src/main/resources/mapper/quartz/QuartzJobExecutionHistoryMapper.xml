@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2018-2026 yangxj96
+  Licensed under the Apache License, Version 2.0.
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.history.mapper.QuartzJobExecutionHistoryMapper">
+
+    <resultMap id="HistoryResultMap"
+               type="com.devops00.spectra.core.scheduler.history.javabean.entity.QuartzJobExecutionHistoryEntity">
+        <id column="id" property="id"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedBy"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted" property="deleted"/>
+        <result column="version" property="version"/>
+        <result column="fire_instance_id" property="fireInstanceId"/>
+        <result column="job_key" property="jobKey"/>
+        <result column="trigger_key" property="triggerKey"/>
+        <result column="job_type" property="jobType"/>
+        <result column="job_class_name" property="jobClassName"/>
+        <result column="trigger_type" property="triggerType"/>
+        <result column="status" property="status"/>
+        <result column="scheduled_fire_at" property="scheduledFireAt"/>
+        <result column="actual_fire_at" property="actualFireAt"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="finished_at" property="finishedAt"/>
+        <result column="duration_ms" property="durationMs"/>
+        <result column="scheduler_instance" property="schedulerInstance"/>
+        <result column="correlation_id" property="correlationId"/>
+        <result column="parameter_version" property="parameterVersion"/>
+        <result column="parameter_sha256" property="parameterSha256"/>
+        <result column="result_summary" property="resultSummary"/>
+        <result column="error_code" property="errorCode"/>
+        <result column="error_message" property="errorMessage"/>
+    </resultMap>
+
+    <sql id="HistoryColumns">
+        id, created_by, created_at, updated_by, updated_at, deleted, version,
+        fire_instance_id, job_key, trigger_key, job_type, job_class_name, trigger_type, status,
+        scheduled_fire_at, actual_fire_at, started_at, finished_at, duration_ms, scheduler_instance,
+        correlation_id, parameter_version, parameter_sha256, result_summary, error_code, error_message
+    </sql>
+
+    <select id="selectHistoryPage" resultMap="HistoryResultMap">
+        SELECT <include refid="HistoryColumns"/>
+        FROM spectra_core.quartz_job_execution_history
+        WHERE 1 = 1
+        <if test="jobKey != null and jobKey != ''">
+            AND job_key = #{jobKey}
+        </if>
+        <if test="triggerKey != null and triggerKey != ''">
+            AND trigger_key = #{triggerKey}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="startedAtFrom != null">
+            AND started_at &gt;= #{startedAtFrom}
+        </if>
+        <if test="startedAtTo != null">
+            AND started_at &lt; #{startedAtTo}
+        </if>
+        ORDER BY created_at DESC, id DESC
+    </select>
+
+    <select id="selectIdByFireInstanceId" resultType="java.util.UUID">
+        SELECT id
+          FROM spectra_core.quartz_job_execution_history
+         WHERE fire_instance_id = #{fireInstanceId}
+    </select>
+
+    <update id="finish">
+        UPDATE spectra_core.quartz_job_execution_history
+           SET status = #{status},
+               finished_at = #{finishedAt},
+               duration_ms = #{durationMs},
+               result_summary = #{resultSummary},
+               error_code = #{errorCode},
+               error_message = #{errorMessage},
+               updated_at = CURRENT_TIMESTAMP,
+               version = version + 1
+         WHERE id = #{id}
+           AND status = 'RUNNING'
+    </update>
+
+    <update id="abandonExpired">
+        WITH candidates AS (
+            SELECT id
+             FROM spectra_core.quartz_job_execution_history
+             WHERE status = 'RUNNING'
+               AND started_at &lt; #{cutoff}
+             ORDER BY started_at ASC, id ASC
+             LIMIT #{limit}
+        )
+        UPDATE spectra_core.quartz_job_execution_history target
+           SET status = 'ABANDONED',
+               finished_at = #{finishedAt},
+               duration_ms = GREATEST(0, EXTRACT(EPOCH FROM (#{finishedAt} - target.started_at) * 1000)::bigint),
+               error_code = #{errorCode},
+               error_message = #{errorMessage},
+               updated_at = CURRENT_TIMESTAMP,
+               version = version + 1
+         WHERE target.id IN (SELECT id FROM candidates)
+    </update>
+
+    <delete id="deleteExpired">
+        WITH candidates AS (
+            SELECT id
+             FROM spectra_core.quartz_job_execution_history
+             WHERE status IN ('SUCCEEDED', 'FAILED', 'VETOED', 'ABANDONED')
+               AND COALESCE(finished_at, created_at) &lt; #{cutoff}
+             ORDER BY COALESCE(finished_at, created_at) ASC, id ASC
+             LIMIT #{limit}
+        )
+        DELETE FROM spectra_core.quartz_job_execution_history target
+         WHERE target.id IN (SELECT id FROM candidates)
+    </delete>
+</mapper>

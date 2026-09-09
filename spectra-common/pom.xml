@@ -43,6 +43,11 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
+        <!-- Quartz Job 定义、Trigger 模板和参数 Schema 是可选业务模块共享的纯契约。 -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+        </dependency>
         <!-- 仅提供公共源码使用的空值语义注解，不引入框架运行时。 -->
         <dependency>
             <groupId>org.jspecify</groupId>

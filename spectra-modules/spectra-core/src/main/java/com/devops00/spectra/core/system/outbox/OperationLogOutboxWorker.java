@@ -6,14 +6,6 @@
 
 package com.devops00.spectra.core.system.outbox;
 
-import com.devops00.spectra.common.scheduler.ScheduledEffectType;
-import com.devops00.spectra.common.scheduler.ScheduledJobDescriptor;
-import com.devops00.spectra.common.scheduler.ScheduledJobType;
-import com.devops00.spectra.common.scheduler.ScheduledLoopContext;
-import com.devops00.spectra.common.scheduler.ScheduledLoopCycleResult;
-import com.devops00.spectra.common.scheduler.ScheduledLoopHandler;
-import com.devops00.spectra.common.scheduler.ScheduledRunScope;
-import com.devops00.spectra.common.scheduler.ScheduledScheduleKind;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.system.service.OperationLogService;
@@ -31,44 +23,22 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 普通操作日志 outbox worker。
  *
  * <p>批量领取和状态推进使用数据库事务；每个事件的 {@code sys_log} 写入和成功确认使用
- * 独立事务，避免一个坏事件回滚整批。当前 worker 由统一单体调度内核作为 SINGLETON/LOOP
- * 处理器驱动。</p>
+ * 独立事务，避免一个坏事件回滚整批。调度入口由 Quartz Job 提供。</p>
  */
 @Slf4j
 @Component
-public class OperationLogOutboxWorker implements ScheduledLoopHandler {
+public class OperationLogOutboxWorker {
 
     private static final int DEFAULT_BATCH_SIZE = 100;
     private static final int MAX_ATTEMPTS = 10;
     private static final Duration LEASE_DURATION = Duration.ofSeconds(30);
     private static final long MAX_BACKOFF_SECONDS = 300;
-
-    private static final ScheduledJobDescriptor DESCRIPTOR = ScheduledJobDescriptor.builder()
-            .jobKey("system.operation-log.outbox")
-            .handlerKey("system.operation-log.outbox")
-            .name("普通操作日志 Outbox")
-            .module("system")
-            .jobType(ScheduledJobType.LOOP)
-            .runScope(ScheduledRunScope.SINGLETON)
-            .scheduleKind(ScheduledScheduleKind.FIXED_DELAY)
-            .effectType(ScheduledEffectType.DB_ONLY)
-            .parameterSchema(Map.of())
-            .supportedActions(Set.of("VIEW", "START", "DRAIN_STOP"))
-            .executionPolicy(Map.of(
-                    "heartbeatIntervalMs", 3000L,
-                    "leaseDurationMs", LEASE_DURATION.toMillis(),
-                    "errorLogIntervalMs", 60000L,
-                    "batchSize", DEFAULT_BATCH_SIZE,
-                    "maxAttempts", MAX_ATTEMPTS))
-            .build();
 
     private final OperationLogOutboxRepository repository;
     private final ObjectMapper objectMapper;
@@ -119,33 +89,9 @@ public class OperationLogOutboxWorker implements ScheduledLoopHandler {
                 .register(meterRegistry);
     }
 
-    @Override
-    public ScheduledJobDescriptor descriptor() {
-        return DESCRIPTOR;
-    }
-
-    /**
-     * 直接执行一批消费，供测试和运维调用；生产调度使用 {@link #runCycle(ScheduledLoopContext)}。
-     */
+    /** 直接执行一批消费，供 Quartz Job、测试和运维调用。 */
     public BatchResult processBatch() {
         return processBatch(defaultOwner, DEFAULT_BATCH_SIZE);
-    }
-
-    @Override
-    public ScheduledLoopCycleResult runCycle(ScheduledLoopContext context) {
-        String owner = owner(context);
-        BatchResult result = processBatch(owner, DEFAULT_BATCH_SIZE);
-        boolean failed = result.failed() > 0;
-        return ScheduledLoopCycleResult.builder()
-                .processed(result.processed())
-                .failed(result.failed())
-                .errorCode(failed ? "OPERATION_LOG_OUTBOX_FAILURE" : null)
-                .sanitizedMessage(failed ? "普通操作日志 outbox 存在处理失败事件" : null)
-                .context(Map.of(
-                        "claimed", result.claimed(),
-                        "pending", result.pending(),
-                        "deadLetter", result.deadLetter()))
-                .build();
     }
 
     BatchResult processBatch(String owner, int batchSize) {
@@ -255,13 +201,6 @@ public class OperationLogOutboxWorker implements ScheduledLoopHandler {
         String normalized = message.replaceAll("[\\r\\n\\t]+", " ").trim();
         String combined = type + ": " + normalized;
         return combined.length() <= 2000 ? combined : combined.substring(0, 2000);
-    }
-
-    private static String owner(ScheduledLoopContext context) {
-        if (context == null || context.instanceId() == null || context.runtimeId() == null) {
-            return "operation-log-outbox";
-        }
-        return context.instanceId() + ":" + context.runtimeId();
     }
 
     /** 一批 outbox 的处理统计。 */
