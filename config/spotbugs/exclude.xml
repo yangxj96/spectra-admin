@@ -321,11 +321,11 @@
     <!-- Quartz Scheduler is a framework-managed mutable collaborator; the lifecycle wrapper deliberately retains it
          and exposes it only after the JDBC readiness gate to the Quartz management service. -->
     <Match>
-        <Class name="com.devops00.spectra.core.scheduler.quartz.configuration.QuartzSchedulerLifecycle"/>
+        <Class name="com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.core.scheduler.quartz.configuration.QuartzSchedulerLifecycle"/>
+        <Class name="com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle"/>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
 </FindBugsFilter>

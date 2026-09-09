@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.contract.service.job;
 
-import com.devops00.spectra.common.port.scheduler.quartz.QuartzBuiltInJobDefinition;
-import com.devops00.spectra.common.port.scheduler.quartz.QuartzParameterSchema;
-import com.devops00.spectra.common.port.scheduler.quartz.QuartzTriggerTemplate;
+import com.devops00.spectra.common.port.quartz.QuartzBuiltInJobDefinition;
+import com.devops00.spectra.common.port.quartz.QuartzParameterSchema;
+import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

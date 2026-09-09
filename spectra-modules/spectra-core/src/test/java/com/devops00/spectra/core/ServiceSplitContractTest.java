@@ -32,7 +32,7 @@ class ServiceSplitContractTest {
     @Test
     void publicEntryServicesMustKeepAThinDependencySurface() throws IOException {
         assertDependencyCountAtMost("user/imports/service/impl/UserImportServiceImpl.java", 8);
-        assertDependencyCountAtMost("scheduler/quartz/service/impl/QuartzJobManagementServiceImpl.java", 8);
+        assertDependencyCountAtMost("quartz/service/impl/QuartzJobManagementServiceImpl.java", 8);
         assertDependencyCountAtMost("system/service/impl/ServiceMonitorServiceImpl.java", 8);
         assertDependencyCountAtMost("security/authorization/service/impl/AuthorizationAssignmentChangeServiceImpl.java", 8);
     }
@@ -43,8 +43,8 @@ class ServiceSplitContractTest {
                 "user/imports/service/impl/UserImportPreviewService.java",
                 "user/imports/service/impl/UserImportExecutionService.java",
                 "user/imports/service/impl/UserImportResultService.java",
-                "scheduler/quartz/service/QuartzJobManagementService.java",
-                "scheduler/history/service/QuartzJobExecutionHistoryService.java",
+                "quartz/service/QuartzJobManagementService.java",
+                "quartz/service/QuartzJobExecutionHistoryService.java",
                 "system/service/impl/ServiceMonitorEvaluationService.java",
                 "system/service/impl/ServiceMonitorQueryService.java",
                 "security/authorization/service/impl/AuthorizationImpactService.java",
@@ -55,7 +55,7 @@ class ServiceSplitContractTest {
     void asynchronousAndTransactionalBoundariesMustBeVisibleInDedicatedBeans() throws IOException {
         String execution = readSource("user/imports/service/impl/UserImportExecutionService.java");
         String worker = readSource("user/imports/service/impl/UserImportExecutionWorker.java");
-        String control = readSource("scheduler/quartz/service/QuartzJobManagementService.java");
+        String control = readSource("quartz/service/QuartzJobManagementService.java");
         Assertions.assertThat(execution).contains("userImportTaskExecutor");
         Assertions.assertThat(worker).contains("@Transactional");
         Assertions.assertThat(worker).contains("CHUNK_SIZE");

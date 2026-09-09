@@ -5,10 +5,10 @@
 -->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.devops00.spectra.core.scheduler.history.mapper.QuartzJobExecutionHistoryMapper">
+<mapper namespace="com.devops00.spectra.core.quartz.mapper.QuartzJobExecutionHistoryMapper">
 
     <resultMap id="HistoryResultMap"
-               type="com.devops00.spectra.core.scheduler.history.javabean.entity.QuartzJobExecutionHistoryEntity">
+               type="com.devops00.spectra.core.quartz.javabean.entity.QuartzJobExecutionHistoryEntity">
         <id column="id" property="id"/>
         <result column="created_by" property="createdBy"/>
         <result column="created_at" property="createdAt"/>

@@ -84,7 +84,7 @@ class OptionalModuleIsolationTest {
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
                 "spectra-framework/src/main/java/com/devops00/spectra/framework/health/RedisHealthContributor.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
-                "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/scheduler/quartz/health/QuartzSchedulerHealthIndicator.java",
+                "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/quartz/health/QuartzSchedulerHealthIndicator.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
                 "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/notification/health/NotificationHealthIndicator.java",
                 "com.devops00.spectra.common.health.DependencyHealthContributor",
