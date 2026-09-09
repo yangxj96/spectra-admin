@@ -31,6 +31,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -215,6 +216,21 @@ class RequestDecryptAdviceTest {
         assertEquals("密钥未就绪，无法解密请求", exception.getMessage());
     }
 
+    @Test
+    void shouldDecryptUnsignedEnvelopeForPermitAllEndpoint() throws Exception {
+        var keyManager = mock(CryptoKeyManager.class);
+        when(keyManager.getServerPrivateKey()).thenReturn(serverKeyPair.getPrivate());
+        when(keyManager.getClientPublicKey()).thenReturn(null);
+        var advice = new RequestDecryptAdvice(keyManager, OBJECT_MAPPER, redisReturning(true), new SecurityProperties());
+        var envelope = unsignedEnvelope("anonymous-login", currentTimestamp());
+
+        var result = advice.beforeBodyRead(message(OBJECT_MAPPER.writeValueAsString(envelope)),
+                new MethodParameter(Endpoint.class.getDeclaredMethod("anonymousRead", Map.class), 0),
+                Map.class, StringHttpMessageConverter.class);
+
+        assertEquals("{\"name\":\"spectra\"}", new String(result.getBody().readAllBytes(), StandardCharsets.UTF_8));
+    }
+
     private static CryptoKeyManager keyManager() {
         var keyManager = mock(CryptoKeyManager.class);
         when(keyManager.getClientPublicKey()).thenReturn(clientKeyPair.getPublic());
@@ -247,6 +263,20 @@ class RequestDecryptAdviceTest {
         return envelope;
     }
 
+    private static Map<String, Object> unsignedEnvelope(String nonce, long timestamp) throws Exception {
+        var aesKey = AESUtils.generateKey();
+        var iv = AESUtils.generateIv();
+        var data = AESUtils.encrypt("{\"name\":\"spectra\"}", aesKey, iv);
+        var encryptedKey = RSAUtils.encrypt(aesKey.getEncoded(), serverKeyPair.getPublic());
+        var envelope = new HashMap<String, Object>();
+        envelope.put("data", data);
+        envelope.put("key", encryptedKey);
+        envelope.put("iv", AESUtils.getIvHex(iv));
+        envelope.put("nonce", nonce);
+        envelope.put("timestamp", timestamp);
+        return envelope;
+    }
+
     private static long currentTimestamp() {
         return System.currentTimeMillis() / 1000;
     }
@@ -263,6 +293,10 @@ class RequestDecryptAdviceTest {
 
         @SuppressWarnings("unused")
         void read(@RequestBody Map<String, Object> body) {
+        }
+
+        @PreAuthorize("permitAll()")
+        void anonymousRead(@RequestBody Map<String, Object> body) {
         }
     }
 

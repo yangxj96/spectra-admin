@@ -38,6 +38,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 import tools.jackson.databind.JsonNode;
@@ -199,7 +200,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
         try {
             long start = System.currentTimeMillis();
-            String decryptedJson = decrypt(node);
+            String decryptedJson = decrypt(node, requiresSignature(parameter));
             log.debug("{}请求解密完成, 耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
             return new DecryptedHttpInputMessage(inputMessage, decryptedJson.getBytes(StandardCharsets.UTF_8));
         } catch (EncryptException exception) {
@@ -279,10 +280,10 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     }
 
     /**
-     * 解密加密请求体（含验签 + 防重放）
+     * 解密加密请求体；匿名接口允许登录前没有客户端私钥的浏览器跳过签名，但仍执行信封、时间戳和 nonce 校验。
      */
-    private String decrypt(JsonNode node) throws Exception {
-        requireEnvelope(node);
+    private String decrypt(JsonNode node, boolean signatureRequired) throws Exception {
+        requireEnvelope(node, signatureRequired);
         String encryptedData = node.get("data").asString();
         String encryptedKey = node.get("key").asString();
         String ivHex = node.get("iv").asString();
@@ -290,10 +291,12 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         long timestamp = node.get("timestamp").asLong();
 
         // 从 CryptoKeyManager 获取密钥
-        PublicKey clientPublicKey = cryptoKeyManager.getClientPublicKey();
+        PublicKey clientPublicKey = signatureRequired ? cryptoKeyManager.getClientPublicKey() : null;
         PrivateKey serverPrivateKey = cryptoKeyManager.getServerPrivateKey();
-        validateKeys(clientPublicKey, serverPrivateKey);
-        verifySignature(node, encryptedData, nonce, timestamp, clientPublicKey);
+        validateKeys(clientPublicKey, serverPrivateKey, signatureRequired);
+        if (signatureRequired) {
+            verifySignature(node, encryptedData, nonce, timestamp, clientPublicKey);
+        }
         validateTimestamp(timestamp);
         consumeNonce(nonce);
 
@@ -303,8 +306,8 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     /**
      * 校验并确保数据满足当前约束（{@code validateKeys}）。
      */
-    private static void validateKeys(PublicKey clientPublicKey, PrivateKey serverPrivateKey) {
-        if (clientPublicKey == null || serverPrivateKey == null) {
+    private static void validateKeys(PublicKey clientPublicKey, PrivateKey serverPrivateKey, boolean signatureRequired) {
+        if (serverPrivateKey == null || (signatureRequired && clientPublicKey == null)) {
             throw new EncryptException("密钥未就绪，无法解密请求");
         }
     }
@@ -372,8 +375,10 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     }
 
     /** 校验加密信封字段，避免空值、隐式默认值和类型转换绕过安全边界。 */
-    private static void requireEnvelope(JsonNode node) {
-        List<String> required = List.of("data", "key", "iv", "signature", "nonce", "timestamp");
+    private static void requireEnvelope(JsonNode node, boolean signatureRequired) {
+        List<String> required = signatureRequired
+                ? List.of("data", "key", "iv", "signature", "nonce", "timestamp")
+                : List.of("data", "key", "iv", "nonce", "timestamp");
         for (String field : required) {
             JsonNode value = node.get(field);
             if (value == null || (!"timestamp".equals(field) && (!value.isTextual() || value.asString().isBlank()))) {
@@ -388,6 +393,30 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         if (nonce.length() > 128 || !nonce.matches("[A-Za-z0-9._:-]+")) {
             throw new RequestCryptoException("请求加密信封 nonce 无效");
         }
+    }
+
+    /**
+     * 判断请求是否需要客户端签名。
+     *
+     * <p>只有显式声明为公开接口的请求才允许在登录前没有客户端私钥时跳过签名；未声明或其他权限表达式仍要求验签。</p>
+     */
+    private static boolean requiresSignature(MethodParameter parameter) {
+        Method method = parameter.getMethod();
+        if (method == null) {
+            return true;
+        }
+        PreAuthorize methodAuthorization = AnnotatedElementUtils.findMergedAnnotation(method, PreAuthorize.class);
+        if (isPermitAll(methodAuthorization)) {
+            return false;
+        }
+        PreAuthorize typeAuthorization = AnnotatedElementUtils.findMergedAnnotation(
+                method.getDeclaringClass(), PreAuthorize.class);
+        return !isPermitAll(typeAuthorization);
+    }
+
+    /** 判断权限注解是否为精确的公开访问表达式。 */
+    private static boolean isPermitAll(PreAuthorize authorization) {
+        return authorization != null && "permitAll()".equals(authorization.value().trim());
     }
 
     /** 校验标准 Base64，避免将非法输入交给底层密码 API。 */
