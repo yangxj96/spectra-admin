@@ -13,7 +13,7 @@
         <result column="schedule_kind_snapshot" property="scheduleKindSnapshot"/>
         <result column="schedule_expression_snapshot" property="scheduleExpressionSnapshot"/>
         <result column="parameters_snapshot" property="parametersSnapshot"
-                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
         <result column="effect_type" property="effectType"/>
         <result column="scheduled_at" property="scheduledAt"/>
         <result column="queued_at" property="queuedAt"/>
@@ -30,7 +30,7 @@
         <result column="last_error_code" property="lastErrorCode"/>
         <result column="last_error_message" property="lastErrorMessage"/>
         <result column="result_summary" property="resultSummary"
-                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
         <result column="original_execution_id" property="originalExecutionId"/>
         <result column="resolution_status" property="resolutionStatus"/>
         <result column="resolution_reason" property="resolutionReason"/>
@@ -51,12 +51,12 @@
             #{execution.id}, #{execution.jobId}, #{execution.fireKey}, #{execution.triggerType}, #{execution.status},
             #{execution.jobRevision}, #{execution.handlerVersion}, #{execution.scheduleKindSnapshot},
             #{execution.scheduleExpressionSnapshot},
-            #{execution.parametersSnapshot, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{execution.parametersSnapshot, typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
             #{execution.effectType}, #{execution.scheduledAt}, #{execution.queuedAt}, #{execution.startedAt},
             #{execution.finishedAt}, #{execution.nextRetryAt}, #{execution.deadlineAt}, #{execution.attemptNo},
             #{execution.maxAttempts}, #{execution.lockedBy}, #{execution.lockedAt}, #{execution.leaseExpiresAt},
             #{execution.lastHeartbeatAt}, #{execution.lastErrorCode}, #{execution.lastErrorMessage},
-            #{execution.resultSummary, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{execution.resultSummary, typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
             #{execution.originalExecutionId}, #{execution.resolutionStatus}, #{execution.resolutionReason},
             #{execution.resolvedBy}, #{execution.resolvedAt}, #{execution.createdBy}, #{execution.createdAt},
             #{execution.updatedBy}, #{execution.updatedAt}, #{execution.deleted}, #{execution.version}
@@ -113,7 +113,7 @@
             attempt_no = CASE WHEN #{status} = 'RETRY_WAIT' THEN attempt_no + 1 ELSE attempt_no END,
             last_error_code = #{errorCode},
             last_error_message = #{errorMessage},
-            result_summary = #{resultSummary, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            result_summary = #{resultSummary, typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
             next_retry_at = #{nextRetryAt},
             finished_at = #{finishedAt},
             locked_by = NULL,

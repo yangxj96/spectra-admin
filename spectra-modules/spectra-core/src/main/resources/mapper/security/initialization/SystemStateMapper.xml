@@ -25,10 +25,10 @@
         <result column="state_key"        property="stateKey"/>
         <result column="state"            property="state"/>
         <result column="initialization_id" property="initializationId"
-                typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
         <result column="initialized_at"    property="initializedAt"/>
         <result column="initialized_by"    property="initializedBy"
-                typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->
 

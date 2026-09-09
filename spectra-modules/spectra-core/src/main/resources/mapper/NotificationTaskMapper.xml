@@ -36,7 +36,7 @@
         <result column="title"                           property="title"/>
         <result column="content"                         property="content"/>
         <result column="link"                            property="link"/>
-        <result column="extra"                           property="extra" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="extra"                           property="extra" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
         <result column="sensitive_parameters_ciphertext" property="sensitiveParametersCiphertext"/>
         <result column="priority"                        property="priority"/>
         <result column="attempt_count"                   property="attemptCount"/>
@@ -150,7 +150,7 @@
                 #{task.title},
                 #{task.content},
                 #{task.link},
-                #{task.extra,typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+                #{task.extra,typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
                 #{task.sensitiveParametersCiphertext},
                 #{task.priority},
                 #{task.attemptCount},

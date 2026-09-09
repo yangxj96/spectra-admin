@@ -21,9 +21,9 @@
         <result column="misfire_policy" property="misfirePolicy"/>
         <result column="concurrency_policy" property="concurrencyPolicy"/>
         <result column="execution_policy" property="executionPolicy"
-                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
         <result column="parameters" property="parameters"
-                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
         <result column="revision" property="revision"/>
     </resultMap>
 
@@ -91,8 +91,8 @@
             next_fire_at = NULL,
             misfire_policy = #{job.misfirePolicy},
             concurrency_policy = #{job.concurrencyPolicy},
-            execution_policy = #{job.executionPolicy, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
-            parameters = #{job.parameters, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            execution_policy = #{job.executionPolicy, typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
+            parameters = #{job.parameters, typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
             revision = revision + 1,
             updated_at = CURRENT_TIMESTAMP,
             version = version + 1

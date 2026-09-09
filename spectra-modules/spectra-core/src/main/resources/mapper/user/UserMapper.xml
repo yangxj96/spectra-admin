@@ -33,7 +33,7 @@
         <result column="email"         property="email"/>
         <result column="language"      property="language"/>
         <result column="timezone"      property="timezone"/>
-        <result column="primary_department_id" property="departmentId" typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+        <result column="primary_department_id" property="departmentId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
         <result column="security_version" property="securityVersion"/>
     </resultMap>
     <!-- @formatter:on -->

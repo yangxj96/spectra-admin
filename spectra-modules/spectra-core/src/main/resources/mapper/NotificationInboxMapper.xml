@@ -34,7 +34,7 @@
         <result column="link"                    property="link"/>
         <result column="is_read"                 property="isRead"/>
         <result column="read_at"                 property="readAt"/>
-        <result column="extra"                   property="extra" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="extra"                   property="extra" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->
 

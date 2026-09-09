@@ -159,7 +159,7 @@ spring:
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.devops00.**.entity
-  type-handlers-package: com.devops00.spectra.common.mybatis.handler
+  type-handlers-package: com.devops00.spectra.framework.persistence.mybatis
   configuration:
     log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
     local-cache-scope: statement

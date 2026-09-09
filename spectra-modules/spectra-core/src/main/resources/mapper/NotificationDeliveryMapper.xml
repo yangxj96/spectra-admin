@@ -38,7 +38,7 @@
         <result column="error_code"              property="errorCode"/>
         <result column="error_message_sanitized" property="errorMessageSanitized"/>
         <result column="duration_ms"              property="durationMs"/>
-        <result column="response_summary"         property="responseSummary" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="response_summary"         property="responseSummary" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
     </resultMap>
 
     <resultMap id="AdminResultMap"

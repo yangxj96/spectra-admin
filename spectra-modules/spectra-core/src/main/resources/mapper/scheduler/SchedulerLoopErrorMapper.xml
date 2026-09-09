@@ -17,7 +17,7 @@
         <result column="occurrence_count" property="occurrenceCount"/>
         <result column="suppressed_count" property="suppressedCount"/>
         <result column="last_context" property="lastContext"
-                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+                typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
         <result column="resolved_by" property="resolvedBy"/>
         <result column="resolved_at" property="resolvedAt"/>
         <result column="resolution_reason" property="resolutionReason"/>
@@ -42,7 +42,7 @@
             #{error.id}, #{error.jobId}, #{error.instanceId}, #{error.runtimeId}, #{error.errorFingerprint},
             #{error.errorCode}, #{error.errorMessage}, 'OPEN', #{error.firstSeenAt}, #{error.lastSeenAt},
             #{error.lastLoggedAt}, 1, 0,
-            #{error.lastContext, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{error.lastContext, typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler},
             #{error.createdAt}, #{error.updatedAt}, #{error.version}
         )
         ON CONFLICT (job_id, instance_id, error_fingerprint) DO UPDATE
