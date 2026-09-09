@@ -19,16 +19,12 @@ package com.devops00.spectra.framework.health;
 import com.devops00.spectra.common.health.DependencyHealthContributor;
 import com.devops00.spectra.common.health.DependencyHealthResult;
 import com.devops00.spectra.common.health.DependencyHealthStatus;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
 
 /** framework 提供的 Redis 技术依赖健康检查。 */
-@Component("redisHealthContributor")
-@ConditionalOnBean(RedisConnectionFactory.class)
 public class RedisHealthContributor implements DependencyHealthContributor {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(3);

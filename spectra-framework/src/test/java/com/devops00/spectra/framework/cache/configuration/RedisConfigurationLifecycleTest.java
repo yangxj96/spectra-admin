@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.framework.cache.configuration;
 
+import com.devops00.spectra.framework.health.RedisHealthContributor;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.resource.ClientResources;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,17 @@ import static org.mockito.Mockito.mock;
 
 /** Lettuce 客户端和线程资源的 Spring 生命周期回归测试。 */
 class RedisConfigurationLifecycleTest {
+
+    @Test
+    void shouldRegisterRedisHealthContributorWithRedisConnectionFactory() {
+        var context = new AnnotationConfigApplicationContext();
+        context.register(RedisConfiguration.class, TestDependencies.class);
+        context.refresh();
+
+        assertThat(context.getBean(RedisHealthContributor.class)).isNotNull();
+
+        context.close();
+    }
 
     @Test
     void shouldCloseClientAndClientResourcesWhenContextCloses() {

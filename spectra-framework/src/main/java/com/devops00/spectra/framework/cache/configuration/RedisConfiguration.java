@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.cache.configuration;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.framework.health.RedisHealthContributor;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.SocketOptions;
@@ -103,6 +104,17 @@ public class RedisConfiguration {
         client.setOptions(clientOptionsBuilder.build());
 
         return client;
+    }
+
+    /**
+     * 注册 Redis 依赖健康检查 contributor。
+     *
+     * @param factory Spring Boot 创建的 Redis 连接工厂，供 contributor 执行 PING 检查。
+     * @return Redis 健康检查 contributor；返回对象始终非 null。
+     */
+    @Bean
+    public RedisHealthContributor redisHealthContributor(RedisConnectionFactory factory) {
+        return new RedisHealthContributor(factory);
     }
 
     /**
