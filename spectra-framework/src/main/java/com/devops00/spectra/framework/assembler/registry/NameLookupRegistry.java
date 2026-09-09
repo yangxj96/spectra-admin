@@ -14,8 +14,11 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.framework.assembler;
+package com.devops00.spectra.framework.assembler.registry;
 
+import com.devops00.spectra.framework.assembler.NameFill;
+import com.devops00.spectra.framework.assembler.NameFillExecutor;
+import com.devops00.spectra.framework.assembler.NameLookup;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Component;
 

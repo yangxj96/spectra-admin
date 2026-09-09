@@ -190,7 +190,7 @@ class BackendUtilityArchitectureTest {
 
         assertThat(contents)
                 .contains("@Component")
-                .contains("private final ApplicationContext applicationContext")
+                .contains("private final NameLookupRegistry lookupRegistry")
                 .doesNotContain("static void fill")
                 .doesNotContain("static Map")
                 .doesNotContain("static Set");

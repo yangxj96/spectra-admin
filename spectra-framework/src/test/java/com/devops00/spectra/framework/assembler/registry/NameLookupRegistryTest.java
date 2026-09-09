@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.devops00.spectra.framework.assembler;
+package com.devops00.spectra.framework.assembler.registry;
 
+import com.devops00.spectra.framework.assembler.NameLookup;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

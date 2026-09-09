@@ -10,6 +10,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
 import com.devops00.spectra.core.security.authorization.domain.RoleChangeImpact;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
@@ -114,6 +115,9 @@ class RoleAuthorizationChangeServiceImplTest {
 
     @Mock
     private SecurityAuditWriter securityAuditWriter;
+
+    @Mock
+    private SecurityAuditEventFactory securityAuditEventFactory;
 
     @Mock
     private SecurityChangeOutboxProducer securityChangeOutboxProducer;

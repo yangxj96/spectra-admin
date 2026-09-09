@@ -18,7 +18,6 @@ package com.devops00.spectra.common.audit;
 
 import org.slf4j.MDC;
 
-import java.lang.ScopedValue;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;

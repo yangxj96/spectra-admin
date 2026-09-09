@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.framework.assembler;
 
+import com.devops00.spectra.framework.assembler.registry.NameLookupRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

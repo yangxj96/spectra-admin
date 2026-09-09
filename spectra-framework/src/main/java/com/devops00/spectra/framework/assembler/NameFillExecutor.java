@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.assembler;
 
 import com.devops00.spectra.framework.assembler.converter.IdConverter;
+import com.devops00.spectra.framework.assembler.registry.NameLookupRegistry;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 

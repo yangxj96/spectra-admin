@@ -6,7 +6,6 @@
 
 package com.devops00.spectra.common.mybatis;
 
-import java.lang.ScopedValue;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
