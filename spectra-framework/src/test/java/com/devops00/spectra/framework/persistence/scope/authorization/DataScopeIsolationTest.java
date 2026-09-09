@@ -13,7 +13,6 @@ import com.devops00.spectra.common.security.authorization.PermissionBoundary;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -37,20 +36,16 @@ class DataScopeIsolationTest {
     private static final UUID USER_ID = UUID.fromString("019bdfdd-b58d-7232-943f-af4141801ae3");
     private static final String READ_PERMISSION = "oa:meeting:read";
 
-    @AfterEach
-    void clearContext() {
-        DataScopeContextHolder.endRequest();
-    }
-
     @Test
-    void requestContextOnlyTracksScopedBypass() {
-        DataScopeContextHolder.beginRequest();
+    void requestContextOnlyTracksScopedBypass() throws Exception {
         assertFalse(DataScopeContextHolder.isBypassed());
 
-        DataScopeContextHolder.withBypass(() -> assertTrue(DataScopeContextHolder.isBypassed()));
-        assertFalse(DataScopeContextHolder.isBypassed());
-
-        DataScopeContextHolder.endRequest();
+        DataScopeContextHolder.callWithRequest(() -> {
+            assertFalse(DataScopeContextHolder.isBypassed());
+            DataScopeContextHolder.withBypass(() -> assertTrue(DataScopeContextHolder.isBypassed()));
+            assertFalse(DataScopeContextHolder.isBypassed());
+            return null;
+        });
         assertFalse(DataScopeContextHolder.isBypassed());
     }
 

@@ -114,7 +114,6 @@ class AuditAspectContractTest {
             aspect.handleAround(point);
         } finally {
             org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
-            RequestCorrelationContext.clear();
         }
 
         var context = recorded.get().context();

@@ -28,7 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * 为每个 HTTP 请求建立并清理数据权限快照。
+ * 为每个 HTTP 请求建立数据权限 callback 作用域，并在请求结束后自动恢复进入前的绕过状态。
  *
  * @author yangxj96
  * @version 1.0
@@ -41,11 +41,17 @@ public class DataScopeContextFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        DataScopeContextHolder.beginRequest();
         try {
-            filterChain.doFilter(request, response);
-        } finally {
-            DataScopeContextHolder.endRequest();
+            DataScopeContextHolder.callWithRequest(() -> {
+                filterChain.doFilter(request, response);
+                return null;
+            });
+        } catch (ServletException | IOException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new ServletException("数据权限请求上下文执行失败", exception);
         }
     }
 }

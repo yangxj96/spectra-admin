@@ -82,7 +82,7 @@ class NotificationGatewayImplTest {
     }
 
     @Test
-    void shouldExpandOneRequestIntoRecipientTasks() {
+    void shouldExpandOneRequestIntoRecipientTasks() throws Exception {
         var requestMapper = mock(NotificationRequestMapper.class);
         var taskMapper = mock(NotificationTaskMapper.class);
         var templateMapper = mock(NotificationTemplateMapper.class);
@@ -100,13 +100,10 @@ class NotificationGatewayImplTest {
 
         stubBatchSuccess(taskMapper);
         var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory, protectorWithKey());
-        NotificationReceipt receipt;
-        try (var ignored = RequestCorrelationContext.openWithMdc(
-                RequestCorrelationContext.forHttp("request-123", "correlation-456"))) {
-            receipt = gateway
-                    .enqueue(NotificationRequest.inApp("test:expand", NotificationPurpose.SYSTEM_NOTICE,
-                            List.of(first, second), "test", "标题", "正文", "TEST", "1", "TEST", null));
-        }
+        NotificationReceipt receipt = RequestCorrelationContext.callWithMdc(
+                RequestCorrelationContext.forHttp("request-123", "correlation-456"),
+                () -> gateway.enqueue(NotificationRequest.inApp("test:expand", NotificationPurpose.SYSTEM_NOTICE,
+                        List.of(first, second), "test", "标题", "正文", "TEST", "1", "TEST", null)));
 
         assertEquals(2, receipt.taskCount());
         assertTrue(!receipt.idempotentReplay());

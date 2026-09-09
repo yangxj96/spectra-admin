@@ -18,16 +18,19 @@ package com.devops00.spectra.common.audit;
 
 import org.slf4j.MDC;
 
+import java.lang.ScopedValue;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 /**
- * 当前线程的请求或后台任务链路上下文。
+ * 当前执行作用域内的请求或后台任务链路上下文。
  *
  * <p>该类型位于 common，供 framework、core 和可选业务模块共享；它不依赖 Servlet 或具体业务实现，
- * 也不包含租户字段。HTTP 入口由 framework 负责创建上下文，后台 worker 必须显式创建任务级上下文并在 finally
- * 中关闭。</p>
+ * 也不包含租户字段。HTTP 入口由 framework 负责创建上下文，后台 worker 必须显式创建任务级上下文并通过
+ * callback 作用域建立；作用域结束后由运行时自动恢复。ScopedValue 负责作用域内的上下文隔离，MDC 只作为
+ * 日志框架适配层在同一 callback 期间同步维护。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -50,7 +53,7 @@ public final class RequestCorrelationContext {
 
     private static final int MAX_ID_LENGTH = 128;
     private static final Pattern SAFE_ID = Pattern.compile("[A-Za-z0-9._:-]{1,128}");
-    private static final ThreadLocal<Context> CURRENT = new ThreadLocal<>();
+    private static final ScopedValue<Context> CURRENT = ScopedValue.newInstance();
 
     private RequestCorrelationContext() {
     }
@@ -61,16 +64,15 @@ public final class RequestCorrelationContext {
      * @return 当前上下文或空上下文
      */
     public static Context current() {
-        var context = CURRENT.get();
-        return context == null ? Context.empty() : context;
+        return CURRENT.orElse(Context.empty());
     }
 
     /**
      * 创建 HTTP 请求上下文。非法或缺失的外部标识会被丢弃，并使用 UUID 作为请求 ID；
      * 缺失或非法的关联 ID 默认跟随请求 ID。
      *
-     * @param requestIdHeader     外部请求 ID
-     * @param correlationIdHeader 外部关联 ID
+     * @param requestIdHeader     客户端传入的请求标识，用于在当前 HTTP 请求范围内定位一次请求
+     * @param correlationIdHeader 客户端传入的关联标识，用于把当前请求与跨请求业务链路关联起来
      * @return 已清洗的 HTTP 上下文
      */
     public static Context forHttp(String requestIdHeader, String correlationIdHeader) {
@@ -94,46 +96,65 @@ public final class RequestCorrelationContext {
     }
 
     /**
-     * 在当前线程安装上下文，并在关闭时恢复之前的上下文。
+     * 在 callback 作用域内安装上下文并同步设置 MDC；callback 结束时恢复进入前的 MDC 值。
      *
-     * @param context 要安装的上下文
-     * @return 可关闭的作用域
+     * @param context 要在 callback 期间读取的链路上下文；为空时使用空上下文
+     * @param action  在该链路上下文和 MDC 中执行的业务动作；动作抛出的受检异常原样传播
+     * @param <T>     动作返回值类型
+     * @return action 产生的业务结果；action 返回 null 时原样返回 null
+     * @throws Exception action 抛出的受检异常
      */
-    public static Scope open(Context context) {
-        var previous = CURRENT.get();
-        CURRENT.set(context == null ? Context.empty() : context);
-        return new Scope(previous, null, null, false);
-    }
-
-    /**
-     * 安装上下文并同步设置 MDC；关闭时恢复原有 MDC，适用于 HTTP、worker 和异步任务边界。
-     *
-     * @param context 要安装的上下文
-     * @return 可关闭的作用域
-     */
-    public static Scope openWithMdc(Context context) {
+    public static <T> T callWithMdc(Context context, Callable<T> action) throws Exception {
+        Objects.requireNonNull(action, "action");
         var previousRequestId = MDC.get(REQUEST_ID_MDC_KEY);
         var previousCorrelationId = MDC.get(CORRELATION_ID_MDC_KEY);
-        var previous = CURRENT.get();
-        CURRENT.set(context == null ? Context.empty() : context);
-        setMdc(REQUEST_ID_MDC_KEY, current().requestId());
-        setMdc(CORRELATION_ID_MDC_KEY, current().correlationId());
-        return new Scope(previous, previousRequestId, previousCorrelationId, true);
+        Context effectiveContext = context == null ? Context.empty() : context;
+        return ScopedValue.where(CURRENT, effectiveContext).call(() -> {
+            setMdc(REQUEST_ID_MDC_KEY, effectiveContext.requestId());
+            setMdc(CORRELATION_ID_MDC_KEY, effectiveContext.correlationId());
+            try {
+                return action.call();
+            } finally {
+                setMdc(REQUEST_ID_MDC_KEY, previousRequestId);
+                setMdc(CORRELATION_ID_MDC_KEY, previousCorrelationId);
+            }
+        });
     }
 
     /**
-     * 打开后台任务级上下文并同步 MDC。
+     * 在 callback 作用域内安装上下文并同步设置 MDC，适用于不返回受检异常的同步动作。
      *
-     * @param taskId 已有任务标识；非法或缺失时自动生成 UUID
-     * @return 可关闭的作用域
+     * @param context 要在 callback 期间读取的链路上下文；为空时使用空上下文
+     * @param action  在该链路上下文和 MDC 中执行的同步动作
      */
-    public static Scope openTask(String taskId) {
-        return openWithMdc(forTask(taskId));
+    public static void runWithMdc(Context context, Runnable action) {
+        Objects.requireNonNull(action, "action");
+        var previousRequestId = MDC.get(REQUEST_ID_MDC_KEY);
+        var previousCorrelationId = MDC.get(CORRELATION_ID_MDC_KEY);
+        Context effectiveContext = context == null ? Context.empty() : context;
+        ScopedValue.where(CURRENT, effectiveContext).run(() -> {
+            setMdc(REQUEST_ID_MDC_KEY, effectiveContext.requestId());
+            setMdc(CORRELATION_ID_MDC_KEY, effectiveContext.correlationId());
+            try {
+                action.run();
+            } finally {
+                setMdc(REQUEST_ID_MDC_KEY, previousRequestId);
+                setMdc(CORRELATION_ID_MDC_KEY, previousCorrelationId);
+            }
+        });
     }
 
-    /** 清理当前线程上下文，主要供测试和线程边界使用。 */
-    public static void clear() {
-        CURRENT.remove();
+    /**
+     * 在 callback 作用域内建立后台任务上下文并同步设置 MDC。
+     *
+     * @param taskId 已有任务标识；非法或缺失时自动生成 UUID，requestId 始终为空
+     * @param action 在任务链路上下文中执行的动作
+     * @param <T>    动作返回值类型
+     * @return action 产生的业务结果；action 返回 null 时原样返回 null
+     * @throws Exception action 抛出的受检异常
+     */
+    public static <T> T callTask(String taskId, Callable<T> action) throws Exception {
+        return callWithMdc(forTask(taskId), action);
     }
 
     /**
@@ -152,7 +173,14 @@ public final class RequestCorrelationContext {
                 : null;
     }
 
-    /** 当前线程的链路上下文。 */
+    /**
+     * 当前执行作用域内的链路上下文。
+     *
+     * HTTP 请求 ID；后台任务上下文中为 {@code null}。
+     *
+     * @param requestId     HTTP 请求标识；后台任务或空上下文为 {@code null}
+     * @param correlationId 跨请求、任务和事件传递的关联标识；空上下文为 {@code null}
+     */
     public record Context(String requestId, String correlationId) {
 
         public Context {
@@ -168,38 +196,6 @@ public final class RequestCorrelationContext {
         /** @return 当前上下文是否没有任何标识 */
         public boolean isEmpty() {
             return requestId == null && correlationId == null;
-        }
-    }
-
-    /** 可恢复的线程上下文作用域。 */
-    public static final class Scope implements AutoCloseable {
-
-        private final Context previous;
-        private final String previousRequestId;
-        private final String previousCorrelationId;
-        private final boolean mdcManaged;
-        private final AtomicBoolean closed = new AtomicBoolean();
-
-        private Scope(Context previous, String previousRequestId, String previousCorrelationId, boolean mdcManaged) {
-            this.previous = previous;
-            this.previousRequestId = previousRequestId;
-            this.previousCorrelationId = previousCorrelationId;
-            this.mdcManaged = mdcManaged;
-        }
-
-        @Override
-        public void close() {
-            if (closed.compareAndSet(false, true)) {
-                if (previous == null) {
-                    CURRENT.remove();
-                } else {
-                    CURRENT.set(previous);
-                }
-                if (mdcManaged) {
-                    setMdc(REQUEST_ID_MDC_KEY, previousRequestId);
-                    setMdc(CORRELATION_ID_MDC_KEY, previousCorrelationId);
-                }
-            }
         }
     }
 

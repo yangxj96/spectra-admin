@@ -36,7 +36,7 @@ class RequestCorrelationFilterTest {
 
     @AfterEach
     void clearContext() {
-        RequestCorrelationContext.clear();
+        org.slf4j.MDC.clear();
     }
 
     @Test

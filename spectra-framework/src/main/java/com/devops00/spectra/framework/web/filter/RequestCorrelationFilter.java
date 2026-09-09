@@ -59,8 +59,17 @@ public class RequestCorrelationFilter extends OncePerRequestFilter {
         request.setAttribute(REQUEST_ID_ATTRIBUTE, context.requestId());
         request.setAttribute(CORRELATION_ID_ATTRIBUTE, context.correlationId());
         setResponseHeaders(response, context);
-        try (var ignored = RequestCorrelationContext.openWithMdc(context)) {
-            filterChain.doFilter(request, response);
+        try {
+            RequestCorrelationContext.callWithMdc(context, () -> {
+                filterChain.doFilter(request, response);
+                return null;
+            });
+        } catch (ServletException | IOException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new ServletException("请求链路上下文执行失败", exception);
         } finally {
             // 再次设置，确保下游没有覆盖为未经清洗的值；响应已提交时 Servlet 容器会按自身规则处理。
             setResponseHeaders(response, context);

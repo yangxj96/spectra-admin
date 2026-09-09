@@ -197,53 +197,52 @@ public class SecurityChangeOutboxWorker implements ScheduledLoopHandler {
     }
 
     private void processOne(SecurityChangeOutboxRepository.SecurityChangeOutboxEvent event, String owner) {
-        try (var ignored = RequestCorrelationContext.openTask(
-                event.correlationId() == null ? event.eventId().toString() : event.correlationId())) {
-            ScheduledFuture<?> renewal = leaseRenewalExecutor.scheduleAtFixedRate(
-                    () -> renewLeaseWithContext(event, owner),
-                    LEASE_RENEWAL_INTERVAL.toMillis(),
-                    LEASE_RENEWAL_INTERVAL.toMillis(),
-                    java.util.concurrent.TimeUnit.MILLISECONDS);
-            try {
-                SecurityAuditEvent auditEvent;
-                try {
-                    auditEvent = objectMapper.readValue(event.payload(), SecurityAuditEvent.class);
-                } catch (RuntimeException exception) {
-                    throw new OutboxPayloadException("安全变更 outbox payload 无法解析", exception);
-                }
-                if (!event.eventId().equals(auditEvent.eventId())
-                        || !event.eventType().equals(auditEvent.eventType())
-                        || (event.correlationId() != null && !event.correlationId().equals(auditEvent.correlationId()))) {
-                    throw new OutboxPayloadException("安全变更 outbox 元数据与 payload 不一致");
-                }
-                transactionTemplate.executeWithoutResult(status -> {
-                    var matchingHandlers = handlers.stream()
-                            .filter(handler -> handler.supports(event.eventType()))
-                            .toList();
-                    // Core 在没有可选下游模块时只承担持久化交接职责；一旦已经注册了
-                    // handler 却没有消费者接收该事件，必须失败并进入重试/死信，不能静默确认。
-                    if (!handlers.isEmpty() && matchingHandlers.isEmpty()) {
-                        throw new OutboxPayloadException("安全变更 outbox 没有匹配的下游处理器");
-                    }
-                    matchingHandlers.forEach(handler -> handler.handle(event, auditEvent));
-                    if (repository.markProcessed(event.eventId(), owner, clock.instant()) != 1) {
-                        throw new DataAccessException("安全变更 outbox 租约已失效，未确认成功") {
-                        };
+        RequestCorrelationContext.runWithMdc(RequestCorrelationContext.forTask(
+                event.correlationId() == null ? event.eventId().toString() : event.correlationId()), () -> {
+                    ScheduledFuture<?> renewal = leaseRenewalExecutor.scheduleAtFixedRate(
+                            () -> renewLeaseWithContext(event, owner),
+                            LEASE_RENEWAL_INTERVAL.toMillis(),
+                            LEASE_RENEWAL_INTERVAL.toMillis(),
+                            java.util.concurrent.TimeUnit.MILLISECONDS);
+                    try {
+                        SecurityAuditEvent auditEvent;
+                        try {
+                            auditEvent = objectMapper.readValue(event.payload(), SecurityAuditEvent.class);
+                        } catch (RuntimeException exception) {
+                            throw new OutboxPayloadException("安全变更 outbox payload 无法解析", exception);
+                        }
+                        if (!event.eventId().equals(auditEvent.eventId())
+                                || !event.eventType().equals(auditEvent.eventType())
+                                || (event.correlationId() != null && !event.correlationId().equals(auditEvent.correlationId()))) {
+                            throw new OutboxPayloadException("安全变更 outbox 元数据与 payload 不一致");
+                        }
+                        transactionTemplate.executeWithoutResult(status -> {
+                            var matchingHandlers = handlers.stream()
+                                    .filter(handler -> handler.supports(event.eventType()))
+                                    .toList();
+                            // Core 在没有可选下游模块时只承担持久化交接职责；一旦已经注册了
+                            // handler 却没有消费者接收该事件，必须失败并进入重试/死信，不能静默确认。
+                            if (!handlers.isEmpty() && matchingHandlers.isEmpty()) {
+                                throw new OutboxPayloadException("安全变更 outbox 没有匹配的下游处理器");
+                            }
+                            matchingHandlers.forEach(handler -> handler.handle(event, auditEvent));
+                            if (repository.markProcessed(event.eventId(), owner, clock.instant()) != 1) {
+                                throw new DataAccessException("安全变更 outbox 租约已失效，未确认成功") {
+                                };
+                            }
+                        });
+                        log.debug("安全变更 outbox 已分发: eventId={}, correlationId={}, eventType={}",
+                                event.eventId(), event.correlationId(), event.eventType());
+                    } finally {
+                        renewal.cancel(false);
                     }
                 });
-                log.debug("安全变更 outbox 已分发: eventId={}, correlationId={}, eventType={}",
-                        event.eventId(), event.correlationId(), event.eventType());
-            } finally {
-                renewal.cancel(false);
-            }
-        }
     }
 
     private void renewLeaseWithContext(SecurityChangeOutboxRepository.SecurityChangeOutboxEvent event, String owner) {
-        try (var ignored = RequestCorrelationContext.openTask(
-                event.correlationId() == null ? event.eventId().toString() : event.correlationId())) {
-            renewLease(event, owner);
-        }
+        RequestCorrelationContext.runWithMdc(RequestCorrelationContext.forTask(
+                event.correlationId() == null ? event.eventId().toString() : event.correlationId()),
+                () -> renewLease(event, owner));
     }
 
     private void renewLease(SecurityChangeOutboxRepository.SecurityChangeOutboxEvent event, String owner) {

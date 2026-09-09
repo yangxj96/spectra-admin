@@ -101,35 +101,32 @@ public class AuditAspect {
         AuditDescriptor descriptor = resolveDescriptor(method, point);
         long startedAt = System.nanoTime();
         var current = resolveCorrelationContext();
-        try (var ignored = RequestCorrelationContext.openWithMdc(
-                current)) {
-            try {
-                return transactionOperations.execute(status -> {
-                    Object result = null;
-                    Throwable failure = null;
-                    try {
-                        result = point.proceed();
-                        return result;
-                    } catch (Throwable ex) {
-                        failure = ex;
-                        throw new AuditedInvocationException(ex);
-                    } finally {
-                        if (descriptor != null) {
-                            try {
-                                submit(point, method, descriptor, result, failure, startedAt);
-                            } catch (AuditService.AuditRecordingException auditFailure) {
-                                if (failure != null) {
-                                    failure.addSuppressed(auditFailure);
-                                } else {
-                                    throw auditFailure;
-                                }
+        try {
+            return RequestCorrelationContext.callWithMdc(current, () -> transactionOperations.execute(status -> {
+                Object result = null;
+                Throwable failure = null;
+                try {
+                    result = point.proceed();
+                    return result;
+                } catch (Throwable ex) {
+                    failure = ex;
+                    throw new AuditedInvocationException(ex);
+                } finally {
+                    if (descriptor != null) {
+                        try {
+                            submit(point, method, descriptor, result, failure, startedAt);
+                        } catch (AuditService.AuditRecordingException auditFailure) {
+                            if (failure != null) {
+                                failure.addSuppressed(auditFailure);
+                            } else {
+                                throw auditFailure;
                             }
                         }
                     }
-                });
-            } catch (AuditedInvocationException ex) {
-                throw ex.getCause();
-            }
+                }
+            }));
+        } catch (AuditedInvocationException ex) {
+            throw ex.getCause();
         }
     }
 

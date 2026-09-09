@@ -185,7 +185,7 @@ public class OperationLogOutboxWorker implements ScheduledLoopHandler {
     }
 
     private void processOne(OperationLogOutboxRepository.OperationLogOutboxEvent event, String owner) {
-        try (var ignored = RequestCorrelationContext.openTask(event.eventId().toString())) {
+        RequestCorrelationContext.runWithMdc(RequestCorrelationContext.forTask(event.eventId().toString()), () -> {
             AuditRecord record;
             try {
                 record = objectMapper.readValue(event.payload(), AuditRecord.class);
@@ -201,7 +201,7 @@ public class OperationLogOutboxWorker implements ScheduledLoopHandler {
             var recordContext = record.context().requestId() == null && correlationId == null
                     ? RequestCorrelationContext.forTask(event.eventId().toString())
                     : new RequestCorrelationContext.Context(record.context().requestId(), correlationId);
-            try (var ignoredRecordContext = RequestCorrelationContext.openWithMdc(recordContext)) {
+            RequestCorrelationContext.runWithMdc(recordContext, () -> {
                 transactionTemplate.executeWithoutResult(status -> {
                     operationLogService.persist(record);
                     if (repository.markProcessed(event.eventId(), owner, clock.instant()) != 1) {
@@ -209,8 +209,8 @@ public class OperationLogOutboxWorker implements ScheduledLoopHandler {
                         };
                     }
                 });
-            }
-        }
+            });
+        });
     }
 
     /**

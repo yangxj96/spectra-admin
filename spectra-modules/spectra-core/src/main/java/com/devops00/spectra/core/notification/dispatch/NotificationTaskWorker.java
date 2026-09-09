@@ -161,10 +161,9 @@ public class NotificationTaskWorker {
      * 领取并处理单个通知任务。
      */
     private void processOne(NotificationTaskEntity task, String workerId) {
-        try (var ignored = RequestCorrelationContext.openTask(
-                task.getId() == null ? null : task.getId().toString())) {
-            processOneWithContext(task, workerId);
-        }
+        RequestCorrelationContext.runWithMdc(
+                RequestCorrelationContext.forTask(task.getId() == null ? null : task.getId().toString()),
+                () -> processOneWithContext(task, workerId));
     }
 
     private void processOneWithContext(NotificationTaskEntity task, String workerId) {
