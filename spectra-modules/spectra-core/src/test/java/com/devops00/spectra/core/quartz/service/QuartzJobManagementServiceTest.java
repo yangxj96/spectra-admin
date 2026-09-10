@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.quartz.service;
 
 import com.devops00.spectra.common.exception.BuiltinDataException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.SchedulerDatabaseUnavailableException;
 import com.devops00.spectra.common.port.quartz.QuartzJobDefinition;
 import com.devops00.spectra.common.port.quartz.QuartzParameterSchema;
@@ -139,6 +140,19 @@ class QuartzJobManagementServiceTest {
         Mockito.when(scheduler.getJobKeys(ArgumentMatchers.any(GroupMatcher.class))).thenReturn(Set.of(key));
         service.triggerNow(key.toString());
         Mockito.verify(scheduler).triggerJob(key);
+    }
+
+    @Test
+    void missingPersistedJobClassMustBeReportedAsInvalidDefinition() throws Exception {
+        JobKey key = new JobKey("system.scheduler.execution-history-cleanup", "SPECTRA_BUILTIN");
+        Mockito.when(scheduler.getJobKeys(ArgumentMatchers.any(GroupMatcher.class))).thenReturn(Set.of(key));
+        Mockito.when(scheduler.getJobDetail(key))
+                .thenThrow(new org.quartz.SchedulerException(new ClassNotFoundException("旧 Job 类名")));
+
+        Assertions.assertThatThrownBy(() -> service.jobs(null))
+                .isInstanceOf(DataException.class)
+                .isNotInstanceOf(SchedulerDatabaseUnavailableException.class)
+                .hasMessage("Quartz Job 定义无效，请执行数据库迁移或联系管理员");
     }
 
     @Test

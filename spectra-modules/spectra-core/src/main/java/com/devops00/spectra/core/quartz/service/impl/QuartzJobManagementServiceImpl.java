@@ -307,6 +307,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         } catch (DataException exception) {
             throw exception;
         } catch (SchedulerException exception) {
+            if (hasCause(exception, ClassNotFoundException.class)) {
+                throw new DataException("Quartz Job 定义无效，请执行数据库迁移或联系管理员", exception);
+            }
             throw schedulerUnavailable(exception);
         }
     }
@@ -424,6 +427,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
             }
             return detail;
         } catch (SchedulerException exception) {
+            if (hasCause(exception, ClassNotFoundException.class)) {
+                throw new DataException("Quartz Job 定义无效，请执行数据库迁移或联系管理员", exception);
+            }
             throw schedulerUnavailable(exception);
         }
     }
@@ -531,6 +537,17 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
 
     private static SchedulerDatabaseUnavailableException schedulerUnavailable(SchedulerException exception) {
         return new SchedulerDatabaseUnavailableException(exception);
+    }
+
+    private static boolean hasCause(Throwable throwable, Class<? extends Throwable> expectedType) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (expectedType.isInstance(current)) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private static <T> T callScheduler(CheckedSupplier<T> supplier) {
