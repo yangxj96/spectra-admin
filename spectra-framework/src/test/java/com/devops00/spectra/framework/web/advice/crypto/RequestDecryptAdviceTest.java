@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.web.advice.crypto;
 
 import com.devops00.spectra.common.exception.EncryptException;
+import com.devops00.spectra.common.port.security.SecurityReplayNonceAdminPort;
 import com.devops00.spectra.common.security.crypto.symmetric.AESUtils;
 import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
 import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
@@ -48,6 +49,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -185,6 +187,22 @@ class RequestDecryptAdviceTest {
                         Map.class, StringHttpMessageConverter.class));
 
         assertEquals("重复请求（nonce 已使用）", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectNonceAtOrBeforeGlobalCutoffBeforeConsumingIt() throws Exception {
+        var nonceAdmin = mock(SecurityReplayNonceAdminPort.class);
+        when(nonceAdmin.isBeforeOrAtCutoff(anyLong())).thenReturn(true);
+        var advice = new RequestDecryptAdvice(keyManager(), OBJECT_MAPPER, redisReturning(true),
+                new SecurityProperties(), nonceAdmin);
+        var envelope = validEnvelope("nonce-cutoff", currentTimestamp());
+
+        var exception = assertThrows(EncryptException.class,
+                () -> advice.beforeBodyRead(message(OBJECT_MAPPER.writeValueAsString(envelope)), parameter(),
+                        Map.class, StringHttpMessageConverter.class));
+
+        assertEquals("请求已被当前 nonce 失效窗口拒绝", exception.getMessage());
+        verify(nonceAdmin, never()).invalidate(anyString(), anyLong());
     }
 
     @Test

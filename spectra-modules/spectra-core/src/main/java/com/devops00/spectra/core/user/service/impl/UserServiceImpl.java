@@ -94,6 +94,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
+    private static final int SECURITY_CANDIDATE_LIMIT = 20;
+
     private static final Duration TEMPORARY_PASSWORD_VALIDITY = Duration.ofHours(24);
 
     private final UserConverter userConverter;
@@ -142,6 +144,32 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         return this.getOne(new LambdaQueryWrapper<User>()
                 .apply("lower(btrim(username)) = lower({0})", username.trim())
                 .last("LIMIT 1"));
+    }
+
+    @Override
+    public List<User> searchSecurityCandidates(String keyword, int limit) {
+        if (StrUtils.isBlank(keyword)) {
+            return List.of();
+        }
+        String normalizedKeyword = keyword.trim();
+        UUID userId = parseUuid(normalizedKeyword);
+        int boundedLimit = Math.min(Math.max(limit, 1), SECURITY_CANDIDATE_LIMIT);
+        var wrapper = new LambdaQueryWrapper<User>()
+                .isNull(User::getDeleted)
+                .and(condition -> {
+                    condition.like(User::getUsername, normalizedKeyword)
+                            .or()
+                            .like(User::getRealName, normalizedKeyword)
+                            .or()
+                            .like(User::getEmployeeNo, normalizedKeyword);
+                    if (userId != null) {
+                        condition.or().eq(User::getId, userId);
+                    }
+                })
+                .orderByAsc(User::getRealName)
+                .orderByAsc(User::getUsername)
+                .last("LIMIT " + boundedLimit);
+        return this.list(wrapper);
     }
 
     @Override
@@ -496,5 +524,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var bytes = new byte[32];
         SECURE_RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private static UUID parseUuid(String value) {
+        try {
+            return UUID.fromString(value);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 }

@@ -23,13 +23,12 @@ import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.security.crypto.symmetric.AESUtils;
 import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
-import com.devops00.spectra.common.security.crypto.digest.SHA256Utils;
-import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
-import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
+import com.devops00.spectra.common.port.security.SecurityReplayNonceAdminPort;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -53,7 +52,6 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
@@ -84,18 +82,28 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     // 加解密key管理器
     private final CryptoKeyManager cryptoKeyManager;
 
-    // redis
-    private final RedisTemplate<String, Object> redisTemplate;
-
     private final SecurityProperties securityProperties;
+
+    // nonce 管理端口；负责摘要、一次性消费和全局 cutoff 校验。
+    private final SecurityReplayNonceAdminPort nonceAdminPort;
 
     public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om,
                                 @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
                                 SecurityProperties securityProperties) {
+        this(cryptoKeyManager, om, redisTemplate, securityProperties,
+                new com.devops00.spectra.framework.security.replay.SecurityReplayNonceAdminService(
+                        redisTemplate, securityProperties));
+    }
+
+    @Autowired
+    public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om,
+                                @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+                                SecurityProperties securityProperties,
+                                SecurityReplayNonceAdminPort nonceAdminPort) {
         this.cryptoKeyManager = cryptoKeyManager;
         this.om = om;
-        this.redisTemplate = redisTemplate;
         this.securityProperties = securityProperties;
+        this.nonceAdminPort = nonceAdminPort;
         log.info(LogPrefix.WEB.f("请求解密 Advice 已注册（运行时由 CryptoKeyManager 控制启用/禁用）"));
     }
 
@@ -298,7 +306,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
             verifySignature(node, encryptedData, nonce, timestamp, clientPublicKey);
         }
         validateTimestamp(timestamp);
-        consumeNonce(nonce);
+        consumeNonce(nonce, timestamp);
 
         return decryptPayload(encryptedKey, serverPrivateKey, encryptedData, ivHex);
     }
@@ -342,12 +350,12 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     /**
      * 更新或推进目标状态（{@code consumeNonce}）。
      */
-    private void consumeNonce(String nonce) throws Exception {
-        long window = securityProperties.getCryptoReplayWindowSeconds();
-        String nonceKey = SecurityRedisKey.CRYPTO_NONCE.format(SHA256Utils.hash(nonce));
-        Boolean success = SecurityRedisExecutor.require("记录加密请求 nonce",
-                () -> redisTemplate.opsForValue().setIfAbsent(nonceKey, "1", Duration.ofSeconds(window)));
-        if (Boolean.FALSE.equals(success)) {
+    private void consumeNonce(String nonce, long timestamp) throws Exception {
+        if (nonceAdminPort.isBeforeOrAtCutoff(timestamp)) {
+            throw new RequestCryptoException("请求已被当前 nonce 失效窗口拒绝");
+        }
+        SecurityReplayNonceAdminPort.Result result = nonceAdminPort.invalidate(nonce, timestamp);
+        if (result.affectedCount() == 0L) {
             throw new RequestCryptoException("重复请求（nonce 已使用）");
         }
     }

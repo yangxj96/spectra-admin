@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.common.port.security;
 
+import com.devops00.spectra.common.constant.ClientType;
+
 import java.util.UUID;
 
 /**
@@ -33,6 +35,11 @@ public interface SecuritySessionRevocationPort {
 
     /** 撤销用户除当前 Access Token 外的其他 Session。 */
     default void revokeUserSessionsExceptToken(UUID userId, String accessToken) {
+        revokeUserSessions(userId);
+    }
+
+    /** 撤销用户指定客户端的全部 Session。 */
+    default void revokeUserClientSessions(UUID userId, ClientType clientType) {
         revokeUserSessions(userId);
     }
 }

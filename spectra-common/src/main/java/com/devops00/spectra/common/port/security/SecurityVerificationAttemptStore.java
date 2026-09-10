@@ -29,4 +29,7 @@ public interface SecurityVerificationAttemptStore {
 
     /** 原子递增尝试次数，并在首次写入时设置 TTL。 */
     long increment(String key, Duration ttl);
+
+    /** 删除指定验证码失败尝试计数。 */
+    void delete(String key);
 }

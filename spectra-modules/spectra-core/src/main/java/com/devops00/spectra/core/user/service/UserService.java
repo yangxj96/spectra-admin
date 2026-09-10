@@ -52,6 +52,15 @@ public interface UserService extends BaseService<User> {
     User getByUsername(String username);
 
     /**
+     * 查询安全运维目标候选用户；仅返回未软删除用户，调用方负责实际权限控制。
+     *
+     * @param keyword 用户编号、用户名、姓名或工号关键字。
+     * @param limit   返回数量上限，由实现进一步限制为安全运维固定上限。
+     * @return 返回候选用户实体列表；无匹配时返回空列表。
+     */
+    List<User> searchSecurityCandidates(String keyword, int limit);
+
+    /**
      * 分页查询用户列表
      *
      * @param page   用户列表的页码、页大小及排序字段。

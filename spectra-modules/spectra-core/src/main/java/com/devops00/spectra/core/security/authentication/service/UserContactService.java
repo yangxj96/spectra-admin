@@ -40,6 +40,16 @@ public interface UserContactService {
     List<UserContact> listActiveByUserId(UUID userId);
 
     /**
+     * 按联系方式类型和关键字查询当前有效联系方式候选。
+     *
+     * @param contactType 联系方式类型，只支持 PHONE 或 EMAIL。
+     * @param keyword     联系方式关键字。
+     * @param limit       返回数量上限，由实现进一步限制。
+     * @return 返回有效联系方式列表；无匹配时返回空列表。
+     */
+    List<UserContact> searchActiveByType(String contactType, String keyword, int limit);
+
+    /**
      * 批量查询用户当前有效联系方式。
      *
      * @param userIds 目标用户标识集合，用于批量处理。

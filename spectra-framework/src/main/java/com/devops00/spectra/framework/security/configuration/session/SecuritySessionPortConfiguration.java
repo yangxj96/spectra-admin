@@ -92,6 +92,17 @@ public class SecuritySessionPortConfiguration {
             public void revokeUserSessionsExceptToken(UUID userId, String accessToken) {
                 sessionRevoker.deleteByUserIdExceptToken(userId, accessToken);
             }
+
+            /**
+             * 撤销用户指定客户端的全部会话。
+             *
+             * @param userId     目标用户的唯一标识，用于限定会话和授权范围。
+             * @param clientType 客户端类型，用于选择对应的安全会话策略。
+             */
+            @Override
+            public void revokeUserClientSessions(UUID userId, com.devops00.spectra.common.constant.ClientType clientType) {
+                sessionRevoker.deleteByUserIdAndClient(userId.toString(), clientType);
+            }
         };
     }
 

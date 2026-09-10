@@ -28,6 +28,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserContactServiceImpl implements UserContactService {
 
+    private static final int SECURITY_CANDIDATE_LIMIT = 20;
+
     private final UserContactMapper mapper;
 
     @Override
@@ -75,6 +77,26 @@ public class UserContactServiceImpl implements UserContactService {
                 .eq(UserContact::getState, ACTIVE)
                 .isNull(UserContact::getDeleted)
                 .orderByAsc(UserContact::getContactType));
+    }
+
+    @Override
+    public List<UserContact> searchActiveByType(String contactType, String keyword, int limit) {
+        if (!StringUtils.hasText(keyword)) {
+            return List.of();
+        }
+        String normalizedType = normalizeType(contactType);
+        String normalizedKeyword = keyword.trim();
+        if (EMAIL.equals(normalizedType)) {
+            normalizedKeyword = normalizedKeyword.toLowerCase(java.util.Locale.ROOT);
+        }
+        int boundedLimit = Math.min(Math.max(limit, 1), SECURITY_CANDIDATE_LIMIT);
+        return mapper.selectList(new LambdaQueryWrapper<UserContact>()
+                .eq(UserContact::getContactType, normalizedType)
+                .eq(UserContact::getState, ACTIVE)
+                .isNull(UserContact::getDeleted)
+                .like(UserContact::getContactValue, normalizedKeyword)
+                .orderByAsc(UserContact::getContactValue)
+                .last("LIMIT " + boundedLimit));
     }
 
     @Override
