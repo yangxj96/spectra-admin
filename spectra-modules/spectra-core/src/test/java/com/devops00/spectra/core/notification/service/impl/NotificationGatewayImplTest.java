@@ -531,12 +531,14 @@ class NotificationGatewayImplTest {
     }
 
     private NotificationPayloadProtector protector() {
-        return new NotificationPayloadProtector(new NotificationModuleProperties(true, "", "", List.of()), new ObjectMapper());
+        return new NotificationPayloadProtector(code -> java.util.Optional.empty(), new ObjectMapper());
     }
 
     private NotificationPayloadProtector protectorWithKey() {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
         return new NotificationPayloadProtector(
-                new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
+                code -> java.util.Optional.of(new com.devops00.spectra.common.port.security.RuntimeSecret(
+                        code, 1, key, "test")),
+                new ObjectMapper());
     }
 }

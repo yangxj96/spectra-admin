@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.security.initialization.javabean.from;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -45,10 +45,6 @@ public class SystemGuideCompleteFrom {
     /** 初始化根部门类型，对应字典组 sys_organization_type。 */
     @NotNull(message = "根部门类型不能为空")
     private Short rootDepartmentType;
-
-    /** 是否启用接口请求加解密。 */
-    @NotNull(message = "是否启用接口加解密不能为空")
-    private Boolean cryptoEnabled;
 
     /** 是否启用统一通知模块。 */
     @NotNull(message = "是否启用通知模块不能为空")

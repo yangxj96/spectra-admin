@@ -30,6 +30,8 @@ import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -51,13 +53,17 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private final NotificationService notificationService;
     private final SecurityVerificationCodeStore verificationCodeStore;
     private final SecurityProperties securityProperties;
+    private final SecretRuntimeService secretRuntimeService;
 
+    @Autowired
     public VerificationCodeServiceImpl(NotificationService notificationService,
                                        SecurityVerificationCodeStore verificationCodeStore,
-                                       SecurityProperties securityProperties) {
+                                       SecurityProperties securityProperties,
+                                       SecretRuntimeService secretRuntimeService) {
         this.notificationService = notificationService;
         this.verificationCodeStore = verificationCodeStore;
         this.securityProperties = securityProperties;
+        this.secretRuntimeService = secretRuntimeService;
     }
 
     @Override
@@ -142,17 +148,13 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
      * 转换、解析或规范化数据（{@code digest}）。
      */
     private String digest(String code) {
-        return VerificationCodeDigest.digest(code, securityProperties.getVerificationCodeHmacKey());
+        return VerificationCodeDigest.digest(code, secretRuntimeService.requireActiveValue(
+                "security.verification-code-hmac"));
     }
 
-    /**
-     * 校验并确保数据满足当前约束（{@code requireHmacKey}）。
-     */
+    /** 在访问安全 Redis 前确认验证码签名密钥可用。 */
     private void requireHmacKey() {
-        if (securityProperties.getVerificationCodeHmacKey() == null
-                || securityProperties.getVerificationCodeHmacKey().isBlank()) {
-            throw new SpectraException("验证码安全密钥未配置");
-        }
+        secretRuntimeService.requireActiveValue("security.verification-code-hmac");
     }
 
 }

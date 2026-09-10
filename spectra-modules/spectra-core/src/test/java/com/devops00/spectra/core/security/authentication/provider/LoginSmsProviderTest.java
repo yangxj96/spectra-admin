@@ -19,6 +19,8 @@ package com.devops00.spectra.core.security.authentication.provider;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,10 +66,13 @@ class LoginSmsProviderTest {
         verificationCodeStore = mock(SecurityVerificationCodeStore.class);
         verificationAttemptStore = mock(SecurityVerificationAttemptStore.class);
         var properties = new SecurityProperties();
-        properties.setVerificationCodeHmacKey(HMAC_KEY);
         provider = new LoginSmsProvider(verificationCodeStore, verificationAttemptStore, mock(UserService.class),
                 mock(AuthenticationIdentityService.class), mock(PasswordCredentialService.class),
-                mock(SecurityUserAssembler.class), properties);
+                mock(SecurityUserAssembler.class), properties, runtime());
+    }
+
+    private static SecretRuntimeService runtime() {
+        return key -> Optional.of(new RuntimeSecret(key, 1, HMAC_KEY, "test-fingerprint"));
     }
 
     @Test

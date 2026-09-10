@@ -65,7 +65,7 @@ class CoreOwnershipTest {
                 "系统管理", "com.devops00.spectra.core.system",
                 "安全审计", "com.devops00.spectra.core.security.audit",
                 "普通操作日志", "com.devops00.spectra.core.audit",
-                "调度", "com.devops00.spectra.core.scheduler",
+                "调度", "com.devops00.spectra.core.quartz",
                 "统一通知", "com.devops00.spectra.core.notification",
                 "文件上传", "com.devops00.spectra.core.upload");
 

@@ -26,6 +26,7 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
 import com.devops00.spectra.core.security.initialization.mapper.SystemStateMapper;
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
+import com.devops00.spectra.core.security.initialization.service.SystemSecretInitializer;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
@@ -65,6 +66,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     private final SecurityPasswordPolicyProvider passwordPolicyProvider;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
+    private final SystemSecretInitializer systemSecretInitializer;
 
     @Override
     public SystemInitializationStatusVO status() {
@@ -166,6 +168,8 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
             }
         }
         authorizationAssignmentChangeService.ensureDefaultUserRole(user.getId());
+
+        systemSecretInitializer.initialize();
 
         state.setState(SystemStateKeys.INITIALIZED);
         state.setInitializedAt(Instant.now());
@@ -282,6 +286,8 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
                 "系统默认时区");
         configuredService.upsert(SystemConfigKeys.SECURITY_PROFILE, settings.securityProfile(), ConfiguredValueType.SELECT,
                 "初始化时选择的安全策略，STANDARD 或 STRICT");
+        configuredService.upsert(SystemConfigKeys.CRYPTO_ENABLED, "false", ConfiguredValueType.BOOL,
+                "密钥管理页面配置的接口加解密开关");
     }
 
     private record InitialSystemSettings(String systemName, String systemShortName, String systemLogo,

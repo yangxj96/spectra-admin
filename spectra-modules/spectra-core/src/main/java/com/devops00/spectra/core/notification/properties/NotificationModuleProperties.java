@@ -27,10 +27,8 @@ import java.util.Optional;
 /**
  * 通知模块基础配置。
  *
- * @param enabled              是否启用统一通知模块
- * @param addressEncryptionKey Base64 编码的收件地址加密密钥
- * @param sensitivePayloadKey  Base64 编码的敏感载荷加密密钥
- * @param allowedLinkPrefixes  允许写入消息中心的前端站内路由前缀
+ * @param enabled             是否启用统一通知模块
+ * @param allowedLinkPrefixes 允许写入消息中心的前端站内路由前缀
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
@@ -43,10 +41,6 @@ public class NotificationModuleProperties {
 
     private boolean enabled = true;
 
-    private String addressEncryptionKey = "";
-
-    private String sensitivePayloadKey = "";
-
     private List<String> allowedLinkPrefixes = DEFAULT_ALLOWED_LINK_PREFIXES;
 
     private SystemConfigValueProvider systemConfigValueProvider;
@@ -54,11 +48,9 @@ public class NotificationModuleProperties {
     /**
      * 保留显式构造器，方便模块单元测试使用固定配置。
      */
-    public NotificationModuleProperties(boolean enabled, String addressEncryptionKey, String sensitivePayloadKey,
+    public NotificationModuleProperties(boolean enabled, String ignoredLegacyAddressKey, String ignoredLegacyPayloadKey,
                                         List<String> allowedLinkPrefixes) {
         this.enabled = enabled;
-        this.addressEncryptionKey = normalize(addressEncryptionKey);
-        this.sensitivePayloadKey = normalize(sensitivePayloadKey);
         this.allowedLinkPrefixes = normalizePrefixes(allowedLinkPrefixes);
     }
 
@@ -82,20 +74,6 @@ public class NotificationModuleProperties {
     }
 
     /**
-     * 处理内部业务逻辑（{@code addressEncryptionKey}）。
-     */
-    public String addressEncryptionKey() {
-        return systemValue("notification.address-encryption-key").orElse(normalize(addressEncryptionKey));
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code sensitivePayloadKey}）。
-     */
-    public String sensitivePayloadKey() {
-        return systemValue("notification.sensitive-payload-key").orElse(normalize(sensitivePayloadKey));
-    }
-
-    /**
      * 查询或获取目标数据（{@code allowedLinkPrefixes}）。
      */
     public List<String> allowedLinkPrefixes() {
@@ -109,20 +87,6 @@ public class NotificationModuleProperties {
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    /**
-     * 更新或推进目标状态（{@code setAddressEncryptionKey}）。
-     */
-    public void setAddressEncryptionKey(String addressEncryptionKey) {
-        this.addressEncryptionKey = addressEncryptionKey;
-    }
-
-    /**
-     * 更新或推进目标状态（{@code setSensitivePayloadKey}）。
-     */
-    public void setSensitivePayloadKey(String sensitivePayloadKey) {
-        this.sensitivePayloadKey = sensitivePayloadKey;
     }
 
     /**

@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.system.security.SystemKeyMaterial;
 import com.devops00.spectra.core.security.authorization.service.SystemGuideAuthorization;
 import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
 import com.devops00.spectra.core.security.initialization.javabean.entity.SystemState;
@@ -36,7 +35,6 @@ import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +42,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
-import java.security.KeyPair;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.UUID;
 
 /** DEV_OPS 系统设置引导默认实现。 */
@@ -55,12 +50,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SystemGuideServiceImpl implements SystemGuideService {
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-
     private final SystemStateMapper stateMapper;
     private final SystemGuideAuthorization guideAuthorization;
     private final ConfiguredService configuredService;
-    private final CryptoKeyManager cryptoKeyManager;
     private final DepartmentMapper departmentMapper;
     private final UserMapper userMapper;
     private final UserDepartmentMembershipMapper userDepartmentMembershipMapper;
@@ -89,15 +81,13 @@ public class SystemGuideServiceImpl implements SystemGuideService {
 
         Department rootDepartment = createRootDepartment(from.getRootDepartmentName(), from.getRootDepartmentRegionId(),
                 from.getRootDepartmentType(), requireCurrentUserId());
-        applyCrypto(Boolean.TRUE.equals(from.getCryptoEnabled()));
         applyNotification(Boolean.TRUE.equals(from.getNotificationEnabled()));
         applyCopyright(Boolean.TRUE.equals(from.getCopyrightEnabled()), from.getCopyrightName(), from.getCopyrightUrl());
         guideState.setState(SystemStateKeys.COMPLETED);
         if (stateMapper.updateById(guideState) != 1) {
             throw new DataSaveException("保存系统引导状态失败");
         }
-        log.info("系统设置引导完成，根部门={}, 接口加解密={}, 通知模块={}", rootDepartment.getName(),
-                from.getCryptoEnabled(), from.getNotificationEnabled());
+        log.info("系统设置引导完成，根部门={}, 通知模块={}", rootDepartment.getName(), from.getNotificationEnabled());
     }
 
     /**
@@ -194,28 +184,6 @@ public class SystemGuideServiceImpl implements SystemGuideService {
     }
 
     /**
-     * 更新或推进目标状态（{@code applyCrypto}）。
-     */
-    private void applyCrypto(boolean enabled) {
-        if (!enabled) {
-            configuredService.upsert(SystemConfigKeys.CRYPTO_ENABLED, "false", ConfiguredValueType.BOOL,
-                    "系统设置引导中配置的接口加解密开关");
-            cryptoKeyManager.refresh();
-            return;
-        }
-
-        if (!cryptoKeyManager.isEnabled()) {
-            saveKeyPair(generateRsaKeyPair(), generateRsaKeyPair());
-        }
-        configuredService.upsert(SystemConfigKeys.CRYPTO_ENABLED, "true", ConfiguredValueType.BOOL,
-                "系统设置引导中配置的接口加解密开关");
-        cryptoKeyManager.refresh();
-        if (!cryptoKeyManager.isEnabled()) {
-            throw new DataSaveException("接口加解密密钥未能正确加载");
-        }
-    }
-
-    /**
      * 更新或推进目标状态（{@code applyNotification}）。
      */
     private void applyNotification(boolean enabled) {
@@ -226,65 +194,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         if (!enabled) {
             return;
         }
-        ensureAesKey(SystemConfigKeys.NOTIFICATION_ADDRESS_ENCRYPTION_KEY, "通知外部地址 AES-GCM 密钥");
-        ensureAesKey(SystemConfigKeys.NOTIFICATION_SENSITIVE_PAYLOAD_KEY, "通知敏感载荷 AES-GCM 密钥");
         configuredService.upsert(SystemConfigKeys.NOTIFICATION_ALLOWED_LINK_PREFIXES,
                 "/login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/",
                 ConfiguredValueType.TEXT, "消息中心允许的站内路由前缀");
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code ensureAesKey}）。
-     */
-    private void ensureAesKey(String key, String remarks) {
-        var existing = configuredService.findValue(key).orElse(null);
-        if (isValidAesKey(existing)) {
-            return;
-        }
-        var bytes = new byte[32];
-        SECURE_RANDOM.nextBytes(bytes);
-        configuredService.upsert(key, Base64.getEncoder().encodeToString(bytes), ConfiguredValueType.TEXT, remarks);
-    }
-
-    /**
-     * 判断条件是否满足（{@code isValidAesKey}）。
-     */
-    private boolean isValidAesKey(String encodedKey) {
-        if (encodedKey == null || encodedKey.isBlank()) {
-            return false;
-        }
-        try {
-            var length = Base64.getDecoder().decode(encodedKey).length;
-            return length == 16 || length == 24 || length == 32;
-        } catch (IllegalArgumentException exception) {
-            return false;
-        }
-    }
-
-    /**
-     * 更新或推进目标状态（{@code saveKeyPair}）。
-     */
-    private void saveKeyPair(KeyPair serverPair, KeyPair clientPair) {
-        String remarks = "系统设置引导自动生成 RSA 密钥对";
-        configuredService.upsert("crypto.server.public-key", SystemKeyMaterial.publicKeyBase64(serverPair.getPublic()),
-                ConfiguredValueType.TEXT, remarks);
-        configuredService.upsert("crypto.server.private-key", SystemKeyMaterial.privateKeyBase64(serverPair.getPrivate()),
-                ConfiguredValueType.TEXT, remarks);
-        configuredService.upsert("crypto.client.public-key", SystemKeyMaterial.publicKeyBase64(clientPair.getPublic()),
-                ConfiguredValueType.TEXT, remarks);
-        configuredService.upsert("crypto.client.private-key", SystemKeyMaterial.privateKeyBase64(clientPair.getPrivate()),
-                ConfiguredValueType.TEXT, remarks);
-    }
-
-    /**
-     * 创建或构建目标数据（{@code generateRsaKeyPair}）。
-     */
-    private KeyPair generateRsaKeyPair() {
-        try {
-            return SystemKeyMaterial.generateKeyPair();
-        } catch (Exception exception) {
-            throw new DataSaveException("生成接口加解密密钥失败", exception);
-        }
     }
 
     /**

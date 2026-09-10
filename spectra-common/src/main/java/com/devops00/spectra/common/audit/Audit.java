@@ -52,4 +52,14 @@ public @interface Audit {
      * 审计可靠性分类。
      */
     AuditCategory category() default AuditCategory.OPERATION;
+
+    /**
+     * 是否把方法参数写入审计 before 快照；涉及密钥、口令或上传包时应关闭。
+     */
+    boolean captureArguments() default true;
+
+    /**
+     * 是否把方法返回值写入审计 after 快照；涉及密钥、口令或导出包时应关闭。
+     */
+    boolean captureResult() default true;
 }

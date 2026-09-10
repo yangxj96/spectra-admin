@@ -19,11 +19,12 @@ package com.devops00.spectra.core.notification.service.impl;
 import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import com.devops00.spectra.core.system.port.SystemConfigValueWriter;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.core.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.core.notification.provider.NotificationProviderRuntime;
+import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.notification.support.NotificationTestTimeMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,6 +58,7 @@ class NotificationProviderAdminServiceImplTest {
     private final Map<String, String> values = new HashMap<>();
     private NotificationProviderAdminServiceImpl service;
     private ObjectProvider<NotificationProviderRuntime> runtimeProvider;
+    private SecretManagementService secretManagementService;
 
     @BeforeEach
     void setUp() {
@@ -76,12 +79,12 @@ class NotificationProviderAdminServiceImplTest {
         }).when(writer)
                 .upsert(ArgumentMatchers.anyString(), ArgumentMatchers.any(), ArgumentMatchers.any(),
                         ArgumentMatchers.anyString());
-        var key = Base64.getEncoder().encodeToString(new byte[32]);
-        var protector = new NotificationPayloadProtector(
-                new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
         runtimeProvider = mock();
+        var secretRuntimeService = mock(SecretRuntimeService.class);
+        secretManagementService = mock(SecretManagementService.class);
         service = new NotificationProviderAdminServiceImpl(
-                provider, protector, new ObjectMapper(), NotificationTestTimeMapper.create(), runtimeProvider);
+                provider, secretRuntimeService, secretManagementService, new ObjectMapper(),
+                NotificationTestTimeMapper.create(), runtimeProvider);
         service.setValueWriter(writer);
     }
 
@@ -106,12 +109,10 @@ class NotificationProviderAdminServiceImplTest {
 
         var result = service.modify(NotificationChannel.SMS, params);
 
-        assertEquals("UNHEALTHY", result.getState());
-        assertTrue(result.isSecretConfigured());
+        assertEquals("BLOCKED", result.getState());
+        assertFalse(result.isSecretConfigured());
         assertNotNull(result.getSecretKeyId());
-        assertNotEquals("test-secret-value", values.get("notification.provider.sms.secret"));
-        assertFalse(values.get("notification.provider.sms.secret").contains("test-secret-value"));
-        assertFalse(values.get("notification.provider.sms").contains("test-secret-value"));
+        verify(secretManagementService).createPending("notification.provider.sms.secret", "test-secret-value", "MANUAL");
         assertFalse(result.toString().contains("test-secret-value"));
     }
 
@@ -131,8 +132,8 @@ class NotificationProviderAdminServiceImplTest {
         assertEquals("dysmsapi.aliyuncs.com", result.getEndpoint());
         assertEquals("cn-hangzhou", result.getRegion());
         assertEquals("LTAI_TEST", result.getCredentialId());
-        assertEquals("UNHEALTHY", result.getState());
-        assertTrue(result.isSecretConfigured());
+        assertEquals("BLOCKED", result.getState());
+        assertFalse(result.isSecretConfigured());
     }
 
     @Test

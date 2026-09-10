@@ -114,11 +114,6 @@ public class SecurityProperties {
     private long verificationCodeExpire = 300L;
 
     /**
-     * 验证码 HMAC 密钥；必须通过环境变量或密钥管理系统提供。
-     */
-    private String verificationCodeHmacKey = "";
-
-    /**
      * 单个验证码窗口允许的最大校验尝试次数。
      */
     @Min(1)
@@ -145,11 +140,6 @@ public class SecurityProperties {
     @Min(1)
     @Max(100)
     private int maxDevOpsUsers = 3;
-
-    /**
-     * Preview/Apply 授权变更 token 的 HMAC 密钥；未配置时相关写入口 fail-closed。
-     */
-    private String authorizationChangeTokenHmacKey = "";
 
     /** v2 会话并发策略；正式部署可由 session_policy 表覆盖。 */
     private SessionConcurrencyMode sessionConcurrencyMode = SessionConcurrencyMode.ALLOW;

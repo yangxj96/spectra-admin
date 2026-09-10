@@ -17,24 +17,15 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
-import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
-import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.system.security.SystemKeyMaterial;
 import com.devops00.spectra.core.system.javabean.vo.CryptoClientKeyVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoConfigVO;
-import com.devops00.spectra.core.system.javabean.vo.CryptoKeyPairVO;
-import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
 import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.security.KeyPair;
 
 /**
  * 加解密密钥管理接口
@@ -43,7 +34,6 @@ import java.security.KeyPair;
  * @version 1.0
  * @since 2026/7/11
  */
-@Slf4j
 @RestController
 @RequestMapping("/system/crypto")
 @RequiredArgsConstructor
@@ -53,11 +43,6 @@ public class CryptoController {
      * CryptoKey管理服务
      */
     private final CryptoKeyManager cryptoKeyManager;
-
-    /**
-     * 系统配置服务
-     */
-    private final ConfiguredService configuredService;
 
     /**
      * 获取加解密配置（前端初始化调用）
@@ -83,47 +68,4 @@ public class CryptoController {
         return new CryptoClientKeyVO(cryptoKeyManager.getClientPrivateKeyBase64());
     }
 
-    /**
-     * 生成新的 RSA 密钥对
-     */
-    @Audit("'生成RSA密钥对'")
-    @PostMapping(value = "/keypair/generate", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
-    public CryptoKeyPairVO generateKeyPair() {
-        try {
-            KeyPair serverPair = SystemKeyMaterial.generateKeyPair();
-            KeyPair clientPair = SystemKeyMaterial.generateKeyPair();
-
-            String serverPublicKey = SystemKeyMaterial.publicKeyBase64(serverPair.getPublic());
-            String serverPrivateKey = SystemKeyMaterial.privateKeyBase64(serverPair.getPrivate());
-            String clientPublicKey = SystemKeyMaterial.publicKeyBase64(clientPair.getPublic());
-            String clientPrivateKey = SystemKeyMaterial.privateKeyBase64(clientPair.getPrivate());
-
-            String remarks = "RSA密钥对自动生成";
-            configuredService.upsert("crypto.server.public-key", serverPublicKey, ConfiguredValueType.TEXT, remarks);
-            configuredService.upsert("crypto.server.private-key", serverPrivateKey, ConfiguredValueType.TEXT, remarks);
-            configuredService.upsert("crypto.client.public-key", clientPublicKey, ConfiguredValueType.TEXT, remarks);
-            configuredService.upsert("crypto.client.private-key", clientPrivateKey, ConfiguredValueType.TEXT, remarks);
-            configuredService.upsert("crypto.enabled", "true", ConfiguredValueType.BOOL, remarks);
-
-            cryptoKeyManager.refresh();
-
-            log.info("已生成并保存新的 RSA 密钥对（2048位 × 2）");
-            return new CryptoKeyPairVO(serverPublicKey, serverPrivateKey, clientPublicKey, clientPrivateKey);
-        } catch (Exception e) {
-            log.error("生成RSA密钥对失败: {}", e.getMessage(), e);
-            throw new DataSaveException("密钥生成失败: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 手动重新加载密钥
-     */
-    @Audit("'重新加载加解密密钥'")
-    @PostMapping(value = "/keypair/refresh", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
-    public void refreshKeys() {
-        cryptoKeyManager.refresh();
-        log.info("密钥已手动刷新");
-    }
 }

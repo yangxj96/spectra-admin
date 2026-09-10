@@ -18,6 +18,8 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -41,6 +44,7 @@ class AuthenticationIdentityBindingServiceImplTest {
         var password = identity("PASSWORD", userId);
         when(identityService.listByUserId(userId)).thenReturn(List.of(password));
         var service = new AuthenticationIdentityBindingServiceImpl(mock(SecurityVerificationCodeStore.class), mock(SecurityProperties.class),
+                runtime(),
                 identityService,
                 mock(UserContactService.class));
 
@@ -55,6 +59,7 @@ class AuthenticationIdentityBindingServiceImplTest {
         var phone = identity("SMS", userId);
         when(identityService.listByUserId(userId)).thenReturn(List.of(password, phone));
         var service = new AuthenticationIdentityBindingServiceImpl(mock(SecurityVerificationCodeStore.class), mock(SecurityProperties.class),
+                runtime(),
                 identityService,
                 mock(UserContactService.class));
 
@@ -70,5 +75,9 @@ class AuthenticationIdentityBindingServiceImplTest {
         identity.setMethodCode(methodCode);
         identity.setState("ACTIVE");
         return identity;
+    }
+
+    private static SecretRuntimeService runtime() {
+        return key -> Optional.of(new RuntimeSecret(key, 1, "test-verification-hmac-key", "test-fingerprint"));
     }
 }

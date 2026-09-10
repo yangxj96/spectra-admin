@@ -17,26 +17,21 @@
 package com.devops00.spectra.framework.web.crypto;
 
 import com.devops00.spectra.common.exception.EncryptException;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
+import com.devops00.spectra.common.port.security.RuntimeSecretProvider;
 import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.security.KeyPair;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 /** 加密密钥运行态和 fail-closed 行为测试。 */
 class CryptoKeyManagerTest {
 
@@ -51,7 +46,7 @@ class CryptoKeyManagerTest {
 
     @Test
     void shouldKeepExplicitlyDisabledState() {
-        var manager = new CryptoKeyManager(jdbc(Map.of("crypto.enabled", "false")));
+        var manager = new CryptoKeyManager(provider(Map.of()), configProvider(Map.of("crypto.enabled", "false")));
 
         manager.refresh();
 
@@ -62,8 +57,18 @@ class CryptoKeyManagerTest {
     }
 
     @Test
+    void shouldRemainDisabledUntilCryptoIsExplicitlyEnabled() {
+        var manager = new CryptoKeyManager(provider(Map.of()), configProvider(Map.of()));
+
+        manager.refresh();
+
+        assertEquals(CryptoKeyManager.State.DISABLED, manager.getState());
+        assertEquals(false, manager.isConfiguredEnabled());
+    }
+
+    @Test
     void shouldExposeReadyStateOnlyAfterAllKeysAreLoaded() {
-        var manager = new CryptoKeyManager(jdbc(readyConfig()));
+        var manager = new CryptoKeyManager(provider(readyConfig()), configProvider(Map.of("crypto.enabled", "true")));
 
         manager.refresh();
 
@@ -73,10 +78,21 @@ class CryptoKeyManagerTest {
     }
 
     @Test
+    void shouldValidateKeyMaterialWithoutChangingDisabledRuntimeState() {
+        var manager = new CryptoKeyManager(provider(readyConfig()), configProvider(Map.of("crypto.enabled", "false")));
+
+        manager.refresh();
+
+        assertTrue(manager.isKeyMaterialReady());
+        assertEquals(CryptoKeyManager.State.DISABLED, manager.getState());
+        assertEquals(false, manager.isEnabled());
+    }
+
+    @Test
     void shouldHidePartialKeysWhenConfigurationIsIncomplete() {
         var config = readyConfig();
         config.remove("crypto.client.private-key");
-        var manager = new CryptoKeyManager(jdbc(config));
+        var manager = new CryptoKeyManager(provider(config), configProvider(Map.of("crypto.enabled", "true")));
 
         manager.refresh();
 
@@ -89,10 +105,10 @@ class CryptoKeyManagerTest {
 
     @Test
     void shouldConvertConfigurationReadFailureToUnavailableState() {
-        var jdbc = mock(JdbcTemplate.class);
-        when(jdbc.queryForList(anyString(), eq(String.class), any(Object[].class)))
-                .thenThrow(new DataAccessResourceFailureException("database unavailable"));
-        var manager = new CryptoKeyManager(jdbc);
+        RuntimeSecretProvider provider = _ -> {
+            throw new IllegalStateException("database unavailable");
+        };
+        var manager = new CryptoKeyManager(provider, configProvider(Map.of("crypto.enabled", "true")));
 
         manager.refresh();
 
@@ -103,25 +119,26 @@ class CryptoKeyManagerTest {
 
     @Test
     void shouldRejectMalformedEnabledValueAsConfigurationFailure() {
-        var manager = new CryptoKeyManager(jdbc(Map.of("crypto.enabled", "yes")));
+        var manager = new CryptoKeyManager(provider(Map.of("crypto.server.public-key", "not-a-key")),
+                configProvider(Map.of("crypto.enabled", "yes")));
 
         manager.refresh();
 
         assertEquals(CryptoKeyManager.State.UNAVAILABLE, manager.getState());
     }
 
-    private static JdbcTemplate jdbc(Map<String, String> values) {
-        var jdbc = mock(JdbcTemplate.class);
-        when(jdbc.queryForList(anyString(), eq(String.class), any(Object[].class))).thenAnswer(invocation -> {
-            String value = values.get(invocation.getArgument(2, String.class));
-            return value == null ? List.of() : List.of(value);
-        });
-        return jdbc;
+    private static RuntimeSecretProvider provider(Map<String, String> values) {
+        return key -> Optional.ofNullable(values.get(key))
+                .map(value -> new RuntimeSecret(key, 1, value, "test-fingerprint"));
+    }
+
+    private static com.devops00.spectra.common.config.SystemConfigValueProvider configProvider(
+                                                                                               Map<String, String> values) {
+        return key -> Optional.ofNullable(values.get(key));
     }
 
     private static Map<String, String> readyConfig() {
         var config = new HashMap<String, String>();
-        config.put("crypto.enabled", "true");
         config.put("crypto.server.public-key", RSAUtils.getPublicKeyBase64(serverKeyPair.getPublic()));
         config.put("crypto.server.private-key", RSAUtils.getPrivateKeyBase64(serverKeyPair.getPrivate()));
         config.put("crypto.client.public-key", RSAUtils.getPublicKeyBase64(clientKeyPair.getPublic()));

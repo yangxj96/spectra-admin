@@ -18,6 +18,8 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,8 +53,8 @@ class VerificationCodeServiceImplTest {
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
         when(verificationCodeStore.saveIfAbsent(any(), any(), any(Duration.class))).thenReturn(true);
         var properties = new SecurityProperties();
-        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties,
+                runtime("test-verification-hmac-key"));
 
         service.sendSmsCode("13800138000");
 
@@ -72,8 +75,8 @@ class VerificationCodeServiceImplTest {
         var verificationCodeStore = mock(SecurityVerificationCodeStore.class);
         when(verificationCodeStore.saveIfAbsent(any(), any(), any(Duration.class))).thenReturn(false);
         var properties = new SecurityProperties();
-        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties,
+                runtime("test-verification-hmac-key"));
 
         service.sendSmsCode("13800138000");
 
@@ -88,8 +91,8 @@ class VerificationCodeServiceImplTest {
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
         when(verificationCodeStore.saveIfAbsent(any(), any(), any(Duration.class))).thenReturn(true);
         var properties = new SecurityProperties();
-        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties,
+                runtime("test-verification-hmac-key"));
 
         service.sendBindingSmsCode("13800138000");
 
@@ -110,8 +113,8 @@ class VerificationCodeServiceImplTest {
         when(notificationService.send(any(NotificationSendRequest.class))).thenThrow(new IllegalStateException("mock failure"));
         when(verificationCodeStore.saveIfAbsent(any(), any(), any(Duration.class))).thenReturn(true);
         var properties = new SecurityProperties();
-        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, properties,
+                runtime("test-verification-hmac-key"));
 
         assertThrows(RuntimeException.class, () -> service.sendEmailCode("user@example.com"));
 
@@ -122,7 +125,8 @@ class VerificationCodeServiceImplTest {
     void shouldRejectMissingHmacKeyBeforeWritingRedis() {
         var notificationService = mock(NotificationService.class);
         var verificationCodeStore = mock(SecurityVerificationCodeStore.class);
-        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, new SecurityProperties());
+        var service = new VerificationCodeServiceImpl(notificationService, verificationCodeStore, new SecurityProperties(),
+                runtime(null));
 
         assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
 
@@ -133,8 +137,14 @@ class VerificationCodeServiceImplTest {
     @Test
     void shouldRequireNotificationServiceAsConstructorDependency() throws NoSuchMethodException {
         var constructor = VerificationCodeServiceImpl.class.getConstructor(
-                NotificationService.class, SecurityVerificationCodeStore.class, SecurityProperties.class);
+                NotificationService.class, SecurityVerificationCodeStore.class, SecurityProperties.class,
+                SecretRuntimeService.class);
 
         assertEquals(NotificationService.class, constructor.getParameterTypes()[0]);
+    }
+
+    private static SecretRuntimeService runtime(String value) {
+        return key -> Optional.ofNullable(value)
+                .map(secret -> new RuntimeSecret(key, 1, secret, "test-fingerprint"));
     }
 }

@@ -147,7 +147,8 @@ public class AuditAspect {
             String eventType = audit.eventType().isBlank()
                     ? generatedEventType(method)
                     : audit.eventType();
-            return new AuditDescriptor(audit.category(), eventType, parseDescription(audit.value(), method, point));
+            return new AuditDescriptor(audit.category(), eventType, parseDescription(audit.value(), method, point),
+                    audit.captureArguments(), audit.captureResult());
         }
 
         return null;
@@ -202,13 +203,17 @@ public class AuditAspect {
                         long startedAt) {
         RequestMetadata request = requestMetadata();
         Map<String, Object> before = new LinkedHashMap<>();
-        before.put("arguments", extractArguments(point));
+        if (descriptor.captureArguments()) {
+            before.put("arguments", extractArguments(point));
+        }
         if (request.webRequest()) {
             before.put("request", Map.of("method", request.method(), "url", request.url()));
         }
 
         Map<String, Object> after = new LinkedHashMap<>();
-        after.put("result", result);
+        if (descriptor.captureResult()) {
+            after.put("result", result);
+        }
         after.put("status", request.status());
         after.put("durationMs", (System.nanoTime() - startedAt) / 1_000_000L);
         if (failure != null) {
@@ -304,7 +309,8 @@ public class AuditAspect {
                 .toList();
     }
 
-    private record AuditDescriptor(AuditCategory category, String eventType, String reason) {
+    private record AuditDescriptor(AuditCategory category, String eventType, String reason,
+                                   boolean captureArguments, boolean captureResult) {
     }
 
     private record RequestMetadata(boolean webRequest,

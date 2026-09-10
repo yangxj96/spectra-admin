@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.security.configuration;
 
 import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
+import com.devops00.spectra.framework.security.secret.SecretMasterKeyProperties;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.authorization.DefaultRootAuthorizationPolicy;
 import jakarta.annotation.PostConstruct;
@@ -32,7 +33,7 @@ import org.springframework.context.annotation.Bean;
  * @since 2025/12/2 17:31
  */
 @AutoConfiguration
-@EnableConfigurationProperties(SecurityProperties.class)
+@EnableConfigurationProperties({SecurityProperties.class, SecretMasterKeyProperties.class})
 public class SecurityAutoConfiguration {
 
     private final SecurityProperties properties;

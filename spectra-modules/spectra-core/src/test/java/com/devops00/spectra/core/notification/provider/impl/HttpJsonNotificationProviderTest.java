@@ -17,18 +17,18 @@
 package com.devops00.spectra.core.notification.provider.impl;
 
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.InetSocketAddress;
 import java.util.Base64;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -55,8 +55,8 @@ class HttpJsonNotificationProviderTest {
         server.start();
         try {
             var key = Base64.getEncoder().encodeToString(new byte[32]);
-            var properties = new NotificationModuleProperties(true, key, key, List.of());
-            var protector = new NotificationPayloadProtector(properties, new ObjectMapper());
+            var protector = new NotificationPayloadProtector(
+                    code -> Optional.of(new RuntimeSecret(code, 1, key, "test")), new ObjectMapper());
             var provider = new HttpJsonNotificationProvider(protector, new ObjectMapper());
             var configuration = new NotificationProviderConfiguration(null, "HTTP_JSON", true,
                     "http://127.0.0.1:" + server.getAddress().getPort() + "/provider", 0, null, null, null, null,

@@ -122,6 +122,26 @@ class AuditAspectContractTest {
     }
 
     @Test
+    void sensitiveAuditCanExcludeArgumentsAndResultSnapshots() throws Throwable {
+        AtomicReference<AuditRecord> recorded = new AtomicReference<>();
+        AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), recorded::set,
+                snapshot -> new java.util.LinkedHashMap<>(snapshot), transactionOperations());
+        Method method = Fixture.class.getDeclaredMethod("sensitiveAudit", String.class);
+        ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        when(signature.getMethod()).thenReturn(method);
+        when(signature.getParameterNames()).thenReturn(new String[]{"value"});
+        when(point.getSignature()).thenReturn(signature);
+        when(point.getArgs()).thenReturn(new Object[]{"sensitive-value"});
+        when(point.proceed()).thenReturn("sensitive-result");
+
+        aspect.handleAround(point);
+
+        assertTrue(!recorded.get().before().containsKey("arguments"));
+        assertTrue(!recorded.get().after().containsKey("result"));
+    }
+
+    @Test
     void generatedAuditEventTypeMustFitPersistenceLimit() throws Exception {
         Method auditedMethod = AuthorizationController.class.getDeclaredMethod(
                 "departmentCreatePreview", OrganizationChangeFrom.class);
@@ -156,6 +176,11 @@ class AuditAspectContractTest {
         @Audit(category = AuditCategory.OPERATION, eventType = "USER.UPDATE")
         String explicitOperationAudit() {
             return "ok";
+        }
+
+        @Audit(captureArguments = false, captureResult = false)
+        String sensitiveAudit(String value) {
+            return value;
         }
     }
 }

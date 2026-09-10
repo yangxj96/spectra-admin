@@ -17,17 +17,17 @@
 package com.devops00.spectra.core.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.Base64;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -43,7 +43,7 @@ class MockProviderTest {
     void shouldUseNormalProviderGateAndPrintOnlyAtFinalSendPoint() {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
         var protector = new NotificationPayloadProtector(
-                new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
+                code -> Optional.of(new RuntimeSecret(code, 1, key, "test")), new ObjectMapper());
         var provider = new MockNotificationProvider(protector);
         var task = new NotificationTaskEntity();
         task.setId(UUID.randomUUID());

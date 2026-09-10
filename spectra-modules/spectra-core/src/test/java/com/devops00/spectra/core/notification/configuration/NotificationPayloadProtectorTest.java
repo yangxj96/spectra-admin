@@ -17,13 +17,13 @@
 package com.devops00.spectra.core.notification.configuration;
 
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Base64;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,8 +36,8 @@ class NotificationPayloadProtectorTest {
     @Test
     void shouldEncryptAddressAndSensitiveParameters() {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
-        var properties = new NotificationModuleProperties(true, key, key, List.of());
-        var protector = new NotificationPayloadProtector(properties, new ObjectMapper());
+        var protector = new NotificationPayloadProtector(code -> Optional.of(new RuntimeSecret(code, 1, key, "test")),
+                new ObjectMapper());
 
         var address = protector.protectAddress("13800138000");
         var payload = protector.protectParameters(Map.of("code", "123456"));
@@ -49,8 +49,7 @@ class NotificationPayloadProtectorTest {
 
     @Test
     void shouldRejectMissingEncryptionKey() {
-        var properties = new NotificationModuleProperties(true, "", "", List.of());
-        var protector = new NotificationPayloadProtector(properties, new ObjectMapper());
+        var protector = new NotificationPayloadProtector(code -> Optional.empty(), new ObjectMapper());
 
         assertThrows(DataSaveException.class, () -> protector.protectAddress("13800138000"));
         assertThrows(DataSaveException.class, () -> protector.protectParameters(Map.of("code", "123456")));

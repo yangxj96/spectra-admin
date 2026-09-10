@@ -16,32 +16,48 @@
 
 package com.devops00.test.spectra;
 
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.devops00.spectra.core.CoreModule;
 import com.devops00.spectra.core.system.service.impl.RegionServiceImpl;
+import com.devops00.spectra.framework.FrameworkModule;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
+import com.devops00.spectra.framework.persistence.mybatis.MetaObjectHandlerImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.quartz.autoconfigure.QuartzAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 import java.util.UUID;
 
 /** 行政区划导入专用测试上下文，避免加载无关业务和其他集成测试配置。 */
 @SpringBootConfiguration
-@EnableAutoConfiguration(exclude = CoreModule.class)
+@EnableAutoConfiguration(exclude = {
+        CoreModule.class,
+        FrameworkModule.class,
+        QuartzAutoConfiguration.class,
+        SecurityAutoConfiguration.class,
+        UserDetailsServiceAutoConfiguration.class
+})
 @ComponentScan("com.devops00.spectra.core.system.javabean.converter")
 @MapperScan("com.devops00.spectra.core.system.mapper")
 @Import(RegionServiceImpl.class)
 public class RegionImportTestApplication {
 
+    /**
+     * 导入测试不加载完整安全会话链，只提供持久化填充器所需的最小安全上下文。
+     * 区域导入没有当前登录用户，审计用户字段保持为空；主键仍由项目统一的
+     * MetaObjectHandlerImpl 生成 UUID v7。
+     */
     @Bean
-    SecurityContextAccessor securityContextAccessor() {
+    SecurityContextAccessor regionImportSecurityContextAccessor() {
         return new SecurityContextAccessor() {
             @Override
-            public SecurityUser currentUser() {
+            public com.devops00.spectra.common.port.security.SecurityPrincipal currentUser() {
                 return null;
             }
 
@@ -62,8 +78,13 @@ public class RegionImportTestApplication {
 
             @Override
             public String currentUsername() {
-                return "";
+                return "region-import";
             }
         };
+    }
+
+    @Bean
+    MetaObjectHandler regionImportMetaObjectHandler(SecurityContextAccessor securityContextAccessor) {
+        return new MetaObjectHandlerImpl(securityContextAccessor);
     }
 }

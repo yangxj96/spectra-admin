@@ -19,7 +19,8 @@ package com.devops00.spectra.core.notification.javabean.domain;
 import java.time.Instant;
 
 /**
- * 写入 {@code sys_config} 的 Provider 非敏感配置文档；不包含 Secret 原文或密文。
+ * 写入 {@code sys_config} 的 Provider 非敏感配置文档；不包含 Secret 原文或密文，
+ * 仅保留统一密钥管理中的 Secret 编码引用。
  *
  * @param providerType           Provider 类型
  * @param enabled                是否启用

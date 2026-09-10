@@ -18,10 +18,9 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.devops00.spectra.core.security.change.AuthorizationChangeToken;
 import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
-import com.devops00.spectra.framework.security.properties.SecurityProperties;
+import com.devops00.spectra.common.port.security.RuntimeSecretProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.ObjectProvider;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -46,17 +45,21 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";
 
-    private final byte[] secret;
+    private final RuntimeSecretProvider secretProvider;
+    private final byte[] fixedSecret;
 
     private final Clock clock;
 
     @Autowired
-    public HmacAuthorizationChangeTokenService(ObjectProvider<SecurityProperties> propertiesProvider) {
-        this(propertiesProvider.getIfAvailable(SecurityProperties::new).getAuthorizationChangeTokenHmacKey(), Clock.systemUTC());
+    public HmacAuthorizationChangeTokenService(RuntimeSecretProvider secretProvider) {
+        this.secretProvider = secretProvider;
+        this.fixedSecret = null;
+        this.clock = Clock.systemUTC();
     }
 
     HmacAuthorizationChangeTokenService(String secret, Clock clock) {
-        this.secret = secret == null ? new byte[0] : secret.getBytes(StandardCharsets.UTF_8);
+        this.secretProvider = null;
+        this.fixedSecret = secret == null ? new byte[0] : secret.getBytes(StandardCharsets.UTF_8);
         this.clock = clock;
     }
 
@@ -112,8 +115,22 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
      * 校验并确保数据满足当前约束（{@code requireSecret}）。
      */
     private void requireSecret() {
-        if (secret.length < 32) {
+        if (secret().length < 32) {
             throw new IllegalStateException("未配置满足长度要求的授权变更 token HMAC 密钥");
+        }
+    }
+
+    /** 每次签名操作从统一密钥运行态读取当前 ACTIVE 版本。 */
+    private byte[] secret() {
+        if (fixedSecret != null) {
+            return fixedSecret;
+        }
+        try {
+            return secretProvider.findActive("security.authorization-change-token-hmac")
+                    .map(secret -> secret.value().getBytes(StandardCharsets.UTF_8))
+                    .orElseGet(() -> new byte[0]);
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException("授权变更 token HMAC 密钥不可用", exception);
         }
     }
 
@@ -137,7 +154,7 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
     private byte[] sign(String payload) {
         try {
             var mac = Mac.getInstance(HMAC_ALGORITHM);
-            mac.init(new SecretKeySpec(secret, HMAC_ALGORITHM));
+            mac.init(new SecretKeySpec(secret(), HMAC_ALGORITHM));
             return mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
         } catch (Exception exception) {
             throw new IllegalStateException("生成授权变更 token 签名失败", exception);

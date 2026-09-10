@@ -1,9 +1,9 @@
 # ==================== 项目自定义配置 ====================
 spectra:
   security:
-    verification-code-hmac-key: ${SECURITY_VERIFICATION_CODE_HMAC_KEY:}
+    secret:
+      master-key: ${SPECTRA_SECURITY_SECRET_MASTER_KEY:}
     verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
-    authorization-change-token-hmac-key: ${SPECTRA_SECURITY_AUTHORIZATION_CHANGE_TOKEN_HMAC_KEY:}
     refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:__Host-spectra-refresh}
     refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:true}
     allow-insecure-refresh-cookie: ${SPECTRA_SECURITY_ALLOW_INSECURE_REFRESH_COOKIE:false}
@@ -54,8 +54,6 @@ spectra:
       presign-ttl: 15m
   notification:
     enabled: true
-    address-encryption-key:
-    sensitive-payload-key:
     allowed-link-prefixes: /login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/
     worker:
       fixed-delay-ms: 5000

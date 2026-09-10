@@ -66,8 +66,7 @@ public class SystemGuideController {
     @PostMapping(value = "/complete", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void complete(@Validated @RequestBody SystemGuideCompleteFrom from) {
-        log.debug("完成系统设置引导，cryptoEnabled={}, notificationEnabled={}", from.getCryptoEnabled(),
-                from.getNotificationEnabled());
+        log.debug("完成系统设置引导，notificationEnabled={}", from.getNotificationEnabled());
         systemGuideService.complete(from);
     }
 }

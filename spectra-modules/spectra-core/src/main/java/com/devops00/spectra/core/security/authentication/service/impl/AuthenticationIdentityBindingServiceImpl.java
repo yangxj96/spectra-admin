@@ -28,6 +28,7 @@ import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,8 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     private final SecurityVerificationCodeStore verificationCodeStore;
 
     private final SecurityProperties securityProperties;
+
+    private final SecretRuntimeService secretRuntimeService;
 
     private final AuthenticationIdentityService identityService;
 
@@ -106,7 +109,8 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
             throw new SpectraException("绑定验证码不能为空");
         }
         var key = prefix + address;
-        var digest = VerificationCodeDigest.digest(code, securityProperties.getVerificationCodeHmacKey());
+        var digest = VerificationCodeDigest.digest(code, secretRuntimeService.requireActiveValue(
+                "security.verification-code-hmac"));
         if (!verificationCodeStore.compareAndDelete(key, digest)) {
             throw new SpectraException("绑定验证码无效或已过期");
         }

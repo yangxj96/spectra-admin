@@ -180,7 +180,7 @@ class ArchitectureTest {
                 Map.entry("系统配置", "com.devops00.spectra.core.system"),
                 Map.entry("安全审计", "com.devops00.spectra.core.security.audit"),
                 Map.entry("普通操作日志", "com.devops00.spectra.core.audit"),
-                Map.entry("调度", "com.devops00.spectra.core.scheduler"),
+                Map.entry("调度", "com.devops00.spectra.core.quartz"),
                 Map.entry("服务监控", "com.devops00.spectra.core.system.service"),
                 Map.entry("统一通知", "com.devops00.spectra.core.notification"),
                 Map.entry("文件上传", "com.devops00.spectra.core.upload"));

@@ -18,10 +18,10 @@ package com.devops00.spectra.core.notification.configuration;
 
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EncryptException;
+import com.devops00.spectra.common.exception.SecuritySecretUnavailableException;
 import com.devops00.spectra.core.notification.security.NotificationPayloadCipher;
-import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import javax.crypto.spec.SecretKeySpec;
@@ -38,7 +38,6 @@ import java.util.Map;
  * @since 2026/8/11
  */
 @Component
-@RequiredArgsConstructor
 public class NotificationPayloadProtector {
 
     /**
@@ -49,12 +48,21 @@ public class NotificationPayloadProtector {
     /**
      * 通知模块密钥配置。
      */
-    private final NotificationModuleProperties properties;
+    private final com.devops00.spectra.core.security.secret.service.SecretRuntimeService runtimeService;
 
     /**
      * 敏感参数序列化器。
      */
     private final ObjectMapper objectMapper;
+
+    /** 运行时从统一密钥服务读取密钥。 */
+    @Autowired
+    public NotificationPayloadProtector(
+                                        com.devops00.spectra.core.security.secret.service.SecretRuntimeService runtimeService,
+                                        ObjectMapper objectMapper) {
+        this.runtimeService = runtimeService;
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * 保护外部渠道地址。
@@ -63,14 +71,14 @@ public class NotificationPayloadProtector {
         if (address == null || address.isBlank()) {
             throw new DataSaveException("通知收件地址不能为空");
         }
-        return protect(address, properties.addressEncryptionKey(), "通知地址");
+        return protect(address, activeKey("notification.address-encryption-key"), "通知地址");
     }
 
     /**
      * 解密外部渠道地址；解密失败时直接阻断当前投递。
      */
     public String unprotectAddress(String ciphertext) {
-        return unprotect(ciphertext, properties.addressEncryptionKey(), "通知地址");
+        return unprotect(ciphertext, activeKey("notification.address-encryption-key"), "通知地址");
     }
 
     /**
@@ -81,7 +89,7 @@ public class NotificationPayloadProtector {
             return null;
         }
         try {
-            return protect(objectMapper.writeValueAsString(parameters), properties.sensitivePayloadKey(), "通知敏感载荷");
+            return protect(objectMapper.writeValueAsString(parameters), activeKey("notification.sensitive-payload-key"), "通知敏感载荷");
         } catch (JacksonException exception) {
             throw new EncryptException("通知敏感载荷序列化失败", exception);
         }
@@ -95,7 +103,7 @@ public class NotificationPayloadProtector {
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> unprotectParameters(String ciphertext) {
-        var plainText = unprotect(ciphertext, properties.sensitivePayloadKey(), "通知敏感载荷");
+        var plainText = unprotect(ciphertext, activeKey("notification.sensitive-payload-key"), "通知敏感载荷");
         try {
             Map<?, ?> map = objectMapper.readValue(plainText, Map.class);
             if (map == null) {
@@ -113,21 +121,13 @@ public class NotificationPayloadProtector {
         }
     }
 
-    /**
-     * 保护 Provider Secret；Secret 只允许以密文形式进入运行时配置存储。
-     */
-    public String protectSecret(String secret) {
-        if (secret == null || secret.isBlank()) {
-            throw new DataSaveException("Provider Secret 不能为空");
+    /** 读取当前 ACTIVE 应用密钥，缺失时保持安全阻断。 */
+    private String activeKey(String code) {
+        try {
+            return runtimeService.requireActiveValue(code);
+        } catch (SecuritySecretUnavailableException exception) {
+            throw new DataSaveException("通知加密密钥不可用", exception);
         }
-        return protect(secret, properties.sensitivePayloadKey(), "Provider Secret");
-    }
-
-    /**
-     * 解密 Provider Secret；解密失败时直接阻断渠道使用。
-     */
-    public String unprotectSecret(String ciphertext) {
-        return unprotect(ciphertext, properties.sensitivePayloadKey(), "Provider Secret");
     }
 
     /**

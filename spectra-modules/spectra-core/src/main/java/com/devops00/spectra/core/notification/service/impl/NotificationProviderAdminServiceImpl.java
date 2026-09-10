@@ -22,7 +22,6 @@ import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
-import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfigDocument;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealth;
@@ -31,6 +30,8 @@ import com.devops00.spectra.core.notification.javabean.from.NotificationProvider
 import com.devops00.spectra.core.notification.javabean.vo.NotificationProviderVO;
 import com.devops00.spectra.core.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.core.notification.service.NotificationProviderAdminService;
+import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
@@ -44,7 +45,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 基于公共运行时配置的 Provider 管理实现。
@@ -106,10 +106,11 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
      */
     private final SystemConfigValueProvider valueProvider;
 
-    /**
-     * Provider Secret 保护器。
-     */
-    private final NotificationPayloadProtector payloadProtector;
+    /** 统一密钥运行时读取端口。 */
+    private final SecretRuntimeService secretRuntimeService;
+
+    /** 统一密钥版本管理端口。 */
+    private final SecretManagementService secretManagementService;
 
     /**
      * JSON 序列化器。
@@ -167,9 +168,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                     .build();
         }
         var document = readDocument(channel);
-        var secretCiphertext = valueProvider.find(secretKey(channel)).orElse(null);
-        var secretConfigured = hasSecret(document, secretCiphertext);
-        var secretUsable = secretConfigured && canDecrypt(secretCiphertext);
+        var activeSecret = activeSecret(channel);
+        var secretConfigured = hasSecret(document, activeSecret);
+        var secretUsable = secretConfigured;
         var state = resolveState(document, secretUsable);
         var result = NotificationProviderVO.builder()
                 .channel(channel.name())
@@ -200,7 +201,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     }
 
     /**
-     * 解析 Provider 运行时配置；密钥不可解密时返回空 Secret 以触发 fail-closed。
+     * 解析 Provider 运行时配置；统一密钥存储不可用时直接阻断请求。
      */
     @Override
     public NotificationProviderConfiguration resolve(NotificationChannel channel) {
@@ -212,14 +213,10 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                     null, null, false, false, 0, 0, 1, null, null, null, null, null);
         }
         var document = readDocument(channel);
-        var ciphertext = valueProvider.find(secretKey(channel)).orElse(null);
+        var activeSecret = activeSecret(channel);
         String secret = null;
-        if (hasSecret(document, ciphertext)) {
-            try {
-                secret = payloadProtector.unprotectSecret(ciphertext);
-            } catch (RuntimeException ignored) {
-                // Secret 不可解密时必须以空值返回，让 Provider 明确阻断发送。
-            }
+        if (hasSecret(document, activeSecret)) {
+            secret = activeSecret.value();
         }
         return new NotificationProviderConfiguration(channel, document.providerType(), document.enabled(),
                 document.endpoint(), document.port(), document.region(), document.credentialId(), document.appId(),
@@ -293,18 +290,14 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         }
         var current = readDocument(channel);
         var secretKeyId = current.secretKeyId();
-        var existingSecretCiphertext = valueProvider.find(secretKey(channel)).orElse(null);
         var providerTypeChanged = !providerType.equals(current.providerType());
         if (params.isClearSecret() || providerTypeChanged) {
             secretKeyId = null;
-            if (StringUtils.hasText(existingSecretCiphertext)) {
-                write(secretKey(channel), "", "通知" + channel.name() + " Provider Secret");
-            }
+            retireActiveSecret(channel);
         }
         if (!params.isClearSecret() && params.getSecret() != null && !params.getSecret().isBlank()) {
-            secretKeyId = channel.name().toLowerCase() + "-" + UUID.randomUUID();
-            write(secretKey(channel), payloadProtector.protectSecret(params.getSecret().trim()),
-                    "通知" + channel.name() + " Provider Secret（AES-GCM 密文）");
+            secretKeyId = secretKey(channel);
+            secretManagementService.createPending(secretKeyId, params.getSecret().trim(), "MANUAL");
         }
         var document = new NotificationProviderConfigDocument(providerType, params.isEnabled(), endpoint,
                 port, region, credentialId, appId, signName, senderAddress, senderName, sslEnabled, starttlsEnabled,
@@ -415,23 +408,30 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     /**
      * 判断条件是否满足（{@code hasSecret}）。
      */
-    private boolean hasSecret(NotificationProviderConfigDocument document, String ciphertext) {
+    private boolean hasSecret(NotificationProviderConfigDocument document,
+                              com.devops00.spectra.common.port.security.RuntimeSecret activeSecret) {
         return document.secretKeyId() != null
                 && !document.secretKeyId().isBlank()
-                && ciphertext != null
-                && !ciphertext.isBlank();
+                && activeSecret != null
+                && document.secretKeyId().equals(activeSecret.code());
     }
 
-    /**
-     * 判断条件是否满足（{@code canDecrypt}）。
-     */
-    private boolean canDecrypt(String ciphertext) {
-        try {
-            payloadProtector.unprotectSecret(ciphertext);
-            return true;
-        } catch (RuntimeException exception) {
-            return false;
+    /** 读取当前 Provider 的统一 ACTIVE Secret。 */
+    private com.devops00.spectra.common.port.security.RuntimeSecret activeSecret(NotificationChannel channel) {
+        return secretRuntimeService.findActive(secretKey(channel)).orElse(null);
+    }
+
+    /** 清除 Provider Secret 时只退役当前版本，不物理删除历史。 */
+    private void retireActiveSecret(NotificationChannel channel) {
+        var active = activeSecret(channel);
+        if (active == null) {
+            return;
         }
+        secretManagementService.listVersions(secretKey(channel))
+                .stream()
+                .filter(version -> "ACTIVE".equals(version.getState()))
+                .findFirst()
+                .ifPresent(version -> secretManagementService.retire(version.getId()));
     }
 
     /**

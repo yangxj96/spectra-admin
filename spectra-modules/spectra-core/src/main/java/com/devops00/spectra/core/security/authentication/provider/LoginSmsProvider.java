@@ -26,6 +26,7 @@ import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.core.security.authentication.exception.LoginException;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.security.authentication.strategy.provider.SmsAuthenticationProvider;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
@@ -63,12 +64,15 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
 
     private final SecurityProperties securityProperties;
 
+    private final SecretRuntimeService secretRuntimeService;
+
     public LoginSmsProvider(SecurityVerificationCodeStore verificationCodeStore,
                             SecurityVerificationAttemptStore verificationAttemptStore,
                             UserService userService,
                             AuthenticationIdentityService identityService,
                             PasswordCredentialService passwordCredentialService,
-                            SecurityUserAssembler securityUserAssembler, SecurityProperties securityProperties) {
+                            SecurityUserAssembler securityUserAssembler, SecurityProperties securityProperties,
+                            SecretRuntimeService secretRuntimeService) {
         this.verificationCodeStore = verificationCodeStore;
         this.verificationAttemptStore = verificationAttemptStore;
         this.userService = userService;
@@ -76,6 +80,7 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
         this.passwordCredentialService = passwordCredentialService;
         this.securityUserAssembler = securityUserAssembler;
         this.securityProperties = securityProperties;
+        this.secretRuntimeService = secretRuntimeService;
     }
 
     @Override
@@ -102,7 +107,8 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
         if (attempts > securityProperties.getVerificationCodeMaxAttempts()) {
             throw new KaptchaNotMatchException("验证码尝试次数过多");
         }
-        var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
+        var digest = VerificationCodeDigest.digest(kaptcha, secretRuntimeService.requireActiveValue(
+                "security.verification-code-hmac"));
         if (!verificationCodeStore.compareAndDelete(key, digest)) {
             throw new KaptchaNotMatchException("验证码错误");
         }
