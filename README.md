@@ -31,7 +31,7 @@
 cp .mise.local.toml.example .mise.local.toml
 ```
 
-数据库初始化、前端联调和 HTTPS 可选配置见根工作区 `docs/50-开发指南/10-环境搭建.md`。
+数据库初始化、前端联调和 HTTPS 可选配置见根工作区 `docs/开发指南/00-环境搭建.md`。
 
 ## 构建与校验
 
@@ -71,17 +71,17 @@ mise exec -- java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED \
 
 | 内容 | 路径 |
 |---|---|
-| 后端架构 | `docs/10-后端/10-架构分层.md` |
-| 用户与权限 | `docs/10-后端/20-用户与权限.md` |
-| 系统管理 | `docs/10-后端/30-系统管理.md` |
-| OA 模块 | `docs/10-后端/40-OA模块.md` |
-| 文件上传 | `docs/10-后端/50-文件上传.md` |
-| 工作流 | `docs/10-后端/60-工作流.md` |
-| 基础设施 | `docs/10-后端/80-基础设施.md` |
-| API 总览 | `docs/10-后端/90-API总览.md` |
-| 数据模型 | `docs/30-数据模型/` |
+| 后端架构 | `docs/后端/10-后端模块/00-架构分层.md` |
+| 用户与权限 | `docs/后端/10-后端模块/04-用户与权限.md` |
+| 系统管理 | `docs/后端/10-后端模块/06-系统管理.md` |
+| OA 模块 | `docs/后端/10-后端模块/08-OA模块.md` |
+| 文件上传 | `docs/后端/10-后端模块/09-文件上传.md` |
+| 工作流 | `docs/后端/10-后端模块/10-工作流.md` |
+| 基础设施 | `docs/后端/10-后端模块/12-基础设施.md` |
+| API 总览 | `docs/后端/10-后端模块/16-API总览.md` |
+| 数据模型 | `docs/后端/20-数据模型/` |
 | 数据库迁移 | `spectra-config/src/main/resources/db/migration/` |
-| 环境与命令 | `docs/50-开发指南/` |
+| 环境与命令 | `docs/开发指南/` |
 
 在线文档：[https://www.devops00.com/spectra-admin/](https://www.devops00.com/spectra-admin/)
 
