@@ -78,6 +78,18 @@ class AuditAspectContractTest {
     }
 
     @Test
+    void quotedAuditValueMustBeStoredAsItsResolvedDescription() throws Throwable {
+        AtomicReference<AuditRecord> recorded = new AtomicReference<>();
+        AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), recorded::set,
+                new DefaultAuditSanitizer(), transactionOperations(),
+                new AuditFailureResolver(new DefaultAuditSanitizer()), mock(AuditFailureRecorder.class));
+
+        aspect.handleAround(point(Fixture.class.getDeclaredMethod("auditWithQuotedDescription")));
+
+        assertEquals("读取用户详情", recorded.get().reason());
+    }
+
+    @Test
     void operationAuditFailureMustPropagateToRollbackOwningTransaction() throws Throwable {
         AuditService auditService = record -> {
             throw new AuditService.AuditRecordingException("operation outbox unavailable");
@@ -266,6 +278,11 @@ class AuditAspectContractTest {
         @Audit(captureArguments = false, captureResult = false)
         String sensitiveAudit(String value) {
             return value;
+        }
+
+        @Audit(value = "'读取用户详情'", eventType = "USER_DETAIL_READ")
+        String auditWithQuotedDescription() {
+            return "ok";
         }
     }
 }

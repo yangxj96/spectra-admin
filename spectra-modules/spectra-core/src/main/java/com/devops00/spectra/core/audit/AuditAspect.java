@@ -193,7 +193,10 @@ public class AuditAspect {
         if (expression == null || expression.isBlank()) {
             return null;
         }
-        if (!expression.contains("#")) {
+        boolean quotedLiteral = expression.length() > 1
+                && expression.charAt(0) == '\''
+                && expression.charAt(expression.length() - 1) == '\'';
+        if (!expression.contains("#") && !quotedLiteral) {
             return expression;
         }
         if (expression.contains("T(")) {

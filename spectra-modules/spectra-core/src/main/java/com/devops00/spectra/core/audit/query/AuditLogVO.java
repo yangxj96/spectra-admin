@@ -9,18 +9,19 @@ package com.devops00.spectra.core.audit.query;
 import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditRecord;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/** Audit row view. occurredAt is required to address the partitioned primary key. */
+/** Audit row view. occurredAt keeps full precision for the partitioned primary key. */
 public record AuditLogVO(UUID eventId,
-                         LocalDateTime occurredAt,
+                         Instant occurredAt,
                          AuditCategory category,
                          String eventType,
                          UUID operatorId,
+                         String operatorName,
                          UUID targetId,
                          String client,
                          String ip,

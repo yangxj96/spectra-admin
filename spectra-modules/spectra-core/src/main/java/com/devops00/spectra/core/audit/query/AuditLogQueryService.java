@@ -35,6 +35,8 @@ public class AuditLogQueryService {
 
     private static final String TABLE = "spectra_core.sys_audit_event";
 
+    private static final String USER_TABLE = "spectra_core.sys_user";
+
     private static final int MAX_PAGE_SIZE = 100;
 
     private static final int MAX_EXPORT_ROWS = 5000;
@@ -44,7 +46,9 @@ public class AuditLogQueryService {
             + "OR UPPER(event_type) LIKE '%SECURITY%' OR UPPER(event_type) LIKE '%SESSION%' "
             + "OR UPPER(event_type) LIKE '%PASSWORD%' OR UPPER(event_type) LIKE '%AUDIT%'))";
 
-    private static final String PROJECTION = "event_id, occurred_at, category, event_type, operator_id, target_id, "
+    private static final String PROJECTION = "event_id, occurred_at, category, event_type, operator_id, "
+            + "(SELECT NULLIF(BTRIM(audit_operator.real_name), '') FROM " + USER_TABLE
+            + " audit_operator WHERE audit_operator.id = operator_id) AS operator_name, target_id, "
             + "client, ip, user_agent, http_method, request_url, http_status, duration_ms, "
             + "before_snapshot::text AS before_snapshot, after_snapshot::text AS after_snapshot, reason, result, "
             + "failure_code, failure_type, failure_reason, correlation_id";
@@ -71,7 +75,7 @@ public class AuditLogQueryService {
         arguments.add(pageSize);
         arguments.add(offset);
         List<AuditLogVO> records = jdbcTemplate.query("SELECT " + PROJECTION + " FROM " + TABLE + plan.whereSql()
-                        + " ORDER BY occurred_at DESC, event_id DESC LIMIT ? OFFSET ?",
+                + " ORDER BY occurred_at DESC, event_id DESC LIMIT ? OFFSET ?",
                 arguments.toArray(), this::mapVisibleRow);
         recordMetrics("PAGE");
         return new AuditLogPageVO(records, total == null ? 0L : total, pageNum, pageSize);
@@ -83,7 +87,8 @@ public class AuditLogQueryService {
             throw new DataNotExistException("审计事件不存在");
         }
         QueryPlan plan = buildPlan(viewer, null);
-        String where = plan.whereSql().isBlank() ? " WHERE event_id = ? AND occurred_at = ?"
+        String where = plan.whereSql().isBlank()
+                ? " WHERE event_id = ? AND occurred_at = ?"
                 : plan.whereSql() + " AND event_id = ? AND occurred_at = ?";
         var arguments = new ArrayList<>(plan.arguments());
         arguments.add(eventId);
@@ -103,7 +108,7 @@ public class AuditLogQueryService {
         var arguments = new ArrayList<>(plan.arguments());
         arguments.add(MAX_EXPORT_ROWS);
         List<AuditLogVO> records = jdbcTemplate.query("SELECT " + PROJECTION + " FROM " + TABLE + plan.whereSql()
-                        + " ORDER BY occurred_at DESC, event_id DESC LIMIT ?",
+                + " ORDER BY occurred_at DESC, event_id DESC LIMIT ?",
                 arguments.toArray(), this::mapVisibleRow);
         var csv = new StringBuilder("event_id,occurred_at,category,event_type,operator_id,target_id,client,ip,"
                 + "user_agent,http_method,request_url,http_status,duration_ms,before,after,reason,result,"
@@ -158,12 +163,24 @@ public class AuditLogQueryService {
             arguments.add(filters.getCategory().name());
         }
         if (filters.getEventType() != null && !filters.getEventType().isBlank()) {
-            conditions.add("event_type = ?");
-            arguments.add(filters.getEventType().trim());
+            String eventType = filters.getEventType().trim();
+            conditions.add("(event_type ILIKE ? OR reason ILIKE ?)");
+            arguments.add("%" + eventType + "%");
+            arguments.add("%" + eventType + "%");
         }
-        if (filters.getOperatorId() != null) {
-            conditions.add("operator_id = ?");
-            arguments.add(filters.getOperatorId());
+        if (filters.getOperator() != null && !filters.getOperator().isBlank()) {
+            String operator = filters.getOperator().trim();
+            UUID operatorId = parseUuid(operator);
+            String operatorNameCondition = "EXISTS (SELECT 1 FROM " + USER_TABLE
+                    + " audit_operator WHERE audit_operator.id = operator_id"
+                    + " AND audit_operator.real_name ILIKE ?)";
+            if (operatorId == null) {
+                conditions.add(operatorNameCondition);
+            } else {
+                conditions.add("(operator_id = ? OR " + operatorNameCondition + ")");
+                arguments.add(operatorId);
+            }
+            arguments.add("%" + operator + "%");
         }
         if (filters.getTargetId() != null) {
             conditions.add("target_id = ?");
@@ -189,10 +206,11 @@ public class AuditLogQueryService {
         String failureReason = resultSet.getString("failure_reason");
         return new AuditLogVO(
                 resultSet.getObject("event_id", UUID.class),
-                timeMapper.toLocalDateTime(toInstant(resultSet.getTimestamp("occurred_at"))),
+                toInstant(resultSet.getTimestamp("occurred_at")),
                 com.devops00.spectra.common.audit.AuditCategory.valueOf(resultSet.getString("category")),
                 resultSet.getString("event_type"),
                 resultSet.getObject("operator_id", UUID.class),
+                resultSet.getString("operator_name"),
                 resultSet.getObject("target_id", UUID.class),
                 resultSet.getString("client"),
                 resultSet.getString("ip"),
@@ -236,7 +254,7 @@ public class AuditLogQueryService {
 
     private AuditRecord toRecord(AuditLogVO value) {
         return new AuditRecord(value.eventId(), value.category(), value.eventType(), value.targetId(), value.result(),
-                timeMapper.toInstant(value.occurredAt()),
+                value.occurredAt(),
                 new com.devops00.spectra.common.audit.AuditContext(value.operatorId(), null, value.correlationId(),
                         value.client(), value.ip(), value.userAgent()),
                 value.before(), value.after(), value.reason(),
@@ -254,6 +272,14 @@ public class AuditLogQueryService {
 
     private static Instant toInstant(Timestamp timestamp) {
         return timestamp == null ? Instant.EPOCH : timestamp.toInstant();
+    }
+
+    private static UUID parseUuid(String value) {
+        try {
+            return UUID.fromString(value);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 
     private static void appendCell(StringBuilder csv, Object value) {

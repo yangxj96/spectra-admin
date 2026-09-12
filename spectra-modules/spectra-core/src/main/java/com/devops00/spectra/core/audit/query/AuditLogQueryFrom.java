@@ -20,7 +20,7 @@ public class AuditLogQueryFrom {
 
     private String eventType;
 
-    private UUID operatorId;
+    private String operator;
 
     private UUID targetId;
 
