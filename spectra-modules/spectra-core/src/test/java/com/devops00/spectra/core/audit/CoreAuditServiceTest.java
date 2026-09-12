@@ -12,12 +12,16 @@ import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.core.audit.repository.JdbcAuditEventWriter;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -59,6 +63,70 @@ class CoreAuditServiceTest {
         assertEquals("***", accepted.getFirst().after().get("token"));
         assertEquals("request-123", auditMetadata(accepted.getFirst().after()).get("requestId"));
         assertEquals(AuditRecord.Result.DENIED, accepted.get(1).result());
+        assertEquals("SYSTEM", accepted.get(1).context().client());
+        assertEquals("SYSTEM", auditMetadata(accepted.get(1).after()).get("client"));
+    }
+
+    @Test
+    void operationClientMustUseTheHttpRequestHeaderAndNormalizeToUppercase() {
+        var request = new MockHttpServletRequest("GET", "/api/test");
+        request.addHeader("X-Client-Type", "mini");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request, new MockHttpServletResponse()));
+        try {
+            var writer = mock(JdbcAuditEventWriter.class);
+            new CoreAuditService(writer, this::sanitize).record(operationRecord(context(null)));
+
+            var captor = org.mockito.ArgumentCaptor.forClass(AuditRecord.class);
+            verify(writer).append(captor.capture());
+            assertEquals("MINI", captor.getValue().context().client());
+            assertEquals("MINI", auditMetadata(captor.getValue().after()).get("client"));
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
+    }
+
+    @Test
+    void operationClientMustDefaultToWebForHttpRequestsWithoutAClientHeader() {
+        var request = new MockHttpServletRequest("GET", "/api/test");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request, new MockHttpServletResponse()));
+        try {
+            var writer = mock(JdbcAuditEventWriter.class);
+            new CoreAuditService(writer, this::sanitize).record(operationRecord(context(null)));
+
+            var captor = org.mockito.ArgumentCaptor.forClass(AuditRecord.class);
+            verify(writer).append(captor.capture());
+            assertEquals("WEB", captor.getValue().context().client());
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
+    }
+
+    @Test
+    void operationClientMustUseSystemWhenNoHttpContextOrClientIsAvailable() {
+        RequestContextHolder.resetRequestAttributes();
+        var writer = mock(JdbcAuditEventWriter.class);
+        new CoreAuditService(writer, this::sanitize).record(operationRecord(context(null)));
+
+        var captor = org.mockito.ArgumentCaptor.forClass(AuditRecord.class);
+        verify(writer).append(captor.capture());
+        assertEquals("SYSTEM", captor.getValue().context().client());
+    }
+
+    @Test
+    void operationRequestMustNotBeAbleToClaimTheSystemClient() {
+        var request = new MockHttpServletRequest("GET", "/api/test");
+        request.addHeader("X-Client-Type", "SYSTEM");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request, new MockHttpServletResponse()));
+        try {
+            var writer = mock(JdbcAuditEventWriter.class);
+            new CoreAuditService(writer, this::sanitize).record(operationRecord(context(null)));
+
+            var captor = org.mockito.ArgumentCaptor.forClass(AuditRecord.class);
+            verify(writer).append(captor.capture());
+            assertEquals("WEB", captor.getValue().context().client());
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
     }
 
     @Test
@@ -92,8 +160,12 @@ class CoreAuditServiceTest {
     }
 
     private AuditRecord operationRecord() {
+        return operationRecord(context("WEB"));
+    }
+
+    private AuditRecord operationRecord(AuditContext recordContext) {
         return new AuditRecord(EVENT_ID, AuditCategory.OPERATION, "USER.UPDATE", null,
-                AuditRecord.Result.SUCCEEDED, OCCURRED_AT, context(),
+                AuditRecord.Result.SUCCEEDED, OCCURRED_AT, recordContext,
                 Map.of("password", "plain"), Map.of("token", "plain"), "user updated");
     }
 
@@ -104,7 +176,11 @@ class CoreAuditServiceTest {
     }
 
     private AuditContext context() {
-        return new AuditContext(OPERATOR_ID, "request-123", "correlation-456", "WEB", "127.0.0.1", "agent");
+        return context("WEB");
+    }
+
+    private AuditContext context(String client) {
+        return new AuditContext(OPERATOR_ID, "request-123", "correlation-456", client, "127.0.0.1", "agent");
     }
 
     private Map<String, Object> sanitize(Map<String, ?> source) {

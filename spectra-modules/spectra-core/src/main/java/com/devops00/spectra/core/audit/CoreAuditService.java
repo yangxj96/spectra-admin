@@ -16,14 +16,18 @@
 
 package com.devops00.spectra.core.audit;
 
+import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditContext;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.core.audit.repository.JdbcAuditEventWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -44,6 +48,8 @@ import java.util.UUID;
 public class CoreAuditService implements AuditService {
 
     private static final String AUDIT_METADATA = "_audit";
+    private static final String SYSTEM_CLIENT = "SYSTEM";
+    private static final String CLIENT_TYPE_HEADER = "X-Client-Type";
 
     private final JdbcAuditEventWriter writer;
     private final AuditSanitizer auditSanitizer;
@@ -69,26 +75,64 @@ public class CoreAuditService implements AuditService {
     }
 
     private AuditRecord sanitize(AuditRecord record) {
-        Map<String, Object> metadata = metadata(record);
-        AuditRecord.Failure failure = record.failure();
+        AuditRecord normalizedRecord = withClient(record, resolveClient(record));
+        Map<String, Object> metadata = metadata(normalizedRecord);
+        AuditRecord.Failure failure = normalizedRecord.failure();
         if (failure != null && failure.reason() != null) {
             String reason = stringValue(auditSanitizer.sanitize(Map.of("failureReason", failure.reason()))
                     .get("failureReason"));
             failure = new AuditRecord.Failure(failure.code(), failure.type(), reason);
         }
         return new AuditRecord(
-                record.eventId(),
-                record.category(),
-                record.eventType(),
-                record.targetId(),
-                record.result(),
-                record.occurredAt(),
-                record.context(),
-                withMetadata(auditSanitizer.sanitize(record.before()), metadata),
-                withMetadata(auditSanitizer.sanitize(record.after()), metadata),
-                record.reason(),
-                record.httpSummary(),
+                normalizedRecord.eventId(),
+                normalizedRecord.category(),
+                normalizedRecord.eventType(),
+                normalizedRecord.targetId(),
+                normalizedRecord.result(),
+                normalizedRecord.occurredAt(),
+                normalizedRecord.context(),
+                withMetadata(auditSanitizer.sanitize(normalizedRecord.before()), metadata),
+                withMetadata(auditSanitizer.sanitize(normalizedRecord.after()), metadata),
+                normalizedRecord.reason(),
+                normalizedRecord.httpSummary(),
                 failure);
+    }
+
+    private static String resolveClient(AuditRecord record) {
+        if (record.category() == AuditCategory.SECURITY) {
+            return SYSTEM_CLIENT;
+        }
+        String client = normalizeClient(record.context().client());
+        if (client != null) {
+            return client;
+        }
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
+            client = normalizeClient(attributes.getRequest().getHeader(CLIENT_TYPE_HEADER));
+            return client == null ? ClientType.WEB.name() : client;
+        }
+        return SYSTEM_CLIENT;
+    }
+
+    private static String normalizeClient(String candidate) {
+        if (candidate == null || candidate.isBlank()) {
+            return null;
+        }
+        for (ClientType clientType : ClientType.values()) {
+            if (clientType.name().equalsIgnoreCase(candidate)
+                    || clientType.getName().equalsIgnoreCase(candidate)) {
+                return clientType.name();
+            }
+        }
+        return null;
+    }
+
+    private static AuditRecord withClient(AuditRecord record, String client) {
+        AuditContext context = record.context();
+        AuditContext normalizedContext = new AuditContext(context.operatorId(), context.requestId(),
+                context.correlationId(), client, context.ip(), context.userAgent());
+        return new AuditRecord(record.eventId(), record.category(), record.eventType(), record.targetId(),
+                record.result(), record.occurredAt(), normalizedContext, record.before(), record.after(),
+                record.reason(), record.httpSummary(), record.failure());
     }
 
     private static Map<String, Object> metadata(AuditRecord record) {
