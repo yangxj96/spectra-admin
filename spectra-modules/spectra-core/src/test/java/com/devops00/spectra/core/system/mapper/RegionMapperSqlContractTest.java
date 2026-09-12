@@ -16,12 +16,16 @@
 
 package com.devops00.spectra.core.system.mapper;
 
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 /** 行政区域递归路径查询 SQL 契约测试。 */
 class RegionMapperSqlContractTest {
@@ -33,11 +37,29 @@ class RegionMapperSqlContractTest {
         assertThat(mapper).contains("<select id=\"selectPath\"")
                 .contains("WITH RECURSIVE region_path AS")
                 .contains("ARRAY[id] AS visited")
-                .contains("current.visited || ARRAY[parent.id] AS visited")
-                .contains("current.depth &lt;= #{maxDepth}")
-                .contains("NOT (parent.id = ANY (current.visited))")
+                .contains("path_node.visited || ARRAY[parent.id] AS visited")
+                .contains("path_node.depth &lt;= #{maxDepth}")
+                .contains("NOT (parent.id = ANY (path_node.visited))")
                 .contains("ORDER BY depth ASC")
                 .contains("deleted IS NULL");
+    }
+
+    @Test
+    void recursivePathQueryCanBeParsedByMybatisPermissionParser() throws IOException {
+        Matcher select = Pattern.compile("(?s)<select id=\"selectPath\"[^>]*>(.*?)</select>")
+                .matcher(readMapper());
+        assertThat(select.find()).isTrue();
+
+        String sql = select.group(1)
+                .replaceAll("(?s)<!--.*?-->", " ")
+                .replaceAll("<[^>]+>", " ")
+                .replace("&lt;", "<")
+                .replace("#{id}", "?")
+                .replace("#{maxDepth}", "?")
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        assertThatNoException().isThrownBy(() -> CCJSqlParserUtil.parse(sql));
     }
 
     private static String readMapper() throws IOException {

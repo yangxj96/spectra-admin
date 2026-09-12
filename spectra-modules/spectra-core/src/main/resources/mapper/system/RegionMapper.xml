@@ -57,13 +57,13 @@
             SELECT parent.id,
                    parent.pid,
                    parent.name,
-                   current.depth + 1 AS depth,
-                   current.visited || ARRAY[parent.id] AS visited
+                   path_node.depth + 1 AS depth,
+                   path_node.visited || ARRAY[parent.id] AS visited
             FROM spectra_core.sys_region parent
-            INNER JOIN region_path current ON current.pid = parent.id
+            INNER JOIN region_path path_node ON path_node.pid = parent.id
             WHERE parent.deleted IS NULL
-              AND current.depth &lt;= #{maxDepth}
-              AND NOT (parent.id = ANY (current.visited))
+              AND path_node.depth &lt;= #{maxDepth}
+              AND NOT (parent.id = ANY (path_node.visited))
         )
         SELECT id, pid, name, depth
         FROM region_path
