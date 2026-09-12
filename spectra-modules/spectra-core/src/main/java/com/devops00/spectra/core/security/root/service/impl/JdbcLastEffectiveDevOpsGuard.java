@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.root.service.impl;
 
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.security.root.RootGovernanceException;
 import com.devops00.spectra.core.security.root.RootPolicy;
@@ -37,12 +37,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class JdbcLastEffectiveDevOpsGuard implements LastEffectiveDevOpsGuard {
 
     private final RootPolicyRepository rootPolicyRepository;
-    private final SecurityAuditWriter securityAuditWriter;
+    private final AuditService auditService;
 
     @Override
     @Transactional
     public void assertCanAddDevOps() {
-        securityAuditWriter.assertAvailable();
+        auditService.assertAvailable();
         RootPolicy policy = rootPolicyRepository.lock();
         long current = rootPolicyRepository.countEffectiveDevOpsUsers();
         if (current >= policy.maxDevOpsUsers()) {
@@ -53,7 +53,7 @@ public class JdbcLastEffectiveDevOpsGuard implements LastEffectiveDevOpsGuard {
     @Override
     @Transactional
     public void assertCanRemoveDevOps() {
-        securityAuditWriter.assertAvailable();
+        auditService.assertAvailable();
         RootPolicy policy = rootPolicyRepository.lock();
         long current = rootPolicyRepository.countEffectiveDevOpsUsers();
         if (current <= policy.minEffectiveDevOpsUsers()) {

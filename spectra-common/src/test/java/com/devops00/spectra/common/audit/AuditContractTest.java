@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,27 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class AuditContractTest {
+
+    @Test
+    void auditRecordMustCarryStructuredHttpAndFailureDetails() {
+        var componentNames = Arrays.stream(AuditRecord.class.getRecordComponents())
+                .map(java.lang.reflect.RecordComponent::getName)
+                .toList();
+
+        assertTrue(componentNames.contains("httpSummary"));
+        assertTrue(componentNames.contains("failure"));
+
+        var record = new AuditRecord(null, AuditCategory.SECURITY, "LOGIN.FAILED", null,
+                AuditRecord.Result.FAILED, Instant.now(), AuditContext.empty(), Map.of(), Map.of(),
+                "business reason", new AuditRecord.HttpSummary("POST", "/login?token=secret", 401, 12L),
+                new AuditRecord.Failure("AUTH_DENIED", "AccessDeniedException", "权限不足"));
+
+        assertEquals("/login", record.httpSummary().url());
+        assertEquals(401, record.httpSummary().status());
+        assertEquals("AUTH_DENIED", record.failure().code());
+        assertEquals("AccessDeniedException", record.failure().type());
+        assertEquals("权限不足", record.failure().reason());
+    }
 
     @Test
     void auditCategoryMustExposeOperationAndSecurity() {
@@ -100,7 +122,10 @@ class AuditContractTest {
         var method = AuditService.class.getMethod("record", AuditRecord.class);
 
         assertEquals(void.class, method.getReturnType());
-        assertEquals(1, AuditService.class.getDeclaredMethods().length);
+        assertTrue(AuditService.class.getMethod("assertAvailable").isDefault());
+        assertEquals(1, Arrays.stream(AuditService.class.getDeclaredMethods())
+                .filter(declaredMethod -> !declaredMethod.isDefault())
+                .count());
         assertInstanceOf(Class.class, AuditService.AuditRecordingException.class);
         assertTrue(RuntimeException.class.isAssignableFrom(AuditService.AuditRecordingException.class));
     }

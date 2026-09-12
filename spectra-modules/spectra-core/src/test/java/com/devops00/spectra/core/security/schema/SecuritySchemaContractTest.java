@@ -21,7 +21,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SecuritySchemaContractTest {
 
     @Test
-    void shouldDeclareCurrentTargetSchemaAndRejectLegacySecurityObjects() throws IOException {
+    void shouldDeclareCurrentTargetSchemaAndRejectSplitAuditObjects() throws IOException {
         String migration = readV1();
 
         for (String schemaName : List.of("spectra_core", "spectra_security", "spectra_oa",
@@ -63,10 +66,11 @@ class SecuritySchemaContractTest {
                 "sec_role_menu")) {
             assertTrue(migration.contains("CREATE TABLE spectra_security." + table), table);
         }
-        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_audit_event"));
-        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_audit_archive_manifest"));
-        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
-        assertTrue(migration.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_audit_event"));
+        assertTrue(migration.contains("PARTITION BY RANGE (occurred_at)"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_audit_event_default"));
+        assertTrue(migration.contains("PRIMARY KEY (event_id, occurred_at)"));
+        assertTrue(migration.contains("CREATE TRIGGER trg_sys_audit_event_immutable"));
 
         for (String legacyObject : List.of(
                 "CREATE TABLE spectra_core.sys_account",
@@ -80,22 +84,27 @@ class SecuritySchemaContractTest {
                 "CREATE TABLE spectra_security.permission")) {
             assertFalse(migration.contains(legacyObject), legacyObject);
         }
+        for (String retiredAuditObject : List.of(
+                "CREATE TABLE spectra_core.sys_log",
+                "CREATE TABLE spectra_core.sys_operation_log_outbox",
+                "CREATE TABLE spectra_security.sec_security_audit_event",
+                "CREATE TABLE spectra_security.sec_security_change_outbox",
+                "CREATE TABLE spectra_security.sec_security_audit_archive_manifest",
+                "CREATE TABLE spectra_security.sec_security_audit_retention_policy")) {
+            assertFalse(migration.contains(retiredAuditObject), retiredAuditObject);
+        }
     }
 
     @Test
     void shouldKeepAuditBoundaryAndSecuritySeedsInTheCurrentBaseline() throws IOException {
         String migration = readV1();
 
-        assertTrue(migration.contains("PARTITION BY RANGE (occurred_at)"));
-        assertTrue(migration.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
+        assertTrue(migration.contains("CREATE TRIGGER trg_sys_audit_event_immutable"));
         assertTrue(migration.contains("REVOKE UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER"));
-        assertTrue(migration.contains("ON spectra_security.sec_security_audit_event FROM spectra_runtime"));
-        assertTrue(migration.contains("hot_retention_months >= 12"));
-        assertTrue(migration.contains("total_retention_years >= 5"));
-        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
+        assertTrue(migration.contains("ON spectra_core.sys_audit_event FROM spectra_runtime"));
         assertTrue(migration.contains("CREATE ROLE spectra_runtime"));
-        assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_security.sec_security_audit_event TO spectra_runtime"));
-        assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_security.sec_security_audit_event_default TO spectra_runtime"));
+        assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_core.sys_audit_event TO spectra_runtime"));
+        assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_core.sys_audit_event_default TO spectra_runtime"));
         assertTrue(migration.contains("INSERT INTO spectra_security.sec_permission"));
         assertTrue(migration.contains("INSERT INTO spectra_security.sec_password_policy"));
         assertTrue(migration.contains("INSERT INTO spectra_security.sec_security_client"));
@@ -123,6 +132,23 @@ class SecuritySchemaContractTest {
         assertFalse(migration.contains("CREATE TABLE spectra_security.sec_recovery_code"));
         assertFalse(migration.contains("encrypted_secret bytea"));
         assertFalse(migration.contains("code_hash character varying(255)"));
+    }
+
+    @Test
+    void userIdentityAndContactTablesMustUseTheirFinalBaselineShape() throws IOException {
+        String migration = readV1();
+        int userStart = migration.indexOf("CREATE TABLE spectra_core.sys_user (");
+        int userEnd = migration.indexOf("\n);", userStart);
+        String userTable = migration.substring(userStart, userEnd);
+
+        assertTrue(userTable.contains("username character varying(100) NOT NULL"));
+        assertFalse(userTable.contains(" phone "));
+        assertFalse(userTable.contains(" email "));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_user_contact"));
+        assertTrue(migration.contains("uk_sec_user_contact_user_type_active"));
+        assertTrue(migration.contains("uk_sec_user_contact_value_active"));
+        assertFalse(migration.contains("UPDATE spectra_core.sys_user"));
+        assertFalse(migration.contains("INSERT INTO spectra_security.sec_user_contact"));
     }
 
     @Test
@@ -182,20 +208,16 @@ class SecuritySchemaContractTest {
     }
 
     @Test
-    void securityOutboxMigrationMustDeclareLeaseIdempotencyAndArchiveFields() throws IOException {
-        String migration = readMigration("V13__secure_outbox_lease_and_indexes.sql");
-
-        for (String column : List.of("idempotency_key", "correlation_id", "state", "available_at",
-                "lease_owner", "lease_until")) {
-            assertTrue(migration.contains("ADD COLUMN " + column), column);
+    void migrationDirectoryMustContainOnlyTheCurrentBaseline() throws IOException {
+        Path directory = migrationDirectory();
+        Pattern versionedMigration = Pattern.compile("V\\d+__.*\\.sql");
+        try (Stream<Path> files = Files.list(directory)) {
+            var names = files.map(path -> path.getFileName().toString())
+                    .filter(name -> versionedMigration.matcher(name).matches())
+                    .sorted(Comparator.naturalOrder())
+                    .toList();
+            assertEquals(List.of("V1__init_db.sql"), names);
         }
-        assertTrue(migration.contains("uk_sec_security_change_outbox_idempotency_key"));
-        assertTrue(migration.contains("idx_sec_security_change_outbox_pending"));
-        assertTrue(migration.contains("idx_sec_security_change_outbox_lease"));
-        assertTrue(migration.contains("content_length bigint"));
-        assertTrue(migration.contains("attempts integer"));
-        assertTrue(migration.contains("idx_sec_security_audit_archive_manifest_pending"));
-        assertTrue(migration.contains("idx_sec_security_audit_archive_manifest_lease"));
     }
 
     private String readV1() throws IOException {
@@ -203,14 +225,13 @@ class SecuritySchemaContractTest {
     }
 
     private String readCatalog() throws IOException {
-        var candidates = List.of(
-                Path.of("..", "..", "docs", "10-后端", "permission-catalog.yaml"),
-                Path.of("..", "..", "..", "docs", "10-后端", "permission-catalog.yaml"),
-                Path.of("..", "..", "..", "..", "docs", "10-后端", "permission-catalog.yaml"));
-        for (var candidate : candidates) {
+        Path directory = Path.of("").toAbsolutePath();
+        while (directory != null) {
+            Path candidate = directory.resolve(Path.of("docs", "后端", "10-后端模块", "permission-catalog.yaml"));
             if (Files.isRegularFile(candidate)) {
                 return Files.readString(candidate);
             }
+            directory = directory.getParent();
         }
         throw new IOException("找不到 Permission Catalog");
     }
@@ -227,5 +248,15 @@ class SecuritySchemaContractTest {
             }
         }
         throw new IOException("找不到目标 Flyway migration: " + fileName);
+    }
+
+    private Path migrationDirectory() throws IOException {
+        var candidates = List.of(
+                Path.of("spectra-config", "src", "main", "resources", "db", "migration"),
+                Path.of("..", "..", "spectra-config", "src", "main", "resources", "db", "migration"),
+                Path.of("..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration"),
+                Path.of("..", "..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration"));
+        return candidates.stream().filter(Files::isDirectory).findFirst()
+                .orElseThrow(() -> new IOException("找不到 Flyway migration 目录"));
     }
 }

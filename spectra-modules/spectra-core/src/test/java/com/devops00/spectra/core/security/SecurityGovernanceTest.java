@@ -17,16 +17,23 @@
 package com.devops00.spectra.core.security;
 
 import com.devops00.spectra.core.security.change.service.impl.DefaultSecurityChangeExecutor;
-import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
+import com.devops00.spectra.common.audit.AuditCategory;
+import com.devops00.spectra.common.audit.AuditContext;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
+import com.devops00.spectra.core.audit.AuditFailureResolver;
+import com.devops00.spectra.core.audit.AuditFailureRecorder;
 import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
-import com.devops00.spectra.core.security.audit.SecurityAuditUnavailableException;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
 import com.devops00.spectra.core.security.root.RootPolicy;
 import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.SimpleTransactionStatus;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +43,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  * Phase 1 安全审计、事务门禁和最后 Root 保护测试。
@@ -45,12 +51,12 @@ class SecurityGovernanceTest {
 
     @Test
     void highRiskMutationMustNotRunWhenAuditIsUnavailable() {
-        var writer = new RecordingAuditWriter();
+        var writer = new RecordingAuditService();
         writer.available = false;
-        var executor = new DefaultSecurityChangeExecutor(writer, mock(SecurityChangeOutboxProducer.class));
+        var executor = executor(writer, new ArrayList<>());
         var executed = new AtomicBoolean();
 
-        assertThrows(SecurityAuditUnavailableException.class,
+        assertThrows(AuditService.AuditRecordingException.class,
                 () -> executor.execute(event(), () -> {
                     executed.set(true);
                     return "unexpected";
@@ -62,17 +68,17 @@ class SecurityGovernanceTest {
 
     @Test
     void successfulMutationWritesStartedAndSucceededFacts() {
-        var writer = new RecordingAuditWriter();
-        var executor = new DefaultSecurityChangeExecutor(writer, mock(SecurityChangeOutboxProducer.class));
+        var writer = new RecordingAuditService();
+        var executor = executor(writer, new ArrayList<>());
 
         assertEquals("ok", executor.execute(event(), () -> "ok"));
-        assertEquals(List.of(AuditResult.STARTED, AuditResult.SUCCEEDED),
-                writer.events.stream().map(SecurityAuditEvent::result).toList());
+        assertEquals(List.of(AuditRecord.Result.STARTED, AuditRecord.Result.SUCCEEDED),
+                writer.events.stream().map(AuditRecord::result).toList());
     }
 
     @Test
     void lastEffectiveRootCannotBeRemoved() {
-        var writer = new RecordingAuditWriter();
+        var writer = new RecordingAuditService();
         var repository = new RecordingRootPolicyRepository(1);
         var guard = new JdbcLastEffectiveDevOpsGuard(repository, writer);
 
@@ -81,34 +87,58 @@ class SecurityGovernanceTest {
 
     @Test
     void rootUpperBoundIsCheckedWithLockedPolicySnapshot() {
-        var writer = new RecordingAuditWriter();
+        var writer = new RecordingAuditService();
         var repository = new RecordingRootPolicyRepository(3);
         var guard = new JdbcLastEffectiveDevOpsGuard(repository, writer);
 
         assertThrows(RuntimeException.class, guard::assertCanAddDevOps);
     }
 
-    private static SecurityAuditEvent event() {
-        return new SecurityAuditEvent(UUID.randomUUID(), "DEV_OPS_TEST", null, null, "WEB", "127.0.0.1", null,
-                Map.of(), Map.of(), "test", null, AuditResult.STARTED, "corr");
+    private static DefaultSecurityChangeExecutor executor(RecordingAuditService service, List<AuditRecord> failures) {
+        var failureRecorder = new AuditFailureRecorder(failures::add, new NoopTransactionManager());
+        return new DefaultSecurityChangeExecutor(service, new AuditFailureResolver(new DefaultAuditSanitizer()),
+                failureRecorder);
     }
 
-    private static final class RecordingAuditWriter implements SecurityAuditWriter {
+    private static AuditRecord event() {
+        return new AuditRecord(UUID.randomUUID(), AuditCategory.SECURITY, "DEV_OPS_TEST", null,
+                AuditRecord.Result.STARTED, Instant.now(), AuditContext.empty(), Map.of(), Map.of(), "test");
+    }
 
-        private final List<SecurityAuditEvent> events = new ArrayList<>();
+    private static final class RecordingAuditService implements AuditService {
+
+        private final List<AuditRecord> events = new ArrayList<>();
         private boolean available = true;
+
+        @Override
+        public void record(AuditRecord event) {
+            if (!available) {
+                throw new AuditService.AuditRecordingException("audit unavailable");
+            }
+            events.add(event);
+        }
 
         @Override
         public void assertAvailable() {
             if (!available) {
-                throw new SecurityAuditUnavailableException("audit unavailable");
+                throw new AuditService.AuditRecordingException("audit unavailable");
             }
+        }
+    }
+
+    private static final class NoopTransactionManager implements PlatformTransactionManager {
+
+        @Override
+        public TransactionStatus getTransaction(TransactionDefinition definition) {
+            return new SimpleTransactionStatus();
         }
 
         @Override
-        public void append(SecurityAuditEvent event) {
-            assertAvailable();
-            events.add(event);
+        public void commit(TransactionStatus status) {
+        }
+
+        @Override
+        public void rollback(TransactionStatus status) {
         }
     }
 

@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.change;
 
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
+import com.devops00.spectra.common.audit.AuditRecord;
 
 import java.util.function.Supplier;
 
@@ -32,5 +32,5 @@ public interface SecurityChangeExecutor {
     /**
      * 在审计预写入成功后执行变更，并在同一事务中追加结果事件。
      */
-    <T> T execute(SecurityAuditEvent event, Supplier<T> mutation);
+    <T> T execute(AuditRecord event, Supplier<T> mutation);
 }

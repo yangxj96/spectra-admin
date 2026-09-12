@@ -19,10 +19,9 @@ package com.devops00.spectra.common.audit;
 /**
  * 统一审计写入端口。
  *
- * <p>调用方只提交 {@link AuditRecord}，不直接依赖 {@code sys_log}、
- * {@code sec_security_audit_event} 或其 Mapper。方法正常返回只表示事件已被当前 sink 接受；
- * 任何无法接受或持久化的错误都必须抛出 {@link AuditRecordingException} 或其子类，禁止静默丢弃。
- * SECURITY 事件由实现保持 fail-closed；OPERATION 事件由 Core sink 在当前事务内写入 PostgreSQL outbox。</p>
+ * <p>调用方只提交 {@link AuditRecord}，不直接依赖审计表或持久化实现。方法正常返回表示事件已在
+ * 当前事务中写入统一审计表；任何无法接受或持久化的错误都必须抛出 {@link AuditRecordingException}，
+ * 禁止静默丢弃。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -38,6 +37,15 @@ public interface AuditService {
      * @throws AuditRecordingException 事件未被接受或存储不可用
      */
     void record(AuditRecord record);
+
+    /**
+     * 在执行不可逆或高风险安全变更前确认统一审计存储可用。
+     *
+     * <p>具体持久化实现应验证连接和审计表写入权限；Core 的生产实现必须 fail-closed。</p>
+     */
+    default void assertAvailable() {
+        // Lightweight test or alternate implementations may not need a preflight check.
+    }
 
     /**
      * 审计事件无法被统一入口接受或持久化时抛出的运行时异常。

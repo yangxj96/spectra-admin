@@ -69,18 +69,6 @@ class CrossModulePortBoundaryTest {
     }
 
     @Test
-    void securityAuditArchivePortMustLiveInCommonPort() {
-        var backend = resolveBackendPath("");
-        List<String> contracts = List.of(
-                "spectra-common/src/main/java/com/devops00/spectra/common/port/audit/SecurityAuditArchiveBackend.java",
-                "spectra-common/src/main/java/com/devops00/spectra/common/port/audit/SecurityAuditArchiveIntegrity.java",
-                "spectra-common/src/main/java/com/devops00/spectra/common/port/audit/SecurityAuditArchiveReceipt.java");
-
-        assertThat(contracts).allMatch(contract -> Files.exists(backend.resolve(contract)),
-                "安全审计归档跨模块契约必须位于 spectra-common/common/port/audit");
-    }
-
-    @Test
     void authenticationWebUtilityMustLiveInFramework() {
         var backend = resolveBackendPath("");
 

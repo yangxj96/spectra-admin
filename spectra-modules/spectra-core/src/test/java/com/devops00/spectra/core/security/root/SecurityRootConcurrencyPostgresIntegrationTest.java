@@ -18,8 +18,8 @@ package com.devops00.spectra.core.security.root;
 
 import com.devops00.spectra.core.security.root.repository.JdbcRootPolicyRepository;
 import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -77,7 +77,7 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
             insertFixtures(jdbc, users);
             insertAssignment(jdbc, assignments.get(0), users.get(0), roleId);
 
-            var guard = new JdbcLastEffectiveDevOpsGuard(new JdbcRootPolicyRepository(jdbc), new AvailableAuditWriter());
+            var guard = new JdbcLastEffectiveDevOpsGuard(new JdbcRootPolicyRepository(jdbc), new AvailableAuditService());
             var transaction = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 
             int successfulRemovals = runConcurrent(transaction, List.of(
@@ -237,14 +237,14 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
         return System.getenv().getOrDefault(name, "").trim();
     }
 
-    private static final class AvailableAuditWriter implements SecurityAuditWriter {
+    private static final class AvailableAuditService implements AuditService {
 
         @Override
         public void assertAvailable() {
         }
 
         @Override
-        public void append(SecurityAuditEvent event) {
+        public void record(AuditRecord event) {
         }
     }
 }

@@ -22,11 +22,8 @@ import com.devops00.spectra.common.port.quartz.QuartzBuiltInJobDefinition;
 import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 import com.devops00.spectra.core.quartz.job.QuartzExecutionHistoryCleanupJob;
 import com.devops00.spectra.common.port.quartz.QuartzParameterSchema;
-import com.devops00.spectra.core.security.audit.job.SecurityAuditArchiveQuartzJob;
-import com.devops00.spectra.core.security.audit.job.SecurityChangeOutboxQuartzJob;
 import com.devops00.spectra.core.system.job.ServiceMonitorDiagnosticCleanupQuartzJob;
 import com.devops00.spectra.core.system.job.ServiceMonitorSnapshotQuartzJob;
-import com.devops00.spectra.core.system.outbox.job.OperationLogOutboxQuartzJob;
 import com.devops00.spectra.core.upload.job.FileUploadCleanupQuartzJob;
 import org.quartz.Job;
 import org.springframework.context.annotation.Bean;
@@ -75,27 +72,6 @@ public class CoreQuartzJobDefinitionConfiguration {
     public QuartzBuiltInJobDefinition serviceMonitorDiagnosticCleanupQuartzJobDefinition() {
         return definition("system.monitor.diagnostic-cleanup", "监控诊断清理", ServiceMonitorDiagnosticCleanupQuartzJob.class,
                 QuartzTriggerTemplate.fixedInterval(Duration.ofHours(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
-    }
-
-    /** @return 操作日志 Outbox Job 定义。 */
-    @Bean
-    public QuartzBuiltInJobDefinition operationLogOutboxQuartzJobDefinition() {
-        return definition("system.operation-log.outbox", "普通操作日志 Outbox", OperationLogOutboxQuartzJob.class,
-                QuartzTriggerTemplate.fixedInterval(Duration.ofSeconds(5), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
-    }
-
-    /** @return 安全变更 Outbox Job 定义。 */
-    @Bean
-    public QuartzBuiltInJobDefinition securityChangeOutboxQuartzJobDefinition() {
-        return definition("security.security-change.outbox", "安全变更 Outbox", SecurityChangeOutboxQuartzJob.class,
-                QuartzTriggerTemplate.fixedInterval(Duration.ofSeconds(5), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
-    }
-
-    /** @return 安全审计归档 Job 定义。 */
-    @Bean
-    public QuartzBuiltInJobDefinition securityAuditArchiveQuartzJobDefinition() {
-        return definition("security.security-audit.archive", "安全审计归档", SecurityAuditArchiveQuartzJob.class,
-                QuartzTriggerTemplate.fixedInterval(Duration.ofSeconds(10), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
     /** @return Quartz 执行历史清理 Job 定义。 */

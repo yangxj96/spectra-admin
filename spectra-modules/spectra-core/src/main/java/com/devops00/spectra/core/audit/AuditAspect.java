@@ -24,8 +24,8 @@ import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.framework.web.request.IpUtils;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.framework.web.request.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +37,8 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.transaction.support.TransactionOperations;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -51,13 +53,12 @@ import java.util.Map;
 /**
  * {@link Audit} 统一技术入口。
  *
- * <p>切面只收集调用元数据并同步提交 {@link AuditRecord}，不依赖具体日志表或 Mapper。
- * 普通操作记录由 Core 的操作日志 sink 写入 PostgreSQL outbox；安全记录由安全审计 sink
- * 同步写入事实表。</p>
+ * <p>成功、拒绝和返回失败状态的事件在业务事务内同步写入。异常事件等事务回滚完成后，
+ * 通过独立事务写入统一审计表。</p>
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/31
+ * @since 2026/9/13
  */
 @Slf4j
 @Aspect
@@ -68,27 +69,30 @@ public class AuditAspect {
     private static final int EVENT_TYPE_MAX_LENGTH = 100;
 
     private final SecurityContextAccessor securityContextAccessor;
-
     private final AuditService auditService;
-
     private final AuditSanitizer auditSanitizer;
-
     private final TransactionOperations transactionOperations;
+    private final AuditFailureResolver failureResolver;
+    private final AuditFailureRecorder failureRecorder;
 
     private final ExpressionParser parser = new SpelExpressionParser();
 
     public AuditAspect(SecurityContextAccessor securityContextAccessor,
                        AuditService auditService,
                        AuditSanitizer auditSanitizer,
-                       TransactionOperations transactionOperations) {
+                       TransactionOperations transactionOperations,
+                       AuditFailureResolver failureResolver,
+                       AuditFailureRecorder failureRecorder) {
         this.securityContextAccessor = securityContextAccessor;
         this.auditService = auditService;
         this.auditSanitizer = auditSanitizer;
         this.transactionOperations = transactionOperations;
+        this.failureResolver = failureResolver;
+        this.failureRecorder = failureRecorder;
     }
 
     /**
-     * 收集调用元数据并提交统一审计事件。
+     * 收集调用元数据并在业务事务边界内提交审计事件。
      *
      * @param point 当前方法调用
      * @return 业务方法返回值
@@ -103,30 +107,55 @@ public class AuditAspect {
         var current = resolveCorrelationContext();
         try {
             return RequestCorrelationContext.callWithMdc(current, () -> transactionOperations.execute(status -> {
-                Object result = null;
-                Throwable failure = null;
+                Object result;
                 try {
                     result = point.proceed();
-                    return result;
-                } catch (Throwable ex) {
-                    failure = ex;
-                    throw new AuditedInvocationException(ex);
-                } finally {
-                    if (descriptor != null) {
-                        try {
-                            submit(point, method, descriptor, result, failure, startedAt);
-                        } catch (AuditService.AuditRecordingException auditFailure) {
-                            if (failure != null) {
-                                failure.addSuppressed(auditFailure);
-                            } else {
-                                throw auditFailure;
-                            }
-                        }
-                    }
+                } catch (Throwable failure) {
+                    throw new AuditedInvocationException(failure);
                 }
+                if (descriptor != null) {
+                    submit(point, method, descriptor, result, null, startedAt);
+                }
+                return result;
             }));
-        } catch (AuditedInvocationException ex) {
-            throw ex.getCause();
+        } catch (AuditedInvocationException exception) {
+            Throwable original = exception.original();
+            if (descriptor != null) {
+                recordFailureAfterRollback(point, method, descriptor, original, startedAt);
+            }
+            throw original;
+        }
+    }
+
+    private void recordFailureAfterRollback(ProceedingJoinPoint point,
+                                           Method method,
+                                           AuditDescriptor descriptor,
+                                           Throwable failure,
+                                           long startedAt) {
+        AuditRecord record = createRecord(point, method, descriptor, null, failure, startedAt);
+        if (TransactionSynchronizationManager.isSynchronizationActive()
+                && TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    recordFailure(record, failure, descriptor);
+                }
+            });
+            return;
+        }
+        recordFailure(record, failure, descriptor);
+    }
+
+    private void recordFailure(AuditRecord record, Throwable failure, AuditDescriptor descriptor) {
+        try {
+            failureRecorder.record(record);
+        } catch (RuntimeException recordingFailure) {
+            if (recordingFailure != failure) {
+                failure.addSuppressed(recordingFailure);
+            }
+            log.error("{}失败审计写入失败: category={}, eventType={}, cause={}",
+                    LogPrefix.LOG.p(), descriptor.category(), descriptor.eventType(),
+                    recordingFailure.getClass().getSimpleName(), recordingFailure);
         }
     }
 
@@ -141,23 +170,17 @@ public class AuditAspect {
         if (method == null) {
             return null;
         }
-
         Audit audit = method.getAnnotation(Audit.class);
-        if (audit != null) {
-            String eventType = audit.eventType().isBlank()
-                    ? generatedEventType(method)
-                    : audit.eventType();
-            return new AuditDescriptor(audit.category(), eventType, parseDescription(audit.value(), method, point),
-                    audit.captureArguments(), audit.captureResult());
+        if (audit == null) {
+            return null;
         }
-
-        return null;
+        String eventType = audit.eventType().isBlank() ? generatedEventType(method) : audit.eventType();
+        return new AuditDescriptor(audit.category(), eventType, parseDescription(audit.value(), method, point),
+                audit.captureArguments(), audit.captureResult());
     }
 
     /**
-     * 生成默认事件类型，并兼容安全审计表的 100 字符长度约束。
-     *
-     * <p>完整类名便于定位，但深层包名可能超过持久化字段长度；超限时使用类简单名仍保持稳定的类名和方法名组合。</p>
+     * 生成稳定事件类型，并确保其长度符合统一表字段限制。
      */
     private static String generatedEventType(Method method) {
         String qualifiedName = method.getDeclaringClass().getName() + "#" + method.getName();
@@ -177,7 +200,6 @@ public class AuditAspect {
             log.warn("{}拒绝包含类型引用的审计描述表达式: {}", LogPrefix.LOG.p(), method.getName());
             return expression;
         }
-
         try {
             StandardEvaluationContext context = new StandardEvaluationContext();
             MethodSignature signature = (MethodSignature) point.getSignature();
@@ -187,20 +209,35 @@ public class AuditAspect {
                 context.setVariable(parameterNames[index], args[index]);
             }
             return parser.parseExpression(expression).getValue(context, String.class);
-        } catch (RuntimeException ex) {
-            // 描述解析失败不应改变业务结果，且不打印参数值，避免将敏感数据带入技术日志。
+        } catch (RuntimeException exception) {
             log.warn("{}审计描述表达式解析失败: method={}, error={}",
-                    LogPrefix.LOG.p(), method.getName(), ex.getClass().getSimpleName());
+                    LogPrefix.LOG.p(), method.getName(), exception.getClass().getSimpleName());
             return expression;
         }
     }
 
     private void submit(ProceedingJoinPoint point,
-                        Method method,
-                        AuditDescriptor descriptor,
-                        Object result,
-                        Throwable failure,
-                        long startedAt) {
+                       Method method,
+                       AuditDescriptor descriptor,
+                       Object result,
+                       Throwable failure,
+                       long startedAt) {
+        AuditRecord record = createRecord(point, method, descriptor, result, failure, startedAt);
+        try {
+            auditService.record(record);
+        } catch (AuditService.AuditRecordingException exception) {
+            log.error("{}审计记录提交失败，业务事务将回滚: category={}, eventType={}",
+                    LogPrefix.LOG.p(), descriptor.category(), descriptor.eventType(), exception);
+            throw exception;
+        }
+    }
+
+    private AuditRecord createRecord(ProceedingJoinPoint point,
+                                     Method method,
+                                     AuditDescriptor descriptor,
+                                     Object result,
+                                     Throwable failure,
+                                     long startedAt) {
         RequestMetadata request = requestMetadata();
         Map<String, Object> before = new LinkedHashMap<>();
         if (descriptor.captureArguments()) {
@@ -211,17 +248,15 @@ public class AuditAspect {
         }
 
         Map<String, Object> after = new LinkedHashMap<>();
-        if (descriptor.captureResult()) {
+        if (failure == null && descriptor.captureResult()) {
             after.put("result", result);
         }
-        after.put("status", request.status());
-        after.put("durationMs", (System.nanoTime() - startedAt) / 1_000_000L);
-        if (failure != null) {
-            after.put("errorType", failure.getClass().getName());
+        if (request.status() != null) {
+            after.put("status", request.status());
         }
+        long durationMs = Math.max(0L, (System.nanoTime() - startedAt) / 1_000_000L);
+        after.put("durationMs", durationMs);
 
-        Map<String, Object> sanitizedBefore = auditSanitizer.sanitize(before);
-        Map<String, Object> sanitizedAfter = auditSanitizer.sanitize(after);
         AuditContext context = new AuditContext(
                 securityContextAccessor.currentUserId(),
                 request.requestId(),
@@ -229,32 +264,31 @@ public class AuditAspect {
                 request.client(),
                 request.ip(),
                 request.userAgent());
-        AuditRecord record = new AuditRecord(
+        AuditRecord.Result recordResult = failure == null
+                ? resultOf(request.status())
+                : AuditRecord.Result.FAILED;
+        AuditRecord.Failure failureDetails = failure == null ? null : failureResolver.resolve(failure);
+        return new AuditRecord(
                 null,
                 descriptor.category(),
                 descriptor.eventType(),
                 null,
-                resultOf(request.status(), failure),
+                recordResult,
                 null,
                 context,
-                sanitizedBefore,
-                sanitizedAfter,
-                descriptor.reason());
-
-        try {
-            auditService.record(record);
-        } catch (AuditService.AuditRecordingException ex) {
-            log.error("{}审计记录提交失败，业务事务将回滚: category={}, eventType={}",
-                    LogPrefix.LOG.p(), descriptor.category(), descriptor.eventType(), ex);
-            throw ex;
-        }
+                auditSanitizer.sanitize(before),
+                auditSanitizer.sanitize(after),
+                descriptor.reason(),
+                new AuditRecord.HttpSummary(request.method(), request.url(), request.status(), durationMs),
+                failureDetails);
     }
 
-    private AuditRecord.Result resultOf(short status, Throwable failure) {
-        if (status == HttpServletResponse.SC_UNAUTHORIZED || status == HttpServletResponse.SC_FORBIDDEN) {
+    private static AuditRecord.Result resultOf(Integer status) {
+        if (status != null && (status == HttpServletResponse.SC_UNAUTHORIZED
+                || status == HttpServletResponse.SC_FORBIDDEN)) {
             return AuditRecord.Result.DENIED;
         }
-        if (failure != null || status >= HttpServletResponse.SC_BAD_REQUEST) {
+        if (status != null && status >= HttpServletResponse.SC_BAD_REQUEST) {
             return AuditRecord.Result.FAILED;
         }
         return AuditRecord.Result.SUCCEEDED;
@@ -268,6 +302,7 @@ public class AuditAspect {
         HttpServletRequest request = attributes.getRequest();
         HttpServletResponse response = attributes.getResponse();
         var trace = RequestCorrelationContext.current();
+        Integer status = response == null ? null : response.getStatus();
         return new RequestMetadata(
                 true,
                 request.getMethod(),
@@ -277,7 +312,7 @@ public class AuditAspect {
                 header(request, CLIENT_TYPE_HEADER),
                 IpUtils.getClientIP(request),
                 header(request, "User-Agent"),
-                response == null ? 0 : (short) response.getStatus());
+                status);
     }
 
     private RequestCorrelationContext.Context resolveCorrelationContext() {
@@ -294,7 +329,7 @@ public class AuditAspect {
         return RequestCorrelationContext.forTask(null);
     }
 
-    private String header(HttpServletRequest request, String name) {
+    private static String header(HttpServletRequest request, String name) {
         String value = request.getHeader(name);
         return value == null || value.isBlank() ? null : value;
     }
@@ -309,8 +344,11 @@ public class AuditAspect {
                 .toList();
     }
 
-    private record AuditDescriptor(AuditCategory category, String eventType, String reason,
-                                   boolean captureArguments, boolean captureResult) {
+    private record AuditDescriptor(AuditCategory category,
+                                   String eventType,
+                                   String reason,
+                                   boolean captureArguments,
+                                   boolean captureResult) {
     }
 
     private record RequestMetadata(boolean webRequest,
@@ -321,11 +359,11 @@ public class AuditAspect {
                                    String client,
                                    String ip,
                                    String userAgent,
-                                   short status) {
+                                   Integer status) {
 
         private static RequestMetadata empty(String requestId, String correlationId) {
             return new RequestMetadata(false, null, null, requestId, correlationId,
-                    null, null, null, (short) 0);
+                    null, null, null, null);
         }
     }
 
@@ -336,6 +374,10 @@ public class AuditAspect {
         private AuditedInvocationException(Throwable original) {
             super(original);
             this.original = original;
+        }
+
+        private Throwable original() {
+            return original;
         }
     }
 }

@@ -113,11 +113,6 @@
         <Class name="com.devops00.spectra.core.user.service.impl.RelRoleMenuServiceImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
-    <!-- The SQL text is fixed; only values are passed through JDBC placeholders. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.service.SecurityAuditQueryService"/>
-        <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
-    </Match>
     <Match>
         <Class name="com.devops00.spectra.core.security.policy.service.impl.JdbcSecurityPolicyService"/>
         <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
@@ -193,22 +188,6 @@
         <Class name="com.devops00.spectra.framework.security.advice.RestAuthenticationEntryPoint"/>
         <Bug pattern="XSS_SERVLET"/>
     </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.system.outbox.OperationLogOutboxRepository"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.system.outbox.OperationLogOutboxRepository"/>
-        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.system.outbox.OperationLogOutboxWriter"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.system.service.impl.OperationLogServiceImpl"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
     <!-- MyBatis Mapper is a Spring-managed collaborator retained by the name lookup adapters. -->
     <Match>
         <Class name="com.devops00.spectra.core.system.lookup.DepartmentNameLookup"/>
@@ -218,36 +197,8 @@
         <Class name="com.devops00.spectra.core.system.lookup.RegionNameLookup"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveDataRepository"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveDataRepository"/>
-        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveManifestRepository"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveManifestRepository"/>
-        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxRepository"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxRepository"/>
-        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"/>
-    </Match>
     <!-- JdbcTemplate owns PreparedStatements returned by PreparedStatementCreator callbacks. -->
     <!-- ThreadLocalRandom is appropriate for non-security retry backoff jitter. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.archive.SecurityAuditArchiveWorker"/>
-        <Bug pattern="PREDICTABLE_RANDOM"/>
-    </Match>
     <Match>
         <Class name="com.devops00.spectra.core.system.health.CoreHealthRegistry"/>
         <Bug pattern="CT_CONSTRUCTOR_THROW"/>

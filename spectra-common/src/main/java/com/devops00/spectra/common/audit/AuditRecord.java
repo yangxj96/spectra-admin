@@ -34,16 +34,18 @@ import java.util.UUID;
  * {@link AuditSanitizer} 清洗快照；本记录同时对快照做深度防御性复制，避免业务对象在提交后被修改。
  * 本模型不引用任何表、Mapper、Spring 类型或具体日志实现。</p>
  *
- * @param eventId    事件唯一 ID
- * @param category   事件分类
- * @param eventType  稳定事件类型
- * @param targetId   被操作主体 ID；系统级事件可以为空
- * @param result     操作结果
- * @param occurredAt 事件发生时间，使用 UTC instant
- * @param context    操作者、请求和客户端上下文
- * @param before     变更前脱敏快照
- * @param after      变更后脱敏快照
- * @param reason     操作原因
+ * @param eventId     事件唯一 ID
+ * @param category    事件分类
+ * @param eventType   稳定事件类型
+ * @param targetId    被操作主体 ID；系统级事件可以为空
+ * @param result      操作结果
+ * @param occurredAt  事件发生时间，使用 UTC instant
+ * @param context     操作者、请求和客户端上下文
+ * @param before      变更前脱敏快照
+ * @param after       变更后脱敏快照
+ * @param reason      操作原因
+ * @param httpSummary HTTP 请求摘要；非 HTTP 调用使用空摘要
+ * @param failure     可选的结构化失败详情
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/31
@@ -57,7 +59,9 @@ public record AuditRecord(UUID eventId,
                           AuditContext context,
                           Map<String, Object> before,
                           Map<String, Object> after,
-                          String reason) {
+                          String reason,
+                          HttpSummary httpSummary,
+                          Failure failure) {
 
     public AuditRecord {
         eventId = eventId == null ? UUID.randomUUID() : eventId;
@@ -68,6 +72,24 @@ public record AuditRecord(UUID eventId,
         context = context == null ? AuditContext.empty() : context;
         before = immutableSnapshot(before);
         after = immutableSnapshot(after);
+        httpSummary = httpSummary == null ? HttpSummary.empty() : httpSummary;
+    }
+
+    /**
+     * 创建没有 HTTP 摘要和失败详情的审计事件。
+     */
+    public AuditRecord(UUID eventId,
+                       AuditCategory category,
+                       String eventType,
+                       UUID targetId,
+                       Result result,
+                       Instant occurredAt,
+                       AuditContext context,
+                       Map<String, Object> before,
+                       Map<String, Object> after,
+                       String reason) {
+        this(eventId, category, eventType, targetId, result, occurredAt, context, before, after, reason,
+                HttpSummary.empty(), null);
     }
 
     /**
@@ -91,6 +113,17 @@ public record AuditRecord(UUID eventId,
     }
 
     /**
+     * 以新的结果创建同一审计事实的不可变副本。
+     *
+     * @param nextResult 新结果
+     * @return 保留其余字段的审计记录副本
+     */
+    public AuditRecord withResult(Result nextResult) {
+        return new AuditRecord(null, category, eventType, targetId, nextResult, occurredAt, context,
+                before, after, reason, httpSummary, failure);
+    }
+
+    /**
      * 审计事件结果。
      */
     public enum Result {
@@ -106,6 +139,83 @@ public record AuditRecord(UUID eventId,
 
         /** 动作被安全策略拒绝。 */
         DENIED
+    }
+
+    /**
+     * HTTP 请求摘要。URL 只保留路径，确保 query string 不进入持久化记录。
+     *
+     * @param method     HTTP 方法
+     * @param url        请求路径
+     * @param status     HTTP 状态码
+     * @param durationMs 调用耗时
+     */
+    public record HttpSummary(String method, String url, Integer status, Long durationMs) {
+
+        public HttpSummary {
+            method = normalize(method);
+            url = pathOnly(url);
+            status = status != null && status >= 100 && status <= 599 ? status : null;
+            durationMs = durationMs == null || durationMs < 0 ? null : durationMs;
+        }
+
+        public static HttpSummary empty() {
+            return new HttpSummary(null, null, null, null);
+        }
+
+        private static String normalize(String value) {
+            if (value == null) {
+                return null;
+            }
+            String normalized = value.trim();
+            return normalized.isEmpty() ? null : normalized;
+        }
+
+        private static String pathOnly(String value) {
+            String normalized = normalize(value);
+            if (normalized == null) {
+                return null;
+            }
+            int queryIndex = normalized.indexOf('?');
+            int fragmentIndex = normalized.indexOf('#');
+            int endIndex = normalized.length();
+            if (queryIndex >= 0) {
+                endIndex = Math.min(endIndex, queryIndex);
+            }
+            if (fragmentIndex >= 0) {
+                endIndex = Math.min(endIndex, fragmentIndex);
+            }
+            return normalized.substring(0, endIndex);
+        }
+    }
+
+    /**
+     * 脱敏后的失败详情，与调用方填写的业务原因分开保存。
+     *
+     * @param code   稳定错误码
+     * @param type   异常简单类型
+     * @param reason 脱敏后的失败说明
+     */
+    public record Failure(String code, String type, String reason) {
+
+        private static final int REASON_MAX_LENGTH = 2000;
+
+        public Failure {
+            code = limit(normalize(code), 100);
+            type = limit(normalize(type), 200);
+            reason = limit(normalize(reason), REASON_MAX_LENGTH);
+        }
+
+        private static String normalize(String value) {
+            if (value == null) {
+                return null;
+            }
+            String normalized = value.trim();
+            return normalized.isEmpty() ? null : normalized;
+        }
+
+        private static String limit(String value, int maxLength) {
+            return value == null || value.length() <= maxLength ? value : value.substring(0, maxLength);
+        }
     }
 
     /**

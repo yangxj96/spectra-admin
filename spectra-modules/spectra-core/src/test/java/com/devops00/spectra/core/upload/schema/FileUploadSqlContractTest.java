@@ -25,18 +25,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * 文件上传数据库契约测试。
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/08/30
- */
+/** 文件上传数据库基线契约测试。 */
 class FileUploadSqlContractTest {
 
     @Test
-    void migrationDefinesFiveFileTablesInSpectraCoreWithAuditOrder() throws IOException {
-        var sql = Files.readString(migrationPath());
+    void baselineDefinesTheCurrentFileTablesAndOaAssetReferences() throws IOException {
+        var sql = Files.readString(baselinePath());
 
         assertThat(sql).contains("CREATE TABLE spectra_core.file_type")
                 .contains("CREATE TABLE spectra_core.file_asset")
@@ -51,69 +45,55 @@ class FileUploadSqlContractTest {
                 .contains("updated_by")
                 .contains("updated_at")
                 .contains("deleted")
-                .contains("version");
-        assertThat(sql).contains("WHERE deleted IS NULL AND status = 'READY'")
+                .contains("version")
+                .contains("WHERE deleted IS NULL AND status = 'READY'")
                 .contains("UNIQUE (upload_session_id, part_number)")
-                .contains("REFERENCES spectra_core.file_asset(id)");
+                .contains("REFERENCES spectra_core.file_asset(id)")
+                .contains("uk_oa_application_attachment_asset")
+                .contains("oa_contract_version_file_asset_fk")
+                .contains("oa_document_version_file_asset_fk");
+        assertThat(sql).doesNotContain("CREATE TABLE spectra_core.file_info")
+                .doesNotContain("CREATE TABLE spectra_core.file_upload_chunk")
+                .doesNotContain("CREATE TABLE spectra_core.file_upload_task");
+        for (var table : List.of("oa_application_attachment", "oa_contract_version", "oa_document_version")) {
+            var start = sql.indexOf("CREATE TABLE spectra_oa." + table + " (");
+            var end = sql.indexOf("\n);", start);
+            assertThat(sql.substring(start, end)).contains("file_asset_id uuid").doesNotContain("file_id uuid");
+        }
     }
 
     @Test
-    void migrationDropsOldPhysicalFileTablesWithoutCopyingRows() throws IOException {
-        var sql = Files.readString(migrationPath());
+    void baselineContainsCanonicalFileTypeSeedsWithoutRepairStatements() throws IOException {
+        var sql = Files.readString(baselinePath());
 
-        assertThat(sql).contains("DROP TABLE IF EXISTS spectra_core.file_upload_chunk")
-                .contains("DROP TABLE IF EXISTS spectra_core.file_upload_task")
-                .contains("DROP TABLE IF EXISTS spectra_core.file_info");
-        assertThat(sql).doesNotContain("INSERT INTO spectra_core.file_asset SELECT")
-                .doesNotContain("INSERT INTO spectra_core.file_upload_session SELECT");
+        assertThat(sql).contains("INSERT INTO spectra_core.file_type")
+                .contains("'XLSX', 'Excel 文档', '[\".xlsx\"]'::jsonb")
+                .contains("[\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\"]'::jsonb")
+                .contains("COMMENT ON TABLE spectra_core.file_type IS '文件类型策略'");
+        assertThat(sql).doesNotContain("UPDATE spectra_core.file_type")
+                .doesNotContain("DROP TABLE IF EXISTS spectra_core.file_info")
+                .doesNotContain("ELF可执行");
     }
 
     @Test
-    void migrationRegistersFileUploadManagementMenu() throws IOException {
-        var sql = Files.readString(fileUploadMenuMigrationPath());
+    void baselineContainsTheFinalFileManagementMenuAndPermissionSeeds() throws IOException {
+        var sql = Files.readString(baselinePath());
 
-        assertThat(sql).contains("INSERT INTO spectra_core.sys_menu")
-                .contains("文件上传")
-                .contains("DevopsFileUpload")
-                .contains("019fdba9-f00a-7716-918c-0ca1ae929b69")
-                .contains("menu_type")
-                .contains("route_name");
-    }
-
-    @Test
-    void migrationsDefineCanonicalXlsxPolicyAndRepairExistingRows() throws IOException {
-        var baseline = Files.readString(migrationPath());
-        var repair = Files.readString(fileUploadRepairMigrationPath());
-
-        assertThat(baseline).contains("(gen_random_uuid(), 'XLSX', 'Excel 文档', '[\".xlsx\"]'::jsonb")
-                .contains("[\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\"]'::jsonb");
-        assertThat(repair).contains("UPDATE spectra_core.file_type")
-                .contains("allowed_extensions = '[\".xlsx\"]'::jsonb")
-                .contains("allowed_content_types = '[\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\"]'::jsonb")
-                .contains("WHERE code = 'XLSX'")
-                .contains("upload_enabled = true")
-                .contains("enabled = true");
-    }
-
-    @Test
-    void repairMigrationDocumentsEveryFileDomainColumn() throws IOException {
-        assertFileDomainComments(Files.readString(fileUploadRepairMigrationPath()));
-    }
-
-    @Test
-    void managementMigrationMovesFileMenusToAnIndependentSiblingDirectory() throws IOException {
-        var sql = Files.readString(fileManagementMigrationPath());
-
-        assertThat(sql).contains("DevopsFileManagement")
-                .contains("文件管理")
-                .contains("DevopsFileUpload")
+        assertThat(sql).contains("DevopsFileUpload")
                 .contains("DevopsStorage")
                 .contains("DevopsUploadTasks")
                 .contains("DevopsFileReferences")
                 .contains("DevopsFileTypes")
                 .contains("file:admin:manage")
-                .contains("019fdba9-f00a-7716-918c-0ca1ae929b65")
-                .contains("UPDATE spectra_core.sys_menu");
+                .contains("019fdba9-f00a-7716-918c-0ca1ae929b84")
+                .contains("DevopsSecretManagement");
+        assertThat(sql).doesNotContain("UPDATE spectra_core.sys_menu")
+                .doesNotContain("DevopsEncryptionKey");
+    }
+
+    @Test
+    void baselineDocumentsEveryFileDomainColumn() throws IOException {
+        assertFileDomainComments(Files.readString(baselinePath()));
     }
 
     private static void assertFileDomainComments(String sql) {
@@ -146,55 +126,16 @@ class FileUploadSqlContractTest {
         }
     }
 
-    private static Path migrationPath() {
+    private static Path baselinePath() {
         var current = Path.of("").toAbsolutePath();
         while (current != null) {
             var candidate = current.resolve(Path.of("spectra-admin", "spectra-config", "src", "main", "resources", "db", "migration",
-                    "V7__rebuild_file_upload_domain.sql"));
+                    "V1__init_db.sql"));
             if (Files.exists(candidate)) {
                 return candidate;
             }
             current = current.getParent();
         }
-        throw new IllegalStateException("找不到文件上传 V7 迁移");
-    }
-
-    private static Path fileUploadMenuMigrationPath() {
-        var current = Path.of("").toAbsolutePath();
-        while (current != null) {
-            var candidate = current.resolve(Path.of("spectra-admin", "spectra-config", "src", "main", "resources", "db", "migration",
-                    "V8__add_file_upload_menu.sql"));
-            if (Files.exists(candidate)) {
-                return candidate;
-            }
-            current = current.getParent();
-        }
-        throw new IllegalStateException("找不到文件上传菜单 V8 迁移");
-    }
-
-    private static Path fileUploadRepairMigrationPath() {
-        var current = Path.of("").toAbsolutePath();
-        while (current != null) {
-            var candidate = current.resolve(Path.of("spectra-admin", "spectra-config", "src", "main", "resources", "db", "migration",
-                    "V9__repair_file_upload_metadata.sql"));
-            if (Files.exists(candidate)) {
-                return candidate;
-            }
-            current = current.getParent();
-        }
-        throw new IllegalStateException("找不到文件上传元数据 V9 迁移");
-    }
-
-    private static Path fileManagementMigrationPath() {
-        var current = Path.of("").toAbsolutePath();
-        while (current != null) {
-            var candidate = current.resolve(Path.of("spectra-admin", "spectra-config", "src", "main", "resources", "db", "migration",
-                    "V11__complete_file_upload_management.sql"));
-            if (Files.exists(candidate)) {
-                return candidate;
-            }
-            current = current.getParent();
-        }
-        throw new IllegalStateException("找不到文件上传管理 V11 迁移");
+        throw new IllegalStateException("找不到 Flyway V1 基线");
     }
 }

@@ -10,7 +10,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authorization.domain.RoleChangeImpact;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
@@ -27,7 +27,8 @@ import com.devops00.spectra.core.security.authorization.service.GrantBoundarySer
 import com.devops00.spectra.core.security.authorization.service.RoleChangeImpactAnalyzer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.core.security.change.AuthorizationEpochGuard;
 import com.devops00.spectra.core.security.change.HighRiskApprovalGate;
@@ -36,7 +37,6 @@ import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
-import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -114,13 +114,10 @@ class RoleAuthorizationChangeServiceImplTest {
     private ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
     @Mock
-    private SecurityAuditWriter securityAuditWriter;
+    private AuditService auditService;
 
     @Mock
-    private SecurityAuditEventFactory securityAuditEventFactory;
-
-    @Mock
-    private SecurityChangeOutboxProducer securityChangeOutboxProducer;
+    private AuditRecordFactory auditRecordFactory;
 
     @Mock
     private TimeMapper timeMapper;

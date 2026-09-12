@@ -16,15 +16,11 @@
 
 package com.devops00.spectra.core.audit;
 
-import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditContext;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
-import com.devops00.spectra.core.system.service.OperationLogService;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.audit.repository.JdbcAuditEventWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,17 +28,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
- * Core 统一审计编排器。
+ * 统一操作与安全审计服务。
  *
- * <p>Core 是审计语义和 sink 路由的唯一入口。安全事件同步写入不可变安全审计事实，
- * 普通操作事件交给操作日志 sink；操作日志 sink 在当前业务事务内写入 PostgreSQL outbox，
- * 由 Core 的 outbox worker 最终落入 sys_log。</p>
+ * <p>两类事件都经过同一套快照脱敏逻辑，并在当前业务事务中同步写入统一审计表。</p>
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/31
+ * @since 2026/9/13
  */
 @Service
 @RequiredArgsConstructor
@@ -50,39 +45,37 @@ public class CoreAuditService implements AuditService {
 
     private static final String AUDIT_METADATA = "_audit";
 
-    private final SecurityAuditWriter securityAuditWriter;
-
-    private final OperationLogService operationLogService;
-
+    private final JdbcAuditEventWriter writer;
     private final AuditSanitizer auditSanitizer;
 
-    private final SecurityAuditEventFactory securityAuditEventFactory;
-
     /**
-     * 清洗统一快照并路由到对应 sink。
+     * 对任意分类的审计记录执行同一清洗并写入同一关系表。
      *
-     * <p>安全 sink 的异常不被捕获，保证安全审计 fail-closed；操作 sink 的异常同样向上抛出，
-     * 使 outbox 写入失败时当前业务事务回滚。</p>
-     *
-     * @param record 统一审计记录
+     * @param record 统一审计事件
      */
     @Override
     @Transactional
     public void record(AuditRecord record) {
         Objects.requireNonNull(record, "统一审计记录不能为空");
-        if (record.category() == AuditCategory.SECURITY) {
-            securityAuditWriter.append(toSecurityEvent(record));
-            return;
-        }
-        operationLogService.record(sanitize(record));
+        writer.append(sanitize(record));
     }
 
     /**
-     * 使用唯一的公共脱敏端口准备记录，并把请求追踪元数据写入两类快照。
+     * 在高风险安全变更开始前确认统一审计表可用。
      */
+    @Override
+    public void assertAvailable() {
+        writer.assertAvailable();
+    }
+
     private AuditRecord sanitize(AuditRecord record) {
-        Objects.requireNonNull(record, "统一审计记录不能为空");
         Map<String, Object> metadata = metadata(record);
+        AuditRecord.Failure failure = record.failure();
+        if (failure != null && failure.reason() != null) {
+            String reason = stringValue(auditSanitizer.sanitize(Map.of("failureReason", failure.reason()))
+                    .get("failureReason"));
+            failure = new AuditRecord.Failure(failure.code(), failure.type(), reason);
+        }
         return new AuditRecord(
                 record.eventId(),
                 record.category(),
@@ -93,39 +86,17 @@ public class CoreAuditService implements AuditService {
                 record.context(),
                 withMetadata(auditSanitizer.sanitize(record.before()), metadata),
                 withMetadata(auditSanitizer.sanitize(record.after()), metadata),
-                record.reason());
-    }
-
-    /**
-     * 转换为安全审计基础模块使用的不可变事件。
-     */
-    private SecurityAuditEvent toSecurityEvent(AuditRecord record) {
-        AuditContext context = record.context();
-        Map<String, Object> metadata = metadata(record);
-        return securityAuditEventFactory.create(
-                record.eventId(),
-                record.eventType(),
-                context.operatorId(),
-                record.targetId(),
-                context.client(),
-                context.ip(),
-                context.userAgent(),
-                withMetadata(record.before(), metadata),
-                withMetadata(record.after(), metadata),
                 record.reason(),
-                record.occurredAt(),
-                AuditResult.valueOf(record.result().name()),
-                context.correlationId());
+                record.httpSummary(),
+                failure);
     }
 
-    /**
-     * 生成两条 sink 都能保存的稳定追踪元数据。
-     */
     private static Map<String, Object> metadata(AuditRecord record) {
         AuditContext context = record.context();
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("eventId", record.eventId().toString());
         metadata.put("eventType", record.eventType());
+        metadata.put("category", record.category().name());
         metadata.put("result", record.result().name());
         metadata.put("occurredAt", record.occurredAt().toString());
         putIfPresent(metadata, "targetId", record.targetId());
@@ -138,9 +109,6 @@ public class CoreAuditService implements AuditService {
         return metadata;
     }
 
-    /**
-     * 使用内部保留字段覆盖调用方可能伪造的旧追踪元数据。
-     */
     private static Map<String, Object> withMetadata(Map<String, Object> snapshot, Map<String, Object> metadata) {
         Map<String, Object> result = new LinkedHashMap<>();
         if (snapshot != null) {
@@ -150,9 +118,13 @@ public class CoreAuditService implements AuditService {
         return result;
     }
 
+    private static String stringValue(Object value) {
+        return value instanceof String text ? text : null;
+    }
+
     private static void putIfPresent(Map<String, Object> target, String key, Object value) {
         if (value != null) {
-            target.put(key, value instanceof java.util.UUID uuid ? uuid.toString() : value);
+            target.put(key, value instanceof UUID uuid ? uuid.toString() : value);
         }
     }
 }

@@ -25,9 +25,9 @@ import com.devops00.spectra.core.security.policy.javabean.from.SecuritySessionPo
 import com.devops00.spectra.core.security.policy.javabean.vo.SecurityPasswordPolicyVO;
 import com.devops00.spectra.core.security.policy.javabean.vo.SecuritySessionPolicyVO;
 import com.devops00.spectra.core.security.policy.service.SecurityPolicyService;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
-import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.policy.PasswordPolicy;
@@ -63,7 +63,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
 
     private final SecurityContextAccessor securityContextAccessor;
 
-    private final SecurityAuditEventFactory securityAuditEventFactory;
+    private final AuditRecordFactory auditRecordFactory;
 
     @Override
     public List<SecuritySessionPolicyVO> sessionPolicies() {
@@ -265,10 +265,10 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     /**
      * 处理内部业务逻辑（{@code auditEvent}）。
      */
-    private SecurityAuditEvent auditEvent(String type, UUID targetId, Map<String, Object> before,
+    private AuditRecord auditEvent(String type, UUID targetId, Map<String, Object> before,
                                           Map<String, Object> after) {
-        return securityAuditEventFactory.create(null, type, securityContextAccessor.currentUserId(), targetId,
-                null, null, null, before, after, "安全策略配置变更", null, AuditResult.STARTED,
+        return auditRecordFactory.create(null, type, securityContextAccessor.currentUserId(), targetId,
+                null, null, null, before, after, "安全策略配置变更", null, AuditRecord.Result.STARTED,
                 RequestCorrelationContext.current().correlationId());
     }
 

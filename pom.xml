@@ -396,6 +396,7 @@
             </activation>
             <properties>
                 <spectra.test.groups.include>integration</spectra.test.groups.include>
+                <spectra.test.groups.exclude>manual-integration</spectra.test.groups.exclude>
             </properties>
         </profile>
         <profile>
@@ -408,6 +409,7 @@
             </activation>
             <properties>
                 <spectra.test.groups.include>manual-integration</spectra.test.groups.include>
+                <spectra.test.groups.exclude>integration</spectra.test.groups.exclude>
             </properties>
         </profile>
     </profiles>

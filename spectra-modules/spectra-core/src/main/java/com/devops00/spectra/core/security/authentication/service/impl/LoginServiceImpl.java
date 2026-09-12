@@ -18,9 +18,9 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
-import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.common.port.security.SecurityAuthenticationPort;
 import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.core.security.authentication.exception.LoginException;
@@ -52,20 +52,20 @@ import java.util.UUID;
 public class LoginServiceImpl implements LoginService {
 
     private final LoginDispatcher loginDispatcher;
-    private final ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider;
+    private final ObjectProvider<AuditService> auditServiceProvider;
     private final SecurityAuthenticationPort securityAuthenticationPort;
     private final SecurityContextAccessor securityContextAccessor;
-    private final SecurityAuditEventFactory securityAuditEventFactory;
+    private final AuditRecordFactory auditRecordFactory;
 
-    public LoginServiceImpl(LoginDispatcher loginDispatcher, ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider,
+    public LoginServiceImpl(LoginDispatcher loginDispatcher, ObjectProvider<AuditService> auditServiceProvider,
                             SecurityAuthenticationPort securityAuthenticationPort,
                             SecurityContextAccessor securityContextAccessor,
-                            SecurityAuditEventFactory securityAuditEventFactory) {
+                            AuditRecordFactory auditRecordFactory) {
         this.loginDispatcher = loginDispatcher;
-        this.securityAuditWriterProvider = securityAuditWriterProvider;
+        this.auditServiceProvider = auditServiceProvider;
         this.securityAuthenticationPort = securityAuthenticationPort;
         this.securityContextAccessor = securityContextAccessor;
-        this.securityAuditEventFactory = securityAuditEventFactory;
+        this.auditRecordFactory = auditRecordFactory;
     }
 
     @Override
@@ -133,12 +133,12 @@ public class LoginServiceImpl implements LoginService {
      * 处理内部业务逻辑（{@code audit}）。
      */
     private void audit(String eventType, UUID operatorId, ClientType clientType, String reason) {
-        SecurityAuditWriter securityAuditWriter = securityAuditWriterProvider.getIfAvailable();
-        if (securityAuditWriter == null) {
+        AuditService auditService = auditServiceProvider.getIfAvailable();
+        if (auditService == null) {
             return;
         }
-        AuditResult result = eventType.endsWith("_FAILED") ? AuditResult.FAILED : AuditResult.SUCCEEDED;
-        securityAuditWriter.append(securityAuditEventFactory.create(UUID.randomUUID(), eventType, operatorId, null,
+        AuditRecord.Result result = eventType.endsWith("_FAILED") ? AuditRecord.Result.FAILED : AuditRecord.Result.SUCCEEDED;
+        auditService.record(auditRecordFactory.create(UUID.randomUUID(), eventType, operatorId, null,
                 clientType.name(), null, null, Map.of(), Map.of(), reason, null, result,
                 RequestCorrelationContext.current().correlationId()));
     }

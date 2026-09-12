@@ -32,8 +32,10 @@ public class AuditConfiguration {
     public AuditAspect auditAspect(SecurityContextAccessor securityContextAccessor,
                                    AuditService auditService,
                                    AuditSanitizer auditSanitizer,
-                                   PlatformTransactionManager transactionManager) {
+                                   PlatformTransactionManager transactionManager,
+                                   AuditFailureResolver failureResolver,
+                                   AuditFailureRecorder failureRecorder) {
         return new AuditAspect(securityContextAccessor, auditService, auditSanitizer,
-                new TransactionTemplate(transactionManager));
+                new TransactionTemplate(transactionManager), failureResolver, failureRecorder);
     }
 }

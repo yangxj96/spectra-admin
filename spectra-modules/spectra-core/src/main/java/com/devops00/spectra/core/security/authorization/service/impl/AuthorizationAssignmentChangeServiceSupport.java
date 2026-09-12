@@ -49,13 +49,12 @@ import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMappe
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
-import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
-import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
@@ -125,11 +124,10 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     private final ObjectProvider<RootAuthorizationPolicy> rootAuthorizationPolicy;
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
-    private final SecurityAuditWriter securityAuditWriter;
+    private final AuditService auditService;
 
-    private final SecurityAuditEventFactory securityAuditEventFactory;
+    private final AuditRecordFactory auditRecordFactory;
 
-    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final TimeMapper timeMapper;
 
@@ -171,10 +169,10 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("授权变更请求已被修改，请重新生成预览");
         }
-        var event = securityAuditEventFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, targetUserId,
+        var event = auditRecordFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, targetUserId,
                 null, null, null, Map.of("assignmentId", String.valueOf(assignmentId)),
                 Map.of("roleId", prepared.role().getId().toString(), "permissionCount", prepared.requests().size()),
-                "通过 Grant Boundary Preview/Apply 提交", null, AuditResult.STARTED,
+                "通过 Grant Boundary Preview/Apply 提交", null, AuditRecord.Result.STARTED,
                 RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             UUID persistedAssignmentId = persist(prepared, targetUserId);
@@ -228,11 +226,11 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
                             targetSecurityVersion, List.of()));
         }
 
-        var event = securityAuditEventFactory.create(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
+        var event = auditRecordFactory.create(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
                 targetUserId, null, null, null,
                 Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
                 Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权", null,
-                AuditResult.STARTED, RequestCorrelationContext.current().correlationId());
+                AuditRecord.Result.STARTED, RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             var update = new LambdaUpdateWrapper<RoleAssignment>()
                     .eq(RoleAssignment::getId, assignment.getId())
@@ -560,11 +558,10 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
      */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = securityAuditEventFactory.create(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditResult.SUCCEEDED,
+        var event = auditRecordFactory.create(null, eventType, operatorId, targetId, null, null, null,
+                before, after, reason, null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
-        securityAuditWriter.append(event);
-        securityChangeOutboxProducer.publish(event);
+        auditService.record(event);
     }
 
     /**

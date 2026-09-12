@@ -16,14 +16,16 @@
 
 package com.devops00.spectra.core.security.change.service.impl;
 
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditEvent;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
-import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.AuditFailureRecorder;
+import com.devops00.spectra.core.audit.AuditFailureResolver;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.function.Supplier;
 
@@ -40,31 +42,54 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class DefaultSecurityChangeExecutor implements SecurityChangeExecutor {
 
-    private final SecurityAuditWriter securityAuditWriter;
-
-    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
+    private final AuditService auditService;
+    private final AuditFailureResolver failureResolver;
+    private final AuditFailureRecorder failureRecorder;
 
     @Override
     @Transactional
-    public <T> T execute(SecurityAuditEvent event, Supplier<T> mutation) {
+    public <T> T execute(AuditRecord event, Supplier<T> mutation) {
         if (event == null || mutation == null) {
             throw new IllegalArgumentException("安全变更事件和变更操作不能为空");
         }
 
-        securityAuditWriter.append(event.started());
+        auditService.record(event.withResult(AuditRecord.Result.STARTED));
         try {
             T result = mutation.get();
-            var succeeded = event.withResult(AuditResult.SUCCEEDED);
-            securityAuditWriter.append(succeeded);
-            securityChangeOutboxProducer.publish(succeeded);
+            var succeeded = event.withResult(AuditRecord.Result.SUCCEEDED);
+            auditService.record(succeeded);
             return result;
         } catch (RuntimeException exception) {
-            try {
-                securityAuditWriter.append(event.withResult(AuditResult.FAILED));
-            } catch (RuntimeException auditException) {
-                exception.addSuppressed(auditException);
+            AuditRecord failed = failedRecord(event, exception);
+            if (TransactionSynchronizationManager.isSynchronizationActive()
+                    && TransactionSynchronizationManager.isActualTransactionActive()) {
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCompletion(int status) {
+                        recordFailure(failed, exception);
+                    }
+                });
+            } else {
+                recordFailure(failed, exception);
             }
             throw exception;
+        }
+    }
+
+    private AuditRecord failedRecord(AuditRecord event, RuntimeException exception) {
+        AuditRecord failed = event.withResult(AuditRecord.Result.FAILED);
+        return new AuditRecord(failed.eventId(), failed.category(), failed.eventType(), failed.targetId(),
+                failed.result(), failed.occurredAt(), failed.context(), failed.before(), failed.after(),
+                failed.reason(), failed.httpSummary(), failureResolver.resolve(exception));
+    }
+
+    private void recordFailure(AuditRecord failed, RuntimeException original) {
+        try {
+            failureRecorder.record(failed);
+        } catch (RuntimeException auditException) {
+            if (auditException != original) {
+                original.addSuppressed(auditException);
+            }
         }
     }
 }

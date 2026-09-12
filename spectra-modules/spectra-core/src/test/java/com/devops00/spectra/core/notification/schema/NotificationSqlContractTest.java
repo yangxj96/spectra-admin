@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -65,6 +66,15 @@ class NotificationSqlContractTest {
         var tableColumns = tableColumns(schema);
         assertEquals(151, tableColumns.size());
         assertEquals(tableColumns, commentedColumns(schema));
+    }
+
+    @Test
+    void shouldKeepFinalTemplateLifecycleIndexesInTheSingleBaseline() throws IOException {
+        var schema = readSql();
+
+        assertTrue(schema.contains("CREATE UNIQUE INDEX \"UK_NTF_TEMPLATE_RELEASED\""));
+        assertTrue(schema.contains("CREATE UNIQUE INDEX \"UK_NTF_TEMPLATE_DRAFT\""));
+        assertFalse(schema.contains("UK_NTF_TEMPLATE_PUBLISHED"));
     }
 
     @Test

@@ -84,12 +84,31 @@ class SecurityFlywayPostgresIntegrationTest {
             }
 
             assertEquals(List.of("1"), versions);
-            assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_event"));
-            assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_archive_manifest"));
+            assertTrue(tableExists(connection, "spectra_core", "sys_audit_event"));
+            assertTrue(tableExists(connection, "spectra_core", "sys_audit_event_default"));
             assertTrue(tableExists(connection, "spectra_security", "sec_assignment_permission_boundary"));
             assertTrue(tableExists(connection, "spectra_security", "sec_security_client"));
             assertTrue(tableExists(connection, "spectra_security", "sec_session_policy"));
             assertTrue(tableExists(connection, "spectra_security", "sec_password_policy"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_log"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_operation_log_outbox"));
+            assertFalse(tableExists(connection, "spectra_security", "sec_security_audit_event"));
+            assertFalse(tableExists(connection, "spectra_security", "sec_security_change_outbox"));
+            assertFalse(tableExists(connection, "spectra_security", "sec_security_audit_archive_manifest"));
+            assertFalse(tableExists(connection, "spectra_security", "sec_security_audit_retention_policy"));
+            assertTrue(isPartitioned(connection, "spectra_core", "sys_audit_event"));
+            assertEquals("RANGE (occurred_at)", partitionKey(connection, "spectra_core", "sys_audit_event"));
+            assertTrue(constraintExists(connection, "spectra_core", "sys_audit_event", "pk_sys_audit_event"));
+            assertTrue(indexExists(connection, "spectra_core", "idx_sys_audit_event_occurred_at"));
+            assertTrue(indexExists(connection, "spectra_core", "idx_sys_audit_event_category_time"));
+            assertTrue(indexExists(connection, "spectra_core", "idx_sys_audit_event_operator_time"));
+            assertTrue(indexExists(connection, "spectra_core", "idx_sys_audit_event_target_time"));
+            assertTrue(indexExists(connection, "spectra_core", "idx_sys_audit_event_type_time"));
+            assertTrue(tablePrivilege(connection, "SELECT"));
+            assertTrue(tablePrivilege(connection, "INSERT"));
+            assertFalse(tablePrivilege(connection, "UPDATE"));
+            assertFalse(tablePrivilege(connection, "DELETE"));
+            assertFalse(tablePrivilege(connection, "TRUNCATE"));
             assertFalse(tableExists(connection, "spectra_security", "security_audit_event"));
             assertFalse(tableExists(connection, "spectra_security", "permission"));
             assertTrue(constraintExists(connection, "spectra_security", "sec_permission", "pk_sec_permission"));
@@ -97,15 +116,14 @@ class SecurityFlywayPostgresIntegrationTest {
                     connection, "spectra_security", "sec_role_permission", "fk_sec_role_permission_role_id"));
             assertTrue(indexExists(connection, "spectra_security", "idx_sec_role_assignment_user_state"));
             assertTrue(indexExists(connection, "spectra_security", "uk_sec_scope_rule_department"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "type"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "explain"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "status"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "method"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "url"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "args"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "result"));
-            assertTrue(columnExists(connection, "spectra_core", "sys_log", "time_cost"));
-            assertEquals("text", columnType(connection, "spectra_core", "sys_log", "explain"));
+            for (String column : List.of("event_id", "occurred_at", "category", "event_type", "operator_id",
+                    "target_id", "result", "client", "ip", "user_agent", "request_id", "correlation_id",
+                    "http_method", "request_url", "http_status", "duration_ms", "before_snapshot",
+                    "after_snapshot", "reason", "failure_code", "failure_type", "failure_reason")) {
+                assertTrue(columnExists(connection, "spectra_core", "sys_audit_event", column), column);
+            }
+            assertEquals("jsonb", columnType(connection, "spectra_core", "sys_audit_event", "before_snapshot"));
+            assertEquals("character varying", columnType(connection, "spectra_core", "sys_audit_event", "failure_reason"));
             assertFalse(tableExists(connection, "spectra_core", "sys_account"));
             assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope"));
             assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope_target"));
@@ -243,6 +261,45 @@ class SecurityFlywayPostgresIntegrationTest {
             try (var resultSet = statement.executeQuery()) {
                 assertTrue(resultSet.next());
                 return resultSet.getString(1);
+            }
+        }
+    }
+
+    private static boolean isPartitioned(Connection connection, String schema, String table) throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT EXISTS (SELECT 1 FROM pg_class table_row "
+                        + "JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace "
+                        + "WHERE schema_row.nspname = ? AND table_row.relname = ? AND table_row.relkind = 'p')")) {
+            statement.setString(1, schema);
+            statement.setString(2, table);
+            try (var resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getBoolean(1);
+            }
+        }
+    }
+
+    private static String partitionKey(Connection connection, String schema, String table) throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT pg_get_partkeydef(table_row.oid) FROM pg_class table_row "
+                        + "JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace "
+                        + "WHERE schema_row.nspname = ? AND table_row.relname = ?")) {
+            statement.setString(1, schema);
+            statement.setString(2, table);
+            try (var resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                return resultSet.getString(1);
+            }
+        }
+    }
+
+    private static boolean tablePrivilege(Connection connection, String privilege) throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT has_table_privilege('spectra_runtime', 'spectra_core.sys_audit_event', ?)")) {
+            statement.setString(1, privilege);
+            try (var resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getBoolean(1);
             }
         }
     }

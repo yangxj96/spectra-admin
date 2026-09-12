@@ -34,7 +34,6 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMap
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.OrganizationChangeService;
 import com.devops00.spectra.core.security.authorization.service.OrganizationImpactAnalyzer;
-import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.javabean.entity.OrganizationVersion;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
@@ -42,9 +41,9 @@ import com.devops00.spectra.core.system.mapper.OrganizationVersionMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
-import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
@@ -105,11 +104,10 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private final ObjectProvider<RootAuthorizationPolicy> rootPolicyProvider;
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
-    private final SecurityAuditWriter securityAuditWriter;
+    private final AuditService auditService;
 
-    private final SecurityAuditEventFactory securityAuditEventFactory;
+    private final AuditRecordFactory auditRecordFactory;
 
-    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final TimeMapper timeMapper;
 
@@ -200,11 +198,11 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private void execute(PreparedChange prepared) {
         UUID operatorId = prepared.operatorId();
         UUID departmentId = prepared.departmentId();
-        var event = securityAuditEventFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, departmentId,
+        var event = auditRecordFactory.create(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, departmentId,
                 null, null, null, Map.of("organizationVersion", prepared.impact().beforeVersion()),
                 Map.of("organizationVersion", prepared.impact().afterVersion(), "operation",
                         prepared.changeType().name()),
-                "通过组织变更 Preview/Apply 提交", null, AuditResult.STARTED,
+                "通过组织变更 Preview/Apply 提交", null, AuditRecord.Result.STARTED,
                 RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             UUID persistedDepartmentId = persist(prepared);
@@ -412,11 +410,10 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
      */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = securityAuditEventFactory.create(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditResult.SUCCEEDED,
+        var event = auditRecordFactory.create(null, eventType, operatorId, targetId, null, null, null,
+                before, after, reason, null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
-        securityAuditWriter.append(event);
-        securityChangeOutboxProducer.publish(event);
+        auditService.record(event);
     }
 
     private enum ChangeType {

@@ -40,8 +40,8 @@
 
 ## 本地 Flyway 状态
 
-- 当前数据库结构来源是 `spectra-config/src/main/resources/db/migration/` 的 V1 基线及后续递增 migration；不得通过打开 `baseline-on-migrate`、`repair`、删除 `flyway_schema_history` 记录或忽略缺失 migration 来掩盖版本漂移。
-- 如果开发库提示数据库版本高于仓库最新 migration，先确认 `DB_URL` 指向可丢弃的开发库；当前仓库基线重整后，执行过旧 V1～V34 或其他历史链的开发库应重建，再由当前 migration 链初始化。需要保留数据的环境必须先设计并审查一次性结构/数据迁移。
+- 当前 Flyway 目录只保留完整 V1 初始化基线；后续结构变更通过递增 migration 表达。不得通过打开 `baseline-on-migrate`、`repair`、删除 `flyway_schema_history` 记录或忽略缺失 migration 来掩盖版本漂移。
+- V1 重整后，执行过旧版本链的开发库应重建，再由当前基线初始化。需要保留数据的环境必须先设计并审查一次性结构/数据迁移。
 
 ## 实现约束
 

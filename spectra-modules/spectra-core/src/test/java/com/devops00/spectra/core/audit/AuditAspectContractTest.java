@@ -11,6 +11,7 @@ import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authorization.controller.AuthorizationController;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeFrom;
@@ -28,11 +29,16 @@ import org.springframework.transaction.support.TransactionOperations;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AuditAspectContractTest {
@@ -44,7 +50,7 @@ class AuditAspectContractTest {
 
         assertTrue(pointcut.contains("com.devops00.spectra.common.audit.Audit"));
         assertTrue(!pointcut.contains("ULog"));
-        assertEquals(4, AuditAspect.class.getDeclaredConstructors()[0].getParameterCount());
+        assertEquals(6, AuditAspect.class.getDeclaredConstructors()[0].getParameterCount());
     }
 
     @Test
@@ -53,7 +59,8 @@ class AuditAspectContractTest {
         AuditService auditService = recorded::set;
         AuditSanitizer sanitizer = snapshot -> Map.of("sanitized", true);
         AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), auditService, sanitizer,
-                transactionOperations());
+                transactionOperations(), new AuditFailureResolver(new DefaultAuditSanitizer()),
+                mock(AuditFailureRecorder.class));
         Method method = Fixture.class.getDeclaredMethod("explicitSecurityAudit");
 
         ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
@@ -76,7 +83,8 @@ class AuditAspectContractTest {
             throw new AuditService.AuditRecordingException("operation outbox unavailable");
         };
         AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), auditService,
-                snapshot -> Map.of("sanitized", true), transactionOperations());
+                snapshot -> Map.of("sanitized", true), transactionOperations(),
+                new AuditFailureResolver(new DefaultAuditSanitizer()), mock(AuditFailureRecorder.class));
         Method method = Fixture.class.getDeclaredMethod("explicitOperationAudit");
 
         ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
@@ -94,7 +102,8 @@ class AuditAspectContractTest {
     void shouldUseSanitizedRequestContextInsteadOfRawHeaders() throws Throwable {
         AtomicReference<AuditRecord> recorded = new AtomicReference<>();
         AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), recorded::set,
-                snapshot -> Map.of("sanitized", true), transactionOperations());
+                snapshot -> Map.of("sanitized", true), transactionOperations(),
+                new AuditFailureResolver(new DefaultAuditSanitizer()), mock(AuditFailureRecorder.class));
         Method method = Fixture.class.getDeclaredMethod("explicitOperationAudit");
         ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
         MethodSignature signature = mock(MethodSignature.class);
@@ -125,7 +134,8 @@ class AuditAspectContractTest {
     void sensitiveAuditCanExcludeArgumentsAndResultSnapshots() throws Throwable {
         AtomicReference<AuditRecord> recorded = new AtomicReference<>();
         AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), recorded::set,
-                snapshot -> new java.util.LinkedHashMap<>(snapshot), transactionOperations());
+                snapshot -> new java.util.LinkedHashMap<>(snapshot), transactionOperations(),
+                new AuditFailureResolver(new DefaultAuditSanitizer()), mock(AuditFailureRecorder.class));
         Method method = Fixture.class.getDeclaredMethod("sensitiveAudit", String.class);
         ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
         MethodSignature signature = mock(MethodSignature.class);
@@ -149,12 +159,87 @@ class AuditAspectContractTest {
                 "resolveDescriptor", Method.class, ProceedingJoinPoint.class);
         assertTrue(resolver.trySetAccessible());
 
-        Object descriptor = resolver.invoke(new AuditAspect(null, null, null, null), auditedMethod, null);
+        Object descriptor = resolver.invoke(new AuditAspect(null, null, null, null, null, null), auditedMethod, null);
         Method eventType = descriptor.getClass().getDeclaredMethod("eventType");
         assertTrue(eventType.trySetAccessible());
 
         assertEquals("AuthorizationController#departmentCreatePreview", eventType.invoke(descriptor));
         assertTrue(((String) eventType.invoke(descriptor)).length() <= 100);
+    }
+
+    @Test
+    void failedBusinessCallMustBeRecordedAfterRollbackAndKeepTheOriginalException() throws Throwable {
+        AtomicBoolean rollbackComplete = new AtomicBoolean();
+        AtomicReference<AuditRecord> recorded = new AtomicReference<>();
+        TransactionOperations transactions = rollbackTransactionOperations(rollbackComplete);
+        AuditFailureRecorder recorder = mock(AuditFailureRecorder.class);
+        doAnswer(invocation -> {
+            assertTrue(rollbackComplete.get());
+            recorded.set(invocation.getArgument(0));
+            return null;
+        }).when(recorder).record(org.mockito.ArgumentMatchers.any(AuditRecord.class));
+        AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), record -> {
+            throw new AssertionError("thrown business call must use the failure recorder");
+        }, new DefaultAuditSanitizer(), transactions,
+                new AuditFailureResolver(new DefaultAuditSanitizer()), recorder);
+        Method method = Fixture.class.getDeclaredMethod("explicitOperationAudit");
+        IllegalStateException original = new IllegalStateException("business failure");
+        ProceedingJoinPoint point = point(method);
+        when(point.proceed()).thenThrow(original);
+
+        Throwable thrown = assertThrows(IllegalStateException.class, () -> aspect.handleAround(point));
+
+        assertSame(original, thrown);
+        assertEquals(AuditRecord.Result.FAILED, recorded.get().result());
+        assertEquals("IllegalStateException", recorded.get().failure().type());
+        assertEquals("操作执行失败", recorded.get().failure().reason());
+        verify(recorder).record(org.mockito.ArgumentMatchers.any(AuditRecord.class));
+    }
+
+    @Test
+    void failureRecorderErrorMustBeSuppressedOnTheOriginalBusinessException() throws Throwable {
+        AuditFailureRecorder recorder = mock(AuditFailureRecorder.class);
+        doThrow(new AuditService.AuditRecordingException("writer unavailable"))
+                .when(recorder).record(org.mockito.ArgumentMatchers.any(AuditRecord.class));
+        TransactionOperations transactions = rollbackTransactionOperations(new AtomicBoolean());
+        AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), record -> {
+            throw new AssertionError("thrown business call must use the failure recorder");
+        }, new DefaultAuditSanitizer(), transactions,
+                new AuditFailureResolver(new DefaultAuditSanitizer()), recorder);
+        Method method = Fixture.class.getDeclaredMethod("explicitOperationAudit");
+        IllegalStateException original = new IllegalStateException("business failure");
+        ProceedingJoinPoint point = point(method);
+        when(point.proceed()).thenThrow(original);
+
+        Throwable thrown = assertThrows(IllegalStateException.class, () -> aspect.handleAround(point));
+
+        assertSame(original, thrown);
+        assertEquals(1, thrown.getSuppressed().length);
+        assertTrue(thrown.getSuppressed()[0] instanceof AuditService.AuditRecordingException);
+    }
+
+    private static ProceedingJoinPoint point(Method method) {
+        ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        when(signature.getMethod()).thenReturn(method);
+        when(signature.getParameterNames()).thenReturn(new String[0]);
+        when(point.getSignature()).thenReturn(signature);
+        when(point.getArgs()).thenReturn(new Object[0]);
+        return point;
+    }
+
+    private static TransactionOperations rollbackTransactionOperations(AtomicBoolean rollbackComplete) {
+        return new TransactionOperations() {
+            @Override
+            public <T> T execute(TransactionCallback<T> action) {
+                try {
+                    return action.doInTransaction(new SimpleTransactionStatus());
+                } catch (RuntimeException failure) {
+                    rollbackComplete.set(true);
+                    throw failure;
+                }
+            }
+        };
     }
 
     private static TransactionOperations transactionOperations() {

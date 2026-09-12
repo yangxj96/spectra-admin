@@ -44,7 +44,6 @@ class AuditSanitizerBeanContractTest {
 
         try (Stream<Path> files = Files.walk(sourceRoot)) {
             files.filter(path -> path.toString().endsWith(".java"))
-                    .filter(path -> !path.getFileName().toString().equals("SecurityAuditEvent.java"))
                     .forEach(path -> {
                         try {
                             assertFalse(Files.readString(path).contains("DefaultAuditSanitizer.INSTANCE"), path.toString());

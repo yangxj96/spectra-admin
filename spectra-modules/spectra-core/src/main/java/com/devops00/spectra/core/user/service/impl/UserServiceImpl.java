@@ -52,12 +52,11 @@ import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
-import com.devops00.spectra.core.security.audit.AuditResult;
-import com.devops00.spectra.core.security.audit.SecurityAuditWriter;
-import com.devops00.spectra.core.audit.SecurityAuditEventFactory;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecuritySessionQueryPort;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
@@ -120,11 +119,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final SecurityChangeExecutor securityChangeExecutor;
 
-    private final SecurityAuditWriter securityAuditWriter;
+    private final AuditService auditService;
 
-    private final SecurityAuditEventFactory securityAuditEventFactory;
+    private final AuditRecordFactory auditRecordFactory;
 
-    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -368,7 +366,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             return;
         }
 
-        var event = securityAuditEventFactory.create(
+        var event = auditRecordFactory.create(
                 null,
                 lifecycleEventType(previous, target),
                 currentOperatorId(),
@@ -380,7 +378,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 Map.of("status", target.getCode()),
                 reason,
                 null,
-                AuditResult.STARTED,
+                AuditRecord.Result.STARTED,
                 RequestCorrelationContext.current().correlationId());
 
         securityChangeExecutor.execute(event, () -> {
@@ -424,11 +422,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
      */
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        var event = securityAuditEventFactory.create(null, eventType, currentOperatorId(), targetId,
-                null, null, null, before, after, reason, null, AuditResult.SUCCEEDED,
+        var event = auditRecordFactory.create(null, eventType, currentOperatorId(), targetId,
+                null, null, null, before, after, reason, null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
-        securityAuditWriter.append(event);
-        securityChangeOutboxProducer.publish(event);
+        auditService.record(event);
     }
 
     /**

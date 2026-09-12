@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Quartz DDL 和旧调度表清理迁移的静态契约。 */
+/** Quartz DDL 的 Flyway 基线静态契约。 */
 class QuartzSchemaContractTest {
 
     private static final List<String> QUARTZ_TABLES = List.of(
@@ -69,8 +69,8 @@ class QuartzSchemaContractTest {
             "error_code", "error_message", "created_by", "created_at", "updated_by", "updated_at", "deleted", "version");
 
     @Test
-    void quartzMigrationMustContainTheCompletePostgresTableSet() throws IOException {
-        var migration = readMigration("V14__create_quartz_schema.sql");
+    void baselineMustContainTheCompletePostgresQuartzTableSet() throws IOException {
+        var migration = readBaseline();
 
         assertThat(migration).contains("CREATE SCHEMA IF NOT EXISTS spectra_quartz");
         for (var table : QUARTZ_TABLES) {
@@ -89,8 +89,8 @@ class QuartzSchemaContractTest {
     }
 
     @Test
-    void executionHistoryMigrationMustContainRequiredSafetyConstraints() throws IOException {
-        var migration = readMigration("V15__create_quartz_execution_history.sql");
+    void baselineMustContainExecutionHistorySafetyConstraints() throws IOException {
+        var migration = readBaseline();
 
         assertThat(migration).contains("CREATE TABLE spectra_core.quartz_job_execution_history");
         assertThat(migration)
@@ -112,7 +112,10 @@ class QuartzSchemaContractTest {
         assertThat(migration).contains("finished_at >= started_at");
         assertThat(migration).contains("idx_quartz_history_job_started");
         assertThat(migration).contains("idx_quartz_history_created_at");
-        assertThat(migration).doesNotContain("JOB_DATA", "parameters jsonb", "parameters_snapshot");
+        var historyStart = migration.indexOf("CREATE TABLE spectra_core.quartz_job_execution_history");
+        var historyEnd = migration.indexOf("\n);", historyStart) + 3;
+        var historyTable = migration.substring(historyStart, historyEnd);
+        assertThat(historyTable).doesNotContain("JOB_DATA", "parameters jsonb", "parameters_snapshot");
         assertThat(migration).contains("DEFAULT uuidv7()");
         assertThat(migration).contains("pk_quartz_job_execution_history");
         assertThat(migration).contains("uk_quartz_job_execution_history_fire_instance_id");
@@ -132,27 +135,20 @@ class QuartzSchemaContractTest {
     }
 
     @Test
-    void legacyMigrationMustOnlyDropKnownTablesInDependencyOrder() throws IOException {
-        var migration = readMigration("V16__drop_legacy_scheduler_tables.sql");
-        var operationAudit = migration.indexOf("scheduler_operation_audit");
-        var loopError = migration.indexOf("scheduler_loop_error");
-        var controlCommand = migration.indexOf("scheduler_control_command");
-        var loopRuntime = migration.indexOf("scheduler_loop_runtime");
-        var execution = migration.indexOf("scheduler_execution");
-        var job = migration.indexOf("scheduler_job");
+    void baselineMustExcludeTheRetiredSelfManagedSchedulerTables() throws IOException {
+        var migration = readBaseline();
 
-        assertThat(operationAudit).isGreaterThanOrEqualTo(0);
-        assertThat(operationAudit).isLessThan(loopError);
-        assertThat(loopError).isLessThan(controlCommand);
-        assertThat(controlCommand).isLessThan(loopRuntime);
-        assertThat(loopRuntime).isLessThan(execution);
-        assertThat(execution).isLessThan(job);
-        assertThat(migration).doesNotContain("INSERT INTO", "UPDATE ", "SELECT ");
+        assertThat(migration).doesNotContain("CREATE TABLE spectra_core.scheduler_job")
+                .doesNotContain("CREATE TABLE spectra_core.scheduler_execution")
+                .doesNotContain("CREATE TABLE spectra_core.scheduler_loop_runtime")
+                .doesNotContain("CREATE TABLE spectra_core.scheduler_control_command")
+                .doesNotContain("CREATE TABLE spectra_core.scheduler_loop_error")
+                .doesNotContain("CREATE TABLE spectra_core.scheduler_operation_audit");
     }
 
-    private String readMigration(String name) throws IOException {
-        try (var stream = getClass().getClassLoader().getResourceAsStream("db/migration/" + name)) {
-            assertThat(stream).as("缺少 migration 资源: %s", name).isNotNull();
+    private String readBaseline() throws IOException {
+        try (var stream = getClass().getClassLoader().getResourceAsStream("db/migration/V1__init_db.sql")) {
+            assertThat(stream).as("缺少 Flyway V1 基线").isNotNull();
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }

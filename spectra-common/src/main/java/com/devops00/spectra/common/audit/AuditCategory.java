@@ -19,8 +19,7 @@ package com.devops00.spectra.common.audit;
 /**
  * 审计事件的可靠性分类。
  *
- * <p>分类只描述事件语义，不决定具体存储。普通操作日志和安全审计仍由不同 sink
- * 负责其事务和失败语义。</p>
+ * <p>分类只描述事件语义；普通操作、安全审计和认证授权事实共用一个事实表。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -28,9 +27,9 @@ package com.devops00.spectra.common.audit;
  */
 public enum AuditCategory {
 
-    /** 普通业务操作，最终由操作日志 outbox 持久化。 */
+    /** 普通业务操作。 */
     OPERATION,
 
-    /** 安全边界、认证和授权事实，必须同步可靠记录。 */
+    /** 安全边界、认证和授权事实。 */
     SECURITY
 }
