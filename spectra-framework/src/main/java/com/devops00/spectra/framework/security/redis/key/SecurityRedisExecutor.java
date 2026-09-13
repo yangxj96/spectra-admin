@@ -26,6 +26,10 @@ import java.util.function.Supplier;
  * 安全 Redis 操作统一执行器。
  *
  * <p>只转换 Redis 数据访问异常；业务校验异常保持原始语义，避免把验证码错误、Token 无效等正常结果误报为基础设施故障。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @NullMarked
 public final class SecurityRedisExecutor {

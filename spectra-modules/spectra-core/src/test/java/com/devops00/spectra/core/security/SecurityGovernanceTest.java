@@ -46,6 +46,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Phase 1 安全审计、事务门禁和最后 Root 保护测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class SecurityGovernanceTest {
 
@@ -94,17 +98,30 @@ class SecurityGovernanceTest {
         assertThrows(RuntimeException.class, guard::assertCanAddDevOps);
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static DefaultSecurityChangeExecutor executor(RecordingAuditService service, List<AuditRecord> failures) {
         var failureRecorder = new AuditFailureRecorder(failures::add, new NoopTransactionManager());
         return new DefaultSecurityChangeExecutor(service, new AuditFailureResolver(new DefaultAuditSanitizer()),
                 failureRecorder);
     }
 
+    /**
+     * 处理事件相关数据。
+     */
     private static AuditRecord event() {
         return new AuditRecord(UUID.randomUUID(), AuditCategory.SECURITY, "DEV_OPS_TEST", null,
                 AuditRecord.Result.STARTED, Instant.now(), AuditContext.empty(), Map.of(), Map.of(), "test");
     }
 
+    /**
+     * 为 {@code SecurityGovernanceTest} 测试提供 {@code RecordingAuditService} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class RecordingAuditService implements AuditService {
 
         private final List<AuditRecord> events = new ArrayList<>();
@@ -126,6 +143,13 @@ class SecurityGovernanceTest {
         }
     }
 
+    /**
+     * 为 {@code SecurityGovernanceTest} 测试提供 {@code NoopTransactionManager} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class NoopTransactionManager implements PlatformTransactionManager {
 
         @Override
@@ -142,6 +166,13 @@ class SecurityGovernanceTest {
         }
     }
 
+    /**
+     * 为 {@code SecurityGovernanceTest} 测试提供 {@code RecordingRootPolicyRepository} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class RecordingRootPolicyRepository implements RootPolicyRepository {
 
         private final long current;

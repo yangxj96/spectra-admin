@@ -34,7 +34,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 行政区域路径查询行为测试。 */
+/**
+ * 行政区域路径查询行为测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RegionServiceImplTest {
 
     private static final int MAX_DEPTH = 64;
@@ -118,10 +124,16 @@ class RegionServiceImplTest {
         verify(mapper).selectPath(id, MAX_DEPTH);
     }
 
+    /**
+     * 处理区域相关数据。
+     */
     private static RegionServiceImpl service(RegionMapper mapper) {
         return new RegionServiceImpl(mapper, mock(RegionConverter.class));
     }
 
+    /**
+     * 处理行数据相关数据。
+     */
     private static RegionPathRow row(UUID id, UUID pid, String name, int depth) {
         var row = new RegionPathRow();
         row.setId(id);

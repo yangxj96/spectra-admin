@@ -28,7 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/** Quartz 执行历史监听器；历史写入异常隔离在监听器内，不影响任务执行。 */
+/**
+ * Quartz 执行历史监听器；历史写入异常隔离在监听器内，不影响任务执行。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 public class QuartzExecutionHistoryJobListener implements JobListener {
 
@@ -85,6 +91,9 @@ public class QuartzExecutionHistoryJobListener implements JobListener {
         failOpen("完成", context, () -> historyService.completed(context, jobException));
     }
 
+    /**
+     * 处理打开相关数据。
+     */
     private void failOpen(String stage, JobExecutionContext context, Runnable action) {
         try {
             action.run();
@@ -96,6 +105,9 @@ public class QuartzExecutionHistoryJobListener implements JobListener {
         }
     }
 
+    /**
+     * 处理安全作业键相关数据。
+     */
     private static String safeJobKey(JobExecutionContext context) {
         try {
             return context == null || context.getJobDetail() == null
@@ -106,6 +118,9 @@ public class QuartzExecutionHistoryJobListener implements JobListener {
         }
     }
 
+    /**
+     * 处理安全触发器键相关数据。
+     */
     private static String safeTriggerKey(JobExecutionContext context) {
         try {
             return context == null || context.getTrigger() == null
@@ -116,6 +131,9 @@ public class QuartzExecutionHistoryJobListener implements JobListener {
         }
     }
 
+    /**
+     * 处理安全标识相关数据。
+     */
     private static String safeFireInstanceId(JobExecutionContext context) {
         try {
             return context == null || context.getFireInstanceId() == null

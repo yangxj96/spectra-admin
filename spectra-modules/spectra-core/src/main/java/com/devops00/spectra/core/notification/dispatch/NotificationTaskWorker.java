@@ -118,10 +118,11 @@ public class NotificationTaskWorker {
     private long retryBaseDelaySeconds;
 
     /**
-     * 周期领取到期任务；停用 Worker 不影响消息中心读取。
-     */
-    /**
-     * 供测试和运维手工触发的任务处理入口。
+     * 处理一批待投递任务，供周期调度器、测试和运维手工触发调用。
+     * Worker 停用时不会影响消息中心读取。
+     *
+     * @param limit 本次最多处理的任务数
+     * @return 本次处理的任务数
      */
     public int processPending(int limit) {
         return processPending(limit, DEFAULT_WORKER_ID, true);
@@ -166,6 +167,9 @@ public class NotificationTaskWorker {
                 () -> processOneWithContext(task, workerId));
     }
 
+    /**
+     * 处理上下文相关数据。
+     */
     private void processOneWithContext(NotificationTaskEntity task, String workerId) {
         var now = Instant.now();
         if (isExpired(task, now)) {

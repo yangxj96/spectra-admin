@@ -78,22 +78,11 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
     }
 
     /**
-     * 获取或判断 Framework 的 supports 结果。
+     * 判断当前 Advice 是否适用于指定控制器响应。
      *
      * @param returnType    控制器方法返回类型，用于判断响应加密规则。
      * @param converterType 当前 HTTP 消息转换器类型，用于判断 Advice 是否适用。
-     * @return 返回响应是否满足加密条件；加密开关未就绪、显式关闭或响应类型不支持时返回 false，满足条件时返回 true。
-     */
-    /**
-     * 按响应内容和加密策略生成加密响应。
-     *
-     * @param body          控制器返回的原始响应体；null 表示控制器没有响应内容。
-     * @param returnType    控制器方法返回类型，用于识别流式和资源响应。
-     * @param contentType   当前响应的媒体类型，用于排除流式内容。
-     * @param converterType 当前 HTTP 消息转换器类型，用于保持二进制和资源响应原样返回。
-     * @param request       当前 HTTP 请求，用于读取请求关联信息和加密上下文。
-     * @param response      当前 HTTP 响应，用于写入加密响应所需的响应头。
-     * @return 流式、资源、二进制或 null 响应原样返回；普通响应成功时返回包含密文、密钥摘要和签名的 JSON 字符串；密钥缺失或加密失败时抛出加密异常，不以空字符串掩盖失败。
+     * @return 响应满足加密条件时返回 true；开关关闭、密钥未就绪或响应类型不支持时返回 false。
      */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -155,6 +144,17 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         return matched;
     }
 
+    /**
+     * 按响应内容和加密策略生成加密响应。
+     *
+     * @param body          控制器返回的原始响应体；null 表示控制器没有响应内容。
+     * @param returnType    控制器方法返回类型，用于识别流式和资源响应。
+     * @param contentType   当前响应的媒体类型，用于排除流式内容。
+     * @param converterType 当前 HTTP 消息转换器类型，用于保持二进制和资源响应原样返回。
+     * @param request       当前 HTTP 请求，用于读取请求关联信息和加密上下文。
+     * @param response      当前 HTTP 响应，用于写入加密响应所需的响应头。
+     * @return 不需要加密的响应原样返回；普通响应加密成功时返回密文 JSON，密钥缺失或加密失败时抛出加密异常。
+     */
     @Override
     public @Nullable Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
                                             Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request,
@@ -238,6 +238,9 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         return cryptoKeyManager.isConfiguredEnabled();
     }
 
+    /**
+     * 处理关联标识相关数据。
+     */
     private static String correlationId() {
         String correlationId = RequestCorrelationContext.current().correlationId();
         return correlationId == null ? "unknown" : correlationId;

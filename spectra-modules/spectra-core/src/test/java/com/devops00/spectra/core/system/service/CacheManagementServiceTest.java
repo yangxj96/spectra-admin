@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.system.service;
@@ -32,6 +41,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code CacheManagementServiceTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class CacheManagementServiceTest {
 
     @Test
@@ -73,11 +89,17 @@ class CacheManagementServiceTest {
         verify(attempts).delete(eq("security:verification:login:sms:attempts:13800000000"));
     }
 
+    /**
+     * 处理缓存相关数据。
+     */
     private static CacheManagementServiceImpl service(SecuritySessionRevocationPort revocation,
                                                       SecurityReplayNonceAdminPort nonce) {
         return service(revocation, nonce, mock(CacheInvalidationCoordinator.class));
     }
 
+    /**
+     * 处理缓存相关数据。
+     */
     private static CacheManagementServiceImpl service(SecuritySessionRevocationPort revocation,
                                                       SecurityReplayNonceAdminPort nonce,
                                                       CacheInvalidationCoordinator coordinator) {
@@ -85,6 +107,9 @@ class CacheManagementServiceTest {
                 mock(SecurityVerificationAttemptStore.class));
     }
 
+    /**
+     * 处理缓存相关数据。
+     */
     private static CacheManagementServiceImpl service(SecuritySessionRevocationPort revocation,
                                                       SecurityReplayNonceAdminPort nonce,
                                                       CacheInvalidationCoordinator coordinator,

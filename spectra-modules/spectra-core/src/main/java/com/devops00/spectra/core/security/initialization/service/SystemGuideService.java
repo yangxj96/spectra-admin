@@ -19,7 +19,13 @@ package com.devops00.spectra.core.security.initialization.service;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemGuideCompleteFrom;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemGuideStatusVO;
 
-/** DEV_OPS 首次进入系统时的设置引导。 */
+/**
+ * DEV_OPS 首次进入系统时的设置引导。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface SystemGuideService {
 
     /**

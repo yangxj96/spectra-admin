@@ -33,6 +33,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Refresh Token Rotation 原子消费结果测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class RefreshTokenRotationStoreTest {
 

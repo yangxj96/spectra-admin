@@ -19,11 +19,11 @@ package com.devops00.spectra.framework.security.redis.key;
 import com.devops00.spectra.common.constant.RedisKey;
 
 /**
- * Security Session and login-protection Redis keys.
+ * 定义 {@code SecurityRedisKey} 支持的业务类型及取值。
  *
- * <p>All session keys use the {@code sec:} namespace. Values are token
- * digests or non-sensitive identifiers; plaintext tokens must never be used
- * as a key or value.</p>
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public enum SecurityRedisKey implements RedisKey {
 

@@ -35,18 +35,18 @@ import java.util.List;
 public interface OrganizationConverter {
 
     /**
-     * 实体转树形
+     * 转换树结构。
      *
-     * @param source 实体
-     * @return 树形
+     * @param source 当前数据或配置的来源。
+     * @return 部门树结构数据。
      */
     DepartmentTreeVo toTreeVO(Department source);
 
     /**
-     * 实体转树形(列表)
+     * 转换树结构。
      *
-     * @param source 实体
-     * @return 树形
+     * @param source 当前数据或配置的来源。
+     * @return 符合条件的数据集合。
      */
     List<DepartmentTreeVo> toTreeVOList(List<Department> source);
 

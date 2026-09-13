@@ -47,6 +47,10 @@ import static org.mockito.Mockito.when;
  *
  * <p>本测试不启动 Docker 或连接开发者本机 Redis；真实 Redis 连通性由显式开启的
  * {@link SecurityRedisFailureIntegrationTest} 验证，避免普通 Maven 测试意外依赖外部服务。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class RedisSecurityContractIntegrationTest {
 

@@ -144,11 +144,17 @@ class CoreNotificationRecipientDirectoryTest {
         assertEquals(1, result.stream().filter(NotificationRecipient::active).count());
     }
 
+    /**
+     * 处理通知相关数据。
+     */
     private CoreNotificationRecipientDirectory directory() {
         return new CoreNotificationRecipientDirectory(userService, userContactService, authorizationSnapshotProvider,
                 departmentService, security);
     }
 
+    /**
+     * 处理范围相关数据。
+     */
     private void allowScope(AuthorizationScope scope) {
         when(authorizationSnapshotProvider.load(CURRENT_USER)).thenReturn(AuthorizationSnapshot.of(List.of(
                 new AuthorizationAssignment(UUID.randomUUID(), "ROLE_TEST", 1,

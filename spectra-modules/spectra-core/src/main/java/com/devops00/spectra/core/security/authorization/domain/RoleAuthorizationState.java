@@ -19,8 +19,11 @@ package com.devops00.spectra.core.security.authorization.domain;
 import java.util.Set;
 
 /**
- * Role 在影响分析中的不可变授权状态。
+ * 承载角色授权状态相关的不可变数据。
  *
+ * @param authorityLevel       角色当前的权限等级
+ * @param permissions          角色拥有的权限集合
+ * @param grantablePermissions 角色可授予的权限集合
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/14

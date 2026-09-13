@@ -64,6 +64,9 @@ class ScopeContainsTest {
         assertFalse(ScopeContains.contains(AuthorizationScope.of(ScopeMode.SELF), rules(ROOT, false)));
     }
 
+    /**
+     * 处理范围是否包含相关数据。
+     */
     private static AuthorizationScope rules(UUID departmentId, boolean includeDescendants) {
         return new AuthorizationScope(ScopeMode.RULES, Set.of(departmentId), includeDescendants);
     }

@@ -19,7 +19,13 @@ package com.devops00.spectra.core.system.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** 服务监控快照采集和告警评估用例。 */
+/**
+ * 服务监控快照采集和告警评估用例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class ServiceMonitorEvaluationService {

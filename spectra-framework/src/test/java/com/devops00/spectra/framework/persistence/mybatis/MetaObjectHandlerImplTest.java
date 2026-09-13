@@ -61,6 +61,9 @@ class MetaObjectHandlerImplTest {
         assertEquals(existingId, entity.getId());
     }
 
+    /**
+     * 判断安全上下文。
+     */
     private static SecurityContextAccessor emptySecurityContext() {
         return new SecurityContextAccessor() {
             @Override

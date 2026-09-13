@@ -29,7 +29,9 @@ import java.util.List;
  * 消费声明使用独立 String Key，避免直接修改 Refresh Hash 时受 HashValueSerializer 影响。</p>
  *
  * @author yangxj96
+ * @version 1.0
  * @since 2026-08-14
+ *
  */
 public final class RefreshTokenRotationStore {
 
@@ -60,6 +62,10 @@ public final class RefreshTokenRotationStore {
 
     /**
      * Refresh Token 消费结果。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public enum ClaimResult {
         /** 首次消费成功。 */

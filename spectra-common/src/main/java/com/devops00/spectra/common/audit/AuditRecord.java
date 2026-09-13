@@ -113,10 +113,7 @@ public record AuditRecord(UUID eventId,
     }
 
     /**
-     * 以新的结果创建同一审计事实的不可变副本。
-     *
-     * @param nextResult 新结果
-     * @return 保留其余字段的审计记录副本
+     * 处理结果相关数据。
      */
     public AuditRecord withResult(Result nextResult) {
         return new AuditRecord(null, category, eventType, targetId, nextResult, occurredAt, context,
@@ -125,6 +122,10 @@ public record AuditRecord(UUID eventId,
 
     /**
      * 审计事件结果。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public enum Result {
 
@@ -148,6 +149,9 @@ public record AuditRecord(UUID eventId,
      * @param url        请求路径
      * @param status     HTTP 状态码
      * @param durationMs 调用耗时
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public record HttpSummary(String method, String url, Integer status, Long durationMs) {
 
@@ -162,6 +166,9 @@ public record AuditRecord(UUID eventId,
             return new HttpSummary(null, null, null, null);
         }
 
+        /**
+         * 规范化HTTP。
+         */
         private static String normalize(String value) {
             if (value == null) {
                 return null;
@@ -170,6 +177,9 @@ public record AuditRecord(UUID eventId,
             return normalized.isEmpty() ? null : normalized;
         }
 
+        /**
+         * 处理路径相关数据。
+         */
         private static String pathOnly(String value) {
             String normalized = normalize(value);
             if (normalized == null) {
@@ -194,6 +204,9 @@ public record AuditRecord(UUID eventId,
      * @param code   稳定错误码
      * @param type   异常简单类型
      * @param reason 脱敏后的失败说明
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public record Failure(String code, String type, String reason) {
 
@@ -205,6 +218,9 @@ public record AuditRecord(UUID eventId,
             reason = limit(normalize(reason), REASON_MAX_LENGTH);
         }
 
+        /**
+         * 规范化失败。
+         */
         private static String normalize(String value) {
             if (value == null) {
                 return null;
@@ -213,6 +229,9 @@ public record AuditRecord(UUID eventId,
             return normalized.isEmpty() ? null : normalized;
         }
 
+        /**
+         * 处理上限相关数据。
+         */
         private static String limit(String value, int maxLength) {
             return value == null || value.length() <= maxLength ? value : value.substring(0, maxLength);
         }

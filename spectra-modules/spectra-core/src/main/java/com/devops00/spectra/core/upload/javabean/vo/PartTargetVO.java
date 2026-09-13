@@ -21,7 +21,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/** 分片上传目标响应。 */
+/**
+ * 分片上传目标响应。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class PartTargetVO {
 

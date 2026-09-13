@@ -20,7 +20,24 @@ import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 
 import java.time.LocalDateTime;
 
-/** Quartz Trigger 的安全展示对象，不暴露 JobDataMap。 */
+/**
+ * 封装Quartz触发器相关的响应数据。
+ *
+ * @param triggerKey         触发器键
+ * @param triggerType        触发器类型
+ * @param state              当前对象所处的业务状态
+ * @param cronExpression     Cron 表达式
+ * @param intervalMs         固定间隔触发器的间隔时长（毫秒）
+ * @param oneShot            是否仅触发一次
+ * @param timeZone           使用的时区
+ * @param misfireInstruction 错过触发
+ * @param startAt            触发器开始生效的时间
+ * @param previousFireAt     上一次实际触发时间
+ * @param nextFireAt         下一次计划触发时间
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record QuartzTriggerVO(String triggerKey, QuartzTriggerTemplate.TriggerType triggerType,
                               String state, String cronExpression, Long intervalMs, boolean oneShot,
                               String timeZone, QuartzTriggerTemplate.MisfirePolicy misfireInstruction,

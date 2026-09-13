@@ -49,6 +49,10 @@ import java.util.stream.Collectors;
 
 /**
  * 腾讯云短信 Provider；使用官方 TC3-HMAC-SHA256 签名调用 SendSms。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 @RequiredArgsConstructor

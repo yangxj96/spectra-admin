@@ -1,10 +1,36 @@
-/* Copyright 2018-2026 yangxj96 */
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.devops00.spectra.core.system.javabean.vo;
 
 import java.util.UUID;
 
-/** 验证码目标候选；target 仅用于受控提交，页面展示使用脱敏值。 */
+/**
+ * 封装安全候选项相关的响应数据。
+ *
+ * @param target       操作作用的目标对象
+ * @param maskedTarget 脱敏后的手机号或验证目标
+ * @param userId       用户标识
+ * @param username     用户登录名
+ * @param realName     用户真实姓名
+ * @param employeeNo   员工编号
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record SecurityVerificationCandidateVO(String target, String maskedTarget, UUID userId, String username,
                                               String realName, String employeeNo) {
 }

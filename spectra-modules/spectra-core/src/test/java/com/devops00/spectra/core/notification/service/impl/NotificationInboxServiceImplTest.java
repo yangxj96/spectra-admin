@@ -144,18 +144,27 @@ class NotificationInboxServiceImplTest {
         assertTrue(batchUpdate.getParamNameValuePairs().containsValue(otherMessageId));
     }
 
+    /**
+     * 处理查询相关数据。
+     */
     private LambdaQueryWrapper<NotificationInboxEntity> captureQuery() {
         var captor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(mapper, org.mockito.Mockito.atLeastOnce()).selectOne(captor.capture());
         return captor.getValue();
     }
 
+    /**
+     * 处理更新相关数据。
+     */
     private LambdaUpdateWrapper<NotificationInboxEntity> captureUpdate() {
         var captor = ArgumentCaptor.forClass(LambdaUpdateWrapper.class);
         verify(mapper, org.mockito.Mockito.atLeastOnce()).update(isNull(), captor.capture());
         return captor.getValue();
     }
 
+    /**
+     * 处理通知相关数据。
+     */
     private void assertScoped(com.baomidou.mybatisplus.core.conditions.AbstractWrapper<?, ?, ?> wrapper) {
         assertTrue(wrapper.getSqlSegment().contains("receiver_user_id"),
                 () -> wrapper.getSqlSegment() + " / " + wrapper.getParamNameValuePairs());

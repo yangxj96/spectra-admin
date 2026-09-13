@@ -28,7 +28,13 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 
-/** Quartz JDBC Cluster 状态和数据库就绪状态健康检查。 */
+/**
+ * Quartz JDBC Cluster 状态和数据库就绪状态健康检查。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component("quartzScheduler")
 @RequiredArgsConstructor
 public class QuartzSchedulerHealthIndicator implements DependencyHealthContributor {

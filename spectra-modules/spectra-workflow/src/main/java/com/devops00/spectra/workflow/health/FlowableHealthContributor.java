@@ -26,7 +26,13 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 
-/** Workflow 模块的 Flowable 引擎健康检查。 */
+/**
+ * Workflow 模块的 Flowable 引擎健康检查。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component("flowableHealthContributor")
 @ConditionalOnProperty(prefix = "spectra.modules.workflow", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class FlowableHealthContributor implements DependencyHealthContributor {
@@ -70,6 +76,9 @@ public class FlowableHealthContributor implements DependencyHealthContributor {
         }
     }
 
+    /**
+     * 处理结果相关数据。
+     */
     private DependencyHealthResult result(DependencyHealthStatus status, long start, String errorCode,
                                           String safeSummary) {
         return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,

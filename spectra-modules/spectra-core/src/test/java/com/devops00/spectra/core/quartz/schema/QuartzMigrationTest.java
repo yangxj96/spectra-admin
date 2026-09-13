@@ -34,7 +34,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 使用隔离 PostgreSQL 验证完整 Flyway 链最终 schema。 */
+/**
+ * 使用隔离 PostgreSQL 验证完整 Flyway 链最终 schema。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Testcontainers
 @Tag("manual-integration")
 @EnabledIfEnvironmentVariable(named = "SPECTRA_QUARTZ_FLYWAY_POSTGRES_TEST", matches = "true")
@@ -96,6 +102,9 @@ class QuartzMigrationTest {
         }
     }
 
+    /**
+     * 处理Quartz相关数据。
+     */
     private void assertHistoryColumnsFollowDatabaseStandard(Connection connection) throws SQLException {
         var expectedColumns = List.of("id", "fire_instance_id", "job_key", "trigger_key", "job_type",
                 "job_class_name", "trigger_type", "status", "scheduled_fire_at", "actual_fire_at", "started_at",
@@ -130,6 +139,9 @@ class QuartzMigrationTest {
         assertColumn(metadata, "version", "bigint", null, "NO", "0");
     }
 
+    /**
+     * 处理Quartz相关数据。
+     */
     private void assertColumn(Map<String, ColumnMetadata> metadata, String name, String type, Integer precision,
                               String nullable, String defaultFragment) {
         var actual = metadata.get(name);
@@ -144,9 +156,23 @@ class QuartzMigrationTest {
         }
     }
 
+    /**
+     * 为 {@code QuartzMigrationTest} 测试提供 {@code ColumnMetadata} 测试类型。
+     *
+     * @param dataType          数据库列声明的数据类型
+     * @param datetimePrecision 日期时间字段允许的小数秒精度
+     * @param nullable          字段是否允许为空值
+     * @param defaultValue      数据库列定义的默认值
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record ColumnMetadata(String dataType, Integer datetimePrecision, String nullable, String defaultValue) {
     }
 
+    /**
+     * 处理Quartz相关数据。
+     */
     private boolean schemaExists(Connection connection, String schema) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = ?)")) {
@@ -158,6 +184,9 @@ class QuartzMigrationTest {
         }
     }
 
+    /**
+     * 处理Quartz相关数据。
+     */
     private boolean tableExists(Connection connection, String schema, String table) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
@@ -171,6 +200,9 @@ class QuartzMigrationTest {
         }
     }
 
+    /**
+     * 处理索引相关数据。
+     */
     private boolean indexExists(Connection connection, String index) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM pg_class index_row "

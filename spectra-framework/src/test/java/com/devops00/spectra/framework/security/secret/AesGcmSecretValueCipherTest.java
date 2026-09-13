@@ -25,7 +25,13 @@ import java.util.Base64;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** 根密钥保护密钥值的 AES-GCM 契约测试。 */
+/**
+ * 根密钥保护密钥值的 AES-GCM 契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class AesGcmSecretValueCipherTest {
 
     private static final String ROOT_KEY = Base64.getEncoder()
@@ -66,6 +72,9 @@ class AesGcmSecretValueCipherTest {
         assertThrows(EncryptException.class, () -> new AesGcmSecretValueCipher(invalid).encrypt("secret.code", "value"));
     }
 
+    /**
+     * 处理密钥值相关数据。
+     */
     private static SecretMasterKeyProperties properties() {
         return new SecretMasterKeyProperties(ROOT_KEY);
     }

@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.framework.persistence.scope.authorization;
@@ -32,6 +42,10 @@ import java.util.stream.Collectors;
  *
  * <p>该类不接受客户端传入的 scope，也不读取 SecurityUser 中的旧全局 scope 快照。
  * 缺少 Permission、Boundary 或资源列时一律生成 {@code 1 = 0} 或抛出登记错误。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class ScopeSqlPolicy {
 

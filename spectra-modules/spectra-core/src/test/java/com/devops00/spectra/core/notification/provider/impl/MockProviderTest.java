@@ -36,6 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 内置 SMS/EMAIL Mock Provider 测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class MockProviderTest {
 

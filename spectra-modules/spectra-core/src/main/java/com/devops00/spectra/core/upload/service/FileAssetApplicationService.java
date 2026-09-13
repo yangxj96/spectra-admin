@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,6 +47,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.UUID;
 
+/**
+ * 定义文件资产申请相关的应用服务契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class FileAssetApplicationService implements FileAssetPort {
@@ -88,6 +106,9 @@ public class FileAssetApplicationService implements FileAssetPort {
         return openObject(asset, context.rangeStart(), context.rangeEnd());
     }
 
+    /**
+     * 打开文件资产申请。
+     */
     private FileDownload openObject(FileAsset asset, Long rangeStart, Long rangeEnd) {
         FileStorageProvider provider = providerRegistry.require(asset.getStorageProvider());
         StorageObject object = provider.open(asset.getStorageContainer(), asset.getStorageKey(), rangeStart, rangeEnd);
@@ -128,6 +149,9 @@ public class FileAssetApplicationService implements FileAssetPort {
         assetMapper.markDeleted(fileAssetId);
     }
 
+    /**
+     * 校验资产。
+     */
     private FileAsset requireAsset(UUID id) {
         FileAsset asset = assetMapper.selectById(id);
         if (asset == null || asset.getStatus() != FileAssetStatus.READY || asset.getDeleted() != null) {
@@ -136,6 +160,9 @@ public class FileAssetApplicationService implements FileAssetPort {
         return asset;
     }
 
+    /**
+     * 处理文件资产申请相关数据。
+     */
     private void authorize(FileAsset asset, FileAccessContext context) {
         if (context == null || context.userId() == null) {
             throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, "file access context is required");
@@ -161,6 +188,9 @@ public class FileAssetApplicationService implements FileAssetPort {
         throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, "business reference is required");
     }
 
+    /**
+     * 判断文件资产申请。
+     */
     private boolean isAdmin(FileAccessContext context) {
         UUID currentUserId = securityContextAccessor.currentUserId();
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -173,6 +203,9 @@ public class FileAssetApplicationService implements FileAssetPort {
         return currentUserId != null && context != null && currentUserId.equals(context.userId()) && admin;
     }
 
+    /**
+     * 处理快照相关数据。
+     */
     private FileAssetSnapshot snapshot(FileAsset asset) {
         var type = typeMapper.findByIdIncludingDisabled(asset.getFileTypeId());
         return new FileAssetSnapshot(asset.getId(), asset.getOriginalName(), asset.getSize(), asset.getContentType(),

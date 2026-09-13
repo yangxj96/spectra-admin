@@ -20,6 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * 定义角色分配相关的数据库访问操作。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface RoleAssignmentMapper extends BaseMapper<RoleAssignment> {
 }

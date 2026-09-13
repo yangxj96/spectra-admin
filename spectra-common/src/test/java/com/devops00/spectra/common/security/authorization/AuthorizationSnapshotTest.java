@@ -27,6 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * 验证 {@code AuthorizationSnapshotTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class AuthorizationSnapshotTest {
 
     private static final UUID JAVA = UUID.fromString("00000000-0000-0000-0000-000000000001");
@@ -107,18 +114,30 @@ class AuthorizationSnapshotTest {
         assertFalse(snapshot.canAccess("salary:read", new ScopeQuery(OTHER_USER, OWNER, FRONTEND, Set.of(FRONTEND, JAVA))));
     }
 
+    /**
+     * 处理边界相关数据。
+     */
     private static PermissionBoundary boundary(String permission, AuthorizationScope scope) {
         return new PermissionBoundary(permission, scope);
     }
 
+    /**
+     * 处理授权快照相关数据。
+     */
     private static AuthorizationScope rules(UUID departmentId, boolean includeDescendants) {
         return new AuthorizationScope(ScopeMode.RULES, Set.of(departmentId), includeDescendants);
     }
 
+    /**
+     * 处理授权快照相关数据。
+     */
     private static AuthorizationScope self() {
         return new AuthorizationScope(ScopeMode.SELF, Set.of(), false);
     }
 
+    /**
+     * 查询授权快照。
+     */
     private static ScopeQuery query(UUID subjectId, UUID ownerId, UUID departmentId) {
         return new ScopeQuery(subjectId, ownerId, departmentId, Set.of(departmentId));
     }

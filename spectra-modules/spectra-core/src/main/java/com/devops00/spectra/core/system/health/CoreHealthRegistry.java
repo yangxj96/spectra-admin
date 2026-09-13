@@ -29,6 +29,10 @@ import java.util.Map;
  *
  * <p>注册表只收集 Spring 已装配的 contributor，不创建可选模块的伪实现；名称、模块、依赖类型和超时预算
  * 在启动阶段完成校验，避免同名 contributor 被后装配的 Bean 静默覆盖。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public final class CoreHealthRegistry {
@@ -86,6 +90,9 @@ public final class CoreHealthRegistry {
         return value;
     }
 
+    /**
+     * 校验健康状态。
+     */
     private static String requireText(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalStateException("健康 contributor " + field + " 不能为空");
@@ -93,7 +100,17 @@ public final class CoreHealthRegistry {
         return value.trim();
     }
 
-    /** 已注册 contributor 的只读归属元数据。 */
+    /**
+     * 承载元数据相关的不可变数据。
+     *
+     * @param contributorName 健康检查贡献器名称
+     * @param moduleName      健康检查项所属模块名称
+     * @param dependencyType  依赖服务的类型
+     * @param timeout         等待操作完成的超时时长
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record ContributorMetadata(String contributorName, String moduleName,
                                       String dependencyType, Duration timeout) {
     }

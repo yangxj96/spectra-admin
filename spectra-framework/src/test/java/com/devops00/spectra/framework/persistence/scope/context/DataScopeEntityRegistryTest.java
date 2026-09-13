@@ -23,7 +23,13 @@ import java.lang.reflect.InvocationTargetException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** 数据权限实体扫描失败必须显式阻断启动的回归测试。 */
+/**
+ * 数据权限实体扫描失败必须显式阻断启动的回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DataScopeEntityRegistryTest {
 
     @Test

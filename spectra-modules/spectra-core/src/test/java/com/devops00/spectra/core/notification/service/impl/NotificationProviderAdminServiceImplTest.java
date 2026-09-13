@@ -48,6 +48,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Provider 配置服务测试；验证全局配置、Secret 密文和状态 fail-closed 规则。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationProviderAdminServiceImplTest {
 

@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.security.secret.javabean.enums;
 
-/** 密钥版本生命周期状态。 */
+/**
+ * 密钥版本生命周期状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum SecretVersionState {
 
     /** 已创建但尚未启用。 */

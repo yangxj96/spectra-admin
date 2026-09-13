@@ -25,7 +25,13 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** PostgreSQL 会话策略读取适配器。 */
+/**
+ * PostgreSQL 会话策略读取适配器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Repository
 @RequiredArgsConstructor
 public class JdbcSecuritySessionPolicyProvider implements SecuritySessionPolicyProvider {

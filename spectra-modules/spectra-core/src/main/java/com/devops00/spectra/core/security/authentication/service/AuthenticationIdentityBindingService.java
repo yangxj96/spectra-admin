@@ -21,7 +21,13 @@ import com.devops00.spectra.core.security.authentication.javabean.entity.Authent
 import java.util.List;
 import java.util.UUID;
 
-/** 当前用户认证身份绑定用例。 */
+/**
+ * 当前用户认证身份绑定用例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface AuthenticationIdentityBindingService {
 
     /**

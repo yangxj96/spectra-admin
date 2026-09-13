@@ -36,7 +36,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 部门统计统一报表查询行为测试。 */
+/**
+ * 部门统计统一报表查询行为测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DepartmentStatsServiceTest {
 
     @Test
@@ -85,16 +91,25 @@ class DepartmentStatsServiceTest {
                 && ids.containsAll(List.of(engineeringId, financeId, emptyId))));
     }
 
+    /**
+     * 处理部门相关数据。
+     */
     private static DirectoryDepartmentSnapshot department(UUID id, String name, String path) {
         return new DirectoryDepartmentSnapshot(id, null, name, path);
     }
 
+    /**
+     * 处理部门相关数据。
+     */
     private static DepartmentStatsVO vo(UUID departmentId) {
         var vo = new DepartmentStatsVO();
         vo.setDepartmentId(departmentId);
         return vo;
     }
 
+    /**
+     * 处理行数据相关数据。
+     */
     private static DepartmentStatsRow fullRow(UUID departmentId) {
         var row = new DepartmentStatsRow();
         row.setDepartmentId(departmentId);
@@ -111,6 +126,9 @@ class DepartmentStatsServiceTest {
         return row;
     }
 
+    /**
+     * 处理行数据相关数据。
+     */
     private static DepartmentStatsRow zeroRow(UUID departmentId) {
         var row = new DepartmentStatsRow();
         row.setDepartmentId(departmentId);

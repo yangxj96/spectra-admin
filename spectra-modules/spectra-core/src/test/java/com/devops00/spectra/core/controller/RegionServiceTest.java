@@ -197,6 +197,9 @@ public class RegionServiceTest {
         }
     }
 
+    /**
+     * 查询父级。
+     */
     private Map<String, Region> loadParentMap(RegionLevel parentLevel) {
         if (parentLevel == null) {
             return Map.of();
@@ -214,6 +217,9 @@ public class RegionServiceTest {
         return parentMap;
     }
 
+    /**
+     * 转换区域。
+     */
     private Region toRegion(
                             JsonNode node,
                             String resourceName,
@@ -249,6 +255,9 @@ public class RegionServiceTest {
         return region;
     }
 
+    /**
+     * 处理必需相关数据。
+     */
     private String requiredText(JsonNode node, String fieldName, String resourceName, int recordNumber) {
         JsonNode field = node.get(fieldName);
         if (field == null || !field.isString() || field.stringValue().isBlank()) {
@@ -257,6 +266,9 @@ public class RegionServiceTest {
         return field.stringValue();
     }
 
+    /**
+     * 保存批次。
+     */
     private void saveBatch(List<Region> batch, String resourceName, int firstRecord, int lastRecord) {
         if (batch.isEmpty()) {
             return;
@@ -268,6 +280,9 @@ public class RegionServiceTest {
         batch.clear();
     }
 
+    /**
+     * 处理区域相关数据。
+     */
     private ClassPathResource resource(String resourceName) {
         ClassPathResource resource = new ClassPathResource(resourceName);
         if (!resource.exists()) {
@@ -276,18 +291,27 @@ public class RegionServiceTest {
         return resource;
     }
 
+    /**
+     * 校验起始。
+     */
     private void requireArrayStart(JsonParser parser, String resourceName) throws IOException {
         if (parser.nextToken() != JsonToken.START_ARRAY) {
             throw new IllegalStateException("区域资源 " + resourceName + " 的根节点必须是 JSON 数组");
         }
     }
 
+    /**
+     * 校验结束文档。
+     */
     private void requireEndOfDocument(JsonParser parser, String resourceName) throws IOException {
         if (parser.nextToken() != null) {
             throw new IllegalStateException("区域资源 " + resourceName + " 的 JSON 数组后存在额外内容");
         }
     }
 
+    /**
+     * 处理区域相关数据。
+     */
     private IllegalStateException invalidResource(String resourceName, int recordNumber, String reason) {
         return new IllegalStateException("区域资源 " + resourceName + " 第 " + recordNumber + " 条记录无效：" + reason);
     }

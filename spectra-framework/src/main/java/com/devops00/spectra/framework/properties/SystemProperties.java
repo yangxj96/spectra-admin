@@ -65,6 +65,10 @@ public class SystemProperties {
 
     /**
      * MVC 相关运行参数。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     public static class SpectraMvc {
@@ -82,6 +86,10 @@ public class SystemProperties {
 
     /**
      * CORS 相关运行参数。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     public static class SpectraCors {

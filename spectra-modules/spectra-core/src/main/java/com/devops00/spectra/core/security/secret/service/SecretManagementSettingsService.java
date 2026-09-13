@@ -27,7 +27,16 @@ import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
  */
 public interface SecretManagementSettingsService {
 
-    /** 接口加解密运行态。 */
+    /**
+     * 定义配置项相关的应用服务契约。
+     *
+     * @param enabled 启用状态
+     * @param ready   就绪状态
+     * @param state   当前对象所处的业务状态
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record CryptoSettings(boolean enabled, boolean ready, CryptoKeyManager.State state) {
     }
 

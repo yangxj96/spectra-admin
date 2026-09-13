@@ -28,6 +28,10 @@ import java.time.Instant;
 
 /**
  * 清理已进入终态或已过期记录中的敏感渲染载荷。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @RequiredArgsConstructor
@@ -53,10 +57,7 @@ public class NotificationCleanupService {
     }
 
     /**
-     * 定时执行清理；关闭时保持完全无副作用。
-     */
-    /**
-     * 批量清理请求和任务的敏感密文，并返回匿名计数。
+     * 批量清理过期请求和任务中的敏感密文，并返回清理数量；功能关闭时不执行清理。
      */
     @Transactional
     public NotificationCleanupResult cleanupSensitivePayloads() {
@@ -74,7 +75,13 @@ public class NotificationCleanupService {
     }
 
     /**
-     * 清理结果；不包含任何业务 ID、正文或地址。
+     * 定义通知清理结果相关的应用服务契约。
+     *
+     * @param requestCount 待清理的请求数量
+     * @param taskCount    待处理的任务数量
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public record NotificationCleanupResult(int requestCount, int taskCount) {
     }

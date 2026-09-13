@@ -428,7 +428,15 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     }
 
     /**
-     * 解析后的请假时段和值班时长。
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param leaveTypeCode 类型编码
+     * @param startTime     起始时间
+     * @param endTime       结束时间
+     * @param durationHours 请假时长（小时）
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     private record ParsedLeave(String leaveTypeCode, Instant startTime, Instant endTime, BigDecimal durationHours) {
     }

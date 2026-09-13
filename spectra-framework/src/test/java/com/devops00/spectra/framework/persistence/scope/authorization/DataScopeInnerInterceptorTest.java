@@ -24,7 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 数据权限拦截器生产构造路径回归测试。 */
+/**
+ * 数据权限拦截器生产构造路径回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DataScopeInnerInterceptorTest {
 
     @Test

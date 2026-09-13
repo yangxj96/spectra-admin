@@ -30,6 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * 通知地址和敏感参数不能以明文落库的测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationPayloadProtectorTest {
 

@@ -43,7 +43,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/** 基于密钥定义和版本表的统一密钥服务。 */
+/**
+ * 基于密钥定义和版本表的统一密钥服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 public class SecretManagementServiceImpl implements SecretManagementService, SecretRuntimeService {
 
@@ -214,6 +220,9 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
         }
     }
 
+    /**
+     * 校验密钥。
+     */
     private SecretDefinitionEntity requireDefinition(String code) {
         if (!StringUtils.hasText(code)) {
             throw new DataSaveException("密钥编码不能为空");
@@ -227,6 +236,9 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
         return definition;
     }
 
+    /**
+     * 校验版本。
+     */
     private SecretVersionEntity requireVersion(UUID versionId) {
         if (versionId == null) {
             throw new DataSaveException("密钥版本ID不能为空");
@@ -238,6 +250,9 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
         return version;
     }
 
+    /**
+     * 校验密钥。
+     */
     private void requireDefinitionMatches(String code, UUID definitionId) {
         SecretDefinitionEntity definition = requireDefinition(code);
         if (!definition.getId().equals(definitionId)) {
@@ -245,10 +260,16 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
         }
     }
 
+    /**
+     * 处理密钥相关数据。
+     */
     private SecuritySecretUnavailableException unavailable(String code, Throwable cause) {
         return new SecuritySecretUnavailableException("密钥运行态不可用: " + code, cause);
     }
 
+    /**
+     * 处理密钥相关数据。
+     */
     private static String fingerprint(String plaintext) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256")

@@ -41,7 +41,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** 响应加密安全边界回归测试。 */
+/**
+ * 响应加密安全边界回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class ResponseEncryptAdviceTest {
 
     @Test
@@ -79,11 +85,21 @@ class ResponseEncryptAdviceTest {
                         StringHttpMessageConverter.class, mock(ServerHttpRequest.class), mock(ServerHttpResponse.class)));
     }
 
+    /**
+     * 处理参数相关数据。
+     */
     private static MethodParameter parameter(String name) throws NoSuchMethodException {
         Method method = Endpoint.class.getDeclaredMethod(name);
         return new MethodParameter(method, -1);
     }
 
+    /**
+     * 为 {@code ResponseEncryptAdviceTest} 测试提供 {@code Endpoint} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class Endpoint {
 
         @Encrypt(response = true)
@@ -104,6 +120,13 @@ class ResponseEncryptAdviceTest {
         }
     }
 
+    /**
+     * 为 {@code ResponseEncryptAdviceTest} 测试提供 {@code Payload} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class Payload {
         @SuppressWarnings("unused")
         private String name = "spectra";

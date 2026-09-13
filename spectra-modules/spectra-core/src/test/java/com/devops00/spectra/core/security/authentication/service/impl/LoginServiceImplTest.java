@@ -41,6 +41,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code LoginServiceImplTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class LoginServiceImplTest {
 
     @AfterEach
@@ -107,6 +114,9 @@ class LoginServiceImplTest {
         verify(authenticationPort).recordLoginFail(user.getUsername());
     }
 
+    /**
+     * 处理相关数据相关数据。
+     */
     private LoginServiceImpl service(LoginDispatcher dispatcher, SecurityAuthenticationPort authenticationPort) {
         ObjectProvider<AuditService> auditProvider = mock(ObjectProvider.class);
         when(auditProvider.getIfAvailable()).thenReturn(null);
@@ -114,6 +124,9 @@ class LoginServiceImplTest {
                 mock(AuditRecordFactory.class));
     }
 
+    /**
+     * 处理用户相关数据。
+     */
     private static SecurityUser user(UUID id, String username, String role) {
         SecurityUser user = new SecurityUser();
         user.setId(id);
@@ -122,6 +135,9 @@ class LoginServiceImplTest {
         return user;
     }
 
+    /**
+     * 处理密码相关数据。
+     */
     private static LoginFrom passwordLogin(String username) {
         LoginFrom login = new LoginFrom();
         login.setType(LoginType.PASSWORD);

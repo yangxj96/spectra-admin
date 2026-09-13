@@ -45,6 +45,13 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code AuthorizationAssignmentQueryServiceImplTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class AuthorizationAssignmentQueryServiceImplTest {
 
     private final RoleAssignmentMapper roleAssignmentMapper = mock(RoleAssignmentMapper.class);
@@ -138,6 +145,9 @@ class AuthorizationAssignmentQueryServiceImplTest {
         assertThat(service().findByUserId(userId)).isEmpty();
     }
 
+    /**
+     * 处理授权分配查询相关数据。
+     */
     private AuthorizationAssignmentQueryServiceImpl service() {
         return new AuthorizationAssignmentQueryServiceImpl(
                 roleAssignmentMapper,
@@ -151,12 +161,18 @@ class AuthorizationAssignmentQueryServiceImplTest {
                 timeMapper());
     }
 
+    /**
+     * 处理时间相关数据。
+     */
     private TimeMapper timeMapper() {
         var accessor = mock(SecurityContextAccessor.class);
         when(accessor.currentUserZoneId()).thenReturn("UTC");
         return new TimeMapper(accessor);
     }
 
+    /**
+     * 处理权限相关数据。
+     */
     private static Permission permission(UUID id, String code) {
         var value = new Permission();
         value.setId(id);
@@ -165,6 +181,9 @@ class AuthorizationAssignmentQueryServiceImplTest {
         return value;
     }
 
+    /**
+     * 处理边界相关数据。
+     */
     private static AssignmentPermissionBoundary boundary(UUID assignmentId, UUID permissionId, UUID scopeId) {
         var value = new AssignmentPermissionBoundary();
         value.setAssignmentId(assignmentId);
@@ -173,6 +192,9 @@ class AuthorizationAssignmentQueryServiceImplTest {
         return value;
     }
 
+    /**
+     * 处理边界相关数据。
+     */
     private static AssignmentGrantBoundary grantBoundary(UUID assignmentId, UUID permissionId, UUID scopeId) {
         var value = new AssignmentGrantBoundary();
         value.setAssignmentId(assignmentId);
@@ -181,6 +203,9 @@ class AuthorizationAssignmentQueryServiceImplTest {
         return value;
     }
 
+    /**
+     * 处理范围相关数据。
+     */
     private static AuthorizationScope scope(
                                             UUID id, String mode, String resourceCode) {
         var value = new AuthorizationScope();

@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.common.port.security;
 
-/** Web 加密请求 replay nonce 的安全管理端口。 */
+/**
+ * Web 加密请求 replay nonce 的安全管理端口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface SecurityReplayNonceAdminPort {
 
     /** 返回 nonce 防重放运行态摘要，不返回 nonce、Redis Key 或安全值。 */
@@ -36,11 +42,29 @@ public interface SecurityReplayNonceAdminPort {
     /** 判断请求时间戳是否位于当前全局失效 cutoff 及之前。 */
     boolean isBeforeOrAtCutoff(long timestamp);
 
-    /** nonce 防重放运行态摘要。 */
+    /**
+     * 定义相关数据相关的跨模块调用契约。
+     *
+     * @param status            业务状态
+     * @param cutoffEpochSecond 清理数据使用的截止 Unix 秒数
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record Summary(String status, Long cutoffEpochSecond) {
     }
 
-    /** nonce 管理操作结果。 */
+    /**
+     * 定义结果相关的跨模块调用契约。
+     *
+     * @param operationType     操作类型
+     * @param affectedCount     本次操作影响的对象数量
+     * @param cutoffEpochSecond 清理数据使用的截止 Unix 秒数
+     * @param status            业务状态
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record Result(String operationType, long affectedCount, Long cutoffEpochSecond, String status) {
     }
 }

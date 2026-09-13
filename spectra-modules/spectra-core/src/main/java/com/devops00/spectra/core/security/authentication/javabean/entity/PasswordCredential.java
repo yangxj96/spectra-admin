@@ -29,6 +29,10 @@ import java.util.UUID;
 
 /**
  * 密码凭证。密码明文永远不进入实体或审计快照。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
  */
 @Data
 @NoArgsConstructor
@@ -37,27 +41,51 @@ import java.util.UUID;
 @TableName(value = "sec_password_credential", schema = "spectra_security")
 public class PasswordCredential extends BaseEntity {
 
+    /**
+     * 该密码凭证所属的用户 ID。
+     */
     @TableField(value = "user_id")
     private UUID userId;
 
+    /**
+     * 用户密码的单向哈希值，不保存密码明文。
+     */
     @TableField(value = "password_hash")
     private String passwordHash;
 
+    /**
+     * 密码最近一次设置或修改的时间。
+     */
     @TableField(value = "changed_at")
     private Instant changedAt;
 
+    /**
+     * 当前密码凭证失效的时间；为空时不设置到期时间。
+     */
     @TableField(value = "expires_at")
     private Instant expiresAt;
 
+    /**
+     * 是否要求用户在下次登录时修改密码。
+     */
     @TableField(value = "must_change")
     private Boolean mustChange;
 
+    /**
+     * 当前连续密码验证失败次数。
+     */
     @TableField(value = "failed_attempts")
     private Integer failedAttempts;
 
+    /**
+     * 密码凭证锁定状态的截止时间；为空时未锁定。
+     */
     @TableField(value = "locked_until")
     private Instant lockedUntil;
 
+    /**
+     * 密码凭证的乐观锁版本号。
+     */
     @TableField(value = "version")
     private Long version;
 }

@@ -21,6 +21,10 @@ import java.util.UUID;
 
 /**
  * 受控发送受众解析端口；具体用户、组织和角色模型留在 Core 模块。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public interface NotificationAudienceDirectory {
 

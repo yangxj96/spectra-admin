@@ -233,17 +233,15 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     }
 
     /**
-     * 预编译后的权限表达式结构
-     * <p>
-     * 若为 segmentBased=true，则使用分段匹配（最快）
-     * <p>
-     * 若为 segmentBased=false，则 fallback 使用 regex
+     * 承载权限相关的不可变数据。
      *
-     * @param segmentBased
+     * @param segmentBased  权限路径是否按完整片段匹配
      * @param segments      仅在 segmentBased=true 时不为空
      * @param hasDoubleStar 是否包含 "**" 通配
-     * @param regex         仅在 segmentBased=false 时不为空
-     *                      编译后的权限匹配模式。
+     * @param regex         仅在 segmentBased=false 时不为空 编译后的权限匹配模式。
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     private record CompiledPermissionPattern(boolean segmentBased, String[] segments, boolean hasDoubleStar, Pattern regex) {
     }

@@ -30,6 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * 验证 {@code FileReferencePermissionResolverTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class FileReferencePermissionResolverTest {
 
     private static final String REFERENCE_TYPE = "OA_DOCUMENT_VERSION";
@@ -118,6 +125,13 @@ class FileReferencePermissionResolverTest {
         assertEquals(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED, exception.getErrorCode());
     }
 
+    /**
+     * 为 {@code FileReferencePermissionResolverTest} 测试提供 {@code RecordingChecker} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class RecordingChecker implements FileReferencePermissionChecker {
 
         private final boolean supported;

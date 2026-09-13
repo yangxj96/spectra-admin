@@ -24,7 +24,13 @@ import com.devops00.spectra.core.security.policy.javabean.vo.SecuritySessionPoli
 import java.util.List;
 import java.util.UUID;
 
-/** 安全策略查询与受审计修改服务。 */
+/**
+ * 安全策略查询与受审计修改服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface SecurityPolicyService {
 
     /**

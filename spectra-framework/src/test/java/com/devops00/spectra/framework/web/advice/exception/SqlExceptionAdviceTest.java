@@ -24,7 +24,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** 安全 Redis 故障必须映射为 503 的测试。 */
+/**
+ * 安全 Redis 故障必须映射为 503 的测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SqlExceptionAdviceTest {
 
     @Test

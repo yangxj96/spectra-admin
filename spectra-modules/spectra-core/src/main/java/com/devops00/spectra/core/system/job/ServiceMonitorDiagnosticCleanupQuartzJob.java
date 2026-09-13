@@ -24,7 +24,13 @@ import org.quartz.JobExecutionContext;
 
 import java.util.Map;
 
-/** 由 Quartz 集群调度服务监控诊断文件清理。 */
+/**
+ * 由 Quartz 集群调度服务监控诊断文件清理。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @DisallowConcurrentExecution
 public class ServiceMonitorDiagnosticCleanupQuartzJob implements Job {
 

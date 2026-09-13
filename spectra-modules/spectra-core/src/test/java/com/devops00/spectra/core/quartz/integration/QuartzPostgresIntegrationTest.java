@@ -27,7 +27,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 在真实 PostgreSQL 上验证 Quartz JDBC Cluster 的最终迁移和 JobStore 配置。 */
+/**
+ * 在真实 PostgreSQL 上验证 Quartz JDBC Cluster 的最终迁移和 JobStore 配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Testcontainers
 @Tag("manual-integration")
 @EnabledIfEnvironmentVariable(named = "SPECTRA_QUARTZ_FLYWAY_POSTGRES_TEST", matches = "true")

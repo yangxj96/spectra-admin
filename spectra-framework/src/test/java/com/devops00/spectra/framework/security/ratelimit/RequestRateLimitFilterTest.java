@@ -41,6 +41,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 请求级限流过滤器行为测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class RequestRateLimitFilterTest {
 
@@ -185,18 +189,30 @@ class RequestRateLimitFilterTest {
         verify(chain).doFilter(request, response);
     }
 
+    /**
+     * 处理过滤条件相关数据。
+     */
     private RequestRateLimitFilter filter(RedisRateLimiter limiter) {
         return filter(limiter, new SimpleMeterRegistry());
     }
 
+    /**
+     * 处理过滤条件相关数据。
+     */
     private RequestRateLimitFilter filter(RedisRateLimiter limiter, SimpleMeterRegistry meterRegistry) {
         return new RequestRateLimitFilter(limiter, contextAccessor, new ObjectMapper(), meterRegistry);
     }
 
+    /**
+     * 处理请求上限过滤条件相关数据。
+     */
     private RedisRateLimiter limiterReturning(long count, long ttlMillis) {
         return new RedisRateLimiter((key, ignoredTtlMillis) -> new RedisRateLimiter.IncrementResult(count, ttlMillis), fixedClock());
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private static MockHttpServletRequest request(String method, String uri, String remoteAddr) {
         var request = new MockHttpServletRequest(method, uri);
         request.setContextPath("/api");
@@ -204,6 +220,9 @@ class RequestRateLimitFilterTest {
         return request;
     }
 
+    /**
+     * 处理请求上限过滤条件相关数据。
+     */
     private static Clock fixedClock() {
         return Clock.fixed(Instant.parse("2026-09-01T00:00:30Z"), ZoneOffset.UTC);
     }

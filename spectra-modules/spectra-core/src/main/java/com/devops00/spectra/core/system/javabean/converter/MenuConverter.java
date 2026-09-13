@@ -37,34 +37,34 @@ import java.util.List;
 public interface MenuConverter {
 
     /**
-     * 实体转 树形实体VO
+     * 转换树结构。
      *
-     * @param source 实体
-     * @return 树形实体VO
+     * @param source 当前数据或配置的来源。
+     * @return 菜单树结构数据。
      */
     MenuTreeVO toTreeVO(Menu source);
 
     /**
-     * 实体转 树形实体VO
+     * 转换树结构。
      *
-     * @param source 实体
-     * @return 树形实体VO
+     * @param source 当前数据或配置的来源。
+     * @return 符合条件的数据集合。
      */
     List<MenuTreeVO> toTreeVOList(List<Menu> source);
 
     /**
-     * 实体转VO
+     * 转换菜单。
      *
-     * @param source 实体
-     * @return VO
+     * @param source 当前数据或配置的来源。
+     * @return 菜单数据。
      */
     MenuVO toVO(Menu source);
 
     /**
-     * 实体转VO(列表)
+     * 转换菜单。
      *
-     * @param source 实体
-     * @return VO
+     * @param source 当前数据或配置的来源。
+     * @return 符合条件的数据集合。
      */
     List<MenuVO> toVOList(List<Menu> source);
 

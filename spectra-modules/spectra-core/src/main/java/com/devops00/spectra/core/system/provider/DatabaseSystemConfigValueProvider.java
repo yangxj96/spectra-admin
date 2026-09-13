@@ -25,6 +25,10 @@ import java.util.Optional;
 
 /**
  * 基于 {@code spectra_core.sys_config} 的公共运行时配置提供者。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 @RequiredArgsConstructor

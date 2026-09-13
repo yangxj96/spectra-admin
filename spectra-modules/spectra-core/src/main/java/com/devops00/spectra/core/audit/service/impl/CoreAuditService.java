@@ -74,6 +74,9 @@ public class CoreAuditService implements AuditService {
         writer.assertAvailable();
     }
 
+    /**
+     * 对审计执行脱敏处理。
+     */
     private AuditRecord sanitize(AuditRecord record) {
         AuditRecord normalizedRecord = withClient(record, resolveClient(record));
         Map<String, Object> metadata = metadata(normalizedRecord);
@@ -98,6 +101,9 @@ public class CoreAuditService implements AuditService {
                 failure);
     }
 
+    /**
+     * 解析客户端。
+     */
     private static String resolveClient(AuditRecord record) {
         if (record.category() == AuditCategory.SECURITY) {
             return SYSTEM_CLIENT;
@@ -113,6 +119,9 @@ public class CoreAuditService implements AuditService {
         return SYSTEM_CLIENT;
     }
 
+    /**
+     * 规范化客户端。
+     */
     private static String normalizeClient(String candidate) {
         if (candidate == null || candidate.isBlank()) {
             return null;
@@ -126,6 +135,9 @@ public class CoreAuditService implements AuditService {
         return null;
     }
 
+    /**
+     * 处理客户端相关数据。
+     */
     private static AuditRecord withClient(AuditRecord record, String client) {
         AuditContext context = record.context();
         AuditContext normalizedContext = new AuditContext(context.operatorId(), context.requestId(),
@@ -135,6 +147,9 @@ public class CoreAuditService implements AuditService {
                 record.reason(), record.httpSummary(), record.failure());
     }
 
+    /**
+     * 处理元数据相关数据。
+     */
     private static Map<String, Object> metadata(AuditRecord record) {
         AuditContext context = record.context();
         Map<String, Object> metadata = new LinkedHashMap<>();
@@ -153,6 +168,9 @@ public class CoreAuditService implements AuditService {
         return metadata;
     }
 
+    /**
+     * 处理元数据相关数据。
+     */
     private static Map<String, Object> withMetadata(Map<String, Object> snapshot, Map<String, Object> metadata) {
         Map<String, Object> result = new LinkedHashMap<>();
         if (snapshot != null) {
@@ -162,10 +180,16 @@ public class CoreAuditService implements AuditService {
         return result;
     }
 
+    /**
+     * 处理值相关数据。
+     */
     private static String stringValue(Object value) {
         return value instanceof String text ? text : null;
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private static void putIfPresent(Map<String, Object> target, String key, Object value) {
         if (value != null) {
             target.put(key, value instanceof UUID uuid ? uuid.toString() : value);

@@ -22,7 +22,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
-/** Quartz JDBC Cluster 的应用级安全配置。 */
+/**
+ * Quartz JDBC Cluster 的应用级安全配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.scheduler.quartz")
 public class QuartzSchedulerProperties {

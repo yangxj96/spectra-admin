@@ -25,7 +25,13 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** 版本化 JSON 参数的对象、字段类型和敏感字段契约。 */
+/**
+ * 版本化 JSON 参数的对象、字段类型和敏感字段契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzJobParameterValidatorTest {
 
     private final QuartzJobParameterValidator validator = new QuartzJobParameterValidator(new ObjectMapper());

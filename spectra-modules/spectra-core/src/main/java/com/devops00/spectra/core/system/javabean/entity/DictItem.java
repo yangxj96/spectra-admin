@@ -41,6 +41,7 @@ import java.util.UUID;
 @TableName(value = "sys_dict_item", schema = "spectra_core")
 public class DictItem extends BaseEntity {
 
+    /** 序列化版本标识。 */
     @Serial
     private static final long serialVersionUID = 1L;
 

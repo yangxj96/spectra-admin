@@ -20,7 +20,13 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 
 import java.util.UUID;
 
-/** 认证上下文工具。 */
+/**
+ * 认证上下文工具。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public final class AuthenticationContextUtils {
 
     private AuthenticationContextUtils() {

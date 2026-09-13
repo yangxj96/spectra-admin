@@ -21,7 +21,13 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
 
-/** 应用统一时间基础设施配置。 */
+/**
+ * 应用统一时间基础设施配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Configuration(proxyBeanMethods = false)
 public class TimeConfiguration {
 

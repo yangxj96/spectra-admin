@@ -281,6 +281,9 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         return output.toByteArray();
     }
 
+    /**
+     * 判断JSON内容类型。
+     */
     private static boolean isJsonContentType(org.springframework.http.MediaType contentType) {
         return contentType != null
                 && (org.springframework.http.MediaType.APPLICATION_JSON.includes(contentType)
@@ -445,6 +448,9 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         }
     }
 
+    /**
+     * 处理关联标识相关数据。
+     */
     private static String correlationId() {
         String correlationId = RequestCorrelationContext.current().correlationId();
         return correlationId == null ? "unknown" : correlationId;
@@ -452,6 +458,10 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     /**
      * 可替换 body 的 HttpInputMessage 包装类
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     private static class DecryptedHttpInputMessage implements HttpInputMessage {
 

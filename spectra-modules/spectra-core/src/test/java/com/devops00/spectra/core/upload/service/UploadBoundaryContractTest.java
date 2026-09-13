@@ -26,7 +26,13 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** 文件上传服务边界契约，防止实体主键和校验事务重新回到应用编排层。 */
+/**
+ * 文件上传服务边界契约，防止实体主键和校验事务重新回到应用编排层。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class UploadBoundaryContractTest {
 
     @Test
@@ -52,6 +58,9 @@ class UploadBoundaryContractTest {
         assertTrue(worker.contains("public void verify(UUID uploadId)"));
     }
 
+    /**
+     * 查询来源。
+     */
     private String readSource(String relativePath) throws IOException {
         var path = Path.of("src", "main", "java",
                 "com", "devops00", "spectra", "core", "upload", relativePath);

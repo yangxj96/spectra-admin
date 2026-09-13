@@ -21,7 +21,13 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-/** 部门统计统一报表查询行。 */
+/**
+ * 部门统计统一报表查询的结果行模型。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Data
 public class DepartmentStatsRow {
 

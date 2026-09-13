@@ -49,6 +49,10 @@ public interface AuditService {
 
     /**
      * 审计事件无法被统一入口接受或持久化时抛出的运行时异常。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     class AuditRecordingException extends RuntimeException {
 

@@ -49,6 +49,13 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * 实现授权分配查询相关的应用服务逻辑。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

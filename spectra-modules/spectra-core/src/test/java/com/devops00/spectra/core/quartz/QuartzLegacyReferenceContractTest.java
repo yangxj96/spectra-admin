@@ -27,7 +27,13 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 旧自研调度内核运行时引用清理契约。 */
+/**
+ * 旧自研调度内核运行时引用清理契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzLegacyReferenceContractTest {
 
     private static final List<String> LEGACY_REFERENCES = List.of(
@@ -55,12 +61,18 @@ class QuartzLegacyReferenceContractTest {
         assertThat(matches).as("运行时仍存在旧自研调度引用").isEmpty();
     }
 
+    /**
+     * 处理运行时环境相关数据。
+     */
     private Stream<Path> runtimeJavaFiles() throws IOException {
         return Files.walk(QuartzTestSource.backendRoot())
                 .filter(path -> path.toString().replace('\\', '/').contains("/src/main/java/"))
                 .filter(path -> path.toString().endsWith(".java"));
     }
 
+    /**
+     * 查询Quartz引用合同。
+     */
     private Stream<String> read(Path path) {
         try {
             return Stream.of(Files.readString(path, StandardCharsets.UTF_8));

@@ -48,6 +48,7 @@ public class AesGcmSecretValueCipher implements SecretValueCipher {
     private static final int TAG_LENGTH_BITS = 128;
 
     private final String encodedRootKey;
+    /** 为 AES-GCM 加密生成随机初始化向量。 */
     private final SecureRandom secureRandom = new SecureRandom();
 
     /**
@@ -93,6 +94,9 @@ public class AesGcmSecretValueCipher implements SecretValueCipher {
         }
     }
 
+    /**
+     * 构建密钥值。
+     */
     private Cipher createCipher(int mode, byte[] nonce, String code) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(mode, rootKey(), new GCMParameterSpec(TAG_LENGTH_BITS, nonce));
@@ -100,6 +104,9 @@ public class AesGcmSecretValueCipher implements SecretValueCipher {
         return cipher;
     }
 
+    /**
+     * 处理键相关数据。
+     */
     private SecretKeySpec rootKey() {
         if (encodedRootKey == null || encodedRootKey.isBlank()) {
             throw new EncryptException("密钥管理根密钥未配置");
@@ -115,6 +122,9 @@ public class AesGcmSecretValueCipher implements SecretValueCipher {
         }
     }
 
+    /**
+     * 校验编码。
+     */
     private static void validateCode(String code) {
         if (code == null || code.isBlank()) {
             throw new EncryptException("密钥编码不能为空");

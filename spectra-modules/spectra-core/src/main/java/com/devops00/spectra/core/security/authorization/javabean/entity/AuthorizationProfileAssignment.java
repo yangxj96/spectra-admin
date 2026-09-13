@@ -25,7 +25,7 @@ import lombok.EqualsAndHashCode;
 import java.util.UUID;
 
 /**
- * 授权方案中的 Role 配置快照。
+ * 授权方案中角色分配及其版本信息的快照。
  *
  * @author yangxj96
  * @version 1.0
@@ -36,12 +36,21 @@ import java.util.UUID;
 @TableName(value = "sec_authorization_profile_assignment", schema = "spectra_security")
 public class AuthorizationProfileAssignment extends BaseEntity {
 
+    /**
+     * 该角色分配快照所属的授权方案 ID。
+     */
     @TableField(value = "profile_id")
     private UUID profileId;
 
+    /**
+     * 快照中角色的稳定业务编码。
+     */
     @TableField(value = "role_code")
     private String roleCode;
 
+    /**
+     * 创建快照时角色对应的授权版本号。
+     */
     @TableField(value = "role_version")
     private Long roleVersion;
 }

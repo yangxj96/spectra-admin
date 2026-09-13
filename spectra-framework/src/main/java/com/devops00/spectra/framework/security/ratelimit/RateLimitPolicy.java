@@ -113,7 +113,13 @@ public record RateLimitPolicy(
         return endpoints.stream().anyMatch(endpoint -> endpoint.matches(method, path));
     }
 
-    /** 限流主体维度。 */
+    /**
+     * 限流主体维度。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public enum SubjectDimension {
         /** 使用客户端地址。 */
         IP,
@@ -123,7 +129,15 @@ public record RateLimitPolicy(
         IP_AND_USER
     }
 
-    /** 请求方法和路径匹配项。 */
+    /**
+     * 承载端点相关的不可变数据。
+     *
+     * @param method      HTTP 请求方法
+     * @param pathPattern 限流策略匹配的请求路径模式
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record Endpoint(String method, String pathPattern) {
 
         /**
@@ -169,6 +183,9 @@ public record RateLimitPolicy(
      *
      * @param clientIp 客户端地址
      * @param userId   当前认证用户 ID；匿名请求为空
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public record Subject(String clientIp, @Nullable String userId) {
 
@@ -203,6 +220,9 @@ public record RateLimitPolicy(
             };
         }
 
+        /**
+         * 处理用户相关数据。
+         */
         private String userOrAnonymous() {
             return userId == null ? "anonymous@" + clientIp : userId;
         }

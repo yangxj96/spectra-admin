@@ -24,14 +24,28 @@ import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
+/**
+ * 安全角色可以向下级角色分配授予权限的关联记录。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sec_role_grantable_permission", schema = "spectra_security")
 public class RoleGrantablePermission extends BaseEntity {
 
+    /**
+     * 获准向下级分配权限的角色 ID。
+     */
     @TableField(value = "role_id")
     private UUID roleId;
 
+    /**
+     * 该角色可以授予下级的权限 ID。
+     */
     @TableField(value = "permission_id")
     private UUID permissionId;
 }

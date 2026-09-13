@@ -26,7 +26,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** 不可变、无重复的代码白名单目录，不保存 Quartz 运行状态。 */
+/**
+ * 不可变、无重复的代码白名单目录，不保存 Quartz 运行状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Component
 public class QuartzJobCatalog {

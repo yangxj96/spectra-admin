@@ -29,7 +29,13 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Quartz 白名单目录的重复和受信任类型契约。 */
+/**
+ * Quartz 白名单目录的重复和受信任类型契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzJobCatalogTest {
 
     @Test
@@ -61,6 +67,9 @@ class QuartzJobCatalogTest {
         assertThatThrownBy(() -> catalog.definitions().clear()).isInstanceOf(UnsupportedOperationException.class);
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private QuartzJobDefinition definition(String key, boolean builtIn, Optional<String> builtInJobKey) {
         return new QuartzJobDefinition() {
             @Override
@@ -100,7 +109,13 @@ class QuartzJobCatalogTest {
         };
     }
 
-    /** 测试用 Quartz Job。 */
+    /**
+     * 测试用 Quartz Job。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class SampleJob implements Job {
 
         @Override

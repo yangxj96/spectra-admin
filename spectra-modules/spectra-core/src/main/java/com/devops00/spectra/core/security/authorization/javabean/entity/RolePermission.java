@@ -24,14 +24,28 @@ import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
+/**
+ * 安全角色与权限目录项之间的关联记录。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sec_role_permission", schema = "spectra_security")
 public class RolePermission extends BaseEntity {
 
+    /**
+     * 拥有该权限的安全角色 ID。
+     */
     @TableField(value = "role_id")
     private UUID roleId;
 
+    /**
+     * 分配给该角色的权限 ID。
+     */
     @TableField(value = "permission_id")
     private UUID permissionId;
 }

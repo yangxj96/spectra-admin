@@ -18,7 +18,13 @@ package com.devops00.spectra.core.upload.javabean.constant;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 
-/** 文件资产状态。 */
+/**
+ * 文件资产状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum FileAssetStatus implements IEnum<String> {
     READY,
     DELETING,

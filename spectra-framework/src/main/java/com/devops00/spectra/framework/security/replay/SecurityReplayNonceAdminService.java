@@ -39,6 +39,10 @@ import java.util.Arrays;
  * <p>该组件只允许访问固定的 crypto nonce 和 cutoff 键，不能被当作通用
  * Redis 清理器使用。全局失效先推进 cutoff，再按记录时间删除旧 nonce；即使
  * 清理阶段失败，已经持久化的 cutoff 仍会让旧请求保持失效。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdminPort {
@@ -53,8 +57,8 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
     private final SecurityProperties securityProperties;
 
     public SecurityReplayNonceAdminService(
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties securityProperties) {
+                                           @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
+                                           SecurityProperties securityProperties) {
         this.redis = redis;
         this.securityProperties = securityProperties;
     }
@@ -93,6 +97,9 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
         return invalidateAt(nonce, requestTimestamp);
     }
 
+    /**
+     * 处理安全随机数相关数据。
+     */
     private Result invalidateAt(String nonce, long markerTimestamp) {
         validateNonce(nonce);
         String nonceKey = SecurityRedisKey.CRYPTO_NONCE.format(SHA256Utils.hash(nonce));
@@ -127,6 +134,9 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
         return cutoff != null && timestamp <= cutoff;
     }
 
+    /**
+     * 查询安全随机数。
+     */
     private Long readCutoff() {
         Object value = SecurityRedisExecutor.execute("读取 nonce 全局失效 cutoff",
                 () -> redis.opsForValue().get(SecurityRedisKey.CRYPTO_NONCE_CUTOFF.getPattern()));
@@ -143,12 +153,18 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
         }
     }
 
+    /**
+     * 删除或清理随机数记录集合。
+     */
     private long deleteNonceRecordsAtOrBefore(long cutoff) {
         Long deleted = SecurityRedisExecutor.require("扫描并清理旧 nonce",
                 () -> redis.execute((RedisCallback<Long>) connection -> scanAndDelete(connection, cutoff)));
         return deleted;
     }
 
+    /**
+     * 处理删除相关数据。
+     */
     private long scanAndDelete(RedisConnection connection, long cutoff) {
         RedisSerializer<?> keySerializer = redis.getKeySerializer();
         RedisSerializer<?> valueSerializer = redis.getValueSerializer();
@@ -176,6 +192,9 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
         return deleted;
     }
 
+    /**
+     * 处理安全随机数相关数据。
+     */
     private static byte[] serialize(RedisSerializer<?> serializer, String value) {
         @SuppressWarnings("unchecked")
         RedisSerializer<Object> typedSerializer = (RedisSerializer<Object>) serializer;
@@ -186,6 +205,9 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
         return result;
     }
 
+    /**
+     * 处理安全随机数相关数据。
+     */
     private static Long deserializeEpoch(RedisSerializer<?> serializer, byte[] rawValue) {
         if (rawValue == null) {
             return null;
@@ -206,16 +228,27 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
         }
     }
 
+    /**
+     * 处理随机数相关数据。
+     */
     private Duration nonceTtl() {
         return Duration.ofSeconds(securityProperties.getCryptoReplayWindowSeconds());
     }
 
+    /**
+     * 处理安全随机数相关数据。
+     */
     private static long epochSecond() {
         return System.currentTimeMillis() / 1000;
     }
 
+    /**
+     * 校验随机数。
+     */
     private static void validateNonce(String nonce) {
-        if (nonce == null || nonce.isBlank() || nonce.length() > 128
+        if (nonce == null
+                || nonce.isBlank()
+                || nonce.length() > 128
                 || !nonce.matches("[A-Za-z0-9._:-]+")) {
             throw new IllegalArgumentException("nonce 格式无效");
         }

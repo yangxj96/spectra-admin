@@ -42,7 +42,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** Web 加密 nonce 管理的安全边界测试。 */
+/**
+ * Web 加密 nonce 管理的安全边界测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecurityReplayNonceAdminServiceTest {
 
     @Test
@@ -71,8 +77,9 @@ class SecurityReplayNonceAdminServiceTest {
         SecurityReplayNonceAdminPort.Result result = service.invalidateAll();
 
         var order = inOrder(values, redis);
-        order.verify(values).set(eq(SecurityRedisKey.CRYPTO_NONCE_CUTOFF.getPattern()), anyLong(),
-                eq(Duration.ofSeconds(300)));
+        order.verify(values)
+                .set(eq(SecurityRedisKey.CRYPTO_NONCE_CUTOFF.getPattern()), anyLong(),
+                        eq(Duration.ofSeconds(300)));
         order.verify(redis).execute(any(org.springframework.data.redis.core.RedisCallback.class));
         verify(redis, never()).delete(SecurityRedisKey.REFRESH_CLAIM.format("refresh-digest"));
         verify(redis, never()).delete(SecurityRedisKey.REFRESH_REPLAY_FENCE.format("family"));
@@ -84,8 +91,9 @@ class SecurityReplayNonceAdminServiceTest {
     @Test
     void shouldKeepCutoffKeyOutsideTheNonceCleanupScope() {
         assertTrue(SecurityRedisKey.CRYPTO_NONCE_CUTOFF.getPattern()
-                .startsWith(SecurityRedisKey.CRYPTO_NONCE.getPattern().substring(0,
-                        SecurityRedisKey.CRYPTO_NONCE.getPattern().indexOf("%s"))));
+                .startsWith(SecurityRedisKey.CRYPTO_NONCE.getPattern()
+                        .substring(0,
+                                SecurityRedisKey.CRYPTO_NONCE.getPattern().indexOf("%s"))));
         assertTrue(SecurityRedisKey.CRYPTO_NONCE_CUTOFF.getPattern().contains("cutoff"));
     }
 
@@ -109,10 +117,16 @@ class SecurityReplayNonceAdminServiceTest {
         assertThrows(SecurityRedisUnavailableException.class, () -> service.invalidate("nonce-for-test"));
     }
 
+    /**
+     * 处理安全随机数相关数据。
+     */
     private static SecurityProperties properties() {
         return new SecurityProperties();
     }
 
+    /**
+     * 处理Redis模板相关数据。
+     */
     @SuppressWarnings("unchecked")
     private static RedisTemplate<String, Object> redisTemplate() {
         var redis = (RedisTemplate<String, Object>) mock(RedisTemplate.class);

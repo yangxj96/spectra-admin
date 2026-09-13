@@ -44,6 +44,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SystemSecretInitializerImpl implements SystemSecretInitializer {
 
+    /** 为首次初始化的系统密钥材料生成随机字节。 */
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private static final List<String> INTERNAL_SECRET_CODES = List.of(
@@ -83,11 +84,17 @@ public class SystemSecretInitializerImpl implements SystemSecretInitializer {
                 "密钥管理页面配置的接口加解密开关");
     }
 
+    /**
+     * 发送或分发系统密钥。
+     */
     private void publishGenerated(String code, String value) {
         var version = secretManagementService.createPending(code, value, "GENERATED");
         secretManagementService.publish(version.getId());
     }
 
+    /**
+     * 处理键相关数据。
+     */
     private KeyPair generateRsaKeyPair() {
         try {
             return SystemKeyMaterial.generateKeyPair();
@@ -96,6 +103,9 @@ public class SystemSecretInitializerImpl implements SystemSecretInitializer {
         }
     }
 
+    /**
+     * 处理系统密钥相关数据。
+     */
     private String randomBase64() {
         byte[] bytes = new byte[32];
         SECURE_RANDOM.nextBytes(bytes);

@@ -22,7 +22,13 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
-/** 确认分片请求。 */
+/**
+ * 确认分片请求。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class ConfirmPartRequest {
 

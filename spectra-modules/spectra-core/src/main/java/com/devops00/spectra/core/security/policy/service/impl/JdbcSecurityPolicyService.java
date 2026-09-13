@@ -46,7 +46,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-/** 安全策略查询与受审计修改实现。 */
+/**
+ * 安全策略查询与受审计修改实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

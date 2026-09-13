@@ -21,7 +21,19 @@ import org.quartz.Job;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Core 用于注册代码拥有型 Quartz 内置任务的不可变定义。 */
+/**
+ * 定义Quartz作业相关的跨模块调用契约。
+ *
+ * @param typeKey         内置作业注册表中的唯一类型键
+ * @param displayName     内置作业的展示名称
+ * @param jobClass        内置作业的实现类
+ * @param jobKey          内置作业在 Quartz 中使用的 JobKey
+ * @param parameterSchema 内置作业参数的校验结构
+ * @param defaultTrigger  默认触发器
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record QuartzBuiltInJobDefinition(
                                          String typeKey,
                                          String displayName,

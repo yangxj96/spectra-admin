@@ -37,6 +37,10 @@ import java.util.concurrent.TimeoutException;
  *
  * <p>聚合器是唯一执行 contributor、处理超时/异常并计算总状态的入口。下游适配器只消费快照，不重新执行
  * 检查，也不定义第二套状态优先级。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public class CoreHealthAggregator implements DependencyHealthSnapshotProvider {
@@ -70,6 +74,9 @@ public class CoreHealthAggregator implements DependencyHealthSnapshotProvider {
         checkExecutor.shutdownNow();
     }
 
+    /**
+     * 校验健康状态。
+     */
     private DependencyHealthResult checkContributor(DependencyHealthContributor contributor) {
         var start = System.nanoTime();
         var metadata = registry.metadata(contributor.contributorName());
@@ -97,6 +104,9 @@ public class CoreHealthAggregator implements DependencyHealthSnapshotProvider {
         }
     }
 
+    /**
+     * 处理失败相关数据。
+     */
     private static DependencyHealthResult failure(DependencyHealthContributor contributor, long start,
                                                   String errorCode, String safeSummary) {
         return new DependencyHealthResult(contributor.contributorName(), contributor.moduleName(),
@@ -104,6 +114,9 @@ public class CoreHealthAggregator implements DependencyHealthSnapshotProvider {
                 Duration.ofNanos(System.nanoTime() - start), Instant.now(), errorCode, safeSummary);
     }
 
+    /**
+     * 处理健康状态相关数据。
+     */
     private static DependencyHealthStatus combine(DependencyHealthStatus left, DependencyHealthStatus right) {
         if (left == DependencyHealthStatus.DOWN || right == DependencyHealthStatus.DOWN) {
             return DependencyHealthStatus.DOWN;

@@ -24,7 +24,13 @@ import java.lang.reflect.Modifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** MyBatis 基础设施构造器装配回归测试。 */
+/**
+ * MyBatis 基础设施构造器装配回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class MyBatisPlusConfigurationTest {
 
     @Test

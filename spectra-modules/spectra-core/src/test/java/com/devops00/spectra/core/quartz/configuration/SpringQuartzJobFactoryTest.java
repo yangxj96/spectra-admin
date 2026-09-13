@@ -30,7 +30,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** SpringQuartzJobFactory 的依赖注入契约。 */
+/**
+ * SpringQuartzJobFactory 的依赖注入契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SpringQuartzJobFactoryTest {
 
     @Test
@@ -50,9 +56,16 @@ class SpringQuartzJobFactoryTest {
         verify(beanFactory).initializeBean(any(SampleJob.class), any(String.class));
     }
 
-    /** 测试用无参 Quartz Job。 */
+    /**
+     * 测试用无参 Quartz Job。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public static class SampleJob implements Job {
 
+        /** {@inheritDoc} */
         @Override
         public void execute(JobExecutionContext context) {
         }

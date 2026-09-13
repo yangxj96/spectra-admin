@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.audit.service;
@@ -35,6 +45,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code AuditLogQueryServiceTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class AuditLogQueryServiceTest {
 
     @Test
@@ -171,12 +188,18 @@ class AuditLogQueryServiceTest {
         verifyNoInteractions(sanitizer);
     }
 
+    /**
+     * 处理审计日志查询相关数据。
+     */
     private static AuditLogQueryService service(AuditLogQueryMapper mapper, ObjectMapper objectMapper,
                                                 AuditSanitizer sanitizer) {
         return new AuditLogQueryService(mapper, objectMapper, new DefaultAuditVisibilityPolicy(),
                 mock(AuditLogMetrics.class), mock(TimeMapper.class), sanitizer);
     }
 
+    /**
+     * 处理身份认证对象相关数据。
+     */
     private static TestingAuthenticationToken authentication(UUID principal, String... authorities) {
         var authentication = new TestingAuthenticationToken(principal, null, authorities);
         authentication.setAuthenticated(true);

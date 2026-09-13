@@ -43,6 +43,10 @@ import java.util.UUID;
  * Core 用户、部门和角色到通知受众的展开适配器。
  *
  * <p>这里只展开候选用户 ID，不返回用户资料或地址；数据范围和渠道地址由通知收件人目录继续校验。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @RequiredArgsConstructor

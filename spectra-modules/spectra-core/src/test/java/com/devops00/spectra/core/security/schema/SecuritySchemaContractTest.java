@@ -220,10 +220,16 @@ class SecuritySchemaContractTest {
         }
     }
 
+    /**
+     * 查询安全合同。
+     */
     private String readV1() throws IOException {
         return readMigration("V1__init_db.sql");
     }
 
+    /**
+     * 查询安全合同。
+     */
     private String readCatalog() throws IOException {
         Path directory = Path.of("").toAbsolutePath();
         while (directory != null) {
@@ -236,6 +242,9 @@ class SecuritySchemaContractTest {
         throw new IOException("找不到 Permission Catalog");
     }
 
+    /**
+     * 查询安全合同。
+     */
     private String readMigration(String fileName) throws IOException {
         var candidates = List.of(
                 Path.of("spectra-config", "src", "main", "resources", "db", "migration", fileName),
@@ -250,13 +259,18 @@ class SecuritySchemaContractTest {
         throw new IOException("找不到目标 Flyway migration: " + fileName);
     }
 
+    /**
+     * 处理安全合同相关数据。
+     */
     private Path migrationDirectory() throws IOException {
         var candidates = List.of(
                 Path.of("spectra-config", "src", "main", "resources", "db", "migration"),
                 Path.of("..", "..", "spectra-config", "src", "main", "resources", "db", "migration"),
                 Path.of("..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration"),
                 Path.of("..", "..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration"));
-        return candidates.stream().filter(Files::isDirectory).findFirst()
+        return candidates.stream()
+                .filter(Files::isDirectory)
+                .findFirst()
                 .orElseThrow(() -> new IOException("找不到 Flyway migration 目录"));
     }
 }

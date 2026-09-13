@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -32,6 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>该测试只确认归属和依赖方向，不把 OA、Workflow、Notification、Upload 或未来 ERP 的实现
  * 强行搬入 Core。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class CoreOwnershipTest {
 
@@ -103,12 +107,18 @@ class CoreOwnershipTest {
                         || artifact.equals("spectra-erp"));
     }
 
+    /**
+     * 处理相关数据相关数据。
+     */
     private static List<Path> javaSources(Path sourceRoot) throws IOException {
         try (var paths = Files.walk(sourceRoot)) {
             return paths.filter(path -> path.toString().endsWith(".java")).toList();
         }
     }
 
+    /**
+     * 查询相关数据。
+     */
     private static String readPackage(Path sourceFile) {
         try (var lines = Files.lines(sourceFile)) {
             return lines.map(String::trim)
@@ -120,6 +130,9 @@ class CoreOwnershipTest {
         }
     }
 
+    /**
+     * 查询相关数据。
+     */
     private static String read(Path sourceFile) {
         try {
             return Files.readString(sourceFile);
@@ -128,6 +141,9 @@ class CoreOwnershipTest {
         }
     }
 
+    /**
+     * 解析路径。
+     */
     private static Path resolveBackendPath(String relativePath) {
         Path current = Path.of(System.getProperty("maven.multiModuleProjectDirectory", "."))
                 .toAbsolutePath()

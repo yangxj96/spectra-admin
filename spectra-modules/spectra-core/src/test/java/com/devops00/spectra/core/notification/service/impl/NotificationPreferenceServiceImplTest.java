@@ -36,6 +36,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 通知偏好首次保存和更新分支测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @ExtendWith(MockitoExtension.class)
 class NotificationPreferenceServiceImplTest {

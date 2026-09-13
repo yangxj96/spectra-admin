@@ -42,6 +42,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 管理端角色矩阵的可执行授权回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationAdminControllerRoleMatrixTest {
 
@@ -51,11 +55,13 @@ class NotificationAdminControllerRoleMatrixTest {
 
     NotificationAdminControllerRoleMatrixTest() {
         handler.setPermissionEvaluator(new PermissionEvaluator() {
+            /** {@inheritDoc} */
             @Override
             public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
                 return authentication.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(String.valueOf(permission)));
             }
 
+            /** {@inheritDoc} */
             @Override
             public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
                 return hasPermission(authentication, null, permission);
@@ -87,6 +93,9 @@ class NotificationAdminControllerRoleMatrixTest {
         assertFalse(evaluate(cancel, controller, ordinary));
     }
 
+    /**
+     * 处理通知角色相关数据。
+     */
     private boolean evaluate(Method method, NotificationAdminController controller, Authentication authentication) {
         var invocation = mock(MethodInvocation.class);
         when(invocation.getMethod()).thenReturn(method);
@@ -97,6 +106,9 @@ class NotificationAdminControllerRoleMatrixTest {
         return Boolean.TRUE.equals(parser.parseExpression(annotation.value()).getValue(context, Boolean.class));
     }
 
+    /**
+     * 处理身份认证对象相关数据。
+     */
     private Authentication authentication(String... authorities) {
         return new UsernamePasswordAuthenticationToken("test-user",
                 "test-token", Arrays.stream(authorities).map(SimpleGrantedAuthority::new).toList());

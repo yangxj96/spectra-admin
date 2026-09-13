@@ -33,7 +33,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** Quartz 生命周期状态、恢复重试和优雅停止契约。 */
+/**
+ * Quartz 生命周期状态、恢复重试和优雅停止契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzSchedulerLifecycleTest {
 
     @Test

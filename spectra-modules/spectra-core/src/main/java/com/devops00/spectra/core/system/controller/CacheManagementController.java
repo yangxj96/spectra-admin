@@ -1,4 +1,18 @@
-/* Copyright 2018-2026 yangxj96 */
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.devops00.spectra.core.system.controller;
 
@@ -34,7 +48,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-/** 缓存监控和系统维护管理接口。 */
+/**
+ * 缓存监控和系统维护管理接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/cache")
@@ -44,6 +64,11 @@ public class CacheManagementController {
 
     private final SecurityTargetCandidateService candidateService;
 
+    /**
+     * 查询缓存。
+     *
+     * @return 缓存数据。
+     */
     @Audit("'获取缓存监控总览'")
     @GetMapping(value = "/monitor/overview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:cache:read')")
@@ -51,6 +76,11 @@ public class CacheManagementController {
         return service.getOverview();
     }
 
+    /**
+     * 查询缓存。
+     *
+     * @return 符合条件的数据集合。
+     */
     @Audit("'获取缓存区域监控'")
     @GetMapping(value = "/monitor/regions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:cache:read')")
@@ -58,6 +88,11 @@ public class CacheManagementController {
         return service.getRegions();
     }
 
+    /**
+     * 查询安全。
+     *
+     * @return 安全运行时环境数据。
+     */
     @Audit("'获取安全运行态摘要'")
     @GetMapping(value = "/monitor/security", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:cache:read')")
@@ -65,6 +100,12 @@ public class CacheManagementController {
         return service.getSecurity();
     }
 
+    /**
+     * 查询操作。
+     *
+     * @param operationId 操作标识。
+     * @return 缓存操作数据。
+     */
     @Audit("'查询缓存维护操作状态'")
     @GetMapping(value = "/admin/operations/{operationId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:cache:read')")
@@ -72,6 +113,12 @@ public class CacheManagementController {
         return service.getOperation(operationId);
     }
 
+    /**
+     * 处理业务清理相关数据。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'预览普通缓存清理'")
     @PostMapping(value = "/admin/business/clear/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:cache:clear')")
@@ -79,6 +126,12 @@ public class CacheManagementController {
         return service.previewBusinessClear(from);
     }
 
+    /**
+     * 删除或清理业务。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'执行普通缓存清理'")
     @PostMapping(value = "/admin/business/clear", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:cache:clear')")
@@ -86,6 +139,12 @@ public class CacheManagementController {
         return service.clearBusiness(from);
     }
 
+    /**
+     * 处理会话相关数据。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'撤销指定客户端安全会话'")
     @PostMapping(value = "/admin/security/session/revoke", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:revoke')")
@@ -93,6 +152,12 @@ public class CacheManagementController {
         return service.revokeSession(from);
     }
 
+    /**
+     * 处理缓存相关数据。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'撤销用户全部安全会话'")
     @PostMapping(value = "/admin/security/session/revoke-all", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:revoke')")
@@ -100,6 +165,12 @@ public class CacheManagementController {
         return service.revokeAllSessions(from);
     }
 
+    /**
+     * 查询会话。
+     *
+     * @param keyword 用于匹配缓存条目的关键字。
+     * @return 符合条件的数据集合。
+     */
     @Audit("'查询会话维护用户候选'")
     @GetMapping(value = "/admin/security/session/candidates", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:revoke')")
@@ -107,6 +178,12 @@ public class CacheManagementController {
         return candidateService.searchUserCandidates(keyword);
     }
 
+    /**
+     * 删除或清理缓存。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'清理安全验证码状态'")
     @PostMapping(value = "/admin/security/verification/clear", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:verification:manage')")
@@ -114,14 +191,28 @@ public class CacheManagementController {
         return service.clearVerification(from);
     }
 
+    /**
+     * 查询缓存。
+     *
+     * @param type    业务类型。
+     * @param keyword 用于匹配缓存条目的关键字。
+     * @return 符合条件的数据集合。
+     */
     @Audit("'查询验证码维护目标候选'")
     @GetMapping(value = "/admin/security/verification/candidates", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:verification:manage')")
     public List<SecurityVerificationCandidateVO> getVerificationCandidates(
-            @RequestParam("type") SecurityVerificationType type, @RequestParam("keyword") String keyword) {
+                                                                           @RequestParam("type") SecurityVerificationType type,
+                                                                           @RequestParam("keyword") String keyword) {
         return candidateService.searchVerificationCandidates(type, keyword);
     }
 
+    /**
+     * 删除或清理失败。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'清理登录失败锁定计数'")
     @PostMapping(value = "/admin/security/login-failure/clear", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:login-failure:manage')")
@@ -129,6 +220,12 @@ public class CacheManagementController {
         return service.clearLoginFailure(from);
     }
 
+    /**
+     * 查询失败。
+     *
+     * @param keyword 用于匹配缓存条目的关键字。
+     * @return 符合条件的数据集合。
+     */
     @Audit("'查询登录失败锁定账号候选'")
     @GetMapping(value = "/admin/security/login-failure/candidates", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:login-failure:manage')")
@@ -136,6 +233,12 @@ public class CacheManagementController {
         return candidateService.searchUserCandidates(keyword);
     }
 
+    /**
+     * 处理随机数相关数据。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'定向失效 Web 加密 nonce'")
     @PostMapping(value = "/admin/security/nonce/invalidate", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -143,11 +246,17 @@ public class CacheManagementController {
         return service.invalidateNonce(from);
     }
 
+    /**
+     * 处理缓存相关数据。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
     @Audit("'全局失效 Web 加密 nonce 窗口'")
     @PostMapping(value = "/admin/security/nonce/invalidate-all", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public CacheOperationVO invalidateAllNonces(
-            @Validated @RequestBody SecurityNonceGlobalInvalidateFrom from) {
+                                                @Validated @RequestBody SecurityNonceGlobalInvalidateFrom from) {
         return service.invalidateAllNonces(from);
     }
 }

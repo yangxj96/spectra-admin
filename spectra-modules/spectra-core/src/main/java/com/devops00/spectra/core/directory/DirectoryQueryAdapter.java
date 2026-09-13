@@ -150,6 +150,9 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         return result.isEmpty() ? Map.of() : Map.copyOf(result);
     }
 
+    /**
+     * 处理查询相关数据。
+     */
     private static List<UUID> distinctIds(Collection<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
@@ -157,6 +160,9 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         return ids.stream().filter(Objects::nonNull).distinct().toList();
     }
 
+    /**
+     * 转换用户快照。
+     */
     private static DirectoryUserSnapshot toUserSnapshot(User user) {
         return new DirectoryUserSnapshot(
                 user.getId(),
@@ -168,11 +174,17 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
                 user.getDepartmentId());
     }
 
+    /**
+     * 转换部门快照。
+     */
     private static DirectoryDepartmentSnapshot toDepartmentSnapshot(Department department) {
         return new DirectoryDepartmentSnapshot(
                 department.getId(), department.getPid(), department.getName(), department.getPath());
     }
 
+    /**
+     * 转换快照。
+     */
     private static DirectoryContactSnapshot toContactSnapshot(UserContact contact) {
         return new DirectoryContactSnapshot(contact.getContactType(), contact.getContactValue());
     }

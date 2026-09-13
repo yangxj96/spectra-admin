@@ -137,7 +137,7 @@ class CryptoUtilsTest {
     }
 
     /**
-     * HMAC-SHA256
+     * 验证 HMAC-SHA256 摘要的计算结果。
      */
     @Test
     void testHmacSha256() throws Exception {

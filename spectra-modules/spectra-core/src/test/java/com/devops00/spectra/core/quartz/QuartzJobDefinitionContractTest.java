@@ -23,7 +23,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Quartz 白名单 Job 定义契约。 */
+/**
+ * Quartz 白名单 Job 定义契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzJobDefinitionContractTest {
 
     @Test

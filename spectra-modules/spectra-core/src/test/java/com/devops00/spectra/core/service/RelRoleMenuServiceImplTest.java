@@ -181,6 +181,9 @@ class RelRoleMenuServiceImplTest {
         assertThrows(DataNotExistException.class, () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(deletedMenu.getId()))));
     }
 
+    /**
+     * 处理菜单相关数据。
+     */
     private static Menu menu(UUID id, MenuType type) {
         var menu = new Menu();
         menu.setId(id);
@@ -188,6 +191,9 @@ class RelRoleMenuServiceImplTest {
         return menu;
     }
 
+    /**
+     * 处理活动状态角色相关数据。
+     */
     private static SecurityRole activeRole(UUID id) {
         var role = new SecurityRole();
         role.setId(id);
@@ -196,6 +202,9 @@ class RelRoleMenuServiceImplTest {
         return role;
     }
 
+    /**
+     * 处理关系相关数据。
+     */
     private static SecurityRoleMenu relation(UUID roleId, UUID menuId) {
         var relation = new SecurityRoleMenu();
         relation.setRoleId(roleId);

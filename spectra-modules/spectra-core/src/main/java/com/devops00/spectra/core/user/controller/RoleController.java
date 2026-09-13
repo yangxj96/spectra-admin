@@ -63,14 +63,17 @@ public class RoleController {
 
     private final RelRoleMenuService relRoleMenuService;
 
+    /**
+     * 保存角色。
+     *
+     * @param params 查询筛选条件。
+     * @return 角色数据。
+     */
     @Audit("'提交角色编辑'")
     @PostMapping(value = "/editor", version = "1.0.0")
     @PreAuthorize("((#p0.id == null and hasPermission(null, 'role:create')) "
             + "or (#p0.id != null and hasPermission(null, 'role:update'))) "
             + "and hasPermission(null, 'role:grant') and hasPermission(null, 'role:assign')")
-    /**
-     * 更新或推进目标状态（{@code saveEditor}）。
-     */
     public RoleVO saveEditor(@Validated @RequestBody RoleEditorSaveFrom params) {
         return roleEditorService.save(params);
     }
@@ -107,6 +110,13 @@ public class RoleController {
 
     /* 查询部分 */
 
+    /**
+     * 按查询条件分页查询角色。
+     *
+     * @param page   分页参数。
+     * @param params 查询筛选条件。
+     * @return 符合条件的分页结果。
+     */
     @Audit("'分页查询角色列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
@@ -136,6 +146,12 @@ public class RoleController {
 
     /* 关联处理部分 */
 
+    /**
+     * 查询角色菜单角色标识。
+     *
+     * @param roleId 角色标识。
+     * @return 符合条件的数据集合。
+     */
     @Audit("'获取角色关联的菜单列表'")
     @GetMapping(value = "/{roleId}/menu", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")

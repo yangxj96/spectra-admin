@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.upload.api;
 
-/** 文件上传服务错误码。 */
+/**
+ * 文件上传服务错误码。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum FileErrorCode {
     FILE_UPLOAD_NOT_FOUND,
     FILE_UPLOAD_EXPIRED,

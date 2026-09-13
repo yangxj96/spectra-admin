@@ -39,7 +39,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 在线用户查询批量读取契约测试。 */
+/**
+ * 在线用户查询批量读取契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecurityOnlineUserQueryServiceTest {
 
     @Test
@@ -68,6 +74,9 @@ class SecurityOnlineUserQueryServiceTest {
         verify(hashes, never()).entries(org.mockito.ArgumentMatchers.anyString());
     }
 
+    /**
+     * 处理安全用户查询相关数据。
+     */
     private static Map<String, Object> summary(String userId) {
         return Map.of("userId", userId, "username", userId, "clientType", "web", "ip", "127.0.0.1",
                 "loginTime", 1_700_000_000_000L);

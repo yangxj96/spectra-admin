@@ -25,7 +25,13 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Quartz 调度基础设施入口契约。 */
+/**
+ * Quartz 调度基础设施入口契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzArchitectureContractTest {
 
     @Test
@@ -53,7 +59,13 @@ class QuartzArchitectureContractTest {
     }
 }
 
-/** 供同包源码契约测试复用的仓库路径辅助类。 */
+/**
+ * 供同包源码契约测试复用的仓库路径辅助类。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 final class QuartzTestSource {
 
     private QuartzTestSource() {

@@ -21,6 +21,13 @@ import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotP
 
 import java.util.UUID;
 
+/**
+ * 定义授权快照相关的应用服务契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface AuthorizationSnapshotLoader extends AuthorizationSnapshotProvider {
 
     /**

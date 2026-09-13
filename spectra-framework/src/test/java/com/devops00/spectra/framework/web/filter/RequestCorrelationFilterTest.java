@@ -30,6 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * 验证 {@code RequestCorrelationFilterTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RequestCorrelationFilterTest {
 
     private final RequestCorrelationFilter filter = new RequestCorrelationFilter();
@@ -106,14 +113,23 @@ class RequestCorrelationFilterTest {
         assertTrue(RequestCorrelationContext.current().isEmpty());
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private MockHttpServletRequest request() {
         return new MockHttpServletRequest("GET", "/api/test");
     }
 
+    /**
+     * 处理请求关联过滤条件相关数据。
+     */
     private FilterChain chain(FilterChain chain) {
         return chain;
     }
 
+    /**
+     * 判断UUID。
+     */
     private boolean isUuid(String value) {
         try {
             UUID.fromString(value);

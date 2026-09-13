@@ -32,6 +32,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 通知模块健康状态回归。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationHealthIndicatorTest {
 
@@ -74,6 +78,9 @@ class NotificationHealthIndicatorTest {
         assertEquals("OPTIONAL_CHANNEL_UNAVAILABLE", indicator.check().errorCode());
     }
 
+    /**
+     * 处理发送器相关数据。
+     */
     private NotificationSender sender(NotificationChannel channel, boolean available) {
         var sender = mock(NotificationSender.class);
         when(sender.channel()).thenReturn(channel);

@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.security.schema;
@@ -28,6 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 统一审计表的真实 PostgreSQL 契约测试。
  *
  * <p>只使用 Testcontainers 创建的临时数据库，覆盖默认分区路由、事务回滚和不可变约束。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Tag("integration")
 @Testcontainers
@@ -99,6 +113,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private static DatabaseConfig migrate() {
         DatabaseConfig database = DatabaseConfig.from(POSTGRES);
         Flyway.configure()
@@ -112,8 +129,12 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         return database;
     }
 
+    /**
+     * 保存审计。
+     */
     private static void insert(Connection connection, UUID eventId, Instant occurredAt, String category,
-                               String eventType) throws SQLException {
+                               String eventType)
+            throws SQLException {
         String sql = "INSERT INTO " + TABLE
                 + " (event_id, occurred_at, category, event_type, result, before_snapshot, after_snapshot)"
                 + " VALUES (?, ?, ?, ?, 'SUCCEEDED', '{}'::jsonb, '{}'::jsonb)";
@@ -126,6 +147,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 统计事件标识数量。
+     */
     private static int countByEventId(Connection connection, UUID eventId) throws SQLException {
         try (var statement = connection.prepareStatement("SELECT COUNT(*) FROM " + TABLE + " WHERE event_id = ?")) {
             statement.setObject(1, eventId);
@@ -136,6 +160,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 统计分类事件标识数量。
+     */
     private static int countByCategoryAndEventId(Connection connection, String category, UUID eventId)
             throws SQLException {
         try (var statement = connection.prepareStatement(
@@ -149,6 +176,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private static String partitionFor(Connection connection, UUID eventId) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT tableoid::regclass::text FROM " + TABLE + " WHERE event_id = ?")) {
@@ -160,6 +190,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private static void mutate(Connection connection, UUID eventId, Instant occurredAt) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "UPDATE " + TABLE + " SET result = 'FAILED' WHERE event_id = ? AND occurred_at = ?")) {
@@ -169,6 +202,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 删除或清理审计。
+     */
     private static void delete(Connection connection, UUID eventId, Instant occurredAt) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "DELETE FROM " + TABLE + " WHERE event_id = ? AND occurred_at = ?")) {
@@ -178,6 +214,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理行数据相关数据。
+     */
     private static boolean rowExists(Connection connection, UUID eventId, Instant occurredAt) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM " + TABLE + " WHERE event_id = ? AND occurred_at = ?)")) {
@@ -190,6 +229,9 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private static boolean tableExists(Connection connection, String schema, String table) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ?)")) {
@@ -202,12 +244,28 @@ class UnifiedAuditSchemaPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 为 {@code UnifiedAuditSchemaPostgresIntegrationTest} 测试提供 {@code DatabaseConfig} 测试类型。
+     *
+     * @param url      HTTP 请求地址
+     * @param username 用户登录名
+     * @param password 用于连接测试数据库的密码
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record DatabaseConfig(String url, String username, String password) {
 
+        /**
+         * 处理配置相关数据。
+         */
         private static DatabaseConfig from(PostgreSQLContainer<?> container) {
             return new DatabaseConfig(container.getJdbcUrl(), container.getUsername(), container.getPassword());
         }
 
+        /**
+         * 打开配置。
+         */
         private Connection open() throws SQLException {
             Connection connection = DriverManager.getConnection(url, username, password);
             connection.setAutoCommit(false);

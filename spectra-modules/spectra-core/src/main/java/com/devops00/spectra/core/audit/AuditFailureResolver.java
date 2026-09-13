@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.audit;
@@ -69,6 +78,9 @@ public class AuditFailureResolver {
         return new AuditRecord.Failure(code, type, sanitize(reason));
     }
 
+    /**
+     * 处理审计失败相关数据。
+     */
     private static Throwable rootCause(Throwable failure) {
         if (failure == null) {
             return new IllegalStateException("操作执行失败");
@@ -78,14 +90,17 @@ public class AuditFailureResolver {
         while (current.getCause() != null
                 && !visited.containsKey(current.getCause())
                 && (current.getMessage() == null
-                || WRAPPER_TYPES.contains(current.getClass())
-                || current instanceof DataAccessException)) {
+                        || WRAPPER_TYPES.contains(current.getClass())
+                        || current instanceof DataAccessException)) {
             visited.put(current, Boolean.TRUE);
             current = current.getCause();
         }
         return current;
     }
 
+    /**
+     * 处理错误编码相关数据。
+     */
     private static String errorCode(Throwable failure) {
         if (failure instanceof AccessDeniedException) {
             return "ACCESS_DENIED";
@@ -102,6 +117,9 @@ public class AuditFailureResolver {
         return null;
     }
 
+    /**
+     * 处理原因相关数据。
+     */
     private static String reason(Throwable failure) {
         if (hasDatabaseCause(failure)) {
             return "数据存储操作失败";
@@ -118,6 +136,9 @@ public class AuditFailureResolver {
         return "操作执行失败";
     }
 
+    /**
+     * 对审计失败执行脱敏处理。
+     */
     private String sanitize(String reason) {
         String cleaned = URL_QUERY.matcher(reason).replaceAll("$1?[REDACTED]");
         cleaned = INLINE_CREDENTIAL.matcher(cleaned).replaceAll("$1$2[REDACTED]");
@@ -135,6 +156,9 @@ public class AuditFailureResolver {
         return cleaned.isBlank() ? "操作执行失败" : cleaned;
     }
 
+    /**
+     * 判断审计失败。
+     */
     private static boolean hasDatabaseCause(Throwable failure) {
         Throwable current = failure;
         var visited = new IdentityHashMap<Throwable, Boolean>();

@@ -27,6 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Root 判定契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class RootAuthorizationPolicyTest {
 
@@ -41,6 +45,9 @@ class RootAuthorizationPolicyTest {
         assertFalse(policy.isRoot(null));
     }
 
+    /**
+     * 处理主体相关数据。
+     */
     private static SecurityPrincipal mockPrincipal(List<String> authorityNames) {
         var principal = org.mockito.Mockito.mock(SecurityPrincipal.class);
         org.mockito.Mockito.when(principal.isEnabled()).thenReturn(true);

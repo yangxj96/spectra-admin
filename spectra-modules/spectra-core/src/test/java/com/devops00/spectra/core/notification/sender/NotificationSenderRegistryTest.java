@@ -83,6 +83,9 @@ class NotificationSenderRegistryTest {
         assertTrue(registry.find(NotificationChannel.EMAIL).isEmpty());
     }
 
+    /**
+     * 处理发送器相关数据。
+     */
     private NotificationSender sender(NotificationChannel channel, boolean available) {
         var sender = mock(NotificationSender.class);
         when(sender.channel()).thenReturn(channel);

@@ -47,6 +47,10 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * 真实 PostgreSQL 上验证 Root singleton 行锁覆盖并发新增和撤销。
  * <p>
  * 该测试默认禁用，只接受专用、可丢弃的 Flyway 测试数据库连接。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST", matches = "true")
 @Tag("manual-integration")
@@ -121,12 +125,18 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理角色标识相关数据。
+     */
     private static UUID existingDevOpsRoleId(JdbcTemplate jdbc) {
         return jdbc.queryForObject(
                 "SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS' AND state = 'ACTIVE'",
                 UUID.class);
     }
 
+    /**
+     * 处理分配标识相关数据。
+     */
     private static UUID existingDevOpsAssignmentId(JdbcTemplate jdbc) {
         return jdbc.queryForObject("""
                 SELECT assignment.id
@@ -139,6 +149,9 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
                 """, UUID.class);
     }
 
+    /**
+     * 保存安全。
+     */
     private static void insertFixtures(JdbcTemplate jdbc, List<UUID> users) {
         for (UUID user : users) {
             jdbc.update("INSERT INTO spectra_core.sys_user (id, username, status) VALUES (?, ?, 'ACTIVE')", user,
@@ -151,6 +164,9 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 保存分配。
+     */
     private static void insertAssignment(JdbcTemplate jdbc, UUID assignmentId, UUID userId, UUID roleId) {
         jdbc.update("""
                 INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id, state)
@@ -158,14 +174,23 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
                 """, assignmentId, userId, roleId);
     }
 
+    /**
+     * 处理分配相关数据。
+     */
     private static void revokeAssignment(JdbcTemplate jdbc, UUID assignmentId) {
         jdbc.update("UPDATE spectra_security.sec_role_assignment SET state = 'REVOKED' WHERE id = ?", assignmentId);
     }
 
+    /**
+     * 处理分配相关数据。
+     */
     private static void reactivateAssignment(JdbcTemplate jdbc, UUID assignmentId) {
         jdbc.update("UPDATE spectra_security.sec_role_assignment SET state = 'ACTIVE' WHERE id = ?", assignmentId);
     }
 
+    /**
+     * 处理统计相关数据。
+     */
     private static long effectiveDevOpsCount(JdbcTemplate jdbc) {
         Long count = jdbc.queryForObject("""
                 SELECT COUNT(DISTINCT assignment.user_id)
@@ -184,6 +209,9 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
         return count == null ? 0 : count;
     }
 
+    /**
+     * 执行安全相关操作。
+     */
     private static int runConcurrent(TransactionTemplate transaction, List<Runnable> operations) throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(operations.size());
         CountDownLatch ready = new CountDownLatch(operations.size());
@@ -222,8 +250,21 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 为 {@code SecurityRootConcurrencyPostgresIntegrationTest} 测试提供 {@code DatabaseConfig} 测试类型。
+     *
+     * @param url      HTTP 请求地址
+     * @param username 用户登录名
+     * @param password 用于连接测试数据库的密码
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record DatabaseConfig(String url, String username, String password) {
 
+        /**
+         * 处理配置相关数据。
+         */
         private static DatabaseConfig from(String prefix) {
             String url = environment(prefix + "URL");
             String username = environment(prefix + "USERNAME");
@@ -233,10 +274,20 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static String environment(String name) {
         return System.getenv().getOrDefault(name, "").trim();
     }
 
+    /**
+     * 为 {@code SecurityRootConcurrencyPostgresIntegrationTest} 测试提供 {@code AvailableAuditService} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class AvailableAuditService implements AuditService {
 
         @Override

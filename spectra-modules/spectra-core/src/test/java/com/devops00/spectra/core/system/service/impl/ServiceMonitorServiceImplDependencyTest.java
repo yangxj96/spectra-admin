@@ -24,7 +24,13 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 服务监控与 Actuator 健康聚合器之间的 Bean 拓扑测试。 */
+/**
+ * 服务监控与 Actuator 健康聚合器之间的 Bean 拓扑测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class ServiceMonitorServiceImplDependencyTest {
 
     @Test

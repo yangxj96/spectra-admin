@@ -85,6 +85,13 @@ public class AuthenticationController {
         return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
     }
 
+    /**
+     * 处理身份认证对象相关数据。
+     *
+     * @param params   查询筛选条件。
+     * @param request  请求参数。
+     * @param response 响应参数。
+     */
     @Audit(value = "'用户登出系统'", category = AuditCategory.SECURITY)
     @PostMapping(value = "/logout", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
@@ -148,6 +155,14 @@ public class AuthenticationController {
         verificationCodeService.sendBindingEmailCode(params.getEmail());
     }
 
+    /**
+     * 刷新身份认证对象。
+     *
+     * @param params   查询筛选条件。
+     * @param request  请求参数。
+     * @param response 响应参数。
+     * @return 安全令牌数据。
+     */
     @Audit(value = "'刷新token'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")

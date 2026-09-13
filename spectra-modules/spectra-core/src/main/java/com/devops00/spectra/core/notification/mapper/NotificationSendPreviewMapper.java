@@ -25,6 +25,10 @@ import java.time.Instant;
 
 /**
  * 受控发送短时 Preview Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Mapper
 public interface NotificationSendPreviewMapper extends BaseMapper<NotificationSendPreviewEntity> {

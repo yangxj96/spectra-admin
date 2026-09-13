@@ -23,7 +23,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 可复用授权方案元数据。
+ * 可复用的授权方案元数据。
  *
  * @author yangxj96
  * @version 1.0
@@ -34,15 +34,27 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "sec_authorization_profile", schema = "spectra_security")
 public class AuthorizationProfile extends BaseEntity {
 
+    /**
+     * 授权方案的唯一业务编码。
+     */
     @TableField(value = "code")
     private String code;
 
+    /**
+     * 授权方案的显示名称。
+     */
     @TableField(value = "name")
     private String name;
 
+    /**
+     * 授权方案用途和适用范围的说明。
+     */
     @TableField(value = "description")
     private String description;
 
+    /**
+     * 授权方案当前的启用状态。
+     */
     @TableField(value = "state")
     private String state;
 }

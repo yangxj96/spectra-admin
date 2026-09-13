@@ -31,7 +31,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 密钥导入导出传输包的口令、完整性和待启用契约测试。 */
+/**
+ * 密钥导入导出传输包的口令、完整性和待启用契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecretTransferServiceTest {
 
     private SecretManagementService managementService;

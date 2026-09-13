@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.framework.security.session.concurrency;
@@ -24,7 +33,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 会话并发策略的行为等价测试。 */
+/**
+ * 会话并发策略的行为等价测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SessionConcurrencyStrategyTest {
 
     @Test
@@ -107,6 +122,9 @@ class SessionConcurrencyStrategyTest {
                 });
     }
 
+    /**
+     * 处理策略相关数据。
+     */
     private static SessionPolicy policy(SessionConcurrencyMode mode, int maxSessions) {
         return new SessionPolicy(mode, maxSessions, 900, 86_400, null, null);
     }

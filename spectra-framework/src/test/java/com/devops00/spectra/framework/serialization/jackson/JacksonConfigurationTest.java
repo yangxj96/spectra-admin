@@ -30,7 +30,13 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** API JSON 时间格式和并发序列化契约测试。 */
+/**
+ * API JSON 时间格式和并发序列化契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class JacksonConfigurationTest {
 
     @Test
@@ -74,6 +80,9 @@ class JacksonConfigurationTest {
         assertThat(apiMapper().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)).isFalse();
     }
 
+    /**
+     * 处理配置相关数据。
+     */
     private static ObjectMapper apiMapper() {
         var builder = JsonMapper.builder();
         JacksonConfiguration configuration = new JacksonConfiguration(new JacksonProperties());

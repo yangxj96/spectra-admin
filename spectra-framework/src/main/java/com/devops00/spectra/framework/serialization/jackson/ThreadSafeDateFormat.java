@@ -136,12 +136,18 @@ final class ThreadSafeDateFormat extends DateFormat {
         return new ThreadSafeDateFormat(pattern, zoneId);
     }
 
+    /**
+     * 查询安全日期格式化。
+     */
     private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
         input.defaultReadObject();
         this.baseFormatter = DateTimeFormatter.ofPattern(pattern, Locale.ROOT);
         this.formatter = baseFormatter.withZone(zoneId);
     }
 
+    /**
+     * 转换安全日期格式化。
+     */
     private Instant toInstant(TemporalAccessor parsed) {
         if (parsed.isSupported(ChronoField.INSTANT_SECONDS)) {
             return Instant.from(parsed);

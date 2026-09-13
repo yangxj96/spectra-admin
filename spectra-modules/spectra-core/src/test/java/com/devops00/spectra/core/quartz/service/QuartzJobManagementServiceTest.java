@@ -59,6 +59,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * 验证 {@code QuartzJobManagementServiceTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzJobManagementServiceTest {
 
     private final QuartzSchedulerLifecycle lifecycle = Mockito.mock(QuartzSchedulerLifecycle.class);
@@ -176,6 +183,9 @@ class QuartzJobManagementServiceTest {
                 .isEqualTo(LocalDateTime.of(2026, 9, 9, 8, 0));
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private QuartzJobDefinition definition(boolean builtIn) {
         return new QuartzJobDefinition() {
             @Override
@@ -215,6 +225,13 @@ class QuartzJobManagementServiceTest {
         };
     }
 
+    /**
+     * 为 {@code QuartzJobManagementServiceTest} 测试提供 {@code SampleJob} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class SampleJob implements Job {
 
         @Override

@@ -76,6 +76,9 @@ public final class WebCookieCsrfFilter extends OncePerRequestFilter {
                 && hasCookie(request, securityProperties.getRefreshCookieName(), securityProperties.getCsrfCookieName());
     }
 
+    /**
+     * 判断Web过滤条件。
+     */
     private static boolean hasCookie(HttpServletRequest request, String... names) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {

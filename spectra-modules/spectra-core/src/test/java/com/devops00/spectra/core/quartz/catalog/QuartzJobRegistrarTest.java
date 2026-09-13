@@ -37,7 +37,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 内置 Job/Trigger 只补缺失且不覆盖既有资源的契约。 */
+/**
+ * 内置 Job/Trigger 只补缺失且不覆盖既有资源的契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzJobRegistrarTest {
 
     @Test
@@ -75,6 +81,9 @@ class QuartzJobRegistrarTest {
         verify(scheduler, never()).scheduleJob(any(Trigger.class));
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private QuartzJobDefinition definition() {
         return new QuartzJobDefinition() {
             @Override
@@ -114,7 +123,13 @@ class QuartzJobRegistrarTest {
         };
     }
 
-    /** 测试用 Quartz Job。 */
+    /**
+     * 测试用 Quartz Job。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class SampleJob implements Job {
 
         @Override

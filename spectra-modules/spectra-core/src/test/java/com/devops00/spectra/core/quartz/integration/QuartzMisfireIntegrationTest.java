@@ -32,7 +32,13 @@ import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 在真实 Quartz 构造器上验证时区、错过策略和 Simple Trigger 语义。 */
+/**
+ * 在真实 Quartz 构造器上验证时区、错过策略和 Simple Trigger 语义。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Testcontainers
 @Tag("manual-integration")
 @EnabledIfEnvironmentVariable(named = "SPECTRA_QUARTZ_FLYWAY_POSTGRES_TEST", matches = "true")

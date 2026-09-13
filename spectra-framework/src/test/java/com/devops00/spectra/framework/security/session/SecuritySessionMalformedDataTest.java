@@ -41,7 +41,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** 安全 Session 脏数据必须 fail-closed 的回归测试。 */
+/**
+ * 安全 Session 脏数据必须 fail-closed 的回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecuritySessionMalformedDataTest {
 
     @Test
@@ -104,6 +110,9 @@ class SecuritySessionMalformedDataTest {
         assertThrows(SecurityRedisUnavailableException.class, repository::listOnlineUsers);
     }
 
+    /**
+     * 处理安全会话相关数据。
+     */
     private static SessionConcurrencyStrategyResolver resolver(SecuritySessionStore store) {
         return new SessionConcurrencyStrategyResolver(List.of(
                 new AllowSessionConcurrencyStrategy(),

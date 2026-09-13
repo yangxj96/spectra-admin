@@ -64,6 +64,9 @@ class NotificationCallerMigrationContractTest {
         assertTrue(support.contains("businessReference("));
     }
 
+    /**
+     * 查询来源。
+     */
     private String readSource(String relativePath) throws Exception {
         var candidates = List.of(
                 Path.of("src/main/java/com/devops00/spectra/oa", relativePath),

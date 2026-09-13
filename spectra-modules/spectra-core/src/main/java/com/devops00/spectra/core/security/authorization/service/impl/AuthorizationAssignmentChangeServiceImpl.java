@@ -26,7 +26,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/** 授权 Assignment 公开入口，只负责路由影响分析和审计变更用例。 */
+/**
+ * 授权 Assignment 公开入口，只负责路由影响分析和审计变更用例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @Primary
 public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAssignmentChangeService {

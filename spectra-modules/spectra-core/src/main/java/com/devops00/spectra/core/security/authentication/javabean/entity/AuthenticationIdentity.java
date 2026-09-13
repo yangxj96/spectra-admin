@@ -29,6 +29,10 @@ import java.util.UUID;
 
 /**
  * 认证身份标识。原始登录标识不落库，只保存规范化标识的摘要。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
  */
 @Data
 @NoArgsConstructor
@@ -37,24 +41,45 @@ import java.util.UUID;
 @TableName(value = "sec_authentication_identity", schema = "spectra_security")
 public class AuthenticationIdentity extends BaseEntity {
 
+    /**
+     * 该认证身份所属的用户 ID。
+     */
     @TableField(value = "user_id")
     private UUID userId;
 
+    /**
+     * 此身份使用的认证方式编码。
+     */
     @TableField(value = "method_code")
     private String methodCode;
 
+    /**
+     * 提供此认证身份的认证源或身份提供方编码。
+     */
     @TableField(value = "provider_code")
     private String providerCode;
 
+    /**
+     * 规范化登录标识的摘要，不保存原始登录标识。
+     */
     @TableField(value = "identifier_hash")
     private String identifierHash;
 
+    /**
+     * 认证身份当前的启用或停用状态。
+     */
     @TableField(value = "state")
     private String state;
 
+    /**
+     * 该身份最近一次通过验证的时间。
+     */
     @TableField(value = "verified_at")
     private Instant verifiedAt;
 
+    /**
+     * 该身份最近一次用于认证的时间。
+     */
     @TableField(value = "last_used_at")
     private Instant lastUsedAt;
 

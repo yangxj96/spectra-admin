@@ -306,6 +306,9 @@ class MenuServiceImplTest {
         assertEquals(List.of(leaf), service.getByRelRoleId(roleId));
     }
 
+    /**
+     * 处理安全角色相关数据。
+     */
     private static SecurityRole securityRole(String code) {
         var role = new SecurityRole();
         role.setId(UUID.randomUUID());
@@ -314,6 +317,9 @@ class MenuServiceImplTest {
         return role;
     }
 
+    /**
+     * 处理关系相关数据。
+     */
     private static SecurityRoleMenu relation(UUID roleId, UUID menuId) {
         var relation = new SecurityRoleMenu();
         relation.setRoleId(roleId);
@@ -321,6 +327,9 @@ class MenuServiceImplTest {
         return relation;
     }
 
+    /**
+     * 处理菜单相关数据。
+     */
     private static Menu menu(UUID pid, MenuType menuType, String routeName, int sort) {
         var menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -331,6 +340,9 @@ class MenuServiceImplTest {
         return menu;
     }
 
+    /**
+     * 转换树结构。
+     */
     private static MenuTreeVO toTreeVO(Menu menu) {
         var vo = new MenuTreeVO();
         vo.setId(menu.getId());

@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.system.javabean.entity;
@@ -13,7 +22,13 @@ import com.devops00.spectra.framework.persistence.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/** 单体服务监控告警规则。 */
+/**
+ * 服务监控告警的阈值与匹配条件配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_service_monitor_alert_rule", schema = "spectra_core")

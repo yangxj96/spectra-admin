@@ -31,6 +31,10 @@ import java.time.Instant;
  * 文件存储健康检查。
  *
  * <p>本地存储检查上传目录和临时目录是否可写；其他存储类型由对应 Provider 自身负责连通性检查。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component("fileStorage")
 public class FileStorageHealthIndicator implements DependencyHealthContributor {
@@ -92,6 +96,9 @@ public class FileStorageHealthIndicator implements DependencyHealthContributor {
         }
     }
 
+    /**
+     * 处理结果相关数据。
+     */
     private DependencyHealthResult result(DependencyHealthStatus status, long start, Instant checkedAt,
                                           String errorCode, String safeSummary) {
         return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,

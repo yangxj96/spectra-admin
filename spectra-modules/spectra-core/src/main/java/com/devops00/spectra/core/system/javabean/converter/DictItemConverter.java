@@ -46,18 +46,18 @@ public interface DictItemConverter {
     DictItem toEntity(DictItemFrom source);
 
     /**
-     * 字典数据转字典数据VO
+     * 转换条目。
      *
-     * @param source 字典数据
-     * @return 字典数据VO
+     * @param source 来源参数。
+     * @return 条目数据。
      */
     DictItemVO toVO(DictItem source);
 
     /**
-     * 字典数据转字典数据VO(列表)
+     * 转换条目。
      *
-     * @param source 字典数据
-     * @return 字典数据VO(列表)
+     * @param source 来源参数。
+     * @return 符合条件的数据集合。
      */
     List<DictItemVO> toVOList(List<DictItem> source);
 }

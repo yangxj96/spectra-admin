@@ -30,6 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * 管理端地址、错误和投递摘要脱敏测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationAdminConverterTest {
 

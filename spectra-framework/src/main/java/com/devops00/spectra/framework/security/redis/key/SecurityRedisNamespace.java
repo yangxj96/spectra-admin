@@ -20,6 +20,10 @@ package com.devops00.spectra.framework.security.redis.key;
  * 安全 Redis 固定命名空间。
  *
  * <p>命名空间属于安全数据格式的一部分，不允许通过运行时配置随意改变；变更必须配套迁移和回滚方案。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class SecurityRedisNamespace {
 

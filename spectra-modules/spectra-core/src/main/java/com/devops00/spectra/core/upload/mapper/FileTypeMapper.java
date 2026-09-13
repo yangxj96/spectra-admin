@@ -23,13 +23,37 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.UUID;
 
-/** 文件类型 Mapper。 */
+/**
+ * 文件类型 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface FileTypeMapper extends BaseMapper<FileType> {
 
+    /**
+     * 查询启用状态编码。
+     *
+     * @param code 编码参数。
+     * @return 文件类型数据。
+     */
     FileType findEnabledByCode(@Param("code") String code);
 
+    /**
+     * 查询启用状态内容类型。
+     *
+     * @param contentType 内容类型参数。
+     * @return 文件类型数据。
+     */
     FileType findEnabledByContentType(@Param("contentType") String contentType);
 
+    /**
+     * 查询标识停用状态。
+     *
+     * @param id 数据记录的唯一标识。
+     * @return 文件类型数据。
+     */
     FileType findByIdIncludingDisabled(@Param("id") UUID id);
 }

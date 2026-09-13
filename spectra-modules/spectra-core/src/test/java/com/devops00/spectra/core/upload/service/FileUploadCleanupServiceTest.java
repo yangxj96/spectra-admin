@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.core.upload.javabean.constant.FileAssetStatus;
@@ -30,6 +41,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code FileUploadCleanupServiceTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class FileUploadCleanupServiceTest {
 
     private static final Instant NOW = Instant.parse("2026-08-31T00:00:00Z");
@@ -101,6 +119,9 @@ class FileUploadCleanupServiceTest {
         assertEquals(1L, result.assetRetryScheduled());
     }
 
+    /**
+     * 处理会话相关数据。
+     */
     private static FileUploadSession session(StorageProviderType provider) {
         var session = new FileUploadSession();
         session.setId(UUID.randomUUID());
@@ -113,6 +134,9 @@ class FileUploadCleanupServiceTest {
         return session;
     }
 
+    /**
+     * 处理资产相关数据。
+     */
     private static FileAsset asset(StorageProviderType provider) {
         var asset = new FileAsset();
         asset.setId(UUID.randomUUID());

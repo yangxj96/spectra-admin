@@ -76,6 +76,13 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
         filterChain.doFilter(new ParamsModifyHttpServletRequestWrapper(request, formatted), response);
     }
 
+    /**
+     * 提供修改HTTP请求相关的基础能力。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public static class ParamsModifyHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
         private final ConcurrentMap<String, String[]> formatted;

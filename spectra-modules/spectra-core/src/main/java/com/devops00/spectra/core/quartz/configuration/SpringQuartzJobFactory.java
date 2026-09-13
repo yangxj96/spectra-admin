@@ -24,7 +24,13 @@ import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
-/** 使用 Spring BeanFactory 创建和初始化 Quartz Job。 */
+/**
+ * 使用 Spring BeanFactory 创建和初始化 Quartz Job。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 @RequiredArgsConstructor
 public class SpringQuartzJobFactory implements JobFactory {

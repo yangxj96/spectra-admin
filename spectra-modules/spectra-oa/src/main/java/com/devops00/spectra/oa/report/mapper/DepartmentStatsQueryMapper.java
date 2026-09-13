@@ -23,7 +23,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-/** 部门统计统一报表查询 Mapper。 */
+/**
+ * 部门统计统一报表查询 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface DepartmentStatsQueryMapper {
 
     /**

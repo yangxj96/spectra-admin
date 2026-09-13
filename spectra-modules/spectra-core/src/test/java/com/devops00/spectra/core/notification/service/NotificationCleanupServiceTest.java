@@ -31,6 +31,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 敏感载荷清理任务的开关、批量和匿名计数回归。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationCleanupServiceTest {
 

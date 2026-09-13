@@ -28,7 +28,13 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 缓存 mapper 的类型边界和 Java 容器兼容性测试。 */
+/**
+ * 缓存 mapper 的类型边界和 Java 容器兼容性测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class CacheConfigurationTest {
 
     @Test
@@ -70,6 +76,9 @@ class CacheConfigurationTest {
         assertThat(cacheMapper().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)).isTrue();
     }
 
+    /**
+     * 处理缓存相关数据。
+     */
     private static ObjectMapper cacheMapper() {
         return new CacheConfiguration().redisObjectMapper();
     }

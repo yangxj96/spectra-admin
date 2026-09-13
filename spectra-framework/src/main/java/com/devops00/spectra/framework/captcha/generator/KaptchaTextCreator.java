@@ -34,9 +34,7 @@ public class KaptchaTextCreator extends DefaultTextCreator {
      */
     private static final String[] NUMBERS = "0,1,2,3,4,5,6,7,8,9,10".split(",");
 
-    /**
-     * 随机数种子
-     */
+    /** 生成验证码运算数时使用的密码学安全随机数生成器。 */
     private static final SecureRandom RANDOM = new SecureRandom();
 
     /**

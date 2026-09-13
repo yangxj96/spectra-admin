@@ -78,6 +78,10 @@ import java.util.stream.Collectors;
  * 受控发送 Preview/Apply 实现。
  *
  * <p>Preview 只保存短时的非敏感请求快照和摘要，Apply 再次展开当前受众并通过统一 Gateway 入队。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @RequiredArgsConstructor
@@ -89,6 +93,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
 
     private static final int MAX_SAMPLE_COUNT = 10;
 
+    /** 生成受控发送预览令牌时使用的密码学安全随机数生成器。 */
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private static final Set<String> SENSITIVE_KEYS = Set.of("code", "captcha", "password", "token", "secret");
@@ -485,6 +490,16 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         return hash(String.join("|", values));
     }
 
+    /**
+     * 实现请求相关的应用服务逻辑。
+     *
+     * @param templateGroupCode 模板分组编码
+     * @param templates         本次发送使用的通知模板快照集合
+     * @param request           本次受控通知发送请求
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record PreparedRequest(String templateGroupCode,
                                    Map<NotificationChannel, NotificationControlledSendTemplateVO> templates,
                                    NotificationControlledSendFrom request) {
@@ -495,6 +510,22 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param candidateUserIds    候选项用户标识
+     * @param candidateUserCount  符合初步筛选条件的候选用户数量
+     * @param eligibleTaskCount   可以创建通知任务的用户数量
+     * @param skippedTaskCount    因条件不符而跳过的任务数量
+     * @param skippedCounts       按原因统计的跳过任务数量
+     * @param skippedDetails      未创建通知任务的用户及跳过原因
+     * @param channelAvailability 各通知渠道的可用状态
+     * @param samples             采样记录
+     * @param resolutionHash      跳过决策的规则计算摘要
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record Evaluation(List<UUID> candidateUserIds, int candidateUserCount, int eligibleTaskCount,
                               int skippedTaskCount, Map<String, Integer> skippedCounts,
                               List<NotificationControlledSendSkippedDetailVO> skippedDetails,

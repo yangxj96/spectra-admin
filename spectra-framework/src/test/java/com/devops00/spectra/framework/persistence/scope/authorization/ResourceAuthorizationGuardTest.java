@@ -39,7 +39,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 资源授权门禁构造和批量快照回归测试。 */
+/**
+ * 资源授权门禁构造和批量快照回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class ResourceAuthorizationGuardTest {
 
     private static final UUID USER_ID = UUID.fromString("019bdfdd-b58d-7232-943f-af4141801ae3");
@@ -67,6 +73,9 @@ class ResourceAuthorizationGuardTest {
         verify(snapshotProvider).load(USER_ID);
     }
 
+    /**
+     * 处理快照相关数据。
+     */
     private static AuthorizationSnapshot snapshot() {
         var boundary = new PermissionBoundary("resource:batch", AuthorizationScope.of(ScopeMode.ALL));
         var assignment = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_USER", 1,

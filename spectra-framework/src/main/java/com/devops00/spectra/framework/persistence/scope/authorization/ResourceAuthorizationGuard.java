@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.framework.persistence.scope.authorization;
@@ -24,6 +34,10 @@ import java.util.Objects;
  *
  * <p>服务层在读取详情、更新、删除、批量操作或导出前调用本门面。它只接受服务端解析出的
  * {@link ScopeQuery}，绝不接受客户端直接声明的部门范围。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public class ResourceAuthorizationGuard {
@@ -89,6 +103,9 @@ public class ResourceAuthorizationGuard {
         }
     }
 
+    /**
+     * 查询授权。
+     */
     private ScopedAuthorization loadAuthorization(ExecutionContext context) {
         AuthorizationSnapshotProvider snapshotProvider = provider.getIfAvailable();
         if (snapshotProvider == null) {
@@ -98,17 +115,26 @@ public class ResourceAuthorizationGuard {
         return new ScopedAuthorization(context.subjectId(), snapshot);
     }
 
+    /**
+     * 校验上下文查询。
+     */
     private static void requireContextAndQuery(ExecutionContext context, ScopeQuery query) {
         requireContext(context);
         requireQuery(query);
     }
 
+    /**
+     * 校验上下文。
+     */
     private static void requireContext(ExecutionContext context) {
         if (context == null) {
             throw new DataScopeViolationException("资源授权上下文不完整");
         }
     }
 
+    /**
+     * 校验查询。
+     */
     private static void requireQuery(ScopeQuery query) {
         if (query == null) {
             throw new DataScopeViolationException("资源授权查询不完整");

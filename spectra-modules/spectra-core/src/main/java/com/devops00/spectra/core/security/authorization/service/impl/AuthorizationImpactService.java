@@ -23,7 +23,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/** 授权 Assignment 影响分析和 Preview 用例。 */
+/**
+ * 授权 Assignment 影响分析和 Preview 用例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthorizationImpactService {

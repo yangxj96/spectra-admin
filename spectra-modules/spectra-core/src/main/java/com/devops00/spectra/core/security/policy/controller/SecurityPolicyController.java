@@ -36,7 +36,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-/** 安全会话和密码策略管理接口。 */
+/**
+ * 安全会话和密码策略管理接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Validated
 @RestController

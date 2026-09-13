@@ -18,7 +18,13 @@ package com.devops00.spectra.core.system.service;
 
 import com.devops00.spectra.core.system.javabean.vo.SystemBootstrapVO;
 
-/** Web 端启动配置聚合服务。 */
+/**
+ * Web 端启动配置聚合服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface SystemBootstrapService {
 
     /**

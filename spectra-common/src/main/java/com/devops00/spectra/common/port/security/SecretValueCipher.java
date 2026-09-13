@@ -29,11 +29,11 @@ import java.util.Objects;
 public interface SecretValueCipher {
 
     /**
-     * 加密密钥值。
+     * 处理密钥值相关数据。
      *
-     * @param code      已注册密钥编码，作为附加认证数据
-     * @param plaintext 待加密明文
-     * @return 加密结果
+     * @param code      业务对象的唯一编码。
+     * @param plaintext 完成本次操作所需的输入数据。
+     * @return 值数据。
      */
     EncryptedValue encrypt(String code, String plaintext);
 
@@ -47,11 +47,14 @@ public interface SecretValueCipher {
     String decrypt(String code, EncryptedValue encrypted);
 
     /**
-     * AES-GCM 加密结果。
+     * 定义值相关的跨模块调用契约。
      *
      * @param algorithm  算法标识
-     * @param nonce      GCM nonce
+     * @param nonce      用于防止请求重放的随机数
      * @param ciphertext 认证密文
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     record EncryptedValue(String algorithm, byte[] nonce, byte[] ciphertext) {
 

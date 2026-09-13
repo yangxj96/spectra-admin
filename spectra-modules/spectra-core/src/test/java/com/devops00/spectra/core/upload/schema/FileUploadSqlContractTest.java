@@ -25,7 +25,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 文件上传数据库基线契约测试。 */
+/**
+ * 文件上传数据库基线契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class FileUploadSqlContractTest {
 
     @Test
@@ -96,6 +102,9 @@ class FileUploadSqlContractTest {
         assertFileDomainComments(Files.readString(baselinePath()));
     }
 
+    /**
+     * 处理文件相关数据。
+     */
     private static void assertFileDomainComments(String sql) {
         var columns = List.of(
                 List.of("file_type", "id", "code", "display_name", "allowed_extensions", "allowed_content_types", "magic_rules",
@@ -126,6 +135,9 @@ class FileUploadSqlContractTest {
         }
     }
 
+    /**
+     * 处理路径相关数据。
+     */
     private static Path baselinePath() {
         var current = Path.of("").toAbsolutePath();
         while (current != null) {

@@ -42,7 +42,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-/** 验证码摘要、过期和发送失败补偿测试。 */
+/**
+ * 验证码摘要、过期和发送失败补偿测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class VerificationCodeServiceImplTest {
 
     @Test
@@ -143,6 +149,9 @@ class VerificationCodeServiceImplTest {
         assertEquals(NotificationService.class, constructor.getParameterTypes()[0]);
     }
 
+    /**
+     * 处理运行时环境相关数据。
+     */
     private static SecretRuntimeService runtime(String value) {
         return key -> Optional.ofNullable(value)
                 .map(secret -> new RuntimeSecret(key, 1, secret, "test-fingerprint"));

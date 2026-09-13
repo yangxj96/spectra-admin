@@ -24,7 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** 安全 Redis 故障统一转换测试。 */
+/**
+ * 安全 Redis 故障统一转换测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecurityRedisExecutorTest {
 
     @Test

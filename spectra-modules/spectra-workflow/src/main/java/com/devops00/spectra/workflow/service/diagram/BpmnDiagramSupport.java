@@ -33,6 +33,10 @@ import java.util.Map;
 
 /**
  * 为没有 BPMN-DI 的历史流程模型补齐最小可渲染布局。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class BpmnDiagramSupport {
 

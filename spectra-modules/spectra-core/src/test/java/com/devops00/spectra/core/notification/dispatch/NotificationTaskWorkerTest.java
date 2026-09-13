@@ -56,6 +56,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Worker 的租约、过期、失败和 Delivery 测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationTaskWorkerTest {
 
@@ -250,6 +254,9 @@ class NotificationTaskWorkerTest {
         assertTrue(RequestCorrelationContext.current().isEmpty());
     }
 
+    /**
+     * 处理通知任务相关数据。
+     */
     private NotificationTaskWorker worker(NotificationTaskMapper taskMapper,
                                           NotificationDeliveryMapper deliveryMapper, NotificationRequestMapper requestMapper,
                                           List<NotificationSender> senders) {
@@ -260,6 +267,9 @@ class NotificationTaskWorkerTest {
         return worker;
     }
 
+    /**
+     * 处理任务相关数据。
+     */
     private NotificationTaskEntity task(String status, Instant scheduledAt, Instant expiresAt) {
         var task = new NotificationTaskEntity();
         task.setId(UUID.randomUUID());
@@ -273,6 +283,9 @@ class NotificationTaskWorkerTest {
         return task;
     }
 
+    /**
+     * 设置通知任务。
+     */
     private void setField(Object target, String name, Object value) {
         try {
             var field = target.getClass().getDeclaredField(name);

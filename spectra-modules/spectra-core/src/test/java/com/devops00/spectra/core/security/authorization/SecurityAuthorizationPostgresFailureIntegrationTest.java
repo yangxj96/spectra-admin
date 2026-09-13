@@ -42,7 +42,13 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** 真实 PostgreSQL 不可用时，授权快照加载必须失败，不得降级为空权限。 */
+/**
+ * 真实 PostgreSQL 不可用时，授权快照加载必须失败，不得降级为空权限。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_POSTGRES_FAILURE_TEST", matches = "true")
 @Tag("manual-integration")
 @SpringBootTest(classes = SecurityAuthorizationPostgresFailureIntegrationTest.TestApplication.class, properties = {
@@ -61,6 +67,13 @@ class SecurityAuthorizationPostgresFailureIntegrationTest {
                 .isInstanceOf(DataAccessException.class);
     }
 
+    /**
+     * 为 {@code SecurityAuthorizationPostgresFailureIntegrationTest} 测试提供 {@code TestApplication} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @Configuration(proxyBeanMethods = false)
     @EnableAutoConfiguration
     @MapperScan("com.devops00.spectra.core.security.authorization.mapper")

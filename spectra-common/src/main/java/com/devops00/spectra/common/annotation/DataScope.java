@@ -75,6 +75,13 @@ public @interface DataScope {
      */
     Relation[] relations() default {};
 
+    /**
+     * 定义用于标记关系的注解。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @interface Relation {
         /**
          * 关联表所在 schema。为空时使用当前连接的 search_path。

@@ -31,7 +31,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 受控发送短时 Preview 快照；过期后由通知清理任务物理删除。
+ * 受控通知发送的短期预览快照；过期后由通知清理任务物理删除。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
  */
 @Getter
 @Setter

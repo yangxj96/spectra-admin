@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.upload.api;
 
-/** 文件上传领域异常。 */
+/**
+ * 文件上传领域异常。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public class FileUploadException extends RuntimeException {
 
     private final FileErrorCode errorCode;

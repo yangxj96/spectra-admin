@@ -22,6 +22,13 @@ import org.jspecify.annotations.Nullable;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * 定义密码凭据相关的应用服务契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface PasswordCredentialService {
 
     /**

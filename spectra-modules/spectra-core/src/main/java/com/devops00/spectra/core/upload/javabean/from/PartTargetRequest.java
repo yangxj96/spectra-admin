@@ -22,7 +22,13 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
-/** 请求分片上传目标。 */
+/**
+ * 请求分片上传目标。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class PartTargetRequest {
 

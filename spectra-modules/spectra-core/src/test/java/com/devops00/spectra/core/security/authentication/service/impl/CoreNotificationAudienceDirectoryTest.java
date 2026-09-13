@@ -45,6 +45,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 受控发送部门、角色和明确用户范围展开测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class CoreNotificationAudienceDirectoryTest {
 

@@ -30,7 +30,13 @@ import tools.jackson.databind.ObjectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-/** Lettuce 客户端和线程资源的 Spring 生命周期回归测试。 */
+/**
+ * Lettuce 客户端和线程资源的 Spring 生命周期回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RedisConfigurationLifecycleTest {
 
     @Test
@@ -64,6 +70,13 @@ class RedisConfigurationLifecycleTest {
         assertThat(resources.eventExecutorGroup().isShuttingDown()).isTrue();
     }
 
+    /**
+     * 为 {@code RedisConfigurationLifecycleTest} 测试提供 {@code TestDependencies} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @Configuration(proxyBeanMethods = false)
     static class TestDependencies {
 

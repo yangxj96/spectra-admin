@@ -49,6 +49,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Redis Security Session 撤销测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class SecuritySessionLifecycleTest {
 
@@ -213,17 +217,26 @@ class SecuritySessionLifecycleTest {
         verify(redis).delete(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest));
     }
 
+    /**
+     * 处理安全会话相关数据。
+     */
     private static SecuritySessionStore store(RedisTemplate<String, Object> redis,
                                               SecuritySessionPolicyProvider policyProvider) {
         return new SecuritySessionStore(redis, new SecurityProperties(), provider(policyProvider));
     }
 
+    /**
+     * 处理提供器相关数据。
+     */
     private static ObjectProvider<SecuritySessionPolicyProvider> provider(SecuritySessionPolicyProvider policyProvider) {
         ObjectProvider<SecuritySessionPolicyProvider> provider = mock();
         when(provider.getIfAvailable()).thenReturn(policyProvider);
         return provider;
     }
 
+    /**
+     * 处理安全会话相关数据。
+     */
     private static SessionConcurrencyStrategyResolver resolver(SecuritySessionStore store) {
         return new SessionConcurrencyStrategyResolver(List.of(
                 new AllowSessionConcurrencyStrategy(),

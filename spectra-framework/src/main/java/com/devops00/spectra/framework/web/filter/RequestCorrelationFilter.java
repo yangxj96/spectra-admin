@@ -76,6 +76,9 @@ public class RequestCorrelationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 设置响应。
+     */
     private void setResponseHeaders(HttpServletResponse response, RequestCorrelationContext.Context context) {
         response.setHeader(REQUEST_ID_HEADER, context.requestId());
         response.setHeader(CORRELATION_ID_HEADER, context.correlationId());

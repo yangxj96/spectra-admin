@@ -33,6 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 通知中心受控发送接口；Preview 与 Apply 都必须经过权限和服务层数据范围校验。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @RestController
 @RequiredArgsConstructor

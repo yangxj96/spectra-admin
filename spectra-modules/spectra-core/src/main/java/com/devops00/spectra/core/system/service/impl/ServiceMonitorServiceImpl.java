@@ -24,7 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-/** 服务监控公开入口，只负责路由查询和快照采集两个用例组。 */
+/**
+ * 服务监控公开入口，只负责路由查询和快照采集两个用例组。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @Primary
 public class ServiceMonitorServiceImpl implements ServiceMonitorService {

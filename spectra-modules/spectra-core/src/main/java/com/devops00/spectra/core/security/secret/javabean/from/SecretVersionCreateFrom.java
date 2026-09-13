@@ -20,7 +20,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/** 创建密钥待启用版本入参。 */
+/**
+ * 创建密钥待启用版本入参。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class SecretVersionCreateFrom {
 

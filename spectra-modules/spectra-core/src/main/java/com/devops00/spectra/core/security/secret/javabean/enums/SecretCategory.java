@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.security.secret.javabean.enums;
 
-/** 密钥管理页面展示的固定分类。 */
+/**
+ * 密钥管理页面展示的固定分类。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum SecretCategory {
 
     /** 应用内部加密密钥。 */

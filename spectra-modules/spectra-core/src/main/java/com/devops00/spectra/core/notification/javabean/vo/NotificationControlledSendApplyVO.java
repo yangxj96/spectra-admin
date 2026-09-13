@@ -19,7 +19,15 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import java.util.UUID;
 
 /**
- * 受控发送 Apply 回执。
+ * 封装通知发送应用相关的响应数据。
+ *
+ * @param requestId        请求标识
+ * @param status           业务状态
+ * @param taskCount        待处理的任务数量
+ * @param idempotentReplay 请求是否命中幂等重放
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record NotificationControlledSendApplyVO(UUID requestId, String status, int taskCount,
                                                 boolean idempotentReplay) {

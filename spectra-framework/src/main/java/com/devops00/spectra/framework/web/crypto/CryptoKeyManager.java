@@ -54,9 +54,12 @@ public class CryptoKeyManager {
     private final SystemConfigValueProvider configProvider;
 
     /**
-     * 不可变密钥容器，volatile 原子替换保证线程安全
+     * 描述加密配置当前的可用状态。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
-    /** 加密配置运行态。 */
     public enum State {
         /** 已明确关闭接口加解密。 */
         DISABLED,
@@ -66,6 +69,20 @@ public class CryptoKeyManager {
         UNAVAILABLE
     }
 
+    /**
+     * 保存当前加载的 RSA 密钥；通过 volatile 引用整体替换，保证读取方看到一致的密钥快照。
+     *
+     * @param state                  当前加密配置状态
+     * @param serverPublicKey        已解析的服务端公钥
+     * @param serverPrivateKey       已解析的服务端私钥
+     * @param clientPublicKey        已解析的客户端公钥
+     * @param clientPrivateKey       已解析的客户端私钥
+     * @param serverPublicKeyBase64  Base64 编码的服务端公钥配置
+     * @param clientPrivateKeyBase64 Base64 编码的客户端私钥配置
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record CryptoKeys(State state, @Nullable PublicKey serverPublicKey, @Nullable PrivateKey serverPrivateKey,
                               @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey,
                               @Nullable String serverPublicKeyBase64, @Nullable String clientPrivateKeyBase64) {

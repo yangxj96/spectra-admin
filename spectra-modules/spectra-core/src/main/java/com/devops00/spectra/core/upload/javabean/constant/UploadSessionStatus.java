@@ -18,7 +18,13 @@ package com.devops00.spectra.core.upload.javabean.constant;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 
-/** 上传会话状态。 */
+/**
+ * 上传会话状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum UploadSessionStatus implements IEnum<String> {
     UPLOADING,
     VERIFYING,

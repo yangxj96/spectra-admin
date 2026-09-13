@@ -16,7 +16,21 @@
 
 package com.devops00.spectra.core.security.policy.javabean.vo;
 
-/** 系统密码策略视图。 */
+/**
+ * 封装安全密码策略相关的响应数据。
+ *
+ * @param policyKey        密码策略的配置键
+ * @param minLength        密码允许的最小字符数
+ * @param requireUppercase 密码是否必须包含大写字母
+ * @param requireLowercase 密码是否必须包含小写字母
+ * @param requireDigit     密码是否必须包含数字
+ * @param requireSpecial   密码是否必须包含特殊字符
+ * @param maxAgeDays       密码的最长有效天数
+ * @param version          当前对象或配置的版本号
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record SecurityPasswordPolicyVO(String policyKey,
                                        Integer minLength,
                                        Boolean requireUppercase,

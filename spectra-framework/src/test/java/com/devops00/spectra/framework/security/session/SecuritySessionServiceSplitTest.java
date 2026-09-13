@@ -22,7 +22,13 @@ import org.springframework.stereotype.Component;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** 安全 Session 用例拆分契约测试。 */
+/**
+ * 安全 Session 用例拆分契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecuritySessionServiceSplitTest {
 
     private static final String SERVICE_PACKAGE = "com.devops00.spectra.framework.security.session.";

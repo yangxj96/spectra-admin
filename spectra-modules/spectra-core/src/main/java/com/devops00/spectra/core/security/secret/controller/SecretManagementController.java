@@ -50,7 +50,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/** 密钥管理接口；所有页面和接口操作都只允许 ROLE_DEV_OPS。 */
+/**
+ * 密钥管理接口；所有页面和接口操作都只允许 ROLE_DEV_OPS。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -163,6 +169,9 @@ public class SecretManagementController {
         cryptoKeyManager.refresh();
     }
 
+    /**
+     * 转换密钥。
+     */
     private SecretDefinitionVO toDefinition(SecretDefinitionEntity definition) {
         List<SecretVersionEntity> versions = managementService.listVersions(definition.getCode());
         SecretVersionEntity active = versions.stream()
@@ -177,16 +186,25 @@ public class SecretManagementController {
                 active == null ? null : active.getFingerprint(), definition.getUpdatedAt());
     }
 
+    /**
+     * 转换版本。
+     */
     private SecretVersionVO toVersion(SecretVersionEntity version) {
         return new SecretVersionVO(version.getId(), version.getVersionNo(), version.getState(),
                 version.getCipherAlgorithm(), version.getFingerprint(), version.getSource(), version.getEffectiveAt(),
                 version.getRetiredAt(), version.getCreatedAt());
     }
 
+    /**
+     * 转换配置项。
+     */
     private SecretManagementSettingsVO toSettings(SecretManagementSettingsService.CryptoSettings settings) {
         return new SecretManagementSettingsVO(settings.enabled(), settings.ready(), settings.state().name());
     }
 
+    /**
+     * 校验文件。
+     */
     private void validateImportFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("密钥导入包不能为空");

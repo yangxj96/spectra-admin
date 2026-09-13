@@ -22,7 +22,14 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * 可绑定到单个 Permission 的 AccessScope 或 GrantScope。
+ * 承载授权范围相关的不可变数据。
+ *
+ * @param mode               缓存区域使用的工作模式
+ * @param departmentIds      部门标识
+ * @param includeDescendants 查询范围是否包含下级部门
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record AuthorizationScope(ScopeMode mode, Set<UUID> departmentIds, boolean includeDescendants) {
 

@@ -22,14 +22,28 @@ import com.devops00.spectra.framework.persistence.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * 权限授权使用的范围定义，描述范围模式和资源编码。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sec_authorization_scope", schema = "spectra_security")
 public class AuthorizationScope extends BaseEntity {
 
+    /**
+     * 授权范围的模式编码，描述权限适用的范围类型。
+     */
     @TableField(value = "scope_mode")
     private String scopeMode;
 
+    /**
+     * 授权范围对应的资源业务编码。
+     */
     @TableField(value = "resource_code")
     private String resourceCode;
 }

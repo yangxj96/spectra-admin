@@ -17,8 +17,13 @@
 package com.devops00.spectra.core.security.authorization.domain;
 
 /**
- * 组织变更影响摘要。
+ * 承载组织相关的不可变数据。
  *
+ * @param beforeVersion             变更前的版本号
+ * @param afterVersion              变更后的版本号
+ * @param expandsEffectiveAuthority 本次变更是否扩大用户的有效权限
+ * @param affectedAssignmentCount   本次变更影响的权限分配数量
+ * @param affectedUserCount         本次变更影响的用户数量
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/14

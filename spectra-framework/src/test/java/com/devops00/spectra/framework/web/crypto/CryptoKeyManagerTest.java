@@ -32,7 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-/** 加密密钥运行态和 fail-closed 行为测试。 */
+/**
+ * 加密密钥运行态和 fail-closed 行为测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class CryptoKeyManagerTest {
 
     private static KeyPair serverKeyPair;
@@ -127,16 +133,25 @@ class CryptoKeyManagerTest {
         assertEquals(CryptoKeyManager.State.UNAVAILABLE, manager.getState());
     }
 
+    /**
+     * 处理提供器相关数据。
+     */
     private static RuntimeSecretProvider provider(Map<String, String> values) {
         return key -> Optional.ofNullable(values.get(key))
                 .map(value -> new RuntimeSecret(key, 1, value, "test-fingerprint"));
     }
 
+    /**
+     * 处理配置提供器相关数据。
+     */
     private static com.devops00.spectra.common.config.SystemConfigValueProvider configProvider(
                                                                                                Map<String, String> values) {
         return key -> Optional.ofNullable(values.get(key));
     }
 
+    /**
+     * 处理就绪状态配置相关数据。
+     */
     private static Map<String, String> readyConfig() {
         var config = new HashMap<String, String>();
         config.put("crypto.server.public-key", RSAUtils.getPublicKeyBase64(serverKeyPair.getPublic()));

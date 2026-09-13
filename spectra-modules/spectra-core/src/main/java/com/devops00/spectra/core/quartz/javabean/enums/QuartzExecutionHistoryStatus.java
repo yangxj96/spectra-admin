@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.quartz.javabean.enums;
 
-/** Quartz 执行历史的生命周期状态。 */
+/**
+ * Quartz 执行历史的生命周期状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum QuartzExecutionHistoryStatus {
     /** 正在执行。 */
     RUNNING,

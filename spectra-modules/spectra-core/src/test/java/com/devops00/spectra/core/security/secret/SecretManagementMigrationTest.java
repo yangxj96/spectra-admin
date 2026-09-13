@@ -23,7 +23,13 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 密钥管理基线的结构和种子契约测试。 */
+/**
+ * 密钥管理基线的结构和种子契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecretManagementMigrationTest {
 
     @Test
@@ -61,6 +67,9 @@ class SecretManagementMigrationTest {
                 .doesNotContain("V20__repair_incomplete_crypto_configuration.sql");
     }
 
+    /**
+     * 查询密钥。
+     */
     private static String readBaseline() throws IOException {
         try (var resource = SecretManagementMigrationTest.class.getClassLoader()
                 .getResourceAsStream("db/migration/V1__init_db.sql")) {

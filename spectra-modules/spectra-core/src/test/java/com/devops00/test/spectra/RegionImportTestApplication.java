@@ -34,7 +34,13 @@ import org.springframework.context.annotation.Import;
 
 import java.util.UUID;
 
-/** 行政区划导入专用测试上下文，避免加载无关业务和其他集成测试配置。 */
+/**
+ * 行政区划导入专用测试上下文，避免加载无关业务和其他集成测试配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @SpringBootConfiguration
 @EnableAutoConfiguration(exclude = {
         CoreModule.class,

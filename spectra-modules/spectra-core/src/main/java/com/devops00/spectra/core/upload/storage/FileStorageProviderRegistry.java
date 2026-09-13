@@ -31,6 +31,10 @@ import java.util.Optional;
  *
  * <p>Registry 在 Spring 创建时固定 Provider 类型到实现的映射。后续业务只通过本类解析 Provider，
  * 从而保证类型缺失和重复注册使用统一的失败语义。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public final class FileStorageProviderRegistry {
@@ -83,6 +87,9 @@ public final class FileStorageProviderRegistry {
         return type == null ? Optional.empty() : Optional.ofNullable(providers.get(type));
     }
 
+    /**
+     * 处理文件存储提供器相关数据。
+     */
     private FileUploadException unavailable(StorageProviderType type) {
         return new FileUploadException(FileErrorCode.FILE_STORAGE_UNAVAILABLE,
                 "storage provider is unavailable: " + type);

@@ -30,7 +30,13 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 
-/** Web 端启动配置聚合服务默认实现。 */
+/**
+ * Web 端启动配置聚合服务默认实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

@@ -24,17 +24,34 @@ import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
+/**
+ * 角色分配、权限和授权访问范围之间的关联实体。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sec_assignment_permission_boundary", schema = "spectra_security")
 public class AssignmentPermissionBoundary extends BaseEntity {
 
+    /**
+     * 访问范围所属的角色分配 ID。
+     */
     @TableField(value = "assignment_id")
     private UUID assignmentId;
 
+    /**
+     * 该角色分配在此范围内可使用的权限 ID。
+     */
     @TableField(value = "permission_id")
     private UUID permissionId;
 
+    /**
+     * 该角色分配访问权限时适用的授权范围 ID。
+     */
     @TableField(value = "scope_id")
     private UUID scopeId;
 }

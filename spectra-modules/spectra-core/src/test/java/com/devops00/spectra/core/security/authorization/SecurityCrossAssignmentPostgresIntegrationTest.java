@@ -49,6 +49,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * 该测试默认禁用，只接受专用、可丢弃的 Flyway 测试数据库连接；启用开关与
  * {@link SecurityFlywayPostgresIntegrationTest} 共用。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST", matches = "true")
 @Tag("manual-integration")
@@ -69,6 +73,13 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
     @Resource
     private JdbcAuthorizationSnapshotLoader authorizationSnapshotLoader;
 
+    /**
+     * 为 {@code SecurityCrossAssignmentPostgresIntegrationTest} 测试提供 {@code TestApplication} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @Configuration(proxyBeanMethods = false)
     @EnableAutoConfiguration
     @MapperScan("com.devops00.spectra.core.security.authorization.mapper")
@@ -179,6 +190,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 保存部门。
+     */
     private void insertDepartment(UUID id, String code) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_core.sys_department (id, name, code, created_at, updated_at)
@@ -186,11 +200,17 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, id, code, code);
     }
 
+    /**
+     * 保存用户。
+     */
     private void insertUser(UUID id, String username) {
         jdbcTemplate.update("INSERT INTO spectra_core.sys_user (id, username, status) VALUES (?, ?, 'ACTIVE')", id,
                 username);
     }
 
+    /**
+     * 保存角色。
+     */
     private void insertRole(UUID id, String code) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_role (id, code, name, authority_level, state, role_kind)
@@ -198,6 +218,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, id, code, code);
     }
 
+    /**
+     * 保存权限。
+     */
     private void insertPermission(UUID id, String code, String action) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_permission
@@ -206,6 +229,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, id, code, code, action);
     }
 
+    /**
+     * 保存角色权限。
+     */
     private void insertRolePermission(UUID roleId, UUID permissionId) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_role_permission (role_id, permission_id)
@@ -213,6 +239,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, roleId, permissionId);
     }
 
+    /**
+     * 保存角色权限。
+     */
     private void insertRoleGrantablePermission(UUID roleId, UUID permissionId) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_role_grantable_permission (role_id, permission_id)
@@ -220,6 +249,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, roleId, permissionId);
     }
 
+    /**
+     * 保存分配。
+     */
     private void insertAssignment(UUID id, UUID userId, UUID roleId) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id, state)
@@ -227,6 +259,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, id, userId, roleId);
     }
 
+    /**
+     * 保存范围。
+     */
     private void insertScope(UUID id, String mode, String resourceCode) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_authorization_scope (id, scope_mode, resource_code)
@@ -234,6 +269,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, id, mode, resourceCode);
     }
 
+    /**
+     * 保存部门规则。
+     */
     private void insertDepartmentRule(UUID id, UUID scopeId, UUID departmentId) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_scope_rule (id, scope_id, rule_type, department_id)
@@ -241,6 +279,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, id, scopeId, departmentId);
     }
 
+    /**
+     * 保存访问边界。
+     */
     private void insertAccessBoundary(UUID assignmentId, UUID permissionId, UUID scopeId) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_assignment_permission_boundary (assignment_id, permission_id, scope_id)
@@ -248,6 +289,9 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, assignmentId, permissionId, scopeId);
     }
 
+    /**
+     * 保存边界。
+     */
     private void insertGrantBoundary(UUID assignmentId, UUID permissionId, UUID scopeId) {
         jdbcTemplate.update("""
                 INSERT INTO spectra_security.sec_assignment_grant_boundary (assignment_id, permission_id, scope_id)
@@ -255,18 +299,30 @@ class SecurityCrossAssignmentPostgresIntegrationTest {
                 """, assignmentId, permissionId, scopeId);
     }
 
+    /**
+     * 处理查询相关数据。
+     */
     private ScopeQuery selfQuery(UUID subjectId, UUID ownerId) {
         return new ScopeQuery(subjectId, ownerId, null, Set.of());
     }
 
+    /**
+     * 处理查询相关数据。
+     */
     private ScopeQuery selfQuery(UUID subjectId, UUID ownerId, UUID departmentId) {
         return new ScopeQuery(subjectId, ownerId, departmentId, Set.of(departmentId));
     }
 
+    /**
+     * 处理部门查询相关数据。
+     */
     private ScopeQuery departmentQuery(UUID subjectId, UUID ownerId, UUID departmentId) {
         return new ScopeQuery(subjectId, ownerId, departmentId, Set.of(departmentId));
     }
 
+    /**
+     * 删除或清理测试夹具。
+     */
     private void deleteFixture(UUID assignmentA, UUID assignmentB, UUID roleA, UUID roleB,
                                UUID accessPermissionId, UUID grantPermissionId, UUID accessSelfScope,
                                UUID accessDepartmentScope, UUID grantDepartmentScope, UUID grantSelfScope,

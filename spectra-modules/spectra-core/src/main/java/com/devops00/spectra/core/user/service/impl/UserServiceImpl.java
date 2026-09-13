@@ -91,46 +91,67 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
+    /** 生成临时密码时使用的密码学安全随机数生成器。 */
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
+    /** 批量查找授权候选项时允许读取的最大记录数。 */
     private static final int SECURITY_CANDIDATE_LIMIT = 20;
 
+    /** 临时密码的有效时长。 */
     private static final Duration TEMPORARY_PASSWORD_VALIDITY = Duration.ofHours(24);
 
+    /** 将用户实体转换为接口返回数据。 */
     private final UserConverter userConverter;
 
+    /** 查询用户当前角色和授权分配。 */
     private final AuthorizationAssignmentQueryService authorizationAssignmentQueryService;
 
+    /** 创建、变更或撤销用户的授权分配。 */
     private final AuthorizationAssignmentChangeService authorizationAssignmentChangeService;
 
+    /** 读写用户与角色之间的分配关系。 */
     private final RoleAssignmentMapper roleAssignmentMapper;
 
+    /** 提供用户部门信息及部门关系操作。 */
     private final DepartmentService departmentService;
 
+    /** 对用户密码执行编码和校验。 */
     private final PasswordEncoder passwordEncoder;
 
+    /** 管理用户的认证身份及其绑定关系。 */
     private final AuthenticationIdentityService authenticationIdentityService;
 
+    /** 管理用户联系信息。 */
     private final UserContactService userContactService;
 
+    /** 管理用户密码凭据及密码变更。 */
     private final PasswordCredentialService passwordCredentialService;
 
+    /** 在用户数据中填充关联对象的名称信息。 */
     private final NameFillExecutor fillExecutor;
 
+    /** 通过统一流程执行安全敏感变更。 */
     private final SecurityChangeExecutor securityChangeExecutor;
 
+    /** 记录用户及安全相关操作的审计事件。 */
     private final AuditService auditService;
 
+    /** 根据用户操作构造审计记录。 */
     private final AuditRecordFactory auditRecordFactory;
 
+    /** 获取当前请求中的安全主体和操作者信息。 */
     private final SecurityContextAccessor securityContextAccessor;
 
+    /** 查询用户关联的安全会话。 */
     private final SecuritySessionQueryPort securitySessionQueryPort;
 
+    /** 撤销用户的安全会话。 */
     private final SecuritySessionRevocationPort securitySessionRevocationPort;
 
+    /** 提供当前生效的密码策略。 */
     private final SecurityPasswordPolicyProvider securityPasswordPolicyProvider;
 
+    /** 转换应用使用的时间类型。 */
     private final TimeMapper timeMapper;
 
     @Override
@@ -522,6 +543,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
+    /**
+     * 解析UUID。
+     */
     private static UUID parseUuid(String value) {
         try {
             return UUID.fromString(value);

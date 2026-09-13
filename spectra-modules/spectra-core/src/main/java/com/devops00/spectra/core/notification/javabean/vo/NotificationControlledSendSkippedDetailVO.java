@@ -19,9 +19,9 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import com.devops00.spectra.common.notification.NotificationChannel;
 
 /**
- * 受控发送 Preview 按渠道和原因汇总的跳过明细。
+ * 封装通知发送详情相关的响应数据。
  *
- * @param channel 渠道
+ * @param channel 通知任务使用的发送渠道
  * @param reason  跳过原因编码
  * @param count   跳过数量
  * @author yangxj96

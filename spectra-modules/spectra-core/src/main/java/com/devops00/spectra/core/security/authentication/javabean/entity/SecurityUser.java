@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 用DTO传输类
+ * 供安全认证流程使用的已认证用户视图，不作为数据库实体持久化。
  *
  * @author yangxj96
  * @version 1.0
@@ -49,6 +49,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SecurityUser implements UserDetails, SecurityPrincipal {
 
+    /** 序列化版本标识。 */
     @Serial
     private static final long serialVersionUID = 1L;
 

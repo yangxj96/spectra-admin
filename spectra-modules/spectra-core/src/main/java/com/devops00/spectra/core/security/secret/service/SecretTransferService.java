@@ -44,7 +44,13 @@ import java.util.Set;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/** 使用一次性口令保护密钥导入导出的传输服务。 */
+/**
+ * 使用一次性口令保护密钥导入导出的传输服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 public class SecretTransferService {
 
@@ -53,6 +59,7 @@ public class SecretTransferService {
     private static final int NONCE_LENGTH = 12;
     private static final int TAG_LENGTH = 128;
     private static final int PBKDF2_ITERATIONS = 120_000;
+    /** 生成密钥传输包盐值、随机数和一次性口令时使用的安全随机源。 */
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final SecretManagementService managementService;
@@ -119,6 +126,9 @@ public class SecretTransferService {
         return entries.size();
     }
 
+    /**
+     * 处理密钥相关数据。
+     */
     private byte[] encryptPackage(List<SecretManagementService.ActiveSecret> current, String passphrase) {
         try {
             var entries = current.stream()
@@ -144,6 +154,9 @@ public class SecretTransferService {
         }
     }
 
+    /**
+     * 处理密钥相关数据。
+     */
     private List<TransferEntry> decryptPackage(byte[] packageBytes, String passphrase) {
         if (packageBytes == null
                 || packageBytes.length <= MAGIC.length + SALT_LENGTH + NONCE_LENGTH
@@ -176,6 +189,9 @@ public class SecretTransferService {
         }
     }
 
+    /**
+     * 处理键相关数据。
+     */
     private static SecretKeySpec deriveKey(String passphrase, byte[] salt) throws GeneralSecurityException {
         if (!StringUtils.hasText(passphrase) || passphrase.length() < 20) {
             throw new GeneralSecurityException("导入口令强度不足");
@@ -186,19 +202,46 @@ public class SecretTransferService {
         return new SecretKeySpec(key, "AES");
     }
 
+    /**
+     * 处理密钥相关数据。
+     */
     private static String generatePassphrase() {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes(24));
     }
 
+    /**
+     * 处理字节数相关数据。
+     */
     private static byte[] randomBytes(int length) {
         byte[] bytes = new byte[length];
         RANDOM.nextBytes(bytes);
         return bytes;
     }
 
+    /**
+     * 定义导出载荷相关的应用服务契约。
+     *
+     * @param formatVersion 格式化版本
+     * @param entries       待导入或导出的密钥条目集合
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record ExportPayload(int formatVersion, List<TransferEntry> entries) {
     }
 
+    /**
+     * 定义条目相关的应用服务契约。
+     *
+     * @param code        业务对象的唯一编码
+     * @param category    业务类别
+     * @param version     当前对象或配置的版本号
+     * @param fingerprint 密钥材料的指纹值
+     * @param value       配置项或密钥对应的实际值
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record TransferEntry(String code, String category, int version, String fingerprint, String value) {
     }
 }

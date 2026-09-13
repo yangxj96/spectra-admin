@@ -19,7 +19,13 @@ package com.devops00.spectra.core.security.secret.javabean.from;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
 
-/** 发布密钥版本的二次确认入参。 */
+/**
+ * 发布密钥版本的二次确认入参。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class SecretPublishFrom {
 

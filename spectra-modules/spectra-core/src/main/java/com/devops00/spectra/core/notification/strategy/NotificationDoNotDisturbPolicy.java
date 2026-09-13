@@ -26,6 +26,10 @@ import java.time.ZoneId;
  * <p>数据库使用 {@link Instant} 保存边界，但边界的日期不参与每日窗口判断，
  * 只按用户时区提取本地时间。因此开始时间晚于结束时间时表示跨午夜窗口。
  * 缺少任一边界时按整个时间段免打扰处理，避免不完整配置意外发送通知。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class NotificationDoNotDisturbPolicy {
 

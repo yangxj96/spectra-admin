@@ -33,48 +33,78 @@ import java.time.Duration;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
-/** Core 内置 Quartz Job 白名单及默认 Trigger 定义。 */
+/**
+ * Core 内置 Quartz Job 白名单及默认 Trigger 定义。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Configuration(proxyBeanMethods = false)
 public class CoreQuartzJobDefinitionConfiguration {
 
     private static final QuartzParameterSchema EMPTY_PARAMETERS = QuartzParameterSchema.empty();
 
-    /** @return 通知任务批处理 Job 定义。 */
+    /**
+     * 定义每 5 秒批量处理通知任务的内置 Quartz 作业。
+     *
+     * @return Quartz作业数据。
+     */
     @Bean
     public QuartzBuiltInJobDefinition notificationTaskQuartzJobDefinition() {
         return definition("notification.task-worker", "通知任务批处理", NotificationTaskQuartzJob.class,
                 QuartzTriggerTemplate.fixedInterval(Duration.ofSeconds(5), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
-    /** @return 通知敏感载荷清理 Job 定义。 */
+    /**
+     * 定义定期清理通知敏感载荷的内置 Quartz 作业。
+     *
+     * @return Quartz作业数据。
+     */
     @Bean
     public QuartzBuiltInJobDefinition notificationCleanupQuartzJobDefinition() {
         return definition("notification.cleanup-sensitive-payload", "通知敏感载荷清理", NotificationCleanupQuartzJob.class,
                 QuartzTriggerTemplate.fixedInterval(Duration.ofHours(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
-    /** @return 文件上传清理 Job 定义。 */
+    /**
+     * 定义定期清理过期文件上传数据的内置 Quartz 作业。
+     *
+     * @return Quartz作业数据。
+     */
     @Bean
     public QuartzBuiltInJobDefinition fileUploadCleanupQuartzJobDefinition() {
         return definition("file.upload.cleanup", "文件上传清理", FileUploadCleanupQuartzJob.class,
                 QuartzTriggerTemplate.fixedInterval(Duration.ofMinutes(5), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
-    /** @return 服务监控采样 Job 定义。 */
+    /**
+     * 定义定期采集服务监控快照的内置 Quartz 作业。
+     *
+     * @return Quartz作业数据。
+     */
     @Bean
     public QuartzBuiltInJobDefinition serviceMonitorSnapshotQuartzJobDefinition() {
         return definition("system.monitor.collect-snapshot", "服务监控采样", ServiceMonitorSnapshotQuartzJob.class,
                 QuartzTriggerTemplate.fixedInterval(Duration.ofSeconds(10), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
-    /** @return 服务监控诊断清理 Job 定义。 */
+    /**
+     * 定义清理过期服务监控诊断数据的内置 Quartz 作业。
+     *
+     * @return Quartz作业数据。
+     */
     @Bean
     public QuartzBuiltInJobDefinition serviceMonitorDiagnosticCleanupQuartzJobDefinition() {
         return definition("system.monitor.diagnostic-cleanup", "监控诊断清理", ServiceMonitorDiagnosticCleanupQuartzJob.class,
                 QuartzTriggerTemplate.fixedInterval(Duration.ofHours(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
-    /** @return Quartz 执行历史清理 Job 定义。 */
+    /**
+     * 定义清理过期 Quartz 执行历史的内置作业。
+     *
+     * @return Quartz作业数据。
+     */
     @Bean
     public QuartzBuiltInJobDefinition quartzExecutionHistoryCleanupJobDefinition() {
         return definition("system.scheduler.execution-history-cleanup", "Quartz 执行历史清理",
@@ -83,6 +113,9 @@ public class CoreQuartzJobDefinitionConfiguration {
                         QuartzTriggerTemplate.MisfirePolicy.DO_NOTHING));
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private QuartzBuiltInJobDefinition definition(String key, String displayName,
                                                   Class<? extends Job> jobClass,
                                                   QuartzTriggerTemplate trigger) {

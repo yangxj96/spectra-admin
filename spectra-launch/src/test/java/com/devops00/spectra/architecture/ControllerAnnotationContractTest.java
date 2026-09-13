@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -84,6 +84,9 @@ class ControllerAnnotationContractTest {
                 .isEmpty();
     }
 
+    /**
+     * 判断目标。
+     */
     private static boolean isTargetController(JavaClass javaClass) {
         var packageName = javaClass.getPackageName();
         return javaClass.isAnnotatedWith(RestController.class)
@@ -91,10 +94,16 @@ class ControllerAnnotationContractTest {
                 && packageName.contains(".controller");
     }
 
+    /**
+     * 判断合同。
+     */
     private static boolean isInjectedField(Field field) {
         return !Modifier.isStatic(field.getModifiers()) && !field.isSynthetic();
     }
 
+    /**
+     * 处理合同相关数据。
+     */
     private static void inspectEndpoints(JavaClass javaClass, List<String> violations) {
         for (var method : javaClass.reflect().getDeclaredMethods()) {
             var mapping = mappingAnnotation(method);
@@ -119,6 +128,9 @@ class ControllerAnnotationContractTest {
         }
     }
 
+    /**
+     * 处理合同相关数据。
+     */
     private static Annotation mappingAnnotation(Method method) {
         for (var annotationType : List.of(GetMapping.class, PostMapping.class,
                 PutMapping.class, DeleteMapping.class)) {
@@ -130,6 +142,9 @@ class ControllerAnnotationContractTest {
         return null;
     }
 
+    /**
+     * 处理版本相关数据。
+     */
     private static String mappingVersion(Annotation mapping) {
         if (mapping instanceof GetMapping annotation) {
             return annotation.version();
@@ -146,23 +161,35 @@ class ControllerAnnotationContractTest {
         throw new IllegalArgumentException("不支持的 Controller mapping 注解: " + mapping.annotationType());
     }
 
+    /**
+     * 判断合同。
+     */
     private static boolean isWriteMapping(Annotation mapping) {
         return mapping instanceof PostMapping
                 || mapping instanceof PutMapping
                 || mapping instanceof DeleteMapping;
     }
 
+    /**
+     * 判断请求。
+     */
     private static boolean hasRequestBody(Method method) {
         return Arrays.stream(method.getParameterAnnotations())
                 .flatMap(Arrays::stream)
                 .anyMatch(annotation -> annotation.annotationType().equals(RequestBody.class));
     }
 
+    /**
+     * 判断合同。
+     */
     private static boolean hasPreAuthorize(Class<?> controller, Method method) {
         return method.isAnnotationPresent(PreAuthorize.class)
                 || controller.isAnnotationPresent(PreAuthorize.class);
     }
 
+    /**
+     * 判断合同。
+     */
     private static boolean hasValidated(Class<?> controller, Method method) {
         return method.isAnnotationPresent(Validated.class)
                 || controller.isAnnotationPresent(Validated.class)

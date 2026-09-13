@@ -39,6 +39,7 @@ public final class SHA256Utils {
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
 
+    /** 为摘要协议所需的随机数和随机 nonce 提供密码学安全随机源。 */
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private SHA256Utils() {

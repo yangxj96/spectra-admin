@@ -27,9 +27,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 授权方案中的 Permission-specific Access/Grant Boundary。
- * <p>
- * JSONB 只保存模式、资源和部门业务编码，不保存运行时 Scope 或 Permission UUID。
+ * 授权方案中单项权限的访问范围和可授予范围配置。
+ * JSONB 字段只保存范围模式与业务编码，不保存运行时 UUID。
  *
  * @author yangxj96
  * @version 1.0
@@ -40,15 +39,27 @@ import java.util.UUID;
 @TableName(value = "sec_authorization_profile_boundary", schema = "spectra_security", autoResultMap = true)
 public class AuthorizationProfileBoundary extends BaseEntity {
 
+    /**
+     * 此权限边界所属的授权方案角色分配 ID。
+     */
     @TableField(value = "profile_assignment_id")
     private UUID profileAssignmentId;
 
+    /**
+     * 此访问或授予边界关联的权限业务编码。
+     */
     @TableField(value = "permission_code")
     private String permissionCode;
 
+    /**
+     * 角色分配可以访问该权限的范围定义，以 JSONB 格式保存。
+     */
     @TableField(value = "access_scope", typeHandler = PgJsonbTypeHandler.class)
     private Map<String, Object> accessScope;
 
+    /**
+     * 角色分配可以将该权限授予下级的范围定义，以 JSONB 格式保存。
+     */
     @TableField(value = "grant_scope", typeHandler = PgJsonbTypeHandler.class)
     private Map<String, Object> grantScope;
 }

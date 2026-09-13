@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.validator;
 
 import com.devops00.spectra.core.upload.api.FileErrorCode;
@@ -16,6 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * 验证 {@code FileDeclarationValidatorTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class FileDeclarationValidatorTest {
 
     private final FileDeclarationValidator validator = new FileDeclarationValidator();
@@ -49,6 +67,9 @@ class FileDeclarationValidatorTest {
         assertEquals(FileErrorCode.FILE_PART_INVALID, exception.getErrorCode());
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private CreateUploadRequest request(String name, String contentType, long size) {
         var request = new CreateUploadRequest();
         request.setOriginalName(name);
@@ -59,6 +80,9 @@ class FileDeclarationValidatorTest {
         return request;
     }
 
+    /**
+     * 处理类型相关数据。
+     */
     private FileType type(String code, String extensions, String contentTypes, long maxSize) {
         var type = new FileType();
         type.setCode(code);

@@ -25,11 +25,19 @@ import org.springframework.context.annotation.Configuration;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
-/** 注册 OA 模块拥有的 Quartz 内置任务。 */
+/**
+ * 注册 OA 模块拥有的 Quartz 内置任务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Configuration(proxyBeanMethods = false)
 public class OaQuartzJobDefinitionConfiguration {
 
-    /** @return 合同里程碑提醒内置任务定义 */
+    /**
+     * 定义按计划发送合同提醒的内置 Quartz 作业。
+     */
     @Bean
     public QuartzBuiltInJobDefinition contractReminderQuartzJobDefinition() {
         return new QuartzBuiltInJobDefinition(

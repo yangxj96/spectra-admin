@@ -20,7 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
 import org.apache.ibatis.annotations.Mapper;
 
-/** 单体服务监控历史采样 Mapper。 */
+/**
+ * 单体服务监控历史采样 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface ServiceMonitorSampleMapper extends BaseMapper<ServiceMonitorSample> {
 }

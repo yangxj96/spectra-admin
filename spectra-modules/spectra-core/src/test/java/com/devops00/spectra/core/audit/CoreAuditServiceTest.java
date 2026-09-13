@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.audit;
@@ -39,6 +49,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+/**
+ * 验证 {@code CoreAuditServiceTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class CoreAuditServiceTest {
 
     private static final UUID EVENT_ID = UUID.fromString("018f0a6f-3b6f-7b2f-8e4f-4e6a7d9c1234");
@@ -160,30 +177,48 @@ class CoreAuditServiceTest {
         assertEquals(1, transactionManager.rollbacks);
     }
 
+    /**
+     * 处理操作记录相关数据。
+     */
     private AuditRecord operationRecord() {
         return operationRecord(context("WEB"));
     }
 
+    /**
+     * 处理操作记录相关数据。
+     */
     private AuditRecord operationRecord(AuditContext recordContext) {
         return new AuditRecord(EVENT_ID, AuditCategory.OPERATION, "USER.UPDATE", null,
                 AuditRecord.Result.SUCCEEDED, OCCURRED_AT, recordContext,
                 Map.of("password", "plain"), Map.of("token", "plain"), "user updated");
     }
 
+    /**
+     * 处理安全记录相关数据。
+     */
     private AuditRecord securityRecord(AuditRecord.Result result) {
         return new AuditRecord(EVENT_ID, AuditCategory.SECURITY, "USER.PASSWORD_RESET", null,
                 result, OCCURRED_AT, context(),
                 Map.of("password", "plain"), Map.of("token", "plain"), "security decision");
     }
 
+    /**
+     * 处理上下文相关数据。
+     */
     private AuditContext context() {
         return context("WEB");
     }
 
+    /**
+     * 处理上下文相关数据。
+     */
     private AuditContext context(String client) {
         return new AuditContext(OPERATOR_ID, "request-123", "correlation-456", client, "127.0.0.1", "agent");
     }
 
+    /**
+     * 对审计执行脱敏处理。
+     */
     private Map<String, Object> sanitize(Map<String, ?> source) {
         var sanitized = new LinkedHashMap<String, Object>();
         source.forEach((key, value) -> sanitized.put(key, value));
@@ -196,11 +231,21 @@ class CoreAuditServiceTest {
         return sanitized;
     }
 
+    /**
+     * 处理审计元数据相关数据。
+     */
     @SuppressWarnings("unchecked")
     private static Map<String, Object> auditMetadata(Map<String, Object> snapshot) {
         return (Map<String, Object>) snapshot.get("_audit");
     }
 
+    /**
+     * 为 {@code CoreAuditServiceTest} 测试提供 {@code RecordingTransactionManager} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class RecordingTransactionManager implements PlatformTransactionManager {
 
         private int commits;

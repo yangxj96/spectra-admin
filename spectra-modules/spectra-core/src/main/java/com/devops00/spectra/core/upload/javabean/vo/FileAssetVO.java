@@ -23,7 +23,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/** 文件资产管理响应。 */
+/**
+ * 文件资产管理响应。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class FileAssetVO {
 

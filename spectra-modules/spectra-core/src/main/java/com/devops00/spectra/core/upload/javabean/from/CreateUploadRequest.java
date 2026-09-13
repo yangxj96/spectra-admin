@@ -23,7 +23,13 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/** 创建或恢复上传会话请求。 */
+/**
+ * 创建或恢复上传会话请求。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class CreateUploadRequest {
 

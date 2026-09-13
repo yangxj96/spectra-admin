@@ -1,4 +1,18 @@
-/* Copyright 2018-2026 yangxj96 */
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.devops00.spectra.core.system.service.impl;
 
@@ -19,7 +33,13 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** 安全运行态目标候选查询实现。 */
+/**
+ * 安全运行态目标候选查询实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandidateService {
@@ -33,7 +53,8 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
     @Override
     public List<SecurityUserCandidateVO> searchUserCandidates(String keyword) {
         String normalizedKeyword = normalizeKeyword(keyword);
-        return userService.searchSecurityCandidates(normalizedKeyword, CANDIDATE_LIMIT).stream()
+        return userService.searchSecurityCandidates(normalizedKeyword, CANDIDATE_LIMIT)
+                .stream()
                 .map(user -> new SecurityUserCandidateVO(
                         user.getId(), user.getUsername(), user.getRealName(), user.getEmployeeNo()))
                 .toList();
@@ -41,7 +62,7 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
 
     @Override
     public List<SecurityVerificationCandidateVO> searchVerificationCandidates(SecurityVerificationType type,
-                                                                               String keyword) {
+                                                                              String keyword) {
         String normalizedKeyword = normalizeKeyword(keyword);
         String contactType = contactType(type);
         if (contactType == null) {
@@ -52,7 +73,8 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
             return List.of();
         }
         List<UUID> userIds = contacts.stream().map(UserContact::getUserId).filter(id -> id != null).distinct().toList();
-        Map<UUID, User> users = userService.listByIds(userIds).stream()
+        Map<UUID, User> users = userService.listByIds(userIds)
+                .stream()
                 .collect(Collectors.toMap(User::getId, Function.identity(), (first, ignored) -> first));
         return contacts.stream()
                 .map(contact -> toVerificationCandidate(contact, users.get(contact.getUserId())))
@@ -60,8 +82,13 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
                 .toList();
     }
 
+    /**
+     * 转换候选项。
+     */
     private static SecurityVerificationCandidateVO toVerificationCandidate(UserContact contact, User user) {
-        if (user == null || contact.getUserId() == null || contact.getContactValue() == null
+        if (user == null
+                || contact.getUserId() == null
+                || contact.getContactValue() == null
                 || contact.getContactValue().isBlank()) {
             return null;
         }
@@ -70,6 +97,9 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
                 user.getUsername(), user.getRealName(), user.getEmployeeNo());
     }
 
+    /**
+     * 处理类型相关数据。
+     */
     private static String contactType(SecurityVerificationType type) {
         if (type == null) {
             throw new IllegalArgumentException("验证码类型不能为空");
@@ -81,6 +111,9 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
         };
     }
 
+    /**
+     * 规范化安全目标候选项。
+     */
     private static String normalizeKeyword(String keyword) {
         if (keyword == null || keyword.isBlank() || keyword.trim().length() > MAX_KEYWORD_LENGTH) {
             throw new IllegalArgumentException("候选查询关键字不能为空且长度不能超过 64");
@@ -88,6 +121,9 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
         return keyword.trim();
     }
 
+    /**
+     * 对目标执行脱敏处理。
+     */
     private static String maskTarget(String contactType, String target) {
         if (UserContactService.PHONE.equals(contactType)) {
             return maskPhone(target);
@@ -100,6 +136,9 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
         return maskMiddle(target);
     }
 
+    /**
+     * 对电话执行脱敏处理。
+     */
     private static String maskPhone(String target) {
         if (target.length() <= 7) {
             return maskMiddle(target);
@@ -107,6 +146,9 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
         return target.substring(0, 3) + "****" + target.substring(target.length() - 4);
     }
 
+    /**
+     * 对安全目标候选项执行脱敏处理。
+     */
     private static String maskMiddle(String target) {
         if (target.length() <= 2) {
             return "*".repeat(target.length());

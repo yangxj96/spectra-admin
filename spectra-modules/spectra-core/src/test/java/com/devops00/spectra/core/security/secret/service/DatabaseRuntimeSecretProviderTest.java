@@ -26,7 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** Framework 运行时密钥端口适配测试。 */
+/**
+ * Framework 运行时密钥端口适配测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DatabaseRuntimeSecretProviderTest {
 
     @Test

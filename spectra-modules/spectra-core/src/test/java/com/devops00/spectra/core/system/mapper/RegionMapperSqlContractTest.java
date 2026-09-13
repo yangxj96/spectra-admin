@@ -27,7 +27,13 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
-/** 行政区域递归路径查询 SQL 契约测试。 */
+/**
+ * 行政区域递归路径查询 SQL 契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RegionMapperSqlContractTest {
 
     @Test
@@ -62,6 +68,9 @@ class RegionMapperSqlContractTest {
         assertThatNoException().isThrownBy(() -> CCJSqlParserUtil.parse(sql));
     }
 
+    /**
+     * 查询区域SQL合同。
+     */
     private static String readMapper() throws IOException {
         try (var resource = RegionMapperSqlContractTest.class.getClassLoader()
                 .getResourceAsStream("mapper/system/RegionMapper.xml")) {

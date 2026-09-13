@@ -22,9 +22,15 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 面向管理端的单个 Permission Boundary 只读视图。
- * <p>
- * Access 与 Grant 分别返回，调用方不能据此推导另一类边界。
+ * 封装授权边界视图相关的响应数据。
+ *
+ * @param permissionCode 权限编码
+ * @param scopeMode      数据范围的匹配模式
+ * @param resourceCode   受数据范围约束的资源编码
+ * @param rules          用于限制数据范围的规则集合
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record AuthorizationBoundaryView(String permissionCode,
                                         String scopeMode,
@@ -40,6 +46,16 @@ public record AuthorizationBoundaryView(String permissionCode,
         return Collections.unmodifiableList(new ArrayList<>(rules));
     }
 
+    /**
+     * 封装范围规则视图相关的响应数据。
+     *
+     * @param ruleType           规则类型
+     * @param departmentId       部门标识
+     * @param includeDescendants 查询范围是否包含下级部门
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record ScopeRuleView(String ruleType, UUID departmentId, boolean includeDescendants) {
     }
 }

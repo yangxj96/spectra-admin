@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.audit.service;
@@ -32,7 +42,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Query, detail and export facade over the one partitioned audit table. */
+/**
+ * 定义审计日志查询相关的应用服务契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class AuditLogQueryService {
@@ -116,6 +132,9 @@ public class AuditLogQueryService {
         return csv.toString();
     }
 
+    /**
+     * 构建筛选条件。
+     */
     private AuditLogQueryCriteria buildCriteria(Authentication viewer, AuditLogQueryFrom query) {
         AuditLogQueryCriteria criteria = new AuditLogQueryCriteria();
         criteria.setCanViewHighRisk(visibilityPolicy.canViewHighRisk(viewer));
@@ -146,6 +165,9 @@ public class AuditLogQueryService {
         return criteria;
     }
 
+    /**
+     * 转换视图。
+     */
     private AuditLogVO toView(AuditLogQueryRow row) {
         return new AuditLogVO(
                 row.getEventId(),
@@ -172,6 +194,9 @@ public class AuditLogQueryService {
                 row.getCorrelationId());
     }
 
+    /**
+     * 解析快照。
+     */
     private Map<String, Object> parseSnapshot(String json) {
         if (json == null || json.isBlank()) {
             return Map.of();
@@ -186,6 +211,9 @@ public class AuditLogQueryService {
         }
     }
 
+    /**
+     * 对审计日志查询执行脱敏处理。
+     */
     private String sanitizeText(String key, String value) {
         if (value == null) {
             return null;
@@ -194,6 +222,9 @@ public class AuditLogQueryService {
         return sanitized instanceof String text ? text : null;
     }
 
+    /**
+     * 转换JSON。
+     */
     private String toJson(Object value) {
         try {
             return objectMapper.writeValueAsString(value);
@@ -202,6 +233,9 @@ public class AuditLogQueryService {
         }
     }
 
+    /**
+     * 解析UUID。
+     */
     private static UUID parseUuid(String value) {
         try {
             return UUID.fromString(value);
@@ -210,6 +244,9 @@ public class AuditLogQueryService {
         }
     }
 
+    /**
+     * 处理审计日志查询相关数据。
+     */
     private static void appendCell(StringBuilder csv, Object value) {
         if (csv.charAt(csv.length() - 1) != '\n') {
             csv.append(',');
@@ -218,12 +255,18 @@ public class AuditLogQueryService {
         csv.append('"').append(text.replace("\"", "\"\"").replace("\r", " ").replace("\n", " ")).append('"');
     }
 
+    /**
+     * 校验已认证状态。
+     */
     private static void requireAuthenticated(Authentication viewer) {
         if (viewer == null || !viewer.isAuthenticated()) {
             throw new AccessDeniedException("需要登录后查询审计日志");
         }
     }
 
+    /**
+     * 记录指标。
+     */
     private void recordMetrics(String operation) {
         metrics.recordQuery(operation, AuditRecord.Result.SUCCEEDED.name());
     }

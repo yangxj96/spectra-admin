@@ -40,7 +40,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 在两个 Quartz 节点共享同一数据库时验证单次领取和非并发语义。 */
+/**
+ * 在两个 Quartz 节点共享同一数据库时验证单次领取和非并发语义。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Testcontainers
 @Tag("manual-integration")
 @EnabledIfEnvironmentVariable(named = "SPECTRA_QUARTZ_FLYWAY_POSTGRES_TEST", matches = "true")
@@ -95,7 +101,13 @@ class QuartzClusterExecutionIntegrationTest {
         }
     }
 
-    /** 用于确认集群同一 Trigger 只被领取一次的非并发 Job。 */
+    /**
+     * 用于确认集群同一 Trigger 只被领取一次的非并发 Job。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @DisallowConcurrentExecution
     public static class ClusterProbeJob implements Job {
 

@@ -62,6 +62,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 受控发送 Preview/Apply、一次性消费和 Gateway 串联测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationControlledSendServiceImplTest {
 
@@ -213,6 +217,9 @@ class NotificationControlledSendServiceImplTest {
                         && detail.count() == 1));
     }
 
+    /**
+     * 处理通知发送相关数据。
+     */
     private NotificationControlledSendServiceImpl service(NotificationSendPreviewMapper previewMapper,
                                                           NotificationTaskMapper taskMapper,
                                                           NotificationTemplateMapper templateMapper,
@@ -228,6 +235,9 @@ class NotificationControlledSendServiceImplTest {
                 NotificationTestTimeMapper.create());
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private NotificationControlledSendFrom request() {
         var audience = new NotificationAudienceFrom();
         audience.setUserIds(List.of(RECIPIENT_ID));
@@ -241,6 +251,9 @@ class NotificationControlledSendServiceImplTest {
         return request;
     }
 
+    /**
+     * 处理模板相关数据。
+     */
     private NotificationTemplateEntity template() {
         var template = new NotificationTemplateEntity();
         template.setId(TEMPLATE_ID);
@@ -255,10 +268,16 @@ class NotificationControlledSendServiceImplTest {
         return template;
     }
 
+    /**
+     * 处理通知发送相关数据。
+     */
     private NotificationUserPreferenceEntity preference() {
         return preference(NotificationChannel.SMS, true);
     }
 
+    /**
+     * 处理通知发送相关数据。
+     */
     private NotificationUserPreferenceEntity preference(NotificationChannel channel, boolean enabled) {
         var preference = new NotificationUserPreferenceEntity();
         preference.setUserId(RECIPIENT_ID);

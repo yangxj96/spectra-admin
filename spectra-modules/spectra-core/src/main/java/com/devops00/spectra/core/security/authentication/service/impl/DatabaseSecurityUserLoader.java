@@ -35,6 +35,10 @@ import java.util.UUID;
 
 /**
  * 基于当前数据库身份源加载安全主体。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 @NullMarked

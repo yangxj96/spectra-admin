@@ -40,7 +40,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-/** 密钥版本服务的状态和 fail-closed 契约测试。 */
+/**
+ * 密钥版本服务的状态和 fail-closed 契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @ExtendWith(MockitoExtension.class)
 class SecretManagementServiceTest {
 

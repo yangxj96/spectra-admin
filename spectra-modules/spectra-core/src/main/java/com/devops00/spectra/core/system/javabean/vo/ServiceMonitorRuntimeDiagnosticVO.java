@@ -1,4 +1,18 @@
-/* Copyright 2018-2026 yangxj96 */
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.devops00.spectra.core.system.javabean.vo;
 
@@ -8,7 +22,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** 服务监控只读运行时诊断信息。 */
+/**
+ * 服务监控只读运行时诊断信息。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @Builder
 public class ServiceMonitorRuntimeDiagnosticVO {
@@ -25,6 +45,14 @@ public class ServiceMonitorRuntimeDiagnosticVO {
     @Builder.Default
     private List<SlowEndpoint> slowEndpoints = List.of();
 
+    /**
+     * 封装相关数据相关的响应数据。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     *
+     */
     @Data
     @Builder
     public static class MemoryPool {
@@ -35,6 +63,14 @@ public class ServiceMonitorRuntimeDiagnosticVO {
         private double usage;
     }
 
+    /**
+     * 封装相关数据相关的响应数据。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     *
+     */
     @Data
     @Builder
     public static class GarbageCollector {
@@ -43,6 +79,13 @@ public class ServiceMonitorRuntimeDiagnosticVO {
         private long collectionTimeMs;
     }
 
+    /**
+     * 封装状态统计相关的响应数据。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @Data
     @Builder
     public static class ThreadStateCount {
@@ -50,6 +93,14 @@ public class ServiceMonitorRuntimeDiagnosticVO {
         private long count;
     }
 
+    /**
+     * 封装相关数据相关的响应数据。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     *
+     */
     @Data
     @Builder
     public static class ConnectionPool {
@@ -61,6 +112,13 @@ public class ServiceMonitorRuntimeDiagnosticVO {
         private Integer maximum;
     }
 
+    /**
+     * 封装Redis诊断相关的响应数据。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @Data
     @Builder
     public static class RedisDiagnostic {
@@ -68,6 +126,13 @@ public class ServiceMonitorRuntimeDiagnosticVO {
         private long latencyMs;
     }
 
+    /**
+     * 封装端点相关的响应数据。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @Data
     @Builder
     public static class SlowEndpoint {

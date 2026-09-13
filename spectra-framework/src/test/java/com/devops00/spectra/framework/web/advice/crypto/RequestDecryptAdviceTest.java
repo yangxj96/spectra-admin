@@ -56,7 +56,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 请求解密安全边界回归测试。 */
+/**
+ * 请求解密安全边界回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RequestDecryptAdviceTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -249,6 +255,9 @@ class RequestDecryptAdviceTest {
         assertEquals("{\"name\":\"spectra\"}", new String(result.getBody().readAllBytes(), StandardCharsets.UTF_8));
     }
 
+    /**
+     * 处理键相关数据。
+     */
     private static CryptoKeyManager keyManager() {
         var keyManager = mock(CryptoKeyManager.class);
         when(keyManager.getClientPublicKey()).thenReturn(clientKeyPair.getPublic());
@@ -256,6 +265,9 @@ class RequestDecryptAdviceTest {
         return keyManager;
     }
 
+    /**
+     * 处理Redis相关数据。
+     */
     @SuppressWarnings("unchecked")
     private static RedisTemplate<String, Object> redisReturning(boolean result) {
         var redis = (RedisTemplate<String, Object>) mock(RedisTemplate.class);
@@ -265,6 +277,9 @@ class RequestDecryptAdviceTest {
         return redis;
     }
 
+    /**
+     * 处理有效相关数据。
+     */
     private static Map<String, Object> validEnvelope(String nonce, long timestamp) throws Exception {
         var aesKey = AESUtils.generateKey();
         var iv = AESUtils.generateIv();
@@ -281,6 +296,9 @@ class RequestDecryptAdviceTest {
         return envelope;
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private static Map<String, Object> unsignedEnvelope(String nonce, long timestamp) throws Exception {
         var aesKey = AESUtils.generateKey();
         var iv = AESUtils.generateIv();
@@ -295,18 +313,34 @@ class RequestDecryptAdviceTest {
         return envelope;
     }
 
+    /**
+     * 查询请求。
+     */
     private static long currentTimestamp() {
         return System.currentTimeMillis() / 1000;
     }
 
+    /**
+     * 处理参数相关数据。
+     */
     private static MethodParameter parameter() throws NoSuchMethodException {
         return new MethodParameter(Endpoint.class.getDeclaredMethod("read", Map.class), 0);
     }
 
+    /**
+     * 处理消息相关数据。
+     */
     private static HttpInputMessage message(String body) {
         return new BodyMessage(body);
     }
 
+    /**
+     * 为 {@code RequestDecryptAdviceTest} 测试提供 {@code Endpoint} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class Endpoint {
 
         @SuppressWarnings("unused")
@@ -318,6 +352,13 @@ class RequestDecryptAdviceTest {
         }
     }
 
+    /**
+     * 为 {@code RequestDecryptAdviceTest} 测试提供 {@code BodyMessage} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class BodyMessage implements HttpInputMessage {
 
         private final HttpHeaders headers = new HttpHeaders();

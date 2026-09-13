@@ -178,6 +178,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         }
     }
 
+    /**
+     * 处理清理会话相关数据。
+     */
     private void cleanupPartialSession(RedisTemplate<String, Object> redis, PartialSessionKeys keys,
                                        PartialSessionIdentity identity) {
         deleteQuietly(() -> redis.delete(keys.sessionKey()));
@@ -195,14 +198,42 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         deleteQuietly(() -> redis.opsForSet().remove(keys.refreshFamilyKey(), identity.refreshDigest()));
     }
 
+    /**
+     * 承载会话键相关的不可变数据。
+     *
+     * @param sessionKey       安全会话在 Redis 中使用的键
+     * @param userClientKey    用户客户端键
+     * @param userTokensKey    用户令牌键
+     * @param accessRefreshKey 访问刷新键
+     * @param sessionFamilyKey 会话族标识在 Redis 中使用的键
+     * @param refreshKey       刷新会话在 Redis 中使用的键
+     * @param refreshFamilyKey 刷新会话族标识在 Redis 中使用的键
+     * @param summaryKey       会话汇总状态在 Redis 中使用的键
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record PartialSessionKeys(String sessionKey, String userClientKey, String userTokensKey,
                                       String accessRefreshKey, String sessionFamilyKey, String refreshKey,
                                       String refreshFamilyKey, String summaryKey) {
     }
 
+    /**
+     * 承载会话身份相关的不可变数据。
+     *
+     * @param tokenDigest   令牌摘要
+     * @param refreshDigest 刷新摘要
+     * @param userId        用户标识
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record PartialSessionIdentity(String tokenDigest, String refreshDigest, String userId) {
     }
 
+    /**
+     * 删除或清理安全会话。
+     */
     private void deleteQuietly(Runnable action) {
         try {
             action.run();
@@ -211,6 +242,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         }
     }
 
+    /**
+     * 处理活动状态令牌相关数据。
+     */
     private Set<String> activeTokenDigests(String userId) {
         Set<Object> tokens = store.members("读取用户会话索引", SecurityRedisKey.USER_TOKENS.format(userId));
         Set<String> active = new java.util.LinkedHashSet<>();
@@ -225,6 +259,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         return active;
     }
 
+    /**
+     * 构建令牌。
+     */
     private SecurityToken buildToken(SecurityPrincipal user, String token, String refreshToken) {
         var permissions = new ArrayList<String>();
         for (String authority : user.getAuthorityNames()) {
@@ -242,6 +279,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
                 .build();
     }
 
+    /**
+     * 解析客户端类型。
+     */
     private ClientType resolveClientType() {
         HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
@@ -278,6 +318,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         return ClientType.WEB;
     }
 
+    /**
+     * 解析标识。
+     */
     private String resolveDeviceId() {
         HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
@@ -287,10 +330,16 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         return deviceId == null || deviceId.isBlank() ? "unknown" : deviceId;
     }
 
+    /**
+     * 解析客户端IP。
+     */
     private String resolveClientIp() {
         return com.devops00.spectra.framework.web.request.IpUtils.getClientIP(getHttpServletRequest());
     }
 
+    /**
+     * 查询HTTP请求。
+     */
     private @Nullable HttpServletRequest getHttpServletRequest() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
         return attributes instanceof ServletRequestAttributes servletAttributes ? servletAttributes.getRequest() : null;

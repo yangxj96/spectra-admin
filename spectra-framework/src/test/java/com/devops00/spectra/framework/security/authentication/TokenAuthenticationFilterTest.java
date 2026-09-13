@@ -34,6 +34,10 @@ import static org.mockito.Mockito.verify;
 
 /**
  * Redis 会话依赖故障时的 fail-closed 回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class TokenAuthenticationFilterTest {
 

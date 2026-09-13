@@ -31,6 +31,13 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * 验证 {@code AuditContractTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class AuditContractTest {
 
     @Test

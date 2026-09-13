@@ -391,6 +391,15 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param allReceived   是否已全部收货
+     * @param hasDifference 是否具有
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record ReceiptProgress(boolean allReceived, boolean hasDifference) {
     }
 

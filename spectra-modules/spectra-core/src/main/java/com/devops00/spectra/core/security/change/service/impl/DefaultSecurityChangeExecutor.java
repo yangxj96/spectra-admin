@@ -76,6 +76,9 @@ public class DefaultSecurityChangeExecutor implements SecurityChangeExecutor {
         }
     }
 
+    /**
+     * 处理记录相关数据。
+     */
     private AuditRecord failedRecord(AuditRecord event, RuntimeException exception) {
         AuditRecord failed = event.withResult(AuditRecord.Result.FAILED);
         return new AuditRecord(failed.eventId(), failed.category(), failed.eventType(), failed.targetId(),
@@ -83,6 +86,9 @@ public class DefaultSecurityChangeExecutor implements SecurityChangeExecutor {
                 failed.reason(), failed.httpSummary(), failureResolver.resolve(exception));
     }
 
+    /**
+     * 记录失败。
+     */
     private void recordFailure(AuditRecord failed, RuntimeException original) {
         try {
             failureRecorder.record(failed);

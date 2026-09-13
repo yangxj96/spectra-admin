@@ -26,7 +26,13 @@ import org.quartz.SchedulerMetaData;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-/** Quartz 健康检查的就绪和集群持久化契约。 */
+/**
+ * Quartz 健康检查的就绪和集群持久化契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzSchedulerHealthIndicatorTest {
 
     @Test

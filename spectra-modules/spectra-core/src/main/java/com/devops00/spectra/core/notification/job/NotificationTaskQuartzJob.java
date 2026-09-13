@@ -24,7 +24,13 @@ import org.quartz.JobExecutionContext;
 
 import java.util.Map;
 
-/** 由 Quartz 集群调度通知投递任务批次。 */
+/**
+ * 由 Quartz 集群调度通知投递任务批次。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @DisallowConcurrentExecution
 public class NotificationTaskQuartzJob implements Job {
 

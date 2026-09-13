@@ -29,6 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 免打扰跨午夜和用户时区规则测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationDoNotDisturbPolicyTest {
 

@@ -48,7 +48,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** Session 多 Key 写入失败时必须清理已写入状态的回归测试。 */
+/**
+ * Session 多 Key 写入失败时必须清理已写入状态的回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecuritySessionIssueServicePartialWriteTest {
 
     @Test

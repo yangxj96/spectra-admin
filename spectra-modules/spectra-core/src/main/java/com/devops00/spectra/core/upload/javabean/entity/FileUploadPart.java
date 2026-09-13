@@ -28,7 +28,13 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.UUID;
 
-/** 上传分片实体。 */
+/**
+ * 分片上传会话中的单个文件分片及其校验状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Getter
 @Setter
 @ToString
@@ -36,33 +42,63 @@ import java.util.UUID;
 @TableName(value = "file_upload_part", schema = "spectra_core")
 public class FileUploadPart extends BaseEntity {
 
+    /**
+     * 该分片所属的上传会话 ID。
+     */
     @TableField("upload_session_id")
     private UUID uploadSessionId;
 
+    /**
+     * 分片在上传会话中的序号，从 1 开始。
+     */
     @TableField("part_number")
     private Integer partNumber;
 
+    /**
+     * 客户端声明的该分片预期大小，单位为字节。
+     */
     @TableField("expected_size")
     private Long expectedSize;
 
+    /**
+     * 客户端声明的该分片预期 SHA-256 摘要。
+     */
     @TableField("expected_sha256")
     private String expectedSha256;
 
+    /**
+     * 服务端已接收的该分片大小，单位为字节。
+     */
     @TableField("uploaded_size")
     private Long uploadedSize;
 
+    /**
+     * 服务端计算得到的该分片实际 SHA-256 摘要。
+     */
     @TableField("actual_sha256")
     private String actualSha256;
 
+    /**
+     * 对象存储提供方返回的该分片 ETag。
+     */
     @TableField("provider_etag")
     private String providerEtag;
 
+    /**
+     * 该分片当前的上传处理状态。
+     */
     @TableField("status")
     private UploadPartStatus status;
 
+    /**
+     * 该分片已进行的上传尝试次数。
+     */
     @TableField("upload_attempt")
     private Integer uploadAttempt;
 
+    /**
+     * 该分片最近一次成功上传的时间。
+     */
     @TableField("uploaded_at")
     private Instant uploadedAt;
 }

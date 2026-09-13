@@ -36,6 +36,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Provider 测试发送的确认、地址保护和结果脱敏边界测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationProviderTestServiceTest {
 
@@ -77,6 +81,9 @@ class NotificationProviderTestServiceTest {
         assertThrows(DataSaveException.class, () -> service.send(NotificationChannel.IN_APP, params()));
     }
 
+    /**
+     * 处理通知提供器相关数据。
+     */
     private NotificationProviderTestFrom params() {
         var params = new NotificationProviderTestFrom();
         params.setRecipientAddress("+8613800138000");

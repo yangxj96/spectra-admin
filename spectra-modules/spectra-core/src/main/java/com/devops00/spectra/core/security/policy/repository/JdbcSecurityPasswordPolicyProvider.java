@@ -24,7 +24,13 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-/** PostgreSQL 系统密码策略读取适配器。 */
+/**
+ * PostgreSQL 系统密码策略读取适配器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Repository
 @RequiredArgsConstructor
 public class JdbcSecurityPasswordPolicyProvider implements SecurityPasswordPolicyProvider {

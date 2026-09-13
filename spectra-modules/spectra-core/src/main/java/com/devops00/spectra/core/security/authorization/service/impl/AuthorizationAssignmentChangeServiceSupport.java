@@ -417,6 +417,9 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         return List.copyOf(result);
     }
 
+    /**
+     * 处理角色名称相关数据。
+     */
     private String roleDisplayName(SecurityRole role) {
         return role.getName() == null || role.getName().isBlank() ? role.getCode() : role.getName().trim();
     }
@@ -612,6 +615,21 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
                 + ":" + scope.includeDescendants();
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param operatorId            操作人标识
+     * @param role                  本次授权变更涉及的角色
+     * @param assignment            待创建或调整的用户授权关系
+     * @param assignmentId          分配标识
+     * @param requests              待处理的授权变更请求集合
+     * @param expectedVersion       执行变更时预期的版本号
+     * @param targetSecurityVersion 目标安全版本
+     * @param requestHash           请求哈希值
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record PreparedChange(UUID operatorId,
                                   SecurityRole role,
                                   RoleAssignment assignment,

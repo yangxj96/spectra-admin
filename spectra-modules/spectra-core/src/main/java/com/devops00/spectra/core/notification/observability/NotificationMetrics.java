@@ -29,6 +29,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 通知域指标门面；标签只允许低基数业务枚举，不接受用户或业务对象标识。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public class NotificationMetrics {

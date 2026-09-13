@@ -51,11 +51,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class CommonExceptionAdvice {
 
     /**
-     * 方法级权限不足异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 403 的统一失败响应，消息为“权限不足”；响应对象始终非 null。
+     * 处理访问异常相关数据。
      */
     @ExceptionHandler(AccessDeniedException.class)
     public R<Object> accessDeniedException(AccessDeniedException e, HttpServletResponse response) {
@@ -79,11 +75,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 未找到资源
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 500 的“未找到资源”统一失败响应；响应对象始终非 null。
+     * 处理异常相关数据。
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
@@ -93,11 +85,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 未进行功能实现异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 500 的“功能暂未实现”统一失败响应；响应对象始终非 null。
+     * 处理不异常相关数据。
      */
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
@@ -107,11 +95,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 数据已存在异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 409 的数据冲突统一失败响应；响应对象始终非 null。
+     * 处理异常相关数据。
      */
     @ExceptionHandler(DataExistException.class)
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
@@ -121,11 +105,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 数据不存在异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 404 的数据不存在统一失败响应；响应对象始终非 null。
+     * 处理不异常相关数据。
      */
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
@@ -135,11 +115,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 参数验证异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 400 的参数校验统一失败响应，优先携带第一个校验错误消息；响应对象始终非 null。
+     * 处理方法不有效异常相关数据。
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
@@ -173,11 +149,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 运行时异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 400 的请求体格式错误统一失败响应；响应对象始终非 null。
+     * 处理HTTP消息不异常相关数据。
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
@@ -187,11 +159,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 运行时异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 500 的通用系统内部错误统一失败响应；响应对象始终非 null且不暴露异常细节。
+     * 处理运行时环境异常相关数据。
      */
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
@@ -201,11 +169,7 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 兜底异常处理
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 HTTP 500 的兜底系统内部错误统一失败响应；响应对象始终非 null且不暴露异常细节。
+     * 处理异常。
      */
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
@@ -214,6 +178,9 @@ public class CommonExceptionAdvice {
         return R.failure("系统内部错误,请联系管理员");
     }
 
+    /**
+     * 处理关联标识相关数据。
+     */
     private static String correlationId() {
         String correlationId = RequestCorrelationContext.current().correlationId();
         return correlationId == null ? "unknown" : correlationId;

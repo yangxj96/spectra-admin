@@ -30,6 +30,12 @@ public interface RedisKey {
      */
     String getPattern();
 
+    /**
+     * 格式化Redis键。
+     *
+     * @param args 用于生成 Redis 键的格式化参数。
+     * @return 处理后的文本结果。
+     */
     default String format(Object... args) {
         return String.format(getPattern(), args);
     }

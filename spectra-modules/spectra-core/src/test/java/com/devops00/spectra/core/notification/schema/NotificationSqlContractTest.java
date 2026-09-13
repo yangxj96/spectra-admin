@@ -44,6 +44,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 通知建表脚本与 Mapper XML 的结构契约测试；真实事务和并发行为需在 PostgreSQL 环境执行。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationSqlContractTest {
 
@@ -138,6 +142,9 @@ class NotificationSqlContractTest {
         assertEquals(originalSql, boundSql.getSql(), "数据权限拦截器不得重新序列化 PostgreSQL 锁定查询");
     }
 
+    /**
+     * 查询SQL。
+     */
     private String readSql() throws IOException {
         var name = "V1__init_db.sql";
         var candidates = List.of(
@@ -153,6 +160,9 @@ class NotificationSqlContractTest {
         throw new IOException("找不到通知 SQL 文件: " + name);
     }
 
+    /**
+     * 查询通知SQL合同。
+     */
     private String readResource(String name) throws IOException {
         try (var resource = getClass().getClassLoader().getResourceAsStream(name)) {
             if (resource == null) {
@@ -162,6 +172,9 @@ class NotificationSqlContractTest {
         }
     }
 
+    /**
+     * 处理通知SQL合同相关数据。
+     */
     private Set<String> tableColumns(String schema) {
         var columns = new HashSet<String>();
         String tableName = null;
@@ -191,6 +204,9 @@ class NotificationSqlContractTest {
         return columns;
     }
 
+    /**
+     * 处理通知SQL合同相关数据。
+     */
     private Set<String> commentedColumns(String schema) {
         var commentPattern = Pattern.compile(
                 "^COMMENT ON COLUMN spectra_notification\\.(\\w+)\\.(\\w+) IS '[^']+';$", Pattern.MULTILINE);

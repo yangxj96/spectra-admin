@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.core.upload.api.FileErrorCode;
@@ -34,7 +45,13 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 
-/** 负责上传会话创建、幂等和状态转换。 */
+/**
+ * 负责上传会话创建、幂等和状态转换。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 public class UploadSessionService {
 
@@ -240,6 +257,9 @@ public class UploadSessionService {
         return new StorageMultipart(session.getStorageContainer(), session.getStagingKey(), session.getProviderUploadId());
     }
 
+    /**
+     * 处理就绪状态响应相关数据。
+     */
     private UploadSessionVO readyResponse(FileAsset asset) {
         var response = fileUploadConverter.toDeduplicatedUploadVO(asset);
         response.setResult("DEDUPLICATED");
@@ -248,6 +268,9 @@ public class UploadSessionService {
         return response;
     }
 
+    /**
+     * 转换视图。
+     */
     private UploadSessionVO toView(FileUploadSession session, String result) {
         var response = fileUploadConverter.toUploadSessionVO(session);
         response.setResult(result);
@@ -266,6 +289,9 @@ public class UploadSessionService {
         return response;
     }
 
+    /**
+     * 校验配置。
+     */
     private void validateChunkConfiguration() {
         if (properties.getChunkSize() < properties.getMinChunkSize()
                 || properties.getChunkSize() > properties.getMaxChunkSize()
@@ -275,6 +301,9 @@ public class UploadSessionService {
         }
     }
 
+    /**
+     * 取消上传会话。
+     */
     private void abortQuietly(FileStorageProvider provider, StorageMultipart multipart) {
         try {
             provider.abortMultipart(multipart);
@@ -283,18 +312,36 @@ public class UploadSessionService {
         }
     }
 
+    /**
+     * 处理不相关数据。
+     */
     private static FileUploadException notFound() {
         return new FileUploadException(FileErrorCode.FILE_UPLOAD_NOT_FOUND, "上传会话不存在");
     }
 
+    /**
+     * 处理上传会话相关数据。
+     */
     private static FileUploadException invalid(String message) {
         return new FileUploadException(FileErrorCode.FILE_PART_INVALID, message);
     }
 
+    /**
+     * 处理冲突相关数据。
+     */
     private static FileUploadException conflict(String message) {
         return new FileUploadException(FileErrorCode.FILE_UPLOAD_CONFLICT, message);
     }
 
+    /**
+     * 定义相关数据相关的应用服务契约。
+     *
+     * @param response            上传完成后提供给调用方的响应信息
+     * @param verificationClaimed 上传会话是否已声明完成校验
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record Completion(UploadSessionVO response, boolean verificationClaimed) {
     }
 }

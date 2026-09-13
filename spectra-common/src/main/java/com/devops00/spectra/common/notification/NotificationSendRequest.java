@@ -138,6 +138,10 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
 
     /**
      * 快捷通知请求构造器。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public static final class Builder {
 
@@ -290,11 +294,7 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
         }
 
         /**
-         * 添加普通模板参数。
-         *
-         * @param name  参数名
-         * @param value 参数值
-         * @return 当前构造器
+         * 处理参数相关数据。
          */
         public Builder parameter(String name, Object value) {
             parameters.put(name, value);
@@ -315,11 +315,7 @@ public record NotificationSendRequest(UUID requestId, String idempotencyKey, Not
         }
 
         /**
-         * 添加敏感模板参数。
-         *
-         * @param name  参数名
-         * @param value 参数值
-         * @return 当前构造器
+         * 处理参数相关数据。
          */
         public Builder sensitiveParameter(String name, Object value) {
             sensitiveParameters.put(name, value);

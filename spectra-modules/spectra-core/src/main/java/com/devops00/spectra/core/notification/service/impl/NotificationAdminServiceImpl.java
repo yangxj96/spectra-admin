@@ -321,7 +321,15 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         return new QueryRange(from, to);
     }
 
-    /** 管理分页查询时间范围。 */
+    /**
+     * 实现查询范围相关的应用服务逻辑。
+     *
+     * @param from 请求表单数据
+     * @param to   通知消息的接收目标
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record QueryRange(Instant from, Instant to) {
     }
 

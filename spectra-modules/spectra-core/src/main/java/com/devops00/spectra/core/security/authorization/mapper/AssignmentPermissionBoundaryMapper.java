@@ -6,6 +6,10 @@
  *  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
@@ -16,6 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.security.authorization.javabean.entity.AssignmentPermissionBoundary;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * 定义分配权限边界相关的数据库访问操作。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface AssignmentPermissionBoundaryMapper extends BaseMapper<AssignmentPermissionBoundary> {
 }

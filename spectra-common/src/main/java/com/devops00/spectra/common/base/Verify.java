@@ -29,12 +29,20 @@ public class Verify {
 
     /**
      * 校验新增分组
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public interface Insert extends Default {
     }
 
     /**
      * 校验修改分组
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public interface Update extends Default {
     }

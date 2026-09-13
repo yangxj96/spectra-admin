@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.security.authentication.javabean.enums;
 
-/** 认证身份状态。 */
+/**
+ * 认证身份状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum AuthenticationIdentityState {
     ACTIVE,
     REVOKED

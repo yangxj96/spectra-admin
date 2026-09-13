@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -32,6 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>接口是服务语义的唯一说明位置；实现类的方法只保留必要的算法和安全不变量说明，避免接口与
  * 实现的两份 Javadoc 漂移。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class ServiceDocumentationContractTest {
 
@@ -102,6 +106,9 @@ class ServiceDocumentationContractTest {
         assertThat(violations).as("公共契约注释缺口或 ServiceImpl 重复注释").isEmpty();
     }
 
+    /**
+     * 校验类型。
+     */
     private static void checkTypeDocumentation(Path sourceFile, String source,
                                                SourceContractTestSupport.TypeDeclaration type,
                                                List<String> violations) {
@@ -111,6 +118,9 @@ class ServiceDocumentationContractTest {
         }
     }
 
+    /**
+     * 校验合同。
+     */
     private static void checkDocumentation(Path sourceFile, String source,
                                            SourceContractTestSupport.MethodDeclaration method,
                                            List<String> violations, String category) {
@@ -138,6 +148,9 @@ class ServiceDocumentationContractTest {
         }
     }
 
+    /**
+     * 查询合同。
+     */
     private static List<String> findDuplicateImplementationDocumentation(Path backend) throws IOException {
         List<String> violations = new ArrayList<>();
         List<Path> roots = List.of(
@@ -163,6 +176,9 @@ class ServiceDocumentationContractTest {
         return violations;
     }
 
+    /**
+     * 查询合同。
+     */
     private static List<String> findGenericDocumentationPlaceholders(Path backend) throws IOException {
         List<String> violations = new ArrayList<>();
         List<Path> roots = new ArrayList<>(SERVICE_SOURCE_ROOTS.stream()
@@ -187,17 +203,26 @@ class ServiceDocumentationContractTest {
         return violations;
     }
 
+    /**
+     * 判断合同。
+     */
     private static boolean isConstructor(SourceContractTestSupport.MethodDeclaration method,
                                          List<SourceContractTestSupport.TypeDeclaration> types) {
         return types.stream().anyMatch(type -> type.name().equals(method.name()));
     }
 
+    /**
+     * 判断合同。
+     */
     private static boolean hasOverrideJavadoc(String prefix) {
         return Pattern.compile("(?s)/\\*\\*.*?\\*/\\s*(?:@[A-Za-z_$][\\w$.]*(?:\\([^;]*?\\))?\\s*)*@Override\\s*$")
                 .matcher(prefix)
                 .find();
     }
 
+    /**
+     * 处理合同相关数据。
+     */
     private static String location(Path sourceFile, String source, int offset) {
         return sourceFile + ":" + SourceContractTestSupport.lineNumber(source, offset);
     }

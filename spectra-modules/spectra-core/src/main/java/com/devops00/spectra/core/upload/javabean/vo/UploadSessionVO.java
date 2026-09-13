@@ -24,7 +24,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/** 上传会话统一响应。 */
+/**
+ * 上传会话统一响应。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 public class UploadSessionVO {
 

@@ -48,6 +48,7 @@ import java.util.List;
 @Service
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
+    /** 生成登录和绑定验证码时使用的密码学安全随机数生成器。 */
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final NotificationService notificationService;

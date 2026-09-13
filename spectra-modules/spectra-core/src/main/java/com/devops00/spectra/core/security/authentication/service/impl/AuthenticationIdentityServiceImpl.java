@@ -36,6 +36,10 @@ import java.util.UUID;
 
 /**
  * 目标 authentication_identity 表的密码身份服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @NullMarked

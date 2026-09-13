@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -29,6 +29,10 @@ import java.util.regex.Pattern;
  *
  * <p>测试只需要识别公开声明和 Javadoc 标签，不需要把生产源码重新解析成完整 AST；扫描器会保留
  * 换行位置，因而失败信息可以直接定位到文件和行号。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 final class SourceContractTestSupport {
 
@@ -227,6 +231,9 @@ final class SourceContractTestSupport {
         return result.toString();
     }
 
+    /**
+     * 处理来源合同相关数据。
+     */
     private static List<String> splitParameters(String parameters) {
         if (parameters.isBlank()) {
             return List.of();
@@ -254,6 +261,20 @@ final class SourceContractTestSupport {
         return result;
     }
 
+    /**
+     * 为 {@code SourceContractTestSupport} 测试提供 {@code MethodDeclaration} 测试类型。
+     *
+     * @param offset       声明在 Java 源文件中的起始字符偏移量
+     * @param modifiers    声明所带的 Java 修饰符集合
+     * @param returnType   Java 方法声明的返回类型
+     * @param name         Java 方法的名称
+     * @param parameters   Java 方法的参数声明集合
+     * @param throwsClause 声明所带的异常类型子句
+     * @param prefix       待检查文本需要匹配的前缀
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record MethodDeclaration(int offset, String modifiers, String returnType, String name, String parameters,
                              String throwsClause, String prefix) {
         boolean isPublic() {
@@ -268,6 +289,15 @@ final class SourceContractTestSupport {
         }
     }
 
+    /**
+     * 为 {@code SourceContractTestSupport} 测试提供 {@code TypeDeclaration} 测试类型。
+     *
+     * @param offset 声明在 Java 源文件中的起始字符偏移量
+     * @param name   Java 类型的名称
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record TypeDeclaration(int offset, String name) {
     }
 }

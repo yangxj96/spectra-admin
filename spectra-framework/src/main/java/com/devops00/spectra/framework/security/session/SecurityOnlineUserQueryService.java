@@ -59,6 +59,9 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
         return SecurityRedisExecutor.execute("查询在线用户", this::listOnlineUsersInternal);
     }
 
+    /**
+     * 查询内部。
+     */
     private List<UserOnlineVO> listOnlineUsersInternal() {
         Set<Object> tokenDigests = store.members("读取在线会话索引", SecurityRedisKey.ONLINE_SESSIONS.getPattern());
         if (tokenDigests.isEmpty()) {

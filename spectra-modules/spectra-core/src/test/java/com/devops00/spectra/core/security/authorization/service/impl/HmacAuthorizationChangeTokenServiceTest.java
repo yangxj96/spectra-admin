@@ -69,6 +69,9 @@ class HmacAuthorizationChangeTokenServiceTest {
         assertEquals(token, service.verify(service.issue(token)));
     }
 
+    /**
+     * 处理授权令牌相关数据。
+     */
     private static HmacAuthorizationChangeTokenService service(Instant now) {
         return new HmacAuthorizationChangeTokenService("01234567890123456789012345678901",
                 Clock.fixed(now, ZoneOffset.UTC));

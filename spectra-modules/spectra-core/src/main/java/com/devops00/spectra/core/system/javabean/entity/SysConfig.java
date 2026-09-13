@@ -40,6 +40,7 @@ import java.io.Serial;
 @TableName(value = "sys_config", schema = "spectra_core")
 public class SysConfig extends BaseEntity {
 
+    /** 序列化版本标识。 */
     @Serial
     private static final long serialVersionUID = 1L;
 

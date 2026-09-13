@@ -25,7 +25,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-/** Quartz Cron/Simple Trigger 的受限请求模型。 */
+/**
+ * Quartz Cron/Simple Trigger 的受限请求模型。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

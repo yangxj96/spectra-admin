@@ -35,6 +35,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code AuthenticationIdentityBindingServiceImplTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class AuthenticationIdentityBindingServiceImplTest {
 
     @Test
@@ -68,6 +75,9 @@ class AuthenticationIdentityBindingServiceImplTest {
         verify(identityService).revokeByUserIdAndId(userId, phone.getId());
     }
 
+    /**
+     * 处理身份相关数据。
+     */
     private static AuthenticationIdentity identity(String methodCode, UUID userId) {
         var identity = new AuthenticationIdentity();
         identity.setId(UUID.randomUUID());
@@ -77,6 +87,9 @@ class AuthenticationIdentityBindingServiceImplTest {
         return identity;
     }
 
+    /**
+     * 处理运行时环境相关数据。
+     */
     private static SecretRuntimeService runtime() {
         return key -> Optional.of(new RuntimeSecret(key, 1, "test-verification-hmac-key", "test-fingerprint"));
     }

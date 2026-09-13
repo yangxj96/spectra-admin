@@ -31,6 +31,10 @@ import java.time.Instant;
 
 /**
  * 通知模块健康 contributor；站内信是必需通道，外部通道按可选能力计算 DEGRADED。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component("notification")
 @RequiredArgsConstructor
@@ -82,16 +86,25 @@ public class NotificationHealthIndicator implements DependencyHealthContributor 
         return result(DependencyHealthStatus.UP, start, checkedAt, null, "通知通道检查正常");
     }
 
+    /**
+     * 处理发送器相关数据。
+     */
     private boolean senderAvailable(NotificationChannel channel) {
         return sender(channel)
                 .map(NotificationSender::available)
                 .orElse(false);
     }
 
+    /**
+     * 处理发送器相关数据。
+     */
     private java.util.Optional<NotificationSender> sender(NotificationChannel channel) {
         return senderRegistry.find(channel);
     }
 
+    /**
+     * 处理结果相关数据。
+     */
     private DependencyHealthResult result(DependencyHealthStatus status, long start, Instant checkedAt,
                                           String errorCode, String safeSummary) {
         return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,

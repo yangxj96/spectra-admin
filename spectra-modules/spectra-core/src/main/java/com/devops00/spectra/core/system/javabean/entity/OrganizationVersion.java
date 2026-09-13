@@ -36,12 +36,21 @@ import java.time.Instant;
 @TableName(value = "sys_organization_version", schema = "spectra_core")
 public class OrganizationVersion extends BaseEntity {
 
+    /**
+     * 组织版本单例记录的固定业务键。
+     */
     @TableField(value = "singleton_key")
     private String singletonKey;
 
+    /**
+     * 组织结构当前版本号；组织关系变化时递增。
+     */
     @TableField(value = "organization_version")
     private Long organizationVersion;
 
+    /**
+     * 组织结构最近一次变更的时间。
+     */
     @TableField(value = "changed_at")
     private Instant changedAt;
 }

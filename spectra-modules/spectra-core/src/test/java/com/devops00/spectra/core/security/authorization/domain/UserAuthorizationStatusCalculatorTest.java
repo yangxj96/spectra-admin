@@ -28,6 +28,13 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * 验证 {@code UserAuthorizationStatusCalculatorTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class UserAuthorizationStatusCalculatorTest {
 
     private static final LocalDateTime NOW = LocalDateTime.parse("2026-08-21T00:00:00");
@@ -104,6 +111,9 @@ class UserAuthorizationStatusCalculatorTest {
                 .isEqualTo(UserAuthorizationStatus.UNCONFIGURED);
     }
 
+    /**
+     * 处理分配相关数据。
+     */
     private static AuthorizationAssignmentView assignment(
                                                           String state,
                                                           String roleState,
@@ -114,6 +124,9 @@ class UserAuthorizationStatusCalculatorTest {
         return assignment("ROLE_TEST", state, roleState, rolePermissionCount, boundaryCount, validFrom, validUntil);
     }
 
+    /**
+     * 处理分配相关数据。
+     */
     private static AuthorizationAssignmentView assignment(
                                                           String roleCode,
                                                           String state,

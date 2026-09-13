@@ -27,7 +27,13 @@ import java.time.Duration;
 import java.time.Instant;
 import javax.sql.DataSource;
 
-/** framework 提供的 PostgreSQL 技术依赖健康检查。 */
+/**
+ * framework 提供的 PostgreSQL 技术依赖健康检查。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component("databaseHealthContributor")
 @ConditionalOnBean(DataSource.class)
 public class DataSourceHealthContributor implements DependencyHealthContributor {
@@ -98,6 +104,9 @@ public class DataSourceHealthContributor implements DependencyHealthContributor 
         }
     }
 
+    /**
+     * 处理结果相关数据。
+     */
     private DependencyHealthResult result(DependencyHealthStatus status, long start, String errorCode,
                                           String safeSummary) {
         return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,

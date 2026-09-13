@@ -47,6 +47,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Workflow 审批结果通知和稳定幂等键回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class TaskServiceImplNotificationTest {
 

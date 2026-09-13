@@ -37,7 +37,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-/** 认证身份绑定用例实现，不读取或写入旧 sys_account。 */
+/**
+ * 认证身份绑定用例实现，不读取或写入旧 sys_account。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @NullMarked
 @RequiredArgsConstructor

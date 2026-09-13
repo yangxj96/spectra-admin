@@ -43,6 +43,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 角色编辑器提交服务测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @ExtendWith(MockitoExtension.class)
 class RoleEditorServiceImplTest {

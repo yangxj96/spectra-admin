@@ -18,7 +18,13 @@ package com.devops00.spectra.framework.security.session.lifecycle;
 
 import com.devops00.spectra.common.port.security.SecurityToken;
 
-/** Security Session Refresh Rotation 窄端口。 */
+/**
+ * Security Session Refresh Rotation 窄端口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @FunctionalInterface
 public interface SecuritySessionRefresher {
 

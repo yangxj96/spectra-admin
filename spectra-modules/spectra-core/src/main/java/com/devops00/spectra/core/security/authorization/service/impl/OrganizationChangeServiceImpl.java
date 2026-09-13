@@ -417,11 +417,32 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         auditService.record(event);
     }
 
+    /**
+     * 定义 {@code ChangeType} 支持的业务类型及取值。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private enum ChangeType {
         CREATE,
         UPDATE
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param operatorId          操作人标识
+     * @param departmentId        部门标识
+     * @param changeType          本次组织或授权变更的类型
+     * @param requestedDepartment 请求调整到的目标部门
+     * @param impact              组织调整对权限和用户的影响明细
+     * @param requestHash         请求哈希值
+     * @param affectedUserIds     用户标识
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record PreparedChange(UUID operatorId,
                                   UUID departmentId,
                                   ChangeType changeType,

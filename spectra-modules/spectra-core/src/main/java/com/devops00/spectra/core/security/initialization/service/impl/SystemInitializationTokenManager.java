@@ -43,8 +43,10 @@ import java.util.HexFormat;
 @Component
 public class SystemInitializationTokenManager {
 
+    /** 初始化令牌随机内容的字节数。 */
     private static final int TOKEN_BYTES = 32;
 
+    /** 生成不可预测的首次初始化令牌。 */
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final SecurityInitializationTokenStore tokenStore;

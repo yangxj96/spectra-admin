@@ -26,7 +26,13 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/** 校验并规范化 Quartz Job 的版本化 JSON 参数，阻断未知字段和凭据输入。 */
+/**
+ * 校验并规范化 Quartz Job 的版本化 JSON 参数，阻断未知字段和凭据输入。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 @RequiredArgsConstructor
 public class QuartzJobParameterValidator {

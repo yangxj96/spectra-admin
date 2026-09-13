@@ -26,7 +26,13 @@ import java.util.UUID;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/** Session 撤销端口适配契约测试。 */
+/**
+ * Session 撤销端口适配契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecuritySessionPortConfigurationTest {
 
     @Test

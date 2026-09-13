@@ -18,7 +18,13 @@ package com.devops00.spectra.core.system.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
-/** 部门层级闭包表维护 Mapper。 */
+/**
+ * 部门层级闭包表维护 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface DepartmentClosureMapper {
 

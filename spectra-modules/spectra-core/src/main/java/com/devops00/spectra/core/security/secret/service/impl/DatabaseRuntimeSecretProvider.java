@@ -23,7 +23,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/** 将安全 Schema 中的 ACTIVE 密钥暴露给 Framework 和业务模块的适配器。 */
+/**
+ * 将安全 Schema 中的 ACTIVE 密钥暴露给 Framework 和业务模块的适配器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 public class DatabaseRuntimeSecretProvider implements RuntimeSecretProvider {
 

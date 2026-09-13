@@ -23,7 +23,27 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * RoleAssignment 只读视图，保留每个 Assignment 内的 Access/Grant Boundary 绑定。
+ * 封装授权分配视图相关的响应数据。
+ *
+ * @param assignmentId        分配标识
+ * @param userId              用户标识
+ * @param roleId              角色标识
+ * @param roleCode            角色编码
+ * @param roleKind            角色所属的角色类型
+ * @param roleName            被分配角色的展示名称
+ * @param roleSystemManaged   角色系统
+ * @param roleState           角色状态
+ * @param roleVersion         角色版本
+ * @param rolePermissionCount 分配角色包含的权限数量
+ * @param version             当前对象或配置的版本号
+ * @param state               当前对象所处的业务状态
+ * @param validFrom           授权关系的生效时间
+ * @param validUntil          授权关系的失效时间
+ * @param accessBoundaries    访问边界
+ * @param grantBoundaries     该授权关系允许授予的权限边界集合
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record AuthorizationAssignmentView(UUID assignmentId,
                                           UUID userId,

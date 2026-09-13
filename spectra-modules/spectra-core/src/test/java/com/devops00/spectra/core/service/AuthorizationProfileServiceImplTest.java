@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.service;
@@ -49,6 +58,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 授权方案服务测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @ExtendWith(MockitoExtension.class)
 class AuthorizationProfileServiceImplTest {
@@ -167,6 +180,9 @@ class AuthorizationProfileServiceImplTest {
         assertEquals("角色「普通角色」至少需要一个权限访问范围", exception.getMessage());
     }
 
+    /**
+     * 保存授权配置档案。
+     */
     private static AuthorizationProfileSaveFrom saveFrom(String roleCode, long roleVersion,
                                                          List<AuthorizationProfileBoundaryFrom> boundaries) {
         var assignment = new AuthorizationProfileAssignmentFrom();
@@ -180,6 +196,9 @@ class AuthorizationProfileServiceImplTest {
         return params;
     }
 
+    /**
+     * 处理角色相关数据。
+     */
     private static SecurityRole role(UUID id, String code, String name, long version) {
         var role = new SecurityRole();
         role.setId(id);

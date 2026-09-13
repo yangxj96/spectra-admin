@@ -24,7 +24,13 @@ import org.quartz.JobExecutionContext;
 
 import java.util.Map;
 
-/** 由 Quartz 集群调度服务监控快照采样。 */
+/**
+ * 由 Quartz 集群调度服务监控快照采样。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @DisallowConcurrentExecution
 public class ServiceMonitorSnapshotQuartzJob implements Job {
 

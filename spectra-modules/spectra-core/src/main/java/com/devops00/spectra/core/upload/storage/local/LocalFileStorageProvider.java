@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.storage.local;
 
 import com.devops00.spectra.core.upload.api.FileErrorCode;
@@ -32,7 +43,13 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 
-/** Streaming local filesystem provider. */
+/**
+ * 封装本地文件存储相关的数据和处理逻辑。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 public class LocalFileStorageProvider implements FileStorageProvider {
 
@@ -190,14 +207,23 @@ public class LocalFileStorageProvider implements FileStorageProvider {
         }
     }
 
+    /**
+     * 处理路径相关数据。
+     */
     private Path stagingPath(UUID uploadId) {
         return stagingRoot.resolve(uploadId.toString()).normalize();
     }
 
+    /**
+     * 处理分片名称相关数据。
+     */
     private static String partName(int partNumber) {
         return "part-" + partNumber + ".bin";
     }
 
+    /**
+     * 处理本地文件存储相关数据。
+     */
     private static long copyExactly(InputStream input, OutputStream output, long expectedSize) throws IOException {
         byte[] buffer = new byte[8192];
         long total = 0;
@@ -212,10 +238,16 @@ public class LocalFileStorageProvider implements FileStorageProvider {
         return total;
     }
 
+    /**
+     * 处理存储失败相关数据。
+     */
     private static FileUploadException storageFailure(String message, Exception cause) {
         return new FileUploadException(FileErrorCode.FILE_STORAGE_UNAVAILABLE, message, cause);
     }
 
+    /**
+     * 删除或清理本地文件存储。
+     */
     private static void deleteQuietly(Path path) {
         try {
             Files.deleteIfExists(path);
@@ -224,6 +256,9 @@ public class LocalFileStorageProvider implements FileStorageProvider {
         }
     }
 
+    /**
+     * 删除或清理树结构。
+     */
     private static void deleteTree(Path root) throws IOException {
         if (!Files.exists(root)) {
             return;
@@ -235,6 +270,13 @@ public class LocalFileStorageProvider implements FileStorageProvider {
         }
     }
 
+    /**
+     * 封装数据流相关的数据和处理逻辑。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class BoundedInputStream extends FilterInputStream {
         private long remaining;
 

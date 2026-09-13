@@ -84,6 +84,10 @@ public class ServiceMonitorOverviewVO {
 
     /**
      * 当前指标摘要。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder
@@ -145,6 +149,10 @@ public class ServiceMonitorOverviewVO {
 
     /**
      * 历史趋势点。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder
@@ -182,6 +190,10 @@ public class ServiceMonitorOverviewVO {
 
     /**
      * 关键依赖状态。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder
@@ -204,6 +216,10 @@ public class ServiceMonitorOverviewVO {
 
     /**
      * 应用健康组件状态。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder

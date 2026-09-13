@@ -239,6 +239,9 @@ class ScopedValueContextContractTest {
                 .anyMatch(type -> type.getSimpleName().equals("Scope")));
     }
 
+    /**
+     * 处理上下文MDC相关数据。
+     */
     private static void assertContextAndMdc(String requestId, String correlationId) {
         assertEquals(requestId, RequestCorrelationContext.current().requestId());
         assertEquals(correlationId, RequestCorrelationContext.current().correlationId());
@@ -246,18 +249,38 @@ class ScopedValueContextContractTest {
         assertEquals(correlationId, MDC.get(RequestCorrelationContext.CORRELATION_ID_MDC_KEY));
     }
 
+    /**
+     * 等待值上下文合同完成。
+     */
     private static void await(CountDownLatch latch) throws InterruptedException {
         assertTrue(latch.await(5, TimeUnit.SECONDS));
     }
 
+    /**
+     * 判断本地。
+     */
     private static boolean hasThreadLocalField(Class<?> type) {
         return Arrays.stream(type.getDeclaredFields()).map(Field::getType).anyMatch(ThreadLocal.class::equals);
     }
 
+    /**
+     * 判断方法。
+     */
     private static boolean hasMethodNamed(Class<?> type, String name) {
         return Arrays.stream(type.getDeclaredMethods()).map(Method::getName).anyMatch(name::equals);
     }
 
+    /**
+     * 为 {@code ScopedValueContextContractTest} 测试提供 {@code ContextSnapshot} 测试类型。
+     *
+     * @param requestId      请求标识
+     * @param correlationId  关联标识
+     * @param requestMdc     请求MDC
+     * @param correlationMdc 关联MDC
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record ContextSnapshot(String requestId, String correlationId, String requestMdc, String correlationMdc) {
 
         private ContextSnapshot {

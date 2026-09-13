@@ -17,8 +17,11 @@
 package com.devops00.spectra.core.security.secret.javabean.vo;
 
 /**
- * 密钥管理页面需要展示的运行策略状态，不包含任何密钥载荷。
+ * 封装密钥配置项相关的响应数据。
  *
+ * @param cryptoEnabled 启用状态
+ * @param cryptoReady   就绪状态
+ * @param cryptoState   密钥加密组件的运行状态
  * @author yangxj96
  * @version 1.0
  * @since 2026/9/10

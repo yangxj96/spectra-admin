@@ -24,7 +24,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-/** 系统引导的 DEV_OPS 身份判断。 */
+/**
+ * 系统引导的 DEV_OPS 身份判断。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 @RequiredArgsConstructor
 public class SystemGuideAuthorization {

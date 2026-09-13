@@ -23,7 +23,13 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Quartz 调度配置的安全默认值和非法值契约。 */
+/**
+ * Quartz 调度配置的安全默认值和非法值契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzSchedulerPropertiesTest {
 
     @Test

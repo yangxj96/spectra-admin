@@ -54,6 +54,10 @@ import static org.junit.jupiter.api.Assertions.fail;
  * <p>该测试只在 Maven 的 {@code integration} profile 中执行，使用 Testcontainers 创建可丢弃的
  * PostgreSQL 数据库并从当前 Flyway migration 完整初始化 schema。每个测试使用随机测试数据并在结束时清理，
  * 不依赖本机已有业务数据。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Tag("integration")
 @Testcontainers
@@ -387,11 +391,17 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 打开通知。
+     */
     private Connection openConnection() throws Exception {
         Class.forName("org.postgresql.Driver");
         return DriverManager.getConnection(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
     }
 
+    /**
+     * 执行载荷清理相关操作。
+     */
     private void executeSensitivePayloadCleanup(Connection connection, Instant now, Instant cutoff, int limit)
             throws SQLException {
         try (var requestCleanup = connection.prepareStatement("""
@@ -438,6 +448,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 保存请求。
+     */
     private void insertRequest(Connection connection, UUID requestId, String idempotencyKey)
             throws SQLException {
         try (var insert = connection.prepareStatement("""
@@ -457,12 +470,18 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 保存任务。
+     */
     private void insertTask(Connection connection, UUID requestId, UUID taskId, String recipientKey,
                             Instant scheduledAt, String status)
             throws SQLException {
         insertTask(connection, requestId, taskId, recipientKey, scheduledAt, status, null);
     }
 
+    /**
+     * 保存任务。
+     */
     private void insertTask(Connection connection, UUID requestId, UUID taskId, String recipientKey,
                             Instant scheduledAt, String status, Instant expiresAt)
             throws SQLException {
@@ -487,6 +506,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 保存消息。
+     */
     private void insertInboxMessage(Connection connection, UUID requestId, UUID taskId)
             throws SQLException {
         try (var insert = connection.prepareStatement("""
@@ -503,6 +525,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 查询任务。
+     */
     private List<UUID> selectPendingTaskIds(Connection connection) throws SQLException {
         try (var query = connection.prepareStatement("""
                 SELECT id
@@ -530,6 +555,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 统计通知数量。
+     */
     private long count(Connection connection, String table, UUID id) throws SQLException {
         try (var query = connection.prepareStatement("SELECT COUNT(*) FROM " + SCHEMA + "." + table + " WHERE id = ?")) {
             query.setObject(1, id);
@@ -540,10 +568,16 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 设置通知。
+     */
     private void setInstant(PreparedStatement statement, int index, Instant value) throws SQLException {
         statement.setTimestamp(index, Timestamp.from(value));
     }
 
+    /**
+     * 统计键数量。
+     */
     private long countByKey(Connection connection, String idempotencyKey) throws SQLException {
         try (var query = connection.prepareStatement(
                 "SELECT COUNT(*) FROM spectra_notification.ntf_request WHERE idempotency_key = ?")) {
@@ -555,6 +589,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 删除或清理任务。
+     */
     private void deleteTask(Connection connection, UUID taskId) throws SQLException {
         try (var delete = connection.prepareStatement("DELETE FROM spectra_notification.ntf_task WHERE id = ?")) {
             delete.setObject(1, taskId);
@@ -562,6 +599,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 删除或清理消息。
+     */
     private void deleteInboxMessage(Connection connection, UUID taskId) throws SQLException {
         try (var delete = connection.prepareStatement(
                 "DELETE FROM spectra_notification.ntf_inbox_message WHERE notification_task_id = ?")) {
@@ -570,6 +610,9 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 删除或清理请求。
+     */
     private void deleteRequest(Connection connection, UUID requestId) throws SQLException {
         try (var delete = connection.prepareStatement("DELETE FROM spectra_notification.ntf_request WHERE id = ?")) {
             delete.setObject(1, requestId);

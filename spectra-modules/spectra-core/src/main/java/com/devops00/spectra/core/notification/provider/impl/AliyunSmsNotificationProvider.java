@@ -51,6 +51,10 @@ import java.util.stream.Collectors;
 
 /**
  * 阿里云短信 Provider；使用官方 SMS OpenAPI 的 RPC 签名方式，不把 AccessKey Secret 写入普通配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 @RequiredArgsConstructor

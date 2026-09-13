@@ -32,7 +32,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-/** Cookie CSRF 过滤器回归测试。 */
+/**
+ * Cookie CSRF 过滤器回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class WebCookieCsrfFilterTest {
 
     private static final String FILTER_CLASS = "com.devops00.spectra.framework.web.security.WebCookieCsrfFilter";
@@ -88,6 +94,9 @@ class WebCookieCsrfFilterTest {
         assertEquals(true, Filter.class.isAssignableFrom(filterType));
     }
 
+    /**
+     * 处理过滤条件相关数据。
+     */
     private static Filter filter(SecurityProperties properties) throws Exception {
         Class<?> filterType = Class.forName(FILTER_CLASS);
         Constructor<?> constructor = filterType.getConstructor(SecurityProperties.class, AccessDeniedHandler.class);
@@ -95,6 +104,9 @@ class WebCookieCsrfFilterTest {
         return (Filter) constructor.newInstance(properties, deniedHandler);
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private static MockHttpServletRequest request(String method) {
         return new MockHttpServletRequest(method, "/api/security/authentication/refresh");
     }

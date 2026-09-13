@@ -38,6 +38,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Provider Runtime 的健康门禁、渠道选择和安全阻断测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationProviderRuntimeTest {
 
@@ -92,12 +96,22 @@ class NotificationProviderRuntimeTest {
         assertEquals("PROVIDER_NOT_REGISTERED", health.reason());
     }
 
+    /**
+     * 处理配置相关数据。
+     */
     private NotificationProviderConfiguration configuration() {
         return new NotificationProviderConfiguration(NotificationChannel.SMS, "HTTP_JSON", true,
                 "https://example.test/provider", 0, null, null, null, null, null, null, false, false,
                 2_000, 10, 3, "template-1", null, "secret", "key-1", Instant.now());
     }
 
+    /**
+     * 为 {@code NotificationProviderRuntimeTest} 测试提供 {@code TestProvider} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class TestProvider implements NotificationProvider {
 
         private boolean sendCalled;

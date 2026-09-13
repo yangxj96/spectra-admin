@@ -19,10 +19,22 @@ package com.devops00.spectra.common.port.quartz;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Quartz Job 版本化 JSON 参数的字段和值类型声明。 */
+/**
+ * Quartz Job 版本化 JSON 参数的字段和值类型声明。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public final class QuartzParameterSchema {
 
-    /** 支持的 JSON 值类型。 */
+    /**
+     * 支持的 JSON 值类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public enum ValueType {
         /** 字符串。 */
         STRING,
@@ -40,7 +52,16 @@ public final class QuartzParameterSchema {
         ARRAY
     }
 
-    /** 单个 JSON 字段定义。 */
+    /**
+     * 定义相关数据相关的跨模块调用契约。
+     *
+     * @param type      业务类型
+     * @param required  该参数是否为必填项
+     * @param sensitive 参数值是否包含敏感信息
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record FieldDefinition(ValueType type, boolean required, boolean sensitive) {
 
         public FieldDefinition {

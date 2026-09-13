@@ -41,6 +41,10 @@ import java.util.UUID;
 
 /**
  * Core 用户账号到通知收件人快照的适配器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @RequiredArgsConstructor

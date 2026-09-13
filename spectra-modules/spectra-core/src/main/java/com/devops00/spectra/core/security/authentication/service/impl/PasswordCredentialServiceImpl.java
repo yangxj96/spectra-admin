@@ -32,6 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * 实现密码凭据相关的应用服务逻辑。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @NullMarked
 @RequiredArgsConstructor

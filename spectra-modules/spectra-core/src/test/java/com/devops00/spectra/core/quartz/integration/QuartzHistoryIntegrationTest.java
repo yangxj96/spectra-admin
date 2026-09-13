@@ -32,7 +32,13 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** 在真实 PostgreSQL 上验证自建执行历史表的审计字段、默认值和状态约束。 */
+/**
+ * 在真实 PostgreSQL 上验证自建执行历史表的审计字段、默认值和状态约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Testcontainers
 @Tag("manual-integration")
 @EnabledIfEnvironmentVariable(named = "SPECTRA_QUARTZ_FLYWAY_POSTGRES_TEST", matches = "true")

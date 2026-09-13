@@ -24,6 +24,10 @@ import java.util.Map;
 
 /**
  * Provider 使用的已渲染消息视图；敏感参数只在调用 Provider 的短暂内存中解密。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class NotificationTaskMessage {
 
@@ -66,6 +70,17 @@ public final class NotificationTaskMessage {
         return new Message(title, content, Map.copyOf(parameters), providerTemplateCode);
     }
 
+    /**
+     * 提供消息所需的能力实现。
+     *
+     * @param title                通知消息的标题
+     * @param content              通知消息正文
+     * @param parameters           通知模板参数映射
+     * @param providerTemplateCode 提供器模板编码
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record Message(String title, String content, Map<String, Object> parameters, String providerTemplateCode) {
 
         public Message {

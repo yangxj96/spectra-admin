@@ -49,6 +49,13 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code JdbcAuthorizationSnapshotLoaderTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class JdbcAuthorizationSnapshotLoaderTest {
 
     private final RoleAssignmentMapper roleAssignmentMapper = mock(RoleAssignmentMapper.class);
@@ -142,6 +149,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
                 .hasMessageContaining("Role 未声明");
     }
 
+    /**
+     * 处理授权快照相关数据。
+     */
     private JdbcAuthorizationSnapshotLoader loader() {
         return new JdbcAuthorizationSnapshotLoader(
                 roleAssignmentMapper,
@@ -155,6 +165,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
                 grantBoundaryMapper);
     }
 
+    /**
+     * 处理分配相关数据。
+     */
     private static RoleAssignment assignment(UUID id, UUID userId, UUID roleId) {
         var value = new RoleAssignment();
         value.setId(id);
@@ -164,6 +177,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理角色相关数据。
+     */
     private static SecurityRole role(UUID id, String code) {
         var value = new SecurityRole();
         value.setId(id);
@@ -172,6 +188,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理权限相关数据。
+     */
     private static Permission permission(UUID id, String code) {
         var value = new Permission();
         value.setId(id);
@@ -180,6 +199,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理角色权限相关数据。
+     */
     private static RolePermission rolePermission(UUID roleId, UUID permissionId) {
         var value = new RolePermission();
         value.setRoleId(roleId);
@@ -187,6 +209,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理角色权限相关数据。
+     */
     private static RoleGrantablePermission roleGrantablePermission(UUID roleId, UUID permissionId) {
         var value = new RoleGrantablePermission();
         value.setRoleId(roleId);
@@ -194,6 +219,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理访问边界相关数据。
+     */
     private static AssignmentPermissionBoundary accessBoundary(UUID assignmentId, UUID permissionId, UUID scopeId) {
         var value = new AssignmentPermissionBoundary();
         value.setAssignmentId(assignmentId);
@@ -202,6 +230,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理边界相关数据。
+     */
     private static AssignmentGrantBoundary grantBoundary(UUID assignmentId, UUID permissionId, UUID scopeId) {
         var value = new AssignmentGrantBoundary();
         value.setAssignmentId(assignmentId);
@@ -210,6 +241,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理范围相关数据。
+     */
     private static AuthorizationScope scope(
                                             UUID id, String mode) {
         var value = new AuthorizationScope();
@@ -218,6 +252,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
+    /**
+     * 处理规则相关数据。
+     */
     private static ScopeRule rule(UUID scopeId, UUID departmentId) {
         var value = new ScopeRule();
         value.setId(UUID.randomUUID());

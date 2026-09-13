@@ -19,7 +19,13 @@ package com.devops00.spectra.core.quartz.parameter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** 已完成 schema 校验、可安全写入 JobDataMap 的版本化参数。 */
+/**
+ * 已完成 schema 校验、可安全写入 JobDataMap 的版本化参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public final class VersionedJsonJobParameters {
 
     private final String version;
@@ -36,17 +42,23 @@ public final class VersionedJsonJobParameters {
         this.json = json;
     }
 
-    /** @return 参数 schema 版本 */
+    /**
+     * 返回参数数据采用的版本号。
+     */
     public String version() {
         return version;
     }
 
-    /** @return 不可变、已脱敏参数值 */
+    /**
+     * 返回版本化参数中的业务值。
+     */
     public Map<String, Object> values() {
         return values;
     }
 
-    /** @return 含 schema version 的规范 JSON 文本 */
+    /**
+     * 将版本化参数编码为 JSON 文本。
+     */
     public String json() {
         return json;
     }

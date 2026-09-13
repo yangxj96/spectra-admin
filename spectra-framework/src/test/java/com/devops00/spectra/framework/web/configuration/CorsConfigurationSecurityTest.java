@@ -30,6 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * CORS 安全配置回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class CorsConfigurationSecurityTest {
 
@@ -82,8 +86,18 @@ class CorsConfigurationSecurityTest {
         new MvcConfiguration(properties).addCorsMappings(new InspectableCorsRegistry());
     }
 
+    /**
+     * 为 {@code CorsConfigurationSecurityTest} 测试提供 {@code InspectableCorsRegistry} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class InspectableCorsRegistry extends CorsRegistry {
 
+        /**
+         * 处理相关数据相关数据。
+         */
         private Map<String, CorsConfiguration> configurations() {
             return getCorsConfigurations();
         }

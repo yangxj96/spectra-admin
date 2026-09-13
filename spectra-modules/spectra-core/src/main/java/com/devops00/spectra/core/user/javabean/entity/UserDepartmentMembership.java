@@ -26,7 +26,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/** 用户与部门之间的主部门或关联部门关系。 */
+/**
+ * 用户与部门之间的主部门或关联部门关系。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,12 +40,21 @@ import java.util.UUID;
 @TableName(value = "sys_user_department_membership", schema = "spectra_core")
 public class UserDepartmentMembership extends BaseEntity {
 
+    /**
+     * 建立该部门关系的用户 ID。
+     */
     @TableField(value = "user_id")
     private UUID userId;
 
+    /**
+     * 与用户建立关系的部门 ID。
+     */
     @TableField(value = "department_id")
     private UUID departmentId;
 
+    /**
+     * 用户与该部门关系的类型，例如主部门或关联部门。
+     */
     @TableField(value = "membership_type")
     private String membershipType;
 }

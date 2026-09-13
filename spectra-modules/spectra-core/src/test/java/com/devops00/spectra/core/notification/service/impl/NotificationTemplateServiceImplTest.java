@@ -48,6 +48,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * 通知模板展示版本选择测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationTemplateServiceImplTest {
 
@@ -119,6 +123,9 @@ class NotificationTemplateServiceImplTest {
         assertEquals(0L, inserted[0].getVersion());
     }
 
+    /**
+     * 处理模板相关数据。
+     */
     private static NotificationTemplateEntity template(String groupCode, int version, String state, String updatedAt) {
         var entity = new NotificationTemplateEntity();
         entity.setTemplateGroupCode(groupCode);

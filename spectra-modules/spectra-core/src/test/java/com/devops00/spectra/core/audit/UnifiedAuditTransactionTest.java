@@ -2,6 +2,16 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.audit;
@@ -39,7 +49,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** Verifies audit writes share successful business transactions and survive business rollback as failures. */
+/**
+ * 验证 {@code UnifiedAuditTransactionTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Tag("integration")
 @Testcontainers
 class UnifiedAuditTransactionTest {
@@ -141,18 +157,30 @@ class UnifiedAuditTransactionTest {
         assertEquals("invalid access_token=[REDACTED]", row.get("failure_reason"));
     }
 
+    /**
+     * 处理操作相关数据。
+     */
     @Audit(eventType = "TEST.AUDIT.SUCCESS", captureArguments = false, captureResult = false)
     private void successfulOperation() {
     }
 
+    /**
+     * 处理审计失败相关数据。
+     */
     @Audit(eventType = "TEST.AUDIT.WRITE.FAIL", captureArguments = false, captureResult = false)
     private void auditWriterFailure() {
     }
 
+    /**
+     * 处理业务失败相关数据。
+     */
     @Audit(eventType = "TEST.AUDIT.BUSINESS.FAIL", captureArguments = false, captureResult = false)
     private void businessFailure() {
     }
 
+    /**
+     * 处理审计事务相关数据。
+     */
     private static AuditAspect aspect() {
         var transactionManager = new DataSourceTransactionManager(dataSource);
         var auditSanitizer = new DefaultAuditSanitizer();
@@ -164,6 +192,9 @@ class UnifiedAuditTransactionTest {
                 new TransactionTemplate(transactionManager), new AuditFailureResolver(auditSanitizer), failureRecorder);
     }
 
+    /**
+     * 处理审计事务相关数据。
+     */
     private static ProceedingJoinPoint invocation(String methodName, ThrowingSupplier work) throws Throwable {
         Method method = UnifiedAuditTransactionTest.class.getDeclaredMethod(methodName);
         MethodSignature signature = mock(MethodSignature.class);
@@ -176,21 +207,39 @@ class UnifiedAuditTransactionTest {
         return point;
     }
 
+    /**
+     * 处理统计相关数据。
+     */
     private static int probeCount(UUID id) {
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM spectra_core.audit_transaction_probe WHERE id = ?",
                 Integer.class, id);
         return count == null ? 0 : count;
     }
 
+    /**
+     * 处理审计统计相关数据。
+     */
     private static int auditCount(String eventType) {
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM " + AUDIT_TABLE + " WHERE event_type = ?",
                 Integer.class, eventType);
         return count == null ? 0 : count;
     }
 
+    /**
+     * 为 {@code UnifiedAuditTransactionTest} 测试提供 {@code ThrowingSupplier} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @FunctionalInterface
     private interface ThrowingSupplier {
 
+        /**
+         * 查询相关数据。
+         *
+         * @return 处理后的结果。
+         */
         Object get();
     }
 }

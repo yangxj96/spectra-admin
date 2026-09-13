@@ -22,6 +22,13 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 定义身份认证对象身份相关的应用服务契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface AuthenticationIdentityService {
 
     /**

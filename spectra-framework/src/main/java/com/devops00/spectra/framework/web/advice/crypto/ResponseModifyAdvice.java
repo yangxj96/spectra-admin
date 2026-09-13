@@ -133,11 +133,7 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     /**
-     * 空body处理
-     *
-     * @param request  请求
-     * @param response 响应
-     * @return 返回与当前 HTTP 状态和方法匹配的空响应对象；已知状态沿用原状态，POST 使用 201、PUT 使用 204，其余请求使用成功响应，不返回 null。
+     * 处理响应修改。
      */
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
         R<Object> r;

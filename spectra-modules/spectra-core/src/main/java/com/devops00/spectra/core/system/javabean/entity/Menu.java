@@ -42,6 +42,7 @@ import java.util.UUID;
 @TableName(value = "sys_menu", schema = "spectra_core")
 public class Menu extends BaseEntity {
 
+    /** 序列化版本标识。 */
     @Serial
     private static final long serialVersionUID = 1L;
 

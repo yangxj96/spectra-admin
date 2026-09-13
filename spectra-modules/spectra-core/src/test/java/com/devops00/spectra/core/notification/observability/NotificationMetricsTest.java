@@ -23,6 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 通知指标低基数标签与匿名 Gauge 回归。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationMetricsTest {
 

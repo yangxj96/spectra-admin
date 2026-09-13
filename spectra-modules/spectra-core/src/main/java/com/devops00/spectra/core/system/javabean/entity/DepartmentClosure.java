@@ -26,7 +26,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/** 部门祖先与后代之间的层级闭包关系。 */
+/**
+ * 部门之间的祖先与后代闭包关系；{@code depth} 表示两者之间的层级距离。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,12 +40,21 @@ import java.util.UUID;
 @TableName(value = "sys_department_closure", schema = "spectra_core")
 public class DepartmentClosure extends BaseEntity {
 
+    /**
+     * 层级关系中的祖先部门 ID。
+     */
     @TableField(value = "ancestor_id")
     private UUID ancestorId;
 
+    /**
+     * 层级关系中的后代部门 ID。
+     */
     @TableField(value = "descendant_id")
     private UUID descendantId;
 
+    /**
+     * 后代部门与祖先部门之间的层级距离；直属关系为 1。
+     */
     @TableField(value = "depth")
     private Integer depth;
 }

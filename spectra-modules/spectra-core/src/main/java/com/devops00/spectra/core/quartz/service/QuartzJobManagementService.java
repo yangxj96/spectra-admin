@@ -29,15 +29,27 @@ import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import java.util.List;
 import java.util.UUID;
 
-/** Quartz 管理应用服务；这是应用层唯一允许调用 Quartz 变更 API 的入口。 */
+/**
+ * Quartz 管理应用服务；这是应用层唯一允许调用 Quartz 变更 API 的入口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface QuartzJobManagementService {
 
-    /** @return 代码白名单中的 Job 类型能力列表；没有定义时返回空列表 */
+    /**
+     * 查询代码白名单中可用的内置 Quartz Job 类型；未定义时返回空列表。
+     *
+     * @return 代码白名单中可用的 Job 类型；没有定义时为空列表。
+     */
     List<QuartzJobTypeVO> jobTypes();
 
     /**
-     * @param page Job 分页参数；为空时使用默认分页
-     * @return Quartz Job 分页；无匹配时 records 为空且不返回 null
+     * 分页查询 Quartz Job；分页参数为空时使用默认分页，没有匹配项时返回空 records。
+     *
+     * @param page 分页参数。
+     * @return Quartz Job 分页；无匹配项时 records 为空且不为 null。
      */
     IPage<QuartzJobVO> jobs(PageFrom page);
 
@@ -50,28 +62,48 @@ public interface QuartzJobManagementService {
     QuartzJobVO job(String jobKey);
 
     /**
-     * @param from 普通 Job 创建参数，JobKey 由服务端生成
-     * @return 创建完成的 Job；不会返回 null
+     * 创建普通 Quartz Job，JobKey 由服务端生成。
+     *
+     * @param from 普通 Job 的创建参数；JobKey 由服务端生成。
+     * @return 创建完成的普通 Quartz Job。
      */
     QuartzJobVO create(QuartzJobCreateFrom from);
 
     /**
-     * @param jobKey 要修改的 JobKey
-     * @param from   修改后的展示信息、参数和唯一 Trigger
-     * @return 修改完成的 Job；内置 Job 仍使用代码白名单中的实现类
+     * 更新 Quartz Job 的展示信息、参数和唯一 Trigger；内置 Job 仍使用白名单中的实现类。
+     *
+     * @param jobKey JobKey 名称或包含 group 的完整 JobKey。
+     * @param from   更新后的展示信息、参数和唯一 Trigger。
+     * @return 更新完成的 Quartz Job。
      */
     QuartzJobVO update(String jobKey, QuartzJobUpdateFrom from);
 
-    /** @param jobKey 要删除的普通 JobKey；内置 Job 不允许删除 */
+    /**
+     * 删除普通 Quartz Job；内置 Job 不允许删除。
+     *
+     * @param jobKey JobKey 名称或包含 group 的完整 JobKey。
+     */
     void delete(String jobKey);
 
-    /** @param jobKey 要暂停的 JobKey */
+    /**
+     * 暂停指定的 Quartz Job。
+     *
+     * @param jobKey JobKey 名称或包含 group 的完整 JobKey。
+     */
     void pause(String jobKey);
 
-    /** @param jobKey 要恢复的 JobKey */
+    /**
+     * 恢复指定的 Quartz Job。
+     *
+     * @param jobKey JobKey 名称或包含 group 的完整 JobKey。
+     */
     void resume(String jobKey);
 
-    /** @param jobKey 要立即触发的 JobKey；立即触发不创建新的 Trigger */
+    /**
+     * 立即触发指定的 Quartz Job；此操作不会创建新的 Trigger。
+     *
+     * @param jobKey JobKey 名称或包含 group 的完整 JobKey。
+     */
     void triggerNow(String jobKey);
 
     /**

@@ -22,7 +22,15 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * 资源访问判断所需的最小上下文。departmentLineage 应包含资源部门自身及其祖先节点。
+ * 承载范围查询相关的不可变数据。
+ *
+ * @param subjectId         数据记录的唯一标识
+ * @param ownerId           所有者标识
+ * @param departmentId      部门标识
+ * @param departmentLineage 数据范围使用的部门层级标识路径
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record ScopeQuery(UUID subjectId, UUID ownerId, UUID departmentId, Set<UUID> departmentLineage) {
 

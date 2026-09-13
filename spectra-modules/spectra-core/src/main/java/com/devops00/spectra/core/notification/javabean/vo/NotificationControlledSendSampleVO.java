@@ -17,7 +17,13 @@
 package com.devops00.spectra.core.notification.javabean.vo;
 
 /**
- * 受控发送脱敏受众样例。
+ * 封装通知发送采样记录相关的响应数据。
+ *
+ * @param channel         通知任务使用的发送渠道
+ * @param recipientMasked 经过脱敏处理的接收方地址
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record NotificationControlledSendSampleVO(String channel, String recipientMasked) {
 }

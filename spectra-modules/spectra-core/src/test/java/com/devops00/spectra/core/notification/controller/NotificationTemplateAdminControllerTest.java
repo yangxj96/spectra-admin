@@ -33,6 +33,10 @@ import static org.mockito.Mockito.mock;
 
 /**
  * 通知模板接口权限和路径参数边界测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationTemplateAdminControllerTest {
 
@@ -52,6 +56,9 @@ class NotificationTemplateAdminControllerTest {
                 NotificationTemplatePreviewFrom.class));
     }
 
+    /**
+     * 处理通知模板相关数据。
+     */
     private String annotation(String method, Class<?>... parameterTypes) throws NoSuchMethodException {
         return NotificationTemplateAdminController.class.getMethod(method, parameterTypes)
                 .getAnnotation(PreAuthorize.class)

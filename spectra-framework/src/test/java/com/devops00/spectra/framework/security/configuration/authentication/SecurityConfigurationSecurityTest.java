@@ -48,7 +48,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** Spring Security Web 边界回归测试。 */
+/**
+ * Spring Security Web 边界回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecurityConfigurationSecurityTest {
 
     @Test
@@ -76,9 +82,13 @@ class SecurityConfigurationSecurityTest {
         assertEquals("SAMEORIGIN", response.getHeader("X-Frame-Options"));
     }
 
+    /**
+     * 构建安全配置安全。
+     */
     @SuppressWarnings("unchecked")
     private static List<SecurityFilterChain> buildChain() throws Exception {
         ObjectPostProcessor<Object> postProcessor = new ObjectPostProcessor<>() {
+            /** {@inheritDoc} */
             @Override
             public <O extends Object> O postProcess(O object) {
                 return object;
@@ -105,6 +115,9 @@ class SecurityConfigurationSecurityTest {
                 new RedisRateLimiter(redis), new ObjectMapper(), objectProvider));
     }
 
+    /**
+     * 处理安全配置安全相关数据。
+     */
     private static FilterChain terminalChain() {
         return (request, response) -> {
             if (response instanceof MockHttpServletResponse mockResponse) {

@@ -24,7 +24,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 系统密码策略修改入参。 */
+/**
+ * 系统密码策略修改入参。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

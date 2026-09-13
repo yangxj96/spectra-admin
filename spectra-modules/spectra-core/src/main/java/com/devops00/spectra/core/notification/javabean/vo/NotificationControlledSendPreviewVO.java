@@ -28,7 +28,23 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 受控发送 Preview 结果；不包含完整用户清单、地址或敏感参数。
+ * 封装通知发送相关的响应数据。
+ *
+ * @param previewId           数据记录的唯一标识
+ * @param previewToken        用于提交受控发送的预览令牌
+ * @param requestHash         请求哈希值
+ * @param expiresAt           该授权变更令牌的失效时间
+ * @param candidateUserCount  符合初步筛选条件的候选用户数量
+ * @param eligibleTaskCount   可以创建通知任务的用户数量
+ * @param skippedTaskCount    因条件不符而跳过的任务数量
+ * @param skippedCounts       按原因统计的跳过任务数量
+ * @param skippedDetails      被跳过的接收对象及其原因明细
+ * @param channelAvailability 各通知渠道的可用状态
+ * @param templates           本次发送使用的通知模板快照集合
+ * @param samples             采样记录
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record NotificationControlledSendPreviewVO(UUID previewId, String previewToken, String requestHash,
                                                   LocalDateTime expiresAt, int candidateUserCount, int eligibleTaskCount,

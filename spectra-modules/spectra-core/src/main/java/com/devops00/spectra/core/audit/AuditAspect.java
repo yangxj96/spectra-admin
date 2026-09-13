@@ -127,11 +127,14 @@ public class AuditAspect {
         }
     }
 
+    /**
+     * 记录失败。
+     */
     private void recordFailureAfterRollback(ProceedingJoinPoint point,
-                                           Method method,
-                                           AuditDescriptor descriptor,
-                                           Throwable failure,
-                                           long startedAt) {
+                                            Method method,
+                                            AuditDescriptor descriptor,
+                                            Throwable failure,
+                                            long startedAt) {
         AuditRecord record = createRecord(point, method, descriptor, null, failure, startedAt);
         if (TransactionSynchronizationManager.isSynchronizationActive()
                 && TransactionSynchronizationManager.isActualTransactionActive()) {
@@ -146,6 +149,9 @@ public class AuditAspect {
         recordFailure(record, failure, descriptor);
     }
 
+    /**
+     * 记录失败。
+     */
     private void recordFailure(AuditRecord record, Throwable failure, AuditDescriptor descriptor) {
         try {
             failureRecorder.record(record);
@@ -159,6 +165,9 @@ public class AuditAspect {
         }
     }
 
+    /**
+     * 解析方法。
+     */
     private Method resolveMethod(ProceedingJoinPoint point) {
         if (!(point.getSignature() instanceof MethodSignature signature)) {
             return null;
@@ -166,6 +175,9 @@ public class AuditAspect {
         return signature.getMethod();
     }
 
+    /**
+     * 解析审计。
+     */
     private AuditDescriptor resolveDescriptor(Method method, ProceedingJoinPoint point) {
         if (method == null) {
             return null;
@@ -189,6 +201,9 @@ public class AuditAspect {
                 : method.getDeclaringClass().getSimpleName() + "#" + method.getName();
     }
 
+    /**
+     * 解析说明。
+     */
     private String parseDescription(String expression, Method method, ProceedingJoinPoint point) {
         if (expression == null || expression.isBlank()) {
             return null;
@@ -219,12 +234,15 @@ public class AuditAspect {
         }
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private void submit(ProceedingJoinPoint point,
-                       Method method,
-                       AuditDescriptor descriptor,
-                       Object result,
-                       Throwable failure,
-                       long startedAt) {
+                        Method method,
+                        AuditDescriptor descriptor,
+                        Object result,
+                        Throwable failure,
+                        long startedAt) {
         AuditRecord record = createRecord(point, method, descriptor, result, failure, startedAt);
         try {
             auditService.record(record);
@@ -235,6 +253,9 @@ public class AuditAspect {
         }
     }
 
+    /**
+     * 构建记录。
+     */
     private AuditRecord createRecord(ProceedingJoinPoint point,
                                      Method method,
                                      AuditDescriptor descriptor,
@@ -286,9 +307,13 @@ public class AuditAspect {
                 failureDetails);
     }
 
+    /**
+     * 处理结果相关数据。
+     */
     private static AuditRecord.Result resultOf(Integer status) {
-        if (status != null && (status == HttpServletResponse.SC_UNAUTHORIZED
-                || status == HttpServletResponse.SC_FORBIDDEN)) {
+        if (status != null
+                && (status == HttpServletResponse.SC_UNAUTHORIZED
+                        || status == HttpServletResponse.SC_FORBIDDEN)) {
             return AuditRecord.Result.DENIED;
         }
         if (status != null && status >= HttpServletResponse.SC_BAD_REQUEST) {
@@ -297,6 +322,9 @@ public class AuditAspect {
         return AuditRecord.Result.SUCCEEDED;
     }
 
+    /**
+     * 处理请求元数据相关数据。
+     */
     private RequestMetadata requestMetadata() {
         if (!(RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes)) {
             var trace = RequestCorrelationContext.current();
@@ -318,6 +346,9 @@ public class AuditAspect {
                 status);
     }
 
+    /**
+     * 解析关联上下文。
+     */
     private RequestCorrelationContext.Context resolveCorrelationContext() {
         var current = RequestCorrelationContext.current();
         if (!current.isEmpty()) {
@@ -332,11 +363,17 @@ public class AuditAspect {
         return RequestCorrelationContext.forTask(null);
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private static String header(HttpServletRequest request, String name) {
         String value = request.getHeader(name);
         return value == null || value.isBlank() ? null : value;
     }
 
+    /**
+     * 处理审计相关数据。
+     */
     private List<Object> extractArguments(ProceedingJoinPoint point) {
         return Arrays.stream(point.getArgs())
                 .filter(argument -> argument != null)
@@ -347,6 +384,18 @@ public class AuditAspect {
                 .toList();
     }
 
+    /**
+     * 承载审计相关的不可变数据。
+     *
+     * @param category         业务类别
+     * @param eventType        事件类型
+     * @param reason           本次操作或审计事件对应的原因
+     * @param captureArguments 是否在审计事件中记录方法参数
+     * @param captureResult    是否记录被审计方法的返回值
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record AuditDescriptor(AuditCategory category,
                                    String eventType,
                                    String reason,
@@ -354,6 +403,22 @@ public class AuditAspect {
                                    boolean captureResult) {
     }
 
+    /**
+     * 承载请求元数据相关的不可变数据。
+     *
+     * @param webRequest    Web请求
+     * @param method        HTTP 请求方法
+     * @param url           HTTP 请求地址
+     * @param requestId     请求标识
+     * @param correlationId 关联标识
+     * @param client        发起请求的客户端信息
+     * @param ip            发起请求的客户端 IP 地址
+     * @param userAgent     发起请求的客户端 User-Agent
+     * @param status        业务状态
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record RequestMetadata(boolean webRequest,
                                    String method,
                                    String url,
@@ -364,12 +429,22 @@ public class AuditAspect {
                                    String userAgent,
                                    Integer status) {
 
+        /**
+         * 判断请求元数据。
+         */
         private static RequestMetadata empty(String requestId, String correlationId) {
             return new RequestMetadata(false, null, null, requestId, correlationId,
                     null, null, null, null);
         }
     }
 
+    /**
+     * 表示异常处理过程中发生的异常。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class AuditedInvocationException extends RuntimeException {
 
         private final Throwable original;
@@ -379,6 +454,9 @@ public class AuditAspect {
             this.original = original;
         }
 
+        /**
+         * 处理异常相关数据。
+         */
         private Throwable original() {
             return original;
         }

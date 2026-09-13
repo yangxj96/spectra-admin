@@ -54,6 +54,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Provider 回执验签、状态更新和重复回执幂等测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationProviderCallbackServiceTest {
 
@@ -125,12 +129,18 @@ class NotificationProviderCallbackServiceTest {
                         "{\"messageId\":\"message-1\",\"status\":\"FAILED\"}"));
     }
 
+    /**
+     * 处理配置相关数据。
+     */
     private NotificationProviderConfiguration configuration() {
         return new NotificationProviderConfiguration(NotificationChannel.SMS, "HTTP_JSON", true,
                 "https://provider.example/send", 0, null, null, null, null, null, null, false, false,
                 5_000, 10, 3, null, null, "callback-secret", "sms-key", null);
     }
 
+    /**
+     * 处理通知提供器回调相关数据。
+     */
     private String signature(String body, String secret) throws Exception {
         var mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));

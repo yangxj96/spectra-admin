@@ -23,6 +23,13 @@ import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
+/**
+ * 验证 {@code DependencyHealthContractTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DependencyHealthContractTest {
 
     @Test

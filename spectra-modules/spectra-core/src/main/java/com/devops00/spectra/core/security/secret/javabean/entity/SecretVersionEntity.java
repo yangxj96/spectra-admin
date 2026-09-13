@@ -27,7 +27,13 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.UUID;
 
-/** 密钥密文版本实体。 */
+/**
+ * 密钥的加密版本记录及其版本元数据。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Getter
 @Setter
 @ToString(exclude = {"nonce", "ciphertext"})

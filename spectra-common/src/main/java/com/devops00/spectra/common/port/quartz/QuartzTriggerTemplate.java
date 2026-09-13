@@ -29,18 +29,38 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.TimeZone;
 
-/** 仅支持 Cron 和 Simple 两种 Quartz Trigger 模板。 */
+/**
+ * 仅支持 Cron 和 Simple 两种 Quartz Trigger 模板。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public final class QuartzTriggerTemplate {
 
-    /** Trigger 类型。 */
+    /**
+     * Trigger 类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public enum TriggerType {
-        /** CronTrigger。 */
+        /**
+         * Cron 触发器类型。
+         */
         CRON,
         /** SimpleTrigger，可表达一次性或固定间隔。 */
         SIMPLE
     }
 
-    /** Quartz 原生错过策略。 */
+    /**
+     * Quartz 原生错过策略。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public enum MisfirePolicy {
         /** 跳过错过的 Cron 周期。 */
         DO_NOTHING,
@@ -140,32 +160,44 @@ public final class QuartzTriggerTemplate {
         }
     }
 
-    /** @return Trigger 类型 */
+    /**
+     * 返回该触发器模板的类型。
+     */
     public TriggerType triggerType() {
         return triggerType;
     }
 
-    /** @return Cron 表达式 */
+    /**
+     * 返回 Cron 表达式；固定间隔模板不包含 Cron 表达式。
+     */
     public String cronExpression() {
         return cronExpression;
     }
 
-    /** @return Simple 间隔 */
+    /**
+     * 返回固定间隔模板的触发间隔；Cron 模板不包含固定间隔。
+     */
     public Duration interval() {
         return interval;
     }
 
-    /** @return 是否为一次性 Trigger */
+    /**
+     * 判断该模板是否只触发一次。
+     */
     public boolean oneShot() {
         return oneShot;
     }
 
-    /** @return Cron IANA 时区 */
+    /**
+     * 返回 Cron 表达式使用的时区；固定间隔模板不使用该时区。
+     */
     public ZoneId timeZone() {
         return timeZone;
     }
 
-    /** @return Quartz 错过策略 */
+    /**
+     * 返回触发时间错过后的处理策略。
+     */
     public MisfirePolicy misfirePolicy() {
         return misfirePolicy;
     }

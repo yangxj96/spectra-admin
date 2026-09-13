@@ -19,13 +19,13 @@ package com.devops00.spectra.common.port.directory;
 import java.util.UUID;
 
 /**
- * 跨模块目录查询返回的用户快照。
+ * 定义用户快照相关的跨模块调用契约。
  *
  * @param id           用户 ID
- * @param employeeNo   工号
+ * @param employeeNo   员工编号
  * @param displayName  显示名称
  * @param username     登录用户名
- * @param avatar       头像
+ * @param avatar       组件 avatar 对应的业务含义
  * @param status       生命周期状态名称
  * @param departmentId 主部门 ID
  * @author yangxj96

@@ -59,14 +59,7 @@ public final class ObjUtils {
     }
 
     /**
-     * Object 转 Map&lt;K, V&gt;
-     *
-     * @param obj        对象
-     * @param keyClass   key类型
-     * @param valueClass value类型
-     * @param <K>        key类型
-     * @param <V>        value类型
-     * @return 转换后的map
+     * 处理相关数据相关数据。
      */
     public static <K, V> Map<K, V> castMap(Object obj, Class<K> keyClass, Class<V> valueClass) {
         if (!(obj instanceof Map<?, ?> rawMap)) {
@@ -87,14 +80,7 @@ public final class ObjUtils {
     }
 
     /**
-     * object转list map
-     *
-     * @param obj    对象
-     * @param kClazz k类型
-     * @param vClazz v类型
-     * @param <K>    class
-     * @param <V>    class
-     * @return 转换后的List Map
+     * 处理相关数据相关数据。
      */
     public static <K, V> List<Map<K, V>> castListMap(Object obj, Class<K> kClazz, Class<V> vClazz) {
         if (!(obj instanceof List<?> list)) {
@@ -111,10 +97,7 @@ public final class ObjUtils {
     }
 
     /**
-     * Object 转换为 Map String Object
-     *
-     * @param obj 对象
-     * @return {@code Map<String,Object} key为string,value为object
+     * 处理相关数据相关数据。
      */
     public static Map<String, Object> castStrObjMap(Object obj) {
         return castMap(obj, String.class, Object.class);

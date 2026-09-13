@@ -63,10 +63,10 @@ public interface ConfiguredService extends BaseService<Configured> {
     void upsert(String key, String value, ConfiguredValueType type, String remarks);
 
     /**
-     * 按配置键读取非空配置值。
+     * 查询值。
      *
-     * @param key 配置键
-     * @return 返回配置键对应的非空配置值；键不存在或值为空时返回 Optional.empty()，不返回 null。
+     * @param key 查询或操作所用的键。
+     * @return 可能存在的查询结果。
      */
     Optional<String> findValue(String key);
 }

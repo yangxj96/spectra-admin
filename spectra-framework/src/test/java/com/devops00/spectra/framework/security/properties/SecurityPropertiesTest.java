@@ -28,6 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 匿名白名单安全回归测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class SecurityPropertiesTest {
 

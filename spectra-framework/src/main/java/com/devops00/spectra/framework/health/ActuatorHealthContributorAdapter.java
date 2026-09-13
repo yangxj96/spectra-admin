@@ -33,6 +33,10 @@ import java.util.Map;
  *
  * <p>适配器只把 core 提供的统一快照转换成 Actuator {@link Health}，不执行 contributor、不聚合状态，也不
  * 读取业务模块实现。详情只复制公共协议中的安全字段。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component("spectraHealth")
 @ConditionalOnBean(DependencyHealthSnapshotProvider.class)
@@ -70,6 +74,9 @@ public class ActuatorHealthContributorAdapter implements HealthIndicator {
         }
     }
 
+    /**
+     * 处理健康状态相关数据。
+     */
     private static Map<String, Object> details(DependencyHealthResult result) {
         var details = new LinkedHashMap<String, Object>();
         details.put("module", result.moduleName());

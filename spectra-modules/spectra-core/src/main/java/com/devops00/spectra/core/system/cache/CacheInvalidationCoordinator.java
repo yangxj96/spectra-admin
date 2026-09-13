@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.system.cache;
@@ -23,6 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>事件只携带操作 ID、区域编码和实例范围，不携带 Redis Key。发布成功
  * 只代表消息已被普通 Redis 接受，不代表所有实例已经完成。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 public class CacheInvalidationCoordinator {
@@ -100,9 +113,16 @@ public class CacheInvalidationCoordinator {
         return clear(regions, allRegions, false, operationId);
     }
 
+    /**
+     * 发送或分发缓存。
+     */
     private boolean publish(UUID operationId, Collection<String> regionCodes, boolean allRegions) {
-        String regions = allRegions ? "*" : String.join(",", registry.validate(regionCodes).stream()
-                .map(CacheRegionDescriptor::code).toList());
+        String regions = allRegions
+                ? "*"
+                : String.join(",", registry.validate(regionCodes)
+                        .stream()
+                        .map(CacheRegionDescriptor::code)
+                        .toList());
         redis.convertAndSend(CHANNEL, operationId + ";" + allRegions + ";" + regions);
         return true;
     }

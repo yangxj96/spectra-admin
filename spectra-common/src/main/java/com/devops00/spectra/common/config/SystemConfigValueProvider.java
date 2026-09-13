@@ -22,15 +22,19 @@ import java.util.Optional;
  * 提供运行时系统配置的最小公共契约。
  * <p>
  * 业务模块只依赖该契约，不直接依赖 Core 的系统配置实现，允许配置在首次引导后动态从数据库读取。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @FunctionalInterface
 public interface SystemConfigValueProvider {
 
     /**
-     * 按配置键读取非空值。
+     * 查询系统配置值。
      *
-     * @param key 配置键
-     * @return 配置值
+     * @param key 查询或操作所用的键。
+     * @return 可能存在的查询结果。
      */
     Optional<String> find(String key);
 }

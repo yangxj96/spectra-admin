@@ -73,6 +73,9 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         return SecurityRedisExecutor.execute("刷新安全会话", () -> refreshInternal(refreshToken));
     }
 
+    /**
+     * 刷新内部。
+     */
     private SecurityToken refreshInternal(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new IllegalArgumentException("刷新token不能为空");
@@ -128,6 +131,9 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         }
     }
 
+    /**
+     * 删除或清理访问会话。
+     */
     private void removeRotatedAccessSession(String accessDigest, String refreshDigest, String userId,
                                             String clientType, String familyId) {
         store.redis().delete(SecurityRedisKey.SESSION.format(accessDigest));

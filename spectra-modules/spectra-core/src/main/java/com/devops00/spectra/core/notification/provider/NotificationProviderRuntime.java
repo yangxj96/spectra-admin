@@ -169,6 +169,15 @@ public class NotificationProviderRuntime {
         return configuration == null || configuration.providerType() == null ? "NONE" : configuration.providerType();
     }
 
+    /**
+     * 提供健康状态快照所需的能力实现。
+     *
+     * @param configurationUpdatedAt 配置更新
+     * @param health                 健康状态
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record HealthSnapshot(Instant configurationUpdatedAt, NotificationProviderHealth health) {
     }
 }

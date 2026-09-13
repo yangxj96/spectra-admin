@@ -27,7 +27,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Web 端启动阶段的公开配置接口。 */
+/**
+ * Web 端启动阶段的公开配置接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor

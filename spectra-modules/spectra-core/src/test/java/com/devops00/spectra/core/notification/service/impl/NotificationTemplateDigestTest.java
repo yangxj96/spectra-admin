@@ -27,6 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * 通知模板版本摘要稳定性测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationTemplateDigestTest {
 
@@ -45,6 +49,9 @@ class NotificationTemplateDigestTest {
         assertNotEquals(NotificationTemplateDigest.calculate(first), NotificationTemplateDigest.calculate(changed));
     }
 
+    /**
+     * 处理模板相关数据。
+     */
     private NotificationTemplateEntity template(Map<String, Object> schema, String content) {
         var template = new NotificationTemplateEntity();
         template.setTemplateGroupCode("SYSTEM_NOTICE");

@@ -22,6 +22,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * 验证 {@code SecurityContextControllerTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecurityContextControllerTest {
 
     @Test

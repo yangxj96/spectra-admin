@@ -19,8 +19,12 @@ package com.devops00.spectra.core.security.authorization;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 
 /**
- * 一个 Permission 的授权变更请求。Access/Grant Boundary 始终保持在 Permission 粒度。
+ * 承载授权请求相关的不可变数据。
  *
+ * @param permission           本次授权操作对应的权限
+ * @param accessScope          访问范围
+ * @param grantScope           本次允许授予的权限范围
+ * @param targetAuthorityLevel 目标权限
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/14

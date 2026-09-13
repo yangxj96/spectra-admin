@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -31,7 +31,13 @@ import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Enforces the XML-based SQL mapping contract across backend modules. */
+/**
+ * 验证 {@code MapperXmlContractTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class MapperXmlContractTest {
 
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("(?m)^\\s*package\\s+([\\w.]+)\\s*;");
@@ -473,6 +479,9 @@ class MapperXmlContractTest {
                 .isEmpty();
     }
 
+    /**
+     * 判断XML合同。
+     */
     private boolean isMyBatisMapper(String source) {
         String withoutComments = SourceContractTestSupport.withoutComments(source);
         return PUBLIC_INTERFACE_PATTERN.matcher(withoutComments).find()
@@ -482,6 +491,9 @@ class MapperXmlContractTest {
                         || withoutComments.matches("(?s).*extends\\s+[^\\{;]*\\bBaseMapper\\s*<.*"));
     }
 
+    /**
+     * 处理名称相关数据。
+     */
     private String qualifiedName(Path javaFile, String source) {
         Matcher packageMatcher = PACKAGE_PATTERN.matcher(source);
         Matcher interfaceMatcher = PUBLIC_INTERFACE_PATTERN.matcher(SourceContractTestSupport.withoutComments(source));
@@ -491,6 +503,9 @@ class MapperXmlContractTest {
         return packageMatcher.group(1) + "." + interfaceMatcher.group(1);
     }
 
+    /**
+     * 处理类型名称相关数据。
+     */
     private String qualifiedTypeName(String typeName, Path javaFile, String source) {
         if (typeName.contains(".")) {
             return typeName;
@@ -507,6 +522,9 @@ class MapperXmlContractTest {
         return packageMatcher.group(1) + "." + typeName;
     }
 
+    /**
+     * 处理XML合同相关数据。
+     */
     private Path moduleRoot(Path javaFile) {
         Path current = javaFile.getParent();
         while (current != null && !current.toString().endsWith("/src/main/java")) {
@@ -518,6 +536,9 @@ class MapperXmlContractTest {
         return current.getParent().getParent().getParent();
     }
 
+    /**
+     * 处理XML合同相关数据。
+     */
     private Path domainDirectory(String qualifiedName) {
         String[] segments = qualifiedName.split("\\.");
         int mapperIndex = Arrays.asList(segments).subList(3, segments.length - 1).lastIndexOf("mapper") + 3;
@@ -536,6 +557,9 @@ class MapperXmlContractTest {
         return Path.of(String.join("/", Arrays.copyOfRange(segments, 4, mapperIndex)));
     }
 
+    /**
+     * 处理XML合同相关数据。
+     */
     private Path mapperResourceRoot(Path xmlFile) {
         Path current = xmlFile.getParent();
         while (current != null && !current.toString().endsWith("/src/main/resources/mapper")) {
@@ -547,6 +571,9 @@ class MapperXmlContractTest {
         return current;
     }
 
+    /**
+     * 查询标签。
+     */
     private int findClosingTag(List<String> lines, int startIndex, String closingTag) {
         for (int index = startIndex + 1; index < lines.size(); index++) {
             if (lines.get(index).strip().equals(closingTag)) {
@@ -556,6 +583,9 @@ class MapperXmlContractTest {
         return -1;
     }
 
+    /**
+     * 判断XML合同。
+     */
     private boolean hasNamespace(Path xmlFile, String namespace) {
         try {
             Matcher matcher = MAPPER_NAMESPACE_PATTERN.matcher(Files.readString(xmlFile));

@@ -23,6 +23,10 @@ import com.devops00.spectra.core.notification.javabean.vo.NotificationControlled
 
 /**
  * 通知中心受控发送服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public interface NotificationControlledSendService {
 

@@ -180,6 +180,9 @@ class UserOnboardingServiceImplTest {
         verify(assignmentChangeService).apply(eq(userId), any(AuthorizationAssignmentApplyFrom.class));
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private UserOnboardingFrom request(UserSaveFrom user, AuthorizationAssignmentChangeFrom assignment) {
         var authorization = new AuthorizationAssignmentsChangeFrom();
         authorization.setAssignments(List.of(assignment));
@@ -190,6 +193,9 @@ class UserOnboardingServiceImplTest {
         return request;
     }
 
+    /**
+     * 处理分配视图相关数据。
+     */
     private AuthorizationAssignmentView assignmentView(UUID assignmentId, UUID roleId, String state, long version) {
         return new AuthorizationAssignmentView(assignmentId, UUID.randomUUID(), roleId, "ROLE_TEST", "BUSINESS",
                 "测试角色", false, "ACTIVE", 1L, 1L, version, state, null, null, List.of(), List.of());

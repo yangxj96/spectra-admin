@@ -17,7 +17,13 @@
 package com.devops00.spectra.common.security.authorization;
 
 /**
- * 一个 Permission 与其 Scope 的绑定。禁止把 Scope 从绑定中抽出来全局合并。
+ * 承载权限边界相关的不可变数据。
+ *
+ * @param permission 本次授权操作对应的权限
+ * @param scope      该权限允许访问的数据范围定义
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record PermissionBoundary(String permission, AuthorizationScope scope) {
 

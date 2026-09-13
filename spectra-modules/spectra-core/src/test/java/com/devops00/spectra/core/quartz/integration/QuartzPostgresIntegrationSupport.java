@@ -27,7 +27,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/** 为 Quartz PostgreSQL 集成测试提供隔离数据库迁移和 Scheduler 工厂。 */
+/**
+ * 为 Quartz PostgreSQL 集成测试提供隔离数据库迁移和 Scheduler 工厂。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 final class QuartzPostgresIntegrationSupport {
 
     private QuartzPostgresIntegrationSupport() {

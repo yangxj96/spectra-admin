@@ -126,6 +126,9 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         collectSnapshotInternal();
     }
 
+    /**
+     * 处理快照内部相关数据。
+     */
     private void collectSnapshotInternal() {
         try {
             var sample = collectSample();
@@ -245,6 +248,9 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         return healthComponent(result.contributorName(), result.status(), result.safeSummary());
     }
 
+    /**
+     * 处理健康状态相关数据。
+     */
     private ServiceMonitorOverviewVO.HealthComponent healthComponent(String name, DependencyHealthStatus status,
                                                                      String message) {
         return ServiceMonitorOverviewVO.HealthComponent.builder()
@@ -266,6 +272,9 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         };
     }
 
+    /**
+     * 转换相关数据。
+     */
     private static List<ServiceMonitorOverviewVO.Dependency> toDependencies(List<DependencyHealthResult> results) {
         return results.stream()
                 .filter(result -> "DATABASE".equals(result.dependencyType())
@@ -524,6 +533,9 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         return entity;
     }
 
+    /**
+     * 处理相关数据相关数据。
+     */
     private Freshness freshness(Instant collectedAt) {
         var ageSeconds = Math.max(Duration.between(collectedAt, Instant.now()).getSeconds(), 0L);
         if (ageSeconds <= collectionIntervalSeconds * 2L) {
@@ -633,9 +645,30 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         return result;
     }
 
+    /**
+     * 实现快照相关的应用服务逻辑。
+     *
+     * @param used  已使用的系统资源量
+     * @param max   系统资源可用的最大容量
+     * @param usage 系统资源使用率
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record MemorySnapshot(long used, long max, double usage) {
     }
 
+    /**
+     * 实现请求相关的应用服务逻辑。
+     *
+     * @param available     系统资源的可用容量
+     * @param qps           每秒处理的请求数
+     * @param errorRate     请求错误占比
+     * @param p95ResponseMs 请求响应耗时的第 95 百分位（毫秒）
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record RequestMetrics(boolean available, double qps, double errorRate, double p95ResponseMs) {
 
         /**
@@ -646,14 +679,67 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         }
     }
 
+    /**
+     * 实现健康状态快照相关的应用服务逻辑。
+     *
+     * @param status     业务状态
+     * @param components 服务健康检查的组件结果集合
+     * @param results    各项依赖检查的结果集合
+     * @param latencyMs  请求处理耗时（毫秒）
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record HealthSnapshot(DependencyHealthStatus status,
                                   List<ServiceMonitorOverviewVO.HealthComponent> components,
                                   List<DependencyHealthResult> results, long latencyMs) {
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param status     业务状态
+     * @param ageSeconds 健康数据距今的秒数
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record Freshness(ServiceMonitorFreshness status, long ageSeconds) {
     }
 
+    /**
+     * 实现采样记录相关的应用服务逻辑。
+     *
+     * @param collectedAt             健康数据的采集时间
+     * @param cpuUsage                CPU 使用率
+     * @param cpuLogicalCores         CPU 逻辑核心数
+     * @param systemMemoryUsage       系统内存使用率
+     * @param totalMemory             系统内存总容量
+     * @param usedMemory              已使用的内存容量
+     * @param availableMemory         可用内存容量
+     * @param jvmHeapUsed             JVM 堆内存已使用量
+     * @param jvmHeapMax              JVM 堆内存最大容量
+     * @param jvmHeapUsage            JVM 堆内存使用率
+     * @param jvmNonHeapUsed          JVM 非堆内存已使用量
+     * @param liveThreadCount         当前存活线程数
+     * @param peakThreadCount         线程峰值数量
+     * @param gcCount                 垃圾回收执行次数
+     * @param qps                     每秒处理的请求数
+     * @param errorRate               请求错误占比
+     * @param p95ResponseMs           请求响应耗时的第 95 百分位（毫秒）
+     * @param requestMetricsAvailable 请求指标
+     * @param dependencies            被检查的外部依赖及其健康结果
+     * @param healthComponents        健康状态
+     * @param healthStatus            健康状态状态
+     * @param healthCheckLatencyMs    健康状态检查
+     * @param status                  业务状态
+     * @param databaseStatus          数据库依赖的健康状态
+     * @param redisStatus             Redis状态
+     * @param uptimeSeconds           服务已运行时长（秒）
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record Sample(Instant collectedAt, double cpuUsage, int cpuLogicalCores, double systemMemoryUsage,
                           long totalMemory,
                           long usedMemory, long availableMemory, long jvmHeapUsed, long jvmHeapMax, double jvmHeapUsage,

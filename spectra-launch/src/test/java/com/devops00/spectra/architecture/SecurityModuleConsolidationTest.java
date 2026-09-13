@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -110,6 +110,9 @@ class SecurityModuleConsolidationTest {
                 .doesNotContain("spectra-security-base");
     }
 
+    /**
+     * 判断安全类型。
+     */
     private static boolean containsForbiddenSecurityType(String source) {
         return source.contains("org.springframework.security")
                 || source.contains("org.springframework.data.redis")
@@ -117,6 +120,9 @@ class SecurityModuleConsolidationTest {
                 || source.contains("@AutoConfiguration");
     }
 
+    /**
+     * 判断引用。
+     */
     private static boolean containsLegacyReference(String source) {
         return source.contains("com.devops00.spectra.security.base")
                 || source.contains("com.devops00.spectra.security.starter")
@@ -125,6 +131,9 @@ class SecurityModuleConsolidationTest {
                 || source.contains("<module>spectra-starter</module>");
     }
 
+    /**
+     * 查询安全。
+     */
     private static String read(Path path) {
         try {
             return Files.readString(path);
@@ -133,6 +142,9 @@ class SecurityModuleConsolidationTest {
         }
     }
 
+    /**
+     * 判断来源配置。
+     */
     private static boolean isSourceOrConfiguration(Path path) {
         String name = path.getFileName().toString();
         String normalized = path.toString().replace('\\', '/');
@@ -144,12 +156,18 @@ class SecurityModuleConsolidationTest {
                 || name.equals("AutoConfiguration.imports");
     }
 
+    /**
+     * 处理来源相关数据。
+     */
     private static List<Path> sourceFiles(Path root) throws IOException {
         try (Stream<Path> paths = Files.walk(root)) {
             return paths.filter(path -> path.toString().endsWith(".java")).toList();
         }
     }
 
+    /**
+     * 解析路径。
+     */
     private static Path resolveBackendPath(String relativePath) {
         Path current = Path.of(System.getProperty("maven.multiModuleProjectDirectory", "."))
                 .toAbsolutePath()

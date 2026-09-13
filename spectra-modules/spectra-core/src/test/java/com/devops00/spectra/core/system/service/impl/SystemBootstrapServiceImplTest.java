@@ -35,6 +35,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code SystemBootstrapServiceImplTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @ExtendWith(MockitoExtension.class)
 class SystemBootstrapServiceImplTest {
 

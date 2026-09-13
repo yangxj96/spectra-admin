@@ -447,6 +447,20 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         auditService.record(event);
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param operatorId      操作人标识
+     * @param role            本次授权变更涉及的角色
+     * @param expectedVersion 执行变更时预期的版本号
+     * @param before          变更前的配置值
+     * @param after           变更后的配置值
+     * @param impact          组织调整对权限和用户的影响明细
+     * @param requestHash     请求哈希值
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record PreparedChange(UUID operatorId,
                                   SecurityRole role,
                                   long expectedVersion,

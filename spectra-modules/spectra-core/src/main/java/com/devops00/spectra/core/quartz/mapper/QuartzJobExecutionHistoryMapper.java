@@ -26,7 +26,13 @@ import org.apache.ibatis.annotations.Param;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Quartz 执行历史持久化 Mapper。 */
+/**
+ * Quartz 执行历史持久化 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface QuartzJobExecutionHistoryMapper extends BaseMapper<QuartzJobExecutionHistoryEntity> {
 

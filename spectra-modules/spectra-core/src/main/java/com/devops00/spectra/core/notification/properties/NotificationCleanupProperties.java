@@ -29,6 +29,10 @@ import java.util.Optional;
  * @param fixedDelayMs     清理任务固定间隔
  * @param batchSize        单次最多处理的请求/任务数
  * @param retentionSeconds 终态记录保留敏感载荷的秒数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @ConfigurationProperties(prefix = "spectra.notification.cleanup")
 public class NotificationCleanupProperties {

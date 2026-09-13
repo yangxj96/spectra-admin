@@ -44,6 +44,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+/**
+ * 验证 {@code DirectoryQueryAdapterTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @ExtendWith(MockitoExtension.class)
 class DirectoryQueryAdapterTest {
 
@@ -186,6 +193,9 @@ class DirectoryQueryAdapterTest {
         verify(userContactService).listActiveByUserIds(List.of(firstId, secondId));
     }
 
+    /**
+     * 处理适配器相关数据。
+     */
     private DirectoryQueryAdapter adapter() {
         return new DirectoryQueryAdapter(userMapper, departmentMapper, userContactService);
     }

@@ -20,8 +20,16 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * 短期授权变更 Preview/Apply token 的已验证载荷。
+ * 承载授权令牌相关的不可变数据。
  *
+ * @param tokenId         令牌标识
+ * @param operatorId      操作人标识
+ * @param targetUserId    目标用户标识
+ * @param roleId          角色标识
+ * @param assignmentId    分配标识
+ * @param expectedVersion 执行变更时预期的版本号
+ * @param requestHash     请求哈希值
+ * @param expiresAt       该授权变更令牌的失效时间
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/14

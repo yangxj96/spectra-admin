@@ -6,6 +6,7 @@
  *  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +16,16 @@
 
 package com.devops00.spectra.core.security.secret.javabean.vo;
 
-/** 密钥导出结果；口令只随本次响应返回一次，服务端不保存。 */
+/**
+ * 封装密钥导出相关的响应数据。
+ *
+ * @param fileName          密钥导出文件的名称
+ * @param packageBase64     Base64 编码的密钥导入包
+ * @param oneTimePassphrase 用于解密导出包的一次性口令
+ * @param entryCount        密钥条目数量
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record SecretExportVO(String fileName, String packageBase64, String oneTimePassphrase, int entryCount) {
 }

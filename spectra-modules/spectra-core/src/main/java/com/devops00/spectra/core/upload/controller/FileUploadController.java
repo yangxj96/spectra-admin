@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.controller;
 
 import com.devops00.spectra.common.audit.Audit;
@@ -32,6 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * 提供文件上传相关的 HTTP 接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @RestController
 @RequestMapping("/file/uploads")
 @RequiredArgsConstructor
@@ -42,6 +60,12 @@ public class FileUploadController {
 
     private final UploadApplicationService uploadService;
 
+    /**
+     * 构建文件上传。
+     *
+     * @param request 请求参数。
+     * @return 上传会话数据。
+     */
     @Audit("'创建或恢复文件上传任务'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
@@ -49,12 +73,27 @@ public class FileUploadController {
         return uploadService.create(request);
     }
 
+    /**
+     * 处理状态相关数据。
+     *
+     * @param uploadId 上传标识。
+     * @return 上传会话数据。
+     */
     @Audit("'查询文件上传状态'")
     @GetMapping(value = "/{uploadId}", version = "1.0.0")
     public UploadSessionVO status(@PathVariable UUID uploadId) {
         return uploadService.status(uploadId);
     }
 
+    /**
+     * 处理目标相关数据。
+     *
+     * @param uploadId       上传标识。
+     * @param partNumber     分片编号参数。
+     * @param request        请求参数。
+     * @param servletRequest 请求参数。
+     * @return 分片目标数据。
+     */
     @Audit("'获取文件分片上传地址'")
     @PostMapping(value = "/{uploadId}/parts/{partNumber}/target", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
@@ -65,6 +104,9 @@ public class FileUploadController {
         return target;
     }
 
+    /**
+     * 处理上下文路径相关数据。
+     */
     private String withContextPath(String contextPath, String url) {
         if (url == null
                 || url.isBlank()
@@ -82,10 +124,22 @@ public class FileUploadController {
         return normalizedContextPath + (url.startsWith("/") ? url : "/" + url);
     }
 
+    /**
+     * 判断URL。
+     */
     private boolean isAbsoluteUrl(String url) {
         return url.matches("^[A-Za-z][A-Za-z0-9+.-]*:.*");
     }
 
+    /**
+     * 处理内容相关数据。
+     *
+     * @param uploadId   上传标识。
+     * @param partNumber 分片编号参数。
+     * @param request    请求参数。
+     * @return 包含处理结果的 HTTP 响应。
+     * @throws IOException 当操作无法完成或前置条件不满足时抛出。
+     */
     @Audit("'上传文件分片'")
     @PutMapping(value = "/{uploadId}/parts/{partNumber}/content", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE, version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
@@ -96,6 +150,14 @@ public class FileUploadController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 处理文件上传相关数据。
+     *
+     * @param uploadId   上传标识。
+     * @param partNumber 分片编号参数。
+     * @param request    请求参数。
+     * @return 包含处理结果的 HTTP 响应。
+     */
     @Audit("'确认文件分片'")
     @PostMapping(value = "/{uploadId}/parts/{partNumber}/confirm", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
@@ -105,6 +167,12 @@ public class FileUploadController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 完成文件上传。
+     *
+     * @param uploadId 上传标识。
+     * @return 上传会话数据。
+     */
     @Audit("'完成文件上传'")
     @PostMapping(value = "/{uploadId}/complete", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
@@ -112,6 +180,12 @@ public class FileUploadController {
         return uploadService.complete(uploadId);
     }
 
+    /**
+     * 取消文件上传。
+     *
+     * @param uploadId 上传标识。
+     * @return 包含处理结果的 HTTP 响应。
+     */
     @Audit("'取消文件上传任务'")
     @DeleteMapping(value = "/{uploadId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")

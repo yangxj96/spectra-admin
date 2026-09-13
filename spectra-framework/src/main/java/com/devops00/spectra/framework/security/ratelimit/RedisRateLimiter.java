@@ -105,6 +105,9 @@ public final class RedisRateLimiter {
         return new Decision(result.count() <= policy.maxRequests(), remaining, retryAfterSeconds);
     }
 
+    /**
+     * 执行Redis相关操作。
+     */
     private static IncrementResult executeRedisScript(RedisTemplate<String, Object> redis, String key, long ttlMillis) {
         // Lua 的 PEXPIRE 参数必须是裸数字；String 会被 JSON 序列化为带引号的参数。
         List<?> response = redis.execute(INCREMENT_SCRIPT, List.of(key), ttlMillis);
@@ -114,6 +117,9 @@ public final class RedisRateLimiter {
         return new IncrementResult(asLong(response.getFirst(), "限流计数"), asLong(response.get(1), "限流 TTL"));
     }
 
+    /**
+     * 处理Redis相关数据。
+     */
     private static long asLong(Object value, String field) {
         if (value instanceof Number number) {
             return number.longValue();
@@ -128,22 +134,34 @@ public final class RedisRateLimiter {
         throw new SecurityRedisUnavailableException("安全 Redis 未返回有效的" + field, null);
     }
 
+    /**
+     * 校验结果。
+     */
     private static void validateResult(IncrementResult result) {
         if (result.count() < 1 || result.ttlMillis() < 1) {
             throw new SecurityRedisUnavailableException("安全 Redis 限流结果不可信", null);
         }
     }
 
+    /**
+     * 处理Redis相关数据。
+     */
     private static long ceilSeconds(long millis) {
         return Math.max(1, (millis + 999) / 1000);
     }
 
+    /**
+     * 构建键。
+     */
     private static String buildKey(RateLimitPolicy policy, RateLimitPolicy.Subject subject, long window) {
         String subjectDigest = sha256(subject.key(policy.subjectDimension()));
         return SecurityRedisNamespace.PREFIX + "ratelimit:" + KEY_VERSION + ":" + policy.name() + ":"
                 + subjectDigest + ":" + window;
     }
 
+    /**
+     * 处理Redis相关数据。
+     */
     private static String sha256(String value) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -153,15 +171,38 @@ public final class RedisRateLimiter {
         }
     }
 
-    /** 限流结果。 */
+    /**
+     * 承载相关数据相关的不可变数据。
+     *
+     * @param allowed           本次请求是否获准通过限流检查
+     * @param remaining         当前限流窗口剩余的请求次数
+     * @param retryAfterSeconds 限流后允许重试前需要等待的秒数
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record Decision(boolean allowed, long remaining, long retryAfterSeconds) {
     }
 
-    /** Redis 原子计数结果。 */
+    /**
+     * 承载结果相关的不可变数据。
+     *
+     * @param count     当前统计得到的数量
+     * @param ttlMillis 键值剩余有效时长（毫秒）
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record IncrementResult(long count, long ttlMillis) {
     }
 
-    /** Redis 原子计数存储适配器。 */
+    /**
+     * Redis 原子计数存储适配器。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @FunctionalInterface
     interface RateLimitStore {
 

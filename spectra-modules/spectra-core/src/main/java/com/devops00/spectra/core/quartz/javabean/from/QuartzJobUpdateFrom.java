@@ -24,7 +24,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 普通 Quartz Job 修改请求；JobKey、Job 类型和 Job 类不可由请求修改。 */
+/**
+ * 普通 Quartz Job 修改请求；JobKey、Job 类型和 Job 类不可由请求修改。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

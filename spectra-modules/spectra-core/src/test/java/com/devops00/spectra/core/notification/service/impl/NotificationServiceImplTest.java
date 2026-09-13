@@ -41,7 +41,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 快捷通知服务请求转换测试。 */
+/**
+ * 快捷通知服务请求转换测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class NotificationServiceImplTest {
 
     @Test

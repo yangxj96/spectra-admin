@@ -67,6 +67,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Gateway 幂等和多收件人展开测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationGatewayImplTest {
 
@@ -480,6 +484,9 @@ class NotificationGatewayImplTest {
         verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
     }
 
+    /**
+     * 处理通知相关数据。
+     */
     private NotificationGatewayImpl gateway(NotificationRequestMapper requestMapper,
                                             NotificationTaskMapper taskMapper,
                                             NotificationTemplateMapper templateMapper,
@@ -492,6 +499,9 @@ class NotificationGatewayImplTest {
                 new NotificationSenderRegistry(List.of()));
     }
 
+    /**
+     * 处理通知相关数据。
+     */
     private NotificationGatewayImpl gateway(NotificationRequestMapper requestMapper,
                                             NotificationTaskMapper taskMapper,
                                             NotificationTemplateMapper templateMapper,
@@ -505,11 +515,17 @@ class NotificationGatewayImplTest {
                 new NotificationSenderRegistry(List.of()));
     }
 
+    /**
+     * 处理批次相关数据。
+     */
     private void stubBatchSuccess(NotificationTaskMapper taskMapper) {
         when(taskMapper.selectExistingTasks(any(), anyList())).thenReturn(List.of());
         when(taskMapper.insertBatch(anyList())).thenAnswer(invocation -> invocation.<List<NotificationTaskEntity>>getArgument(0).size());
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private NotificationRequest request(NotificationPurpose purpose, NotificationChannel channel, UUID recipientId,
                                         String idempotencyKey) {
         return new NotificationRequest(null, idempotencyKey, purpose, List.of(channel), List.of(recipientId),
@@ -517,6 +533,9 @@ class NotificationGatewayImplTest {
                 "SYSTEM", idempotencyKey, "SYSTEM", null, null, null, 0, null);
     }
 
+    /**
+     * 处理模板相关数据。
+     */
     private NotificationTemplateEntity template(NotificationChannel channel) {
         var template = new NotificationTemplateEntity();
         template.setTemplateGroupCode("test");
@@ -530,10 +549,16 @@ class NotificationGatewayImplTest {
         return template;
     }
 
+    /**
+     * 处理通知相关数据。
+     */
     private NotificationPayloadProtector protector() {
         return new NotificationPayloadProtector(code -> java.util.Optional.empty(), new ObjectMapper());
     }
 
+    /**
+     * 处理键相关数据。
+     */
     private NotificationPayloadProtector protectorWithKey() {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
         return new NotificationPayloadProtector(

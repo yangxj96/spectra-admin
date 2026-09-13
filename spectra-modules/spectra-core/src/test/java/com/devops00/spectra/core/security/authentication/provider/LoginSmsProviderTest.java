@@ -71,6 +71,9 @@ class LoginSmsProviderTest {
                 mock(SecurityUserAssembler.class), properties, runtime());
     }
 
+    /**
+     * 处理运行时环境相关数据。
+     */
     private static SecretRuntimeService runtime() {
         return key -> Optional.of(new RuntimeSecret(key, 1, HMAC_KEY, "test-fingerprint"));
     }

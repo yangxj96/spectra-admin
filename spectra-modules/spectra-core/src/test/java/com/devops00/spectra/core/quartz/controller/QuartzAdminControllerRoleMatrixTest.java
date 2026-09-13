@@ -25,7 +25,13 @@ import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Quartz 管理 API 的角色、版本和路径契约测试。 */
+/**
+ * Quartz 管理 API 的角色、版本和路径契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzAdminControllerRoleMatrixTest {
 
     @Test
@@ -57,6 +63,9 @@ class QuartzAdminControllerRoleMatrixTest {
                 .value()).containsExactly("/scheduler/quartz");
     }
 
+    /**
+     * 查询Quartz角色。
+     */
     private Method find(String name) {
         return java.util.Arrays.stream(QuartzAdminController.class.getDeclaredMethods())
                 .filter(method -> method.getName().equals(name))

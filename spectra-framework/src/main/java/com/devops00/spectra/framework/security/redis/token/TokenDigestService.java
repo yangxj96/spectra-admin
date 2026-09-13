@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.framework.security.redis.token;
@@ -17,9 +26,14 @@ import java.util.Base64;
  * Opaque Token 的生成和摘要工具。
  *
  * <p>明文 Token 只在请求和响应边界短暂存在；Redis key、索引和 Hash 中只允许出现摘要。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class TokenDigestService {
 
+    /** 生成不透明访问令牌时使用的密码学安全随机数生成器。 */
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final int TOKEN_BYTES = 32;
 

@@ -22,7 +22,16 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 用户获得的一个 RoleAssignment 及其 Access/Grant 边界。
+ * 承载授权分配相关的不可变数据。
+ *
+ * @param assignmentId     分配标识
+ * @param roleCode         角色编码
+ * @param authorityLevel   角色当前的权限等级
+ * @param accessBoundaries 访问边界
+ * @param grantBoundaries  角色可授予的权限边界集合
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public record AuthorizationAssignment(UUID assignmentId,
                                       String roleCode,

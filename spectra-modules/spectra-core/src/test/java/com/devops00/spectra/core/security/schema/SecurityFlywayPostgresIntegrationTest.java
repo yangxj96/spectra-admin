@@ -42,6 +42,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * 该测试只在 Maven 的 {@code integration} profile 中执行，使用 Testcontainers 创建
  * 两个可丢弃的 PostgreSQL 数据库。当前 V1 基线会创建数据库角色，容器账号使用测试专用超级用户。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Tag("integration")
 @Testcontainers
@@ -191,6 +195,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static boolean tableExists(Connection connection, String schema, String table) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = ? AND table_name = ?)")) {
@@ -203,6 +210,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static boolean columnExists(Connection connection, String schema, String table, String column)
             throws SQLException {
         try (var statement = connection.prepareStatement(
@@ -218,6 +228,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static boolean constraintExists(Connection connection, String schema, String table, String constraint)
             throws SQLException {
         try (var statement = connection.prepareStatement(
@@ -236,6 +249,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理索引相关数据。
+     */
     private static boolean indexExists(Connection connection, String schema, String index) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM pg_class index_row "
@@ -250,6 +266,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理类型相关数据。
+     */
     private static String columnType(Connection connection, String schema, String table, String column)
             throws SQLException {
         try (var statement = connection.prepareStatement(
@@ -265,6 +284,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 判断安全。
+     */
     private static boolean isPartitioned(Connection connection, String schema, String table) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT EXISTS (SELECT 1 FROM pg_class table_row "
@@ -279,6 +301,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理键相关数据。
+     */
     private static String partitionKey(Connection connection, String schema, String table) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT pg_get_partkeydef(table_row.oid) FROM pg_class table_row "
@@ -293,6 +318,9 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static boolean tablePrivilege(Connection connection, String privilege) throws SQLException {
         try (var statement = connection.prepareStatement(
                 "SELECT has_table_privilege('spectra_runtime', 'spectra_core.sys_audit_event', ?)")) {
@@ -304,12 +332,28 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
+    /**
+     * 为 {@code SecurityFlywayPostgresIntegrationTest} 测试提供 {@code DatabaseConfig} 测试类型。
+     *
+     * @param url      HTTP 请求地址
+     * @param username 用户登录名
+     * @param password 用于连接测试数据库的密码
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record DatabaseConfig(String url, String username, String password) {
 
+        /**
+         * 处理配置相关数据。
+         */
         private static DatabaseConfig from(PostgreSQLContainer<?> container) {
             return new DatabaseConfig(container.getJdbcUrl(), container.getUsername(), container.getPassword());
         }
 
+        /**
+         * 打开配置。
+         */
         private Connection open() throws SQLException {
             return DriverManager.getConnection(url, username, password);
         }

@@ -42,6 +42,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
+/**
+ * 验证 {@code QuartzJobExecutionHistoryServiceTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzJobExecutionHistoryServiceTest {
 
     private final QuartzJobExecutionHistoryMapper mapper = Mockito.mock(QuartzJobExecutionHistoryMapper.class);
@@ -133,12 +140,22 @@ class QuartzJobExecutionHistoryServiceTest {
         Mockito.verify(mapper, Mockito.times(2)).deleteExpired(ArgumentMatchers.any(), ArgumentMatchers.eq(2));
     }
 
+    /**
+     * 处理触发器相关数据。
+     */
     private Trigger mockTrigger() {
         CronTrigger trigger = Mockito.mock(CronTrigger.class);
         Mockito.when(trigger.getKey()).thenReturn(new TriggerKey("sample.job.trigger", "SPECTRA_BUILTIN"));
         return trigger;
     }
 
+    /**
+     * 为 {@code QuartzJobExecutionHistoryServiceTest} 测试提供 {@code SampleJob} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private static final class SampleJob implements Job {
 
         @Override

@@ -24,7 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-/** 授权 Assignment 变更、审计和安全失效通知用例。 */
+/**
+ * 授权 Assignment 变更、审计和安全失效通知用例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthorizationAuditService {

@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -34,6 +34,10 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * 可选模块隔离、统一入口和未来模块装配契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class OptionalModuleIsolationTest {
 
@@ -154,6 +158,9 @@ class OptionalModuleIsolationTest {
                 .startsWith("com.devops00.spectra.common.health");
     }
 
+    /**
+     * 处理可选相关数据。
+     */
     private static List<Path> uncheckedJavaSources(Path sourceRoot) {
         try {
             return javaSources(sourceRoot);
@@ -162,12 +169,18 @@ class OptionalModuleIsolationTest {
         }
     }
 
+    /**
+     * 处理可选相关数据。
+     */
     private static List<Path> javaSources(Path sourceRoot) throws IOException {
         try (var paths = Files.walk(sourceRoot)) {
             return paths.filter(path -> path.toString().endsWith(".java")).toList();
         }
     }
 
+    /**
+     * 查询可选。
+     */
     private static String readPackage(Path sourceFile) {
         try (var lines = Files.lines(sourceFile)) {
             return lines.map(String::trim)
@@ -179,6 +192,9 @@ class OptionalModuleIsolationTest {
         }
     }
 
+    /**
+     * 查询可选。
+     */
     private static String read(Path sourceFile) {
         try {
             return Files.readString(sourceFile);
@@ -187,6 +203,9 @@ class OptionalModuleIsolationTest {
         }
     }
 
+    /**
+     * 判断业务。
+     */
     private static boolean hasBusinessImport(String source) {
         return source.lines()
                 .map(String::trim)
@@ -194,6 +213,9 @@ class OptionalModuleIsolationTest {
                 .anyMatch(line -> BUSINESS_PACKAGES.stream().anyMatch(line::contains));
     }
 
+    /**
+     * 解析路径。
+     */
     private static Path resolveBackendPath(String relativePath) {
         Path current = Path.of(System.getProperty("maven.multiModuleProjectDirectory", "."))
                 .toAbsolutePath()

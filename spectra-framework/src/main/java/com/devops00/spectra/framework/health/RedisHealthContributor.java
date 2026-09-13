@@ -24,7 +24,13 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import java.time.Duration;
 import java.time.Instant;
 
-/** framework 提供的 Redis 技术依赖健康检查。 */
+/**
+ * framework 提供的 Redis 技术依赖健康检查。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public class RedisHealthContributor implements DependencyHealthContributor {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(3);
@@ -93,6 +99,9 @@ public class RedisHealthContributor implements DependencyHealthContributor {
         }
     }
 
+    /**
+     * 处理结果相关数据。
+     */
     private DependencyHealthResult result(DependencyHealthStatus status, long start, String errorCode,
                                           String safeSummary) {
         return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,

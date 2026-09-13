@@ -18,7 +18,13 @@ package com.devops00.spectra.core.upload.javabean.constant;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 
-/** 文件存储提供者。 */
+/**
+ * 文件存储提供者。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum StorageProviderType implements IEnum<String> {
     LOCAL,
     S3;

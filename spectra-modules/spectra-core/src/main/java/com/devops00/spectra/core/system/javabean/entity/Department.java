@@ -43,6 +43,7 @@ import java.util.UUID;
 @TableName(value = "sys_department", schema = "spectra_core")
 public class Department extends BaseEntity {
 
+    /** 序列化版本标识。 */
     @Serial
     private static final long serialVersionUID = 1L;
 

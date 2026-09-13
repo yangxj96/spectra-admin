@@ -24,7 +24,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** 服务监控历史趋势。 */
+/**
+ * 服务监控历史趋势。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @Builder
 @NoArgsConstructor

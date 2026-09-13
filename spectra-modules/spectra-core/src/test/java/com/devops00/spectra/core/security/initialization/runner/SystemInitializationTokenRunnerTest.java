@@ -26,7 +26,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 系统初始化令牌启动引导测试。 */
+/**
+ * 系统初始化令牌启动引导测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SystemInitializationTokenRunnerTest {
 
     @Test

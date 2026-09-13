@@ -32,7 +32,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** DEV_OPS 首次进入系统时的设置引导接口。 */
+/**
+ * DEV_OPS 首次进入系统时的设置引导接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Validated
 @RestController

@@ -34,7 +34,13 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Redis-backed API 限流策略与计数语义测试。 */
+/**
+ * Redis-backed API 限流策略与计数语义测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RedisRateLimiterTest {
 
     private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-09-01T00:00:30Z"), ZoneOffset.UTC);

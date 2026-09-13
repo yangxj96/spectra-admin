@@ -24,7 +24,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** 密钥定义元数据实体。 */
+/**
+ * 密钥定义元数据实体。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Getter
 @Setter
 @ToString

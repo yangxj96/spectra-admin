@@ -20,6 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * 定义身份认证对象身份相关的数据库访问操作。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface AuthenticationIdentityMapper extends BaseMapper<AuthenticationIdentity> {
 }

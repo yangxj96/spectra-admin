@@ -77,6 +77,9 @@ public final class NameLookupRegistry {
         return lookup;
     }
 
+    /**
+     * 处理类型相关数据。
+     */
     @SuppressWarnings("unchecked")
     private Class<? extends NameLookup<?>> lookupTypeOf(NameLookup<?> lookup) {
         Class<?> targetClass = AopUtils.getTargetClass(lookup);

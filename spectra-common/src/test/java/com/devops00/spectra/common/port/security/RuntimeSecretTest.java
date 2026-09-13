@@ -20,7 +20,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** 运行时密钥公共值对象契约测试。 */
+/**
+ * 运行时密钥公共值对象契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class RuntimeSecretTest {
 
     @Test

@@ -27,7 +27,13 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
 import org.springframework.stereotype.Component;
 
-/** 启动时只补注册缺失的内置 JobDetail 和一对一 Trigger。 */
+/**
+ * 启动时只补注册缺失的内置 JobDetail 和一对一 Trigger。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 @RequiredArgsConstructor
 public class QuartzJobRegistrar {

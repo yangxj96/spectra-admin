@@ -20,7 +20,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 服务监控历史查询入参。 */
+/**
+ * 服务监控历史查询入参。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -26,7 +26,13 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Quartz 执行历史写入、收敛和查询服务。 */
+/**
+ * Quartz 执行历史写入、收敛和查询服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface QuartzJobExecutionHistoryService {
 
     /**

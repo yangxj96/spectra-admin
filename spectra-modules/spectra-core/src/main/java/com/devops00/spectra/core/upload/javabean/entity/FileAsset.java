@@ -29,7 +29,13 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.UUID;
 
-/** 已完成文件资产实体。 */
+/**
+ * 已完成上传并可供业务引用的文件资产元数据；文件内容由对象存储管理。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Getter
 @Setter
 @ToString
@@ -37,42 +43,81 @@ import java.util.UUID;
 @TableName(value = "file_asset", schema = "spectra_core")
 public class FileAsset extends BaseEntity {
 
+    /**
+     * 该文件资产对应的文件类型策略 ID。
+     */
     @TableField("file_type_id")
     private UUID fileTypeId;
 
+    /**
+     * 用户上传时提供的原始文件名。
+     */
     @TableField("original_name")
     private String originalName;
 
+    /**
+     * 文件内容的 SHA-256 摘要，用于完整性校验。
+     */
     @TableField("content_sha256")
     private String contentSha256;
 
+    /**
+     * 文件内容大小，单位为字节。
+     */
     @TableField("size")
     private Long size;
 
+    /**
+     * 文件内容的媒体类型。
+     */
     @TableField("content_type")
     private String contentType;
 
+    /**
+     * 保存文件内容的对象存储提供方。
+     */
     @TableField("storage_provider")
     private StorageProviderType storageProvider;
 
+    /**
+     * 对象存储中的存储桶或容器名称。
+     */
     @TableField("storage_container")
     private String storageContainer;
 
+    /**
+     * 文件内容在对象存储中的对象键。
+     */
     @TableField("storage_key")
     private String storageKey;
 
+    /**
+     * 文件资产当前的处理或可用状态。
+     */
     @TableField("status")
     private FileAssetStatus status;
 
+    /**
+     * 文件资产完成上传并可用的时间。
+     */
     @TableField("completed_at")
     private Instant completedAt;
 
+    /**
+     * 文件资产被判定为无业务引用的时间。
+     */
     @TableField("orphaned_at")
     private Instant orphanedAt;
 
+    /**
+     * 针对孤立资产已执行的清理尝试次数。
+     */
     @TableField("cleanup_attempts")
     private Integer cleanupAttempts;
 
+    /**
+     * 下一次计划清理该孤立资产的时间。
+     */
     @TableField("next_cleanup_at")
     private Instant nextCleanupAt;
 }

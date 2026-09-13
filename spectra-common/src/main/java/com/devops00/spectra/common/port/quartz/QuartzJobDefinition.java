@@ -25,6 +25,10 @@ import java.util.Optional;
  *
  * <p>契约只描述受信任的 Job 类型、参数规则和默认触发策略；Core 负责目录校验、资源注册和管理 API，
  * 业务模块不需要依赖 Core 的内部实现。</p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public interface QuartzJobDefinition {
 

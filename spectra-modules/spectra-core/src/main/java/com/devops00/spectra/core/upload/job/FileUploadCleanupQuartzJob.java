@@ -24,7 +24,13 @@ import org.quartz.JobExecutionContext;
 
 import java.time.Instant;
 
-/** 由 Quartz 集群调度文件上传临时资源清理。 */
+/**
+ * 由 Quartz 集群调度文件上传临时资源清理。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @DisallowConcurrentExecution
 public class FileUploadCleanupQuartzJob implements Job {
 

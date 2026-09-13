@@ -23,6 +23,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+/**
+ * 验证 {@code DefaultAuditSanitizerTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DefaultAuditSanitizerTest {
 
     @Test

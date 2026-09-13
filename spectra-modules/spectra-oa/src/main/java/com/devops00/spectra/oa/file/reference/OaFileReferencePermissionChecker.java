@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.oa.file.reference;
 
 import com.devops00.spectra.oa.application.javabean.entity.Application;
@@ -26,6 +37,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * 封装文件引用权限相关的数据和处理逻辑。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Component
 @RequiredArgsConstructor
 public class OaFileReferencePermissionChecker implements FileReferencePermissionChecker {
@@ -59,6 +77,9 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
         };
     }
 
+    /**
+     * 判断合同。
+     */
     private boolean canReadContract(ContractVersion version, UUID userId) {
         if (version == null || version.getDeleted() != null)
             return false;
@@ -66,6 +87,9 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
         return contract != null && visible(contract.getOwnerId(), contract.getDepartmentId(), contract.getVisibility(), userId);
     }
 
+    /**
+     * 判断文档。
+     */
     private boolean canReadDocument(DocumentVersion version, UUID userId) {
         if (version == null || version.getDeleted() != null)
             return false;
@@ -73,6 +97,9 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
         return document != null && visible(document.getOwnerId(), document.getDepartmentId(), document.getVisibility(), userId);
     }
 
+    /**
+     * 判断申请。
+     */
     private boolean canReadApplication(ApplicationAttachment attachment, UUID userId) {
         if (attachment == null || attachment.getDeleted() != null)
             return false;
@@ -82,12 +109,18 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
                         || Objects.equals(application.getDepartmentId(), currentDepartmentId()));
     }
 
+    /**
+     * 处理文件引用权限相关数据。
+     */
     private boolean visible(UUID ownerId, UUID departmentId, String visibility, UUID userId) {
         if (Objects.equals(ownerId, userId) || "PUBLIC".equals(visibility))
             return true;
         return "DEPARTMENT".equals(visibility) && Objects.equals(departmentId, currentDepartmentId());
     }
 
+    /**
+     * 查询部门标识。
+     */
     private UUID currentDepartmentId() {
         var user = securityContextAccessor.currentUser();
         return user == null ? null : user.getDepartmentId();

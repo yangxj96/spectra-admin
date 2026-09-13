@@ -42,11 +42,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class KaptchaExceptionAdvice {
 
     /**
-     * 验证码不匹配
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回验证码不匹配统一失败响应；响应对象始终非 null。
+     * 处理不异常相关数据。
      */
     @ExceptionHandler(KaptchaNotMatchException.class)
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
@@ -56,11 +52,7 @@ public class KaptchaExceptionAdvice {
     }
 
     /**
-     * 验证码过期
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回验证码过期统一失败响应；响应对象始终非 null。
+     * 处理异常相关数据。
      */
     @ExceptionHandler(KaptchaExpiresException.class)
     public R<Object> kaptchaExpiresException(Exception e, HttpServletResponse response) {

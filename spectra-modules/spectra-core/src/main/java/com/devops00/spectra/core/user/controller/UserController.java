@@ -106,6 +106,12 @@ public class UserController {
         return bindService.passwordResetById(uid);
     }
 
+    /**
+     * 处理锁相关数据。
+     *
+     * @param uid    用户标识。
+     * @param reason 原因参数。
+     */
     @Audit("'锁定用户'")
     @PutMapping(value = "/lock/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:disable')")
@@ -113,6 +119,12 @@ public class UserController {
         bindService.changeStatus(uid, UserStatus.LOCKED, reason);
     }
 
+    /**
+     * 处理用户相关数据。
+     *
+     * @param uid    用户标识。
+     * @param reason 原因参数。
+     */
     @Audit("'解锁用户'")
     @PutMapping(value = "/unlock/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:unlock')")
@@ -120,6 +132,12 @@ public class UserController {
         bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
     }
 
+    /**
+     * 处理用户相关数据。
+     *
+     * @param uid    用户标识。
+     * @param reason 原因参数。
+     */
     @Audit("'禁用用户'")
     @PutMapping(value = "/disable/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:disable')")
@@ -127,6 +145,12 @@ public class UserController {
         bindService.changeStatus(uid, UserStatus.DISABLED, reason);
     }
 
+    /**
+     * 处理用户相关数据。
+     *
+     * @param uid    用户标识。
+     * @param reason 原因参数。
+     */
     @Audit("'启用用户'")
     @PutMapping(value = "/enable/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:unlock')")
@@ -134,6 +158,12 @@ public class UserController {
         bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
     }
 
+    /**
+     * 处理用户相关数据。
+     *
+     * @param uid    用户标识。
+     * @param reason 原因参数。
+     */
     @Audit("'用户离职'")
     @PutMapping(value = "/depart/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:disable')")
@@ -141,6 +171,12 @@ public class UserController {
         bindService.changeStatus(uid, UserStatus.DEPARTED, reason);
     }
 
+    /**
+     * 处理用户相关数据。
+     *
+     * @param uid    用户标识。
+     * @param reason 原因参数。
+     */
     @Audit("'用户重新入职'")
     @PutMapping(value = "/reinstate/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:unlock')")

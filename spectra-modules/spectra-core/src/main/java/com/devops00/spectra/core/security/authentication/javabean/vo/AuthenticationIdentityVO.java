@@ -25,7 +25,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/** 目标认证身份响应；不返回原始标识，只返回摘要对应的元数据。 */
+/**
+ * 目标认证身份响应；不返回原始标识，只返回摘要对应的元数据。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

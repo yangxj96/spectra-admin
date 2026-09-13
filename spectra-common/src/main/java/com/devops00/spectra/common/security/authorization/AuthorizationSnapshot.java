@@ -29,6 +29,10 @@ import java.util.Set;
  * <p>
  * 相同 Permission 的 Scope 可以合并；不同 Permission 永远只能读取自己的 Assignment Boundary，
  * 不能先把所有 Permission 和 Scope 全局 UNION 后重新组合。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class AuthorizationSnapshot {
 

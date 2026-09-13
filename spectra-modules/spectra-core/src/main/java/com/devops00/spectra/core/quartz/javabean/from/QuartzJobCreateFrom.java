@@ -24,7 +24,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** 普通 Quartz Job 创建请求；JobKey 由服务端生成。 */
+/**
+ * 普通 Quartz Job 创建请求；JobKey 由服务端生成。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

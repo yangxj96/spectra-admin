@@ -109,25 +109,61 @@ public class NotificationTaskBatchPlanner {
         }).toList();
     }
 
+    /**
+     * 处理键哈希值相关数据。
+     */
     private String recipientKeyHash(UUID recipientUserId, NotificationChannel channel, String address) {
         var key = recipientUserId == null ? channel.name() + ":" + address : recipientUserId.toString();
         return NotificationDigest.hash(key);
     }
 
+    /**
+     * 规范化通知任务批次。
+     */
     private int normalizePriority(Integer priority) {
         return priority == null ? 0 : priority;
     }
 
-    /** 收件人和渠道的投递目标。 */
+    /**
+     * 定义任务目标相关的应用服务契约。
+     *
+     * @param recipientUserId 用户标识
+     * @param channel         通知任务使用的发送渠道
+     * @param address         通知渠道使用的接收方地址
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record TaskTarget(UUID recipientUserId, NotificationChannel channel, String address) {
     }
 
-    /** 单个渠道的渲染模板快照。 */
+    /**
+     * 定义模板快照相关的应用服务契约。
+     *
+     * @param templateId           模板标识
+     * @param versionNo            通知模板定义的版本号
+     * @param versionDigest        版本摘要
+     * @param providerTemplateCode 提供器模板编码
+     * @param title                通知消息的标题
+     * @param content              通知模板的正文内容
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record TemplateSnapshot(UUID templateId, Integer versionNo, String versionDigest,
                                    String providerTemplateCode, String title, String content) {
     }
 
-    /** 带有数据库幂等键的任务草稿。 */
+    /**
+     * 定义任务相关的应用服务契约。
+     *
+     * @param task             尚未持久化的待发送通知任务
+     * @param recipientKeyHash 键哈希值
+     * @param channel          通知任务使用的发送渠道
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public record TaskDraft(NotificationTaskEntity task, String recipientKeyHash, String channel) {
 
         /**

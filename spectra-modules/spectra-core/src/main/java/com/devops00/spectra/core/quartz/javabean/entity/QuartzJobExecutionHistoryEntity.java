@@ -27,7 +27,13 @@ import lombok.ToString;
 
 import java.time.Instant;
 
-/** Quartz 执行历史实体；公共主键和审计字段统一继承 framework 持久化基类。 */
+/**
+ * Quartz 作业执行历史实体，公共主键和审计字段统一继承 {@code BaseEntity}。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Getter
 @Setter
 @ToString

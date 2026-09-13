@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.framework.assembler;
@@ -87,6 +87,13 @@ class NameFillExecutorTest {
         assertThat(lookup.calls).isEqualTo(1);
     }
 
+    /**
+     * 为 {@code NameFillExecutorTest} 测试提供 {@code FixtureLookup} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     static final class FixtureLookup implements NameLookup<UUID> {
 
         private final Map<UUID, String> names;
@@ -105,6 +112,13 @@ class NameFillExecutorTest {
         }
     }
 
+    /**
+     * 为 {@code NameFillExecutorTest} 测试提供 {@code StringKeyFixtureLookup} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     static final class StringKeyFixtureLookup implements NameLookup<UUID> {
 
         private final UUID departmentId;
@@ -124,6 +138,13 @@ class NameFillExecutorTest {
         }
     }
 
+    /**
+     * 为 {@code NameFillExecutorTest} 测试提供 {@code FixtureView} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     static final class FixtureView {
 
         private final Object departmentId;
@@ -136,6 +157,13 @@ class NameFillExecutorTest {
         }
     }
 
+    /**
+     * 为 {@code NameFillExecutorTest} 测试提供 {@code StringKeyFixtureView} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     static final class StringKeyFixtureView {
 
         private final UUID departmentId;

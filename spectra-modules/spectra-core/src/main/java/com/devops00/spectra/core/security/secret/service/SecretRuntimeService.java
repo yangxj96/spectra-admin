@@ -21,7 +21,13 @@ import com.devops00.spectra.common.port.security.RuntimeSecret;
 
 import java.util.Optional;
 
-/** 受控运行时密钥读取端口。 */
+/**
+ * 受控运行时密钥读取端口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface SecretRuntimeService {
 
     /**

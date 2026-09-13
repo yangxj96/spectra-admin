@@ -70,7 +70,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-/** Quartz 管理应用服务；所有 Job 变更都经过代码白名单和唯一 Trigger 约束。 */
+/**
+ * Quartz 管理应用服务；所有 Job 变更都经过代码白名单和唯一 Trigger 约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 public class QuartzJobManagementServiceImpl implements QuartzJobManagementService {
 
@@ -298,6 +304,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                 .orElseThrow(() -> new DataNotExistException("Quartz 执行历史不存在"));
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private <T> T withScheduler(SchedulerCallback<T> callback) {
         if (!lifecycle.isReady()) {
             throw new SchedulerDatabaseUnavailableException(new IllegalStateException("Quartz Scheduler 未就绪"));
@@ -314,6 +323,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 处理作业相关数据。
+     */
     private void mutateJob(String jobKey, SchedulerMutation mutation) {
         withScheduler(scheduler -> {
             mutation.apply(scheduler, resolveJobKey(scheduler, jobKey));
@@ -321,11 +333,17 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         });
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private QuartzJobDefinition definition(String typeKey) {
         return catalog.find(normalize(typeKey))
                 .orElseThrow(() -> new DataException("Quartz Job 类型未注册"));
     }
 
+    /**
+     * 按查询条件查询Quartz作业详情。
+     */
     private JobDetail jobDetail(QuartzJobDefinition definition, JobKey jobKey, String displayName,
                                 VersionedJsonJobParameters parameters, boolean builtIn) {
         JobDataMap data = new JobDataMap();
@@ -343,6 +361,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                 .build();
     }
 
+    /**
+     * 处理触发器相关数据。
+     */
     private Trigger trigger(QuartzTriggerFrom from, TriggerKey triggerKey, JobKey jobKey) {
         if (from == null || from.getTriggerType() == null) {
             throw new DataSaveException("Quartz Trigger 类型不能为空");
@@ -371,6 +392,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                 .build(triggerKey, jobKey, from.getStartAt());
     }
 
+    /**
+     * 校验Quartz作业。
+     */
     private VersionedJsonJobParameters validateParameters(QuartzJobDefinition definition, String json) {
         try {
             return parameterValidator.validate(definition.parameterSchema(), json);
@@ -379,10 +403,16 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 查询Quartz作业。
+     */
     private List<? extends Trigger> getTriggers(Scheduler scheduler, JobKey jobKey) throws SchedulerException {
         return scheduler.getTriggersOfJob(jobKey);
     }
 
+    /**
+     * 解析作业键。
+     */
     private JobKey resolveJobKey(Scheduler scheduler, String value) {
         String normalized = normalize(value);
         if (normalized == null) {
@@ -396,6 +426,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                 .orElseThrow(() -> new DataNotExistException("Quartz Job 不存在"));
     }
 
+    /**
+     * 解析触发器键。
+     */
     private TriggerKey resolveTriggerKey(Scheduler scheduler, String value) {
         String normalized = normalize(value);
         if (normalized == null) {
@@ -419,6 +452,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 按查询条件查询Quartz作业详情。
+     */
     private JobDetail getJobDetail(Scheduler scheduler, JobKey jobKey) {
         try {
             JobDetail detail = scheduler.getJobDetail(jobKey);
@@ -434,6 +470,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 转换作业。
+     */
     private QuartzJobVO toJob(Scheduler scheduler, JobKey jobKey) {
         JobDetail detail = getJobDetail(scheduler, jobKey);
         List<? extends Trigger> triggers = callScheduler(() -> getTriggers(scheduler, jobKey));
@@ -448,6 +487,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                 detail.getJobDataMap().getString(PARAMETER_JSON), trigger);
     }
 
+    /**
+     * 转换触发器。
+     */
     private QuartzTriggerVO toTrigger(Scheduler scheduler, Trigger trigger) {
         String state = callScheduler(() -> scheduler.getTriggerState(trigger.getKey()).name());
         if (trigger instanceof CronTrigger cron) {
@@ -465,6 +507,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         throw new DataException("Quartz Trigger 类型不受支持");
     }
 
+    /**
+     * 转换Quartz作业。
+     */
     private QuartzExecutionHistoryVO toHistory(QuartzJobExecutionHistoryEntity source) {
         return new QuartzExecutionHistoryVO(source.getId(), source.getFireInstanceId(), source.getJobKey(),
                 source.getTriggerKey(), source.getJobType(), source.getJobClassName(), source.getTriggerType(),
@@ -475,18 +520,30 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                 source.getErrorMessage());
     }
 
+    /**
+     * 判断Quartz作业。
+     */
     private boolean isBuiltIn(JobKey key, JobDetail detail) {
         return BUILTIN_GROUP.equals(key.getGroup()) || detail.getJobDataMap().getBoolean(JOB_BUILT_IN);
     }
 
+    /**
+     * 处理分组相关数据。
+     */
     private boolean managedGroup(JobKey key) {
         return BUILTIN_GROUP.equals(key.getGroup()) || ADMIN_GROUP.equals(key.getGroup());
     }
 
+    /**
+     * 处理触发器键相关数据。
+     */
     private TriggerKey triggerKey(JobKey jobKey) {
         return new TriggerKey(jobKey.getName() + ".trigger", jobKey.getGroup());
     }
 
+    /**
+     * 处理Cron错过触发相关数据。
+     */
     private static QuartzTriggerTemplate.MisfirePolicy cronMisfire(int instruction) {
         return instruction == 2
                 ? QuartzTriggerTemplate.MisfirePolicy.DO_NOTHING
@@ -495,20 +552,32 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
                         : QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW;
     }
 
+    /**
+     * 处理错过触发相关数据。
+     */
     private static QuartzTriggerTemplate.MisfirePolicy simpleMisfire(int instruction) {
         return instruction == 1
                 ? QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW
                 : QuartzTriggerTemplate.MisfirePolicy.NEXT_WITH_REMAINING_COUNT;
     }
 
+    /**
+     * 处理本地相关数据。
+     */
     private LocalDateTime local(Date value) {
         return timeMapper.toLocalDateTime(value);
     }
 
+    /**
+     * 处理本地相关数据。
+     */
     private LocalDateTime local(Instant value) {
         return timeMapper.toLocalDateTime(value);
     }
 
+    /**
+     * 解析时间。
+     */
     private static Instant parseTime(String value, String label) {
         String normalized = normalize(value);
         if (normalized == null) {
@@ -521,10 +590,16 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 规范化Quartz作业。
+     */
     private static String normalize(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private static String sha256(String value) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256")
@@ -535,10 +610,16 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private static SchedulerDatabaseUnavailableException schedulerUnavailable(SchedulerException exception) {
         return new SchedulerDatabaseUnavailableException(exception);
     }
 
+    /**
+     * 判断Quartz作业。
+     */
     private static boolean hasCause(Throwable throwable, Class<? extends Throwable> expectedType) {
         Throwable current = throwable;
         while (current != null) {
@@ -550,6 +631,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         return false;
     }
 
+    /**
+     * 执行Quartz作业相关操作。
+     */
     private static <T> T callScheduler(CheckedSupplier<T> supplier) {
         try {
             return supplier.get();
@@ -558,21 +642,64 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
     }
 
+    /**
+     * 实现回调相关的应用服务逻辑。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     @FunctionalInterface
     private interface SchedulerCallback<T> {
 
+        /**
+         * 执行回调相关操作。
+         *
+         * @param scheduler 负责执行作业的调度器。
+         * @return 处理后的结果。
+         * @throws SchedulerException 当操作无法完成或前置条件不满足时抛出。
+         */
         T call(Scheduler scheduler) throws SchedulerException;
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     *
+     */
     @FunctionalInterface
     private interface SchedulerMutation {
 
+        /**
+         * 执行相关数据相关操作。
+         *
+         * @param scheduler 负责执行作业的调度器。
+         * @param jobKey    目标 JobKey。
+         * @throws SchedulerException 当操作无法完成或前置条件不满足时抛出。
+         */
         void apply(Scheduler scheduler, JobKey jobKey) throws SchedulerException;
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     *
+     */
     @FunctionalInterface
     private interface CheckedSupplier<T> {
 
+        /**
+         * 查询相关数据。
+         *
+         * @return 处理后的结果。
+         * @throws SchedulerException 当操作无法完成或前置条件不满足时抛出。
+         */
         T get() throws SchedulerException;
     }
 }

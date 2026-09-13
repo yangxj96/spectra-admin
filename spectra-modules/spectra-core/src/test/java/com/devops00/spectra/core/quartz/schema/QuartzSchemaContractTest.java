@@ -25,7 +25,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Quartz DDL 的 Flyway 基线静态契约。 */
+/**
+ * Quartz DDL 的 Flyway 基线静态契约。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class QuartzSchemaContractTest {
 
     private static final List<String> QUARTZ_TABLES = List.of(
@@ -146,6 +152,9 @@ class QuartzSchemaContractTest {
                 .doesNotContain("CREATE TABLE spectra_core.scheduler_operation_audit");
     }
 
+    /**
+     * 查询Quartz合同。
+     */
     private String readBaseline() throws IOException {
         try (var stream = getClass().getClassLoader().getResourceAsStream("db/migration/V1__init_db.sql")) {
             assertThat(stream).as("缺少 Flyway V1 基线").isNotNull();

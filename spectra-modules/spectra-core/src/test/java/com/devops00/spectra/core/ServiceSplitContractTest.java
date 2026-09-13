@@ -25,13 +25,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * 验证 {@code ServiceSplitContractTest} 的主要行为、边界条件和回归约束。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class ServiceSplitContractTest {
 
     private static final Path JAVA_ROOT = Path.of("src", "main", "java", "com", "devops00", "spectra", "core");
 
     @Test
     void publicEntryServicesMustKeepAThinDependencySurface() throws IOException {
-        assertDependencyCountAtMost("user/imports/service/impl/UserImportServiceImpl.java", 8);
+        assertDependencyCountAtMost("user/service/impl/UserImportServiceImpl.java", 8);
         assertDependencyCountAtMost("quartz/service/impl/QuartzJobManagementServiceImpl.java", 8);
         assertDependencyCountAtMost("system/service/impl/ServiceMonitorServiceImpl.java", 8);
         assertDependencyCountAtMost("security/authorization/service/impl/AuthorizationAssignmentChangeServiceImpl.java", 8);
@@ -40,9 +47,9 @@ class ServiceSplitContractTest {
     @Test
     void eachUseCaseGroupMustHaveAnIndependentService() {
         assertFilesExist(List.of(
-                "user/imports/service/impl/UserImportPreviewService.java",
-                "user/imports/service/impl/UserImportExecutionService.java",
-                "user/imports/service/impl/UserImportResultService.java",
+                "user/service/impl/UserImportPreviewService.java",
+                "user/service/impl/UserImportExecutionService.java",
+                "user/service/impl/UserImportResultService.java",
                 "quartz/service/QuartzJobManagementService.java",
                 "quartz/service/QuartzJobExecutionHistoryService.java",
                 "system/service/impl/ServiceMonitorEvaluationService.java",
@@ -53,8 +60,8 @@ class ServiceSplitContractTest {
 
     @Test
     void asynchronousAndTransactionalBoundariesMustBeVisibleInDedicatedBeans() throws IOException {
-        String execution = readSource("user/imports/service/impl/UserImportExecutionService.java");
-        String worker = readSource("user/imports/service/impl/UserImportExecutionWorker.java");
+        String execution = readSource("user/service/impl/UserImportExecutionService.java");
+        String worker = readSource("user/service/impl/UserImportExecutionWorker.java");
         String control = readSource("quartz/service/QuartzJobManagementService.java");
         Assertions.assertThat(execution).contains("userImportTaskExecutor");
         Assertions.assertThat(worker).contains("@Transactional");
@@ -62,6 +69,9 @@ class ServiceSplitContractTest {
         Assertions.assertThat(control).contains("QuartzJobManagementService");
     }
 
+    /**
+     * 处理统计相关数据。
+     */
     private void assertDependencyCountAtMost(String relativePath, int maximum) throws IOException {
         String source = readSource(relativePath);
         long dependencies = source.lines()
@@ -72,6 +82,9 @@ class ServiceSplitContractTest {
                 .isLessThanOrEqualTo(maximum);
     }
 
+    /**
+     * 处理合同相关数据。
+     */
     private void assertFilesExist(List<String> relativePaths) {
         for (String relativePath : relativePaths) {
             Path path = JAVA_ROOT.resolve(relativePath);
@@ -81,6 +94,9 @@ class ServiceSplitContractTest {
         }
     }
 
+    /**
+     * 查询来源。
+     */
     private String readSource(String relativePath) throws IOException {
         Path path = JAVA_ROOT.resolve(relativePath);
         Assertions.assertThat(Files.isRegularFile(path))

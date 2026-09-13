@@ -28,7 +28,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 系统初始化令牌管理测试。 */
+/**
+ * 系统初始化令牌管理测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SystemInitializationTokenManagerTest {
 
     @Test

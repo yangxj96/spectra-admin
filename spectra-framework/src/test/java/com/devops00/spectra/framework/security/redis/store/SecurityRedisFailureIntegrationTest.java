@@ -36,7 +36,13 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** 真实 Redis 上验证安全 Redis 正常读写与故障拒绝。 */
+/**
+ * 真实 Redis 上验证安全 Redis 正常读写与故障拒绝。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Tag("integration")
 @Testcontainers
 class SecurityRedisFailureIntegrationTest {
@@ -78,12 +84,27 @@ class SecurityRedisFailureIntegrationTest {
         }
     }
 
+    /**
+     * 为 {@code SecurityRedisFailureIntegrationTest} 测试提供 {@code RedisProbe} 测试类型。
+     *
+     * @param redis             Redis
+     * @param connectionFactory 用于创建 Redis 连接的连接工厂
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record RedisProbe(RedisTemplate<String, String> redis, LettuceConnectionFactory connectionFactory) {
 
+        /**
+         * 处理Redis相关数据。
+         */
         private static RedisProbe connect(RedisContainer container) {
             return connect(container.getHost(), container.getFirstMappedPort());
         }
 
+        /**
+         * 处理Redis相关数据。
+         */
         private static RedisProbe connect(String host, int port) {
             RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
             configuration.setDatabase(0);
@@ -100,6 +121,9 @@ class SecurityRedisFailureIntegrationTest {
             return new RedisProbe(redis, connectionFactory);
         }
 
+        /**
+         * 关闭Redis。
+         */
         private void close() {
             connectionFactory.destroy();
         }

@@ -246,10 +246,7 @@ public class TimeMapper {
     }
 
     /**
-     * 时间戳转 Instant
-     *
-     * @param epochMilli 时间戳
-     * @return 返回 Unix 毫秒时间戳对应的 Instant；输入为 null 时返回 null。
+     * 转换时间。
      */
     public @Nullable Instant toInstant(@Nullable Long epochMilli) {
         return epochMilli == null ? null : Instant.ofEpochMilli(epochMilli);

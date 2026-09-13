@@ -74,6 +74,10 @@ public class NotificationOverviewVO {
 
     /**
      * 渠道运行摘要。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder
@@ -93,6 +97,10 @@ public class NotificationOverviewVO {
 
     /**
      * 按小时聚合的投递趋势点。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder
@@ -114,6 +122,10 @@ public class NotificationOverviewVO {
 
     /**
      * 脱敏投递错误摘要。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     @Builder

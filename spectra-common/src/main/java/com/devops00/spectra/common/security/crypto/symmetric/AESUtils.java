@@ -40,6 +40,7 @@ public final class AESUtils {
     private static final int KEY_SIZE = 256;
     private static final int IV_SIZE = 12; // 12字节推荐
     private static final int TAG_LENGTH = 128; // GCM标签长度
+    /** 为密钥和初始化向量提供密码学安全随机数。 */
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private AESUtils() {

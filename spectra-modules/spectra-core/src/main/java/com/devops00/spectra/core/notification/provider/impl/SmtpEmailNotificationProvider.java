@@ -41,6 +41,10 @@ import java.util.UUID;
 
 /**
  * SMTP 邮件 Provider；支持 465 隐式 SSL 和 587 STARTTLS 两种常见部署方式。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Component
 @RequiredArgsConstructor

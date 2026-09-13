@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.security.initialization.service.impl;
@@ -46,6 +55,10 @@ import java.util.UUID;
 
 /**
  * PostgreSQL + Redis 的系统首次初始化实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @RequiredArgsConstructor
@@ -290,6 +303,19 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
                 "密钥管理页面配置的接口加解密开关");
     }
 
+    /**
+     * 实现系统配置项相关的应用服务逻辑。
+     *
+     * @param systemName      系统完整显示名称
+     * @param systemShortName 系统简称
+     * @param systemLogo      系统 Logo 图片地址
+     * @param defaultLocale   默认区域设置
+     * @param defaultTimezone 默认时区
+     * @param securityProfile 安全配置档案
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record InitialSystemSettings(String systemName, String systemShortName, String systemLogo,
                                          String defaultLocale, String defaultTimezone, String securityProfile) {
     }

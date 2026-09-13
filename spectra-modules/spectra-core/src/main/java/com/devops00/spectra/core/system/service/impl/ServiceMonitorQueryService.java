@@ -22,7 +22,13 @@ import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** 服务监控总览和历史趋势查询用例。 */
+/**
+ * 服务监控总览和历史趋势查询用例。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 @RequiredArgsConstructor
 public class ServiceMonitorQueryService {

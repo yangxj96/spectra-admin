@@ -18,7 +18,13 @@ package com.devops00.spectra.core.upload.javabean.constant;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 
-/** 分片数据传输模式。 */
+/**
+ * 分片数据传输模式。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public enum TransportMode implements IEnum<String> {
     LOCAL_PROXY,
     PRESIGNED;

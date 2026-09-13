@@ -68,6 +68,9 @@ public record DependencyHealthResult(String contributorName,
         safeSummary = normalizeSummary(safeSummary);
     }
 
+    /**
+     * 校验健康状态结果。
+     */
     private static String requireText(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " 不能为空");
@@ -75,10 +78,16 @@ public record DependencyHealthResult(String contributorName,
         return value.trim();
     }
 
+    /**
+     * 规范化健康状态结果。
+     */
     private static String normalize(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
+    /**
+     * 规范化健康状态结果。
+     */
     private static String normalizeSummary(String value) {
         if (value == null || value.isBlank()) {
             return null;

@@ -25,26 +25,52 @@ import lombok.EqualsAndHashCode;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * 用户与安全角色之间的有效分配关系。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sec_role_assignment", schema = "spectra_security")
 public class RoleAssignment extends BaseEntity {
 
+    /**
+     * 获得角色分配的用户 ID。
+     */
     @TableField(value = "user_id")
     private UUID userId;
 
+    /**
+     * 分配给用户的安全角色 ID。
+     */
     @TableField(value = "role_id")
     private UUID roleId;
 
+    /**
+     * 角色分配当前的生命周期状态。
+     */
     @TableField(value = "state")
     private String state;
 
+    /**
+     * 角色分配开始生效的时间；为空时不限制起始时间。
+     */
     @TableField(value = "valid_from")
     private Instant validFrom;
 
+    /**
+     * 角色分配失效的时间；为空时不设置截止时间。
+     */
     @TableField(value = "valid_until")
     private Instant validUntil;
 
+    /**
+     * 角色分配记录的乐观锁版本号。
+     */
     @TableField(value = "version")
     private Long version;
 }

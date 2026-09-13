@@ -1,17 +1,17 @@
 /*
- * Copyright 2018-2026 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.architecture;
@@ -235,6 +235,9 @@ class FrameworkPackageLayoutTest {
                 .isEmpty();
     }
 
+    /**
+     * 处理相关数据相关数据。
+     */
     private static List<SourceFile> frameworkSources() throws IOException {
         Path sourceRoot = resolveBackendPath("spectra-framework/src/main/java");
         try (var paths = Files.walk(sourceRoot)) {
@@ -246,6 +249,9 @@ class FrameworkPackageLayoutTest {
         }
     }
 
+    /**
+     * 查询相关数据。
+     */
     private static String readPackage(Path sourceFile) {
         try (var lines = Files.lines(sourceFile)) {
             return lines.map(String::trim)
@@ -258,6 +264,9 @@ class FrameworkPackageLayoutTest {
         }
     }
 
+    /**
+     * 解析路径。
+     */
     private static Path resolveBackendPath(String relativePath) {
         Path current = Path.of(System.getProperty("maven.multiModuleProjectDirectory", "."))
                 .toAbsolutePath()
@@ -272,6 +281,16 @@ class FrameworkPackageLayoutTest {
         throw new IllegalStateException("无法定位 Maven 工程文件: " + relativePath);
     }
 
+    /**
+     * 为 {@code FrameworkPackageLayoutTest} 测试提供 {@code SourceFile} 测试类型。
+     *
+     * @param path        诊断文件或资源的存储路径
+     * @param packageName Java 源文件声明的包名
+     * @param className   Java 源文件声明的类型名称
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record SourceFile(Path path, String packageName, String className) {
     }
 }

@@ -22,7 +22,21 @@ import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 import java.util.List;
 import java.util.Map;
 
-/** 代码白名单中的 Quartz Job 类型能力描述。 */
+/**
+ * 封装Quartz作业类型相关的响应数据。
+ *
+ * @param typeKey                作业类型注册表中的唯一类型键
+ * @param displayName            Quartz Job 类型的展示名称
+ * @param protectedJob           该作业是否受内置定义保护
+ * @param jobClassName           Quartz Job 实现类的全限定类名
+ * @param parameterVersion       参数版本
+ * @param parameterFields        Job 参数字段的定义集合
+ * @param allowUnknownParameters 是否允许未在定义中声明的参数
+ * @param supportedTriggerTypes  支持触发器类型
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record QuartzJobTypeVO(String typeKey, String displayName, boolean protectedJob,
                               String jobClassName, String parameterVersion,
                               Map<String, QuartzParameterSchema.FieldDefinition> parameterFields,

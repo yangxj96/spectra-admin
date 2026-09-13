@@ -28,7 +28,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/** 管理 Quartz JDBC Scheduler 的启动重试、就绪和优雅停止。 */
+/**
+ * 管理 Quartz JDBC Scheduler 的启动重试、就绪和优雅停止。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 public class QuartzSchedulerLifecycle implements SmartLifecycle {
 
@@ -47,7 +53,13 @@ public class QuartzSchedulerLifecycle implements SmartLifecycle {
     private volatile ScheduledFuture<?> retryFuture;
     private volatile boolean ready;
 
-    /** Quartz 生命周期状态。 */
+    /**
+     * Quartz 生命周期状态。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     public enum State {
         /** 正在初始化 JDBC Scheduler。 */
         STARTING,

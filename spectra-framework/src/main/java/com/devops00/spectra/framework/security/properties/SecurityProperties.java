@@ -200,6 +200,10 @@ public class SecurityProperties {
      *
      * <p>连接/命令超时和连接池由 Spring Boot 的 {@code spring.data.redis} 管理；这里仅登记安全数据格式、
      * fail-closed 不变量和后续可靠 worker 共用的批量边界。</p>
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     @Data
     public static class RedisContractProperties {

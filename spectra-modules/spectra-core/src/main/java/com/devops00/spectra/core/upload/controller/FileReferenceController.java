@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.controller;
 
 import com.devops00.spectra.common.port.file.FileReferenceCommand;
@@ -29,6 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * 提供文件引用相关的 HTTP 接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @RestController
 @RequestMapping("/file/references")
 @RequiredArgsConstructor
@@ -40,6 +58,12 @@ public class FileReferenceController {
 
     private final FileReferenceAdminService adminService;
 
+    /**
+     * 处理文件引用相关数据。
+     *
+     * @param request 请求参数。
+     * @return 文件引用视图数据。
+     */
     @Audit("'登记文件引用'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:reference')")
@@ -48,6 +72,11 @@ public class FileReferenceController {
                 request.getReferenceId(), request.getPurpose(), request.getDisplayName()));
     }
 
+    /**
+     * 删除或清理文件引用。
+     *
+     * @param referenceId 引用标识。
+     */
     @Audit("'删除文件引用'")
     @DeleteMapping(value = "/{referenceId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:reference')")
@@ -55,6 +84,13 @@ public class FileReferenceController {
         referenceService.removeById(referenceId);
     }
 
+    /**
+     * 按查询条件分页查询文件引用。
+     *
+     * @param page    分页参数。
+     * @param request 请求参数。
+     * @return 符合条件的分页结果。
+     */
     @Audit("'查询文件引用'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")

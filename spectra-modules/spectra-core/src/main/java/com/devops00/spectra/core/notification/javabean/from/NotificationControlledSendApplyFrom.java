@@ -25,6 +25,10 @@ import java.util.UUID;
 
 /**
  * 受控发送 Apply 请求；所有发送内容都来自已保存的 Preview 快照。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Data
 public class NotificationControlledSendApplyFrom {

@@ -179,6 +179,9 @@ public final class RequestCorrelationContext {
      *
      * @param requestId     HTTP 请求标识；后台任务或空上下文为 {@code null}
      * @param correlationId 跨请求、任务和事件传递的关联标识；空上下文为 {@code null}
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
      */
     public record Context(String requestId, String correlationId) {
 
@@ -187,17 +190,24 @@ public final class RequestCorrelationContext {
             correlationId = sanitize(correlationId);
         }
 
-        /** @return 空上下文 */
+        /**
+         * 判断上下文。
+         */
         public static Context empty() {
             return new Context(null, null);
         }
 
-        /** @return 当前上下文是否没有任何标识 */
+        /**
+         * 判断上下文。
+         */
         public boolean isEmpty() {
             return requestId == null && correlationId == null;
         }
     }
 
+    /**
+     * 设置MDC。
+     */
     private static void setMdc(String key, String value) {
         if (value == null) {
             MDC.remove(key);

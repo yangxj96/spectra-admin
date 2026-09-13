@@ -50,11 +50,7 @@ import java.util.regex.Pattern;
 public class SqlExceptionAdvice {
 
     /**
-     * 处理唯一键冲突异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回数据重复统一失败响应；响应对象始终非 null且不向客户端暴露数据库原始信息。
+     * 处理键异常。
      */
     @ExceptionHandler(DuplicateKeyException.class)
     public R<Object> handleDuplicateKeyException(DuplicateKeyException e, HttpServletResponse response) {
@@ -74,11 +70,7 @@ public class SqlExceptionAdvice {
     }
 
     /**
-     * 处理 SQL 语法错误
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 返回 SQL 查询失败统一失败响应；响应对象始终非 null且不向客户端暴露 SQL 文本。
+     * 处理SQL异常。
      */
     @ExceptionHandler(BadSqlGrammarException.class)
     public R<Object> handleBadSqlGrammarException(BadSqlGrammarException e, HttpServletResponse response) {

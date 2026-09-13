@@ -32,7 +32,13 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-/** Quartz JDBC Scheduler、生命周期和 Spring JobFactory 配置。 */
+/**
+ * Quartz JDBC Scheduler、生命周期和 Spring JobFactory 配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore(QuartzAutoConfiguration.class)
 @EnableConfigurationProperties(QuartzSchedulerProperties.class)

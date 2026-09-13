@@ -18,6 +18,10 @@ package com.devops00.spectra.common.security.authorization;
 
 /**
  * permission-specific 数据边界模式。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public enum ScopeMode {
     NONE,

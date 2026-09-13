@@ -26,7 +26,13 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-/** 文件业务引用实体。 */
+/**
+ * 业务对象与文件资产之间的引用关系。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/9/13
+ */
 @Getter
 @Setter
 @ToString
@@ -34,18 +40,33 @@ import java.util.UUID;
 @TableName(value = "file_reference", schema = "spectra_core")
 public class FileReference extends BaseEntity {
 
+    /**
+     * 被业务对象引用的文件资产 ID。
+     */
     @TableField("file_asset_id")
     private UUID fileAssetId;
 
+    /**
+     * 引用该文件的业务对象类型编码。
+     */
     @TableField("reference_type")
     private String referenceType;
 
+    /**
+     * 引用该文件的业务对象 ID。
+     */
     @TableField("reference_id")
     private UUID referenceId;
 
+    /**
+     * 文件在该业务对象中的用途编码。
+     */
     @TableField("purpose")
     private String purpose;
 
+    /**
+     * 在该业务引用中展示给用户的文件名。
+     */
     @TableField("display_name")
     private String displayName;
 }

@@ -56,6 +56,10 @@ import java.util.stream.Collectors;
 
 /**
  * 从目标 security schema 读取授权快照。任何结构缺失都会 fail-closed，绝不补成 ALL。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @Service
 @RequiredArgsConstructor

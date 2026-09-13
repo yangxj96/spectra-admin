@@ -22,7 +22,13 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 
-/** 由 Quartz 集群调度执行历史超时记录收敛。 */
+/**
+ * 由 Quartz 集群调度执行历史超时记录收敛。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @DisallowConcurrentExecution
 public class QuartzExecutionHistoryCleanupJob implements Job {
 

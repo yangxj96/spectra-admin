@@ -19,8 +19,16 @@ package com.devops00.spectra.core.security.authorization.domain;
 import java.util.Set;
 
 /**
- * Role 变更影响分析结果。
+ * 承载角色相关的不可变数据。
  *
+ * @param addedPermissions            本次新增的权限集合
+ * @param removedPermissions          本次移除的权限集合
+ * @param addedGrantablePermissions   本次新增的可授予权限集合
+ * @param removedGrantablePermissions 本次移除的可授予权限集合
+ * @param authorityLevelChanged       角色权限等级是否发生变化
+ * @param expandsEffectiveAuthority   本次变更是否扩大用户的有效权限
+ * @param affectedAssignmentCount     本次变更影响的权限分配数量
+ * @param affectedUserCount           本次变更影响的用户数量
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/14

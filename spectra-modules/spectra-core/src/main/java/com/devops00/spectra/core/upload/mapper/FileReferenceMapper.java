@@ -23,25 +23,84 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.UUID;
 
-/** 文件引用 Mapper。 */
+/**
+ * 文件引用 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface FileReferenceMapper extends BaseMapper<FileReference> {
 
+    /**
+     * 查询键。
+     *
+     * @param fileAssetId   文件资产标识。
+     * @param referenceType 引用类型参数。
+     * @param referenceId   引用标识。
+     * @param purpose       用途参数。
+     * @return 文件引用数据。
+     */
     FileReference findByKey(@Param("fileAssetId") UUID fileAssetId, @Param("referenceType") String referenceType,
                             @Param("referenceId") UUID referenceId, @Param("purpose") String purpose);
 
+    /**
+     * 查询业务键。
+     *
+     * @param referenceType 引用类型参数。
+     * @param referenceId   引用标识。
+     * @param purpose       用途参数。
+     * @return 文件引用数据。
+     */
     FileReference findByBusinessKey(@Param("referenceType") String referenceType, @Param("referenceId") UUID referenceId,
                                     @Param("purpose") String purpose);
 
+    /**
+     * 统计资产标识数量。
+     *
+     * @param fileAssetId 文件资产标识。
+     * @return 符合条件的数量。
+     */
     int countByAssetId(@Param("fileAssetId") UUID fileAssetId);
 
+    /**
+     * 处理删除键相关数据。
+     *
+     * @param fileAssetId   文件资产标识。
+     * @param referenceType 引用类型参数。
+     * @param referenceId   引用标识。
+     * @param purpose       用途参数。
+     * @return 符合条件的数量。
+     */
     int softDeleteByKey(@Param("fileAssetId") UUID fileAssetId, @Param("referenceType") String referenceType,
                         @Param("referenceId") UUID referenceId, @Param("purpose") String purpose);
 
+    /**
+     * 处理删除业务键用途相关数据。
+     *
+     * @param referenceType 引用类型参数。
+     * @param referenceId   引用标识。
+     * @param purpose       用途参数。
+     * @return 符合条件的数量。
+     */
     int softDeleteByBusinessKeyAndPurpose(@Param("referenceType") String referenceType, @Param("referenceId") UUID referenceId,
                                           @Param("purpose") String purpose);
 
+    /**
+     * 处理删除标识相关数据。
+     *
+     * @param id 数据记录的唯一标识。
+     * @return 符合条件的数量。
+     */
     int softDeleteById(@Param("id") UUID id);
 
+    /**
+     * 处理删除业务键相关数据。
+     *
+     * @param referenceType 引用类型参数。
+     * @param referenceId   引用标识。
+     * @return 符合条件的数量。
+     */
     int softDeleteByBusinessKey(@Param("referenceType") String referenceType, @Param("referenceId") UUID referenceId);
 }

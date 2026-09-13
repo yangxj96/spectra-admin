@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.security.authorization.service.impl;
@@ -60,6 +69,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Role 目标授权状态查询测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 @ExtendWith(MockitoExtension.class)
 class RoleAuthorizationChangeServiceImplTest {
@@ -242,6 +255,9 @@ class RoleAuthorizationChangeServiceImplTest {
         assertThrows(DataException.class, () -> service.preview(roleId, from));
     }
 
+    /**
+     * 处理角色相关数据。
+     */
     private static SecurityRole role(UUID id, long version) {
         var role = new SecurityRole();
         role.setId(id);
@@ -252,6 +268,9 @@ class RoleAuthorizationChangeServiceImplTest {
         return role;
     }
 
+    /**
+     * 处理权限相关数据。
+     */
     private static Permission permission(UUID id, String code) {
         var permission = new Permission();
         permission.setId(id);

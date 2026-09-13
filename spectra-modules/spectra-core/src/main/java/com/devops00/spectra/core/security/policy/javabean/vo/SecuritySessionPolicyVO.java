@@ -18,7 +18,24 @@ package com.devops00.spectra.core.security.policy.javabean.vo;
 
 import java.util.UUID;
 
-/** 登录端会话策略视图。 */
+/**
+ * 封装安全会话策略相关的响应数据。
+ *
+ * @param clientId           客户端标识
+ * @param clientCode         客户端编码
+ * @param clientName         客户端应用名称
+ * @param concurrencyMode    会话并发控制模式
+ * @param allowConcurrent    是否允许多个并发会话
+ * @param maxSessions        该客户端允许的最大并发会话数
+ * @param accessTtlSeconds   访问令牌有效时长（秒）
+ * @param refreshTtlSeconds  刷新令牌有效时长（秒）
+ * @param absoluteTtlSeconds 会话的绝对有效时长（秒）
+ * @param idleTtlSeconds     会话空闲超时时长（秒）
+ * @param version            当前对象或配置的版本号
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public record SecuritySessionPolicyVO(UUID clientId,
                                       String clientCode,
                                       String clientName,

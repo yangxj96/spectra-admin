@@ -119,12 +119,18 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         }
     }
 
+    /**
+     * 处理缓存值Redis相关数据。
+     */
     private static Map<String, String> encodeMap(Map<?, ?> source) {
         Map<String, String> result = new LinkedHashMap<>();
         source.forEach((key, value) -> result.put(toUuid(key), toNullableText(value)));
         return result;
     }
 
+    /**
+     * 处理缓存值Redis相关数据。
+     */
     private static List<String> encodeCollection(Collection<?> source) {
         List<String> result = new ArrayList<>(source.size());
         for (Object value : source) {
@@ -133,6 +139,9 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         return result;
     }
 
+    /**
+     * 处理缓存值Redis相关数据。
+     */
     private static @Nullable Map<UUID, String> decodeMap(Object value) {
         if (!(value instanceof Map<?, ?> source)) {
             return null;
@@ -144,6 +153,9 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         return result;
     }
 
+    /**
+     * 处理缓存值Redis相关数据。
+     */
     private static @Nullable List<UUID> decodeCollection(Object value) {
         if (!(value instanceof Collection<?> source)) {
             return null;
@@ -155,6 +167,9 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         return result;
     }
 
+    /**
+     * 转换UUID。
+     */
     private static String toUuid(Object value) {
         if (!(value instanceof UUID uuid)) {
             throw new SerializationException("缓存值只允许 UUID 元素");
@@ -162,6 +177,9 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
         return uuid.toString();
     }
 
+    /**
+     * 转换缓存值Redis。
+     */
     private static @Nullable String toNullableText(Object value) {
         if (value == null) {
             return null;

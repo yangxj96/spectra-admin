@@ -31,6 +31,10 @@ import static org.mockito.Mockito.mock;
 
 /**
  * 管理端查询、重试和取消权限边界测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 class NotificationAdminControllerTest {
 

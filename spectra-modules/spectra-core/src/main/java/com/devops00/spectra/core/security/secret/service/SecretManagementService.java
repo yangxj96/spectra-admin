@@ -22,10 +22,27 @@ import com.devops00.spectra.core.security.secret.javabean.entity.SecretVersionEn
 import java.util.List;
 import java.util.UUID;
 
-/** 密钥定义、密文版本和发布状态管理端口。 */
+/**
+ * 密钥定义、密文版本和发布状态管理端口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public interface SecretManagementService {
 
-    /** 当前启用密钥的受控导出内部记录；仅供传输服务使用，不得作为管理响应返回。 */
+    /**
+     * 定义活动状态密钥相关的应用服务契约。
+     *
+     * @param code        业务对象的唯一编码
+     * @param category    业务类别
+     * @param version     当前对象或配置的版本号
+     * @param fingerprint 密钥材料的指纹值
+     * @param value       配置项或密钥对应的实际值
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     record ActiveSecret(String code, String category, int version, String fingerprint, String value) {
     }
 

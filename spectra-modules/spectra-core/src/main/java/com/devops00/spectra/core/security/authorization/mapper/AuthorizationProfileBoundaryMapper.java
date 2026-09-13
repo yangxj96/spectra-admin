@@ -20,6 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.security.authorization.javabean.entity.AuthorizationProfileBoundary;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * 定义授权配置档案边界相关的数据库访问操作。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface AuthorizationProfileBoundaryMapper extends BaseMapper<AuthorizationProfileBoundary> {
 }

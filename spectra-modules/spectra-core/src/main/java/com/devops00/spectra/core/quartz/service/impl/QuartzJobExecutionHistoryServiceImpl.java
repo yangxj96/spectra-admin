@@ -39,7 +39,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Quartz 执行历史服务；监听写入失败由 listener 隔离，不影响任务执行。 */
+/**
+ * Quartz 执行历史服务；监听写入失败由 listener 隔离，不影响任务执行。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -129,6 +135,9 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
         }
     }
 
+    /**
+     * 处理实体相关数据。
+     */
     private QuartzJobExecutionHistoryEntity baseEntity(JobExecutionContext context,
                                                        QuartzExecutionHistoryStatus status,
                                                        Instant startedAt) {
@@ -153,6 +162,9 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
         return entity;
     }
 
+    /**
+     * 处理Quartz作业相关数据。
+     */
     private String schedulerInstance(JobExecutionContext context) {
         try {
             return context.getScheduler().getSchedulerInstanceId();
@@ -161,6 +173,9 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
         }
     }
 
+    /**
+     * 处理触发器类型相关数据。
+     */
     private static String triggerType(JobExecutionContext context) {
         if (context.getTrigger() instanceof CronTrigger) {
             return "CRON";
@@ -171,16 +186,25 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
         return "UNKNOWN";
     }
 
+    /**
+     * 转换Quartz作业。
+     */
     private static Instant toInstant(Date date) {
         return date == null ? null : date.toInstant();
     }
 
+    /**
+     * 处理安全错误编码相关数据。
+     */
     private static String safeErrorCode(Throwable exception) {
         return exception instanceof JobExecutionException jobException && jobException.getCause() != null
                 ? jobException.getCause().getClass().getSimpleName()
                 : exception.getClass().getSimpleName();
     }
 
+    /**
+     * 处理安全错误消息相关数据。
+     */
     private static String safeErrorMessage(Throwable exception) {
         var message = exception.getMessage();
         if (message == null || message.isBlank()) {
@@ -200,6 +224,9 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
         return summary.length() > 500 ? summary.substring(0, 500) : summary;
     }
 
+    /**
+     * 规范化Quartz作业。
+     */
     private static String normalize(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }

@@ -83,15 +83,24 @@ class GrantBoundaryPolicyTest {
                 List.of(request("role:assign", 99)), true));
     }
 
+    /**
+     * 处理分配相关数据。
+     */
     private static AuthorizationAssignment assignment(int authorityLevel,
                                                       Map<String, PermissionBoundary> grantBoundaries) {
         return new AuthorizationAssignment(UUID.randomUUID(), "ROLE_MANAGER", authorityLevel, Map.of(), grantBoundaries);
     }
 
+    /**
+     * 处理边界相关数据。
+     */
     private static PermissionBoundary rulesBoundary(String permission) {
         return new PermissionBoundary(permission, new AuthorizationScope(ScopeMode.RULES, Set.of(DEPARTMENT), false));
     }
 
+    /**
+     * 处理请求相关数据。
+     */
     private static AuthorizationGrantRequest request(String permission, int targetAuthorityLevel) {
         return new AuthorizationGrantRequest(permission, AuthorizationScope.of(ScopeMode.NONE), null,
                 targetAuthorityLevel);

@@ -71,6 +71,9 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
         return SecurityRedisExecutor.execute("读取安全会话主体", () -> getCurrentUserInternal(token));
     }
 
+    /**
+     * 查询当前用户内部。
+     */
     private @Nullable SecurityPrincipal getCurrentUserInternal(String token) {
         String tokenDigest = TokenDigestService.digest(token);
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
@@ -89,6 +92,9 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
         return token == null || token.isBlank() ? getTokenFromHttpRequest() : token;
     }
 
+    /**
+     * 查询令牌安全上下文。
+     */
     private @Nullable String getTokenFromSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
@@ -98,6 +104,9 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
         return credentials instanceof String token ? token : null;
     }
 
+    /**
+     * 查询令牌HTTP请求。
+     */
     private @Nullable String getTokenFromHttpRequest() {
         HttpServletRequest request = getHttpServletRequest();
         if (request == null) {
@@ -110,6 +119,9 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
         return bearer.substring(7);
     }
 
+    /**
+     * 查询用户安全上下文。
+     */
     private @Nullable SecurityPrincipal getUserFromSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
@@ -119,6 +131,9 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
         return principal instanceof SecurityPrincipal user ? user : null;
     }
 
+    /**
+     * 查询HTTP请求。
+     */
     private @Nullable HttpServletRequest getHttpServletRequest() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
         return attributes instanceof ServletRequestAttributes servletAttributes ? servletAttributes.getRequest() : null;

@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.core.system.constant;
 
-/** 系统配置键常量。 */
+/**
+ * 系统配置键常量。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 public final class SystemConfigKeys {
 
     public static final String SYSTEM_NAME = "system.name";

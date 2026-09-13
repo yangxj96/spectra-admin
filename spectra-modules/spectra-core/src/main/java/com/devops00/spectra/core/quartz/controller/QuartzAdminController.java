@@ -43,7 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-/** Quartz Job、Trigger 和执行历史的管理接口。 */
+/**
+ * Quartz Job、Trigger 和执行历史的管理接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/scheduler/quartz")

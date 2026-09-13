@@ -117,6 +117,9 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         run("按 Refresh Token 撤销会话", () -> deleteByRefreshTokenInternal(refreshToken));
     }
 
+    /**
+     * 删除或清理刷新令牌内部。
+     */
     private void deleteByRefreshTokenInternal(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             return;
@@ -160,6 +163,9 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         run("按用户撤销除当前会话外的其他会话", () -> deleteByUserIdInternal(userId, accessToken));
     }
 
+    /**
+     * 删除或清理用户标识内部。
+     */
     private void deleteByUserIdInternal(UUID userId, String accessToken) {
         Objects.requireNonNull(userId, "userId");
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
@@ -187,6 +193,9 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         }
     }
 
+    /**
+     * 删除或清理过期状态访问会话状态。
+     */
     private void deleteExpiredAccessSessionState(String accessDigest) {
         String accessRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(accessDigest);
         Object refreshDigestValue = store.value("读取过期 Access Refresh 映射", accessRefreshKey);

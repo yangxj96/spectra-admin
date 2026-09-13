@@ -25,7 +25,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 安全 Redis mapper 的基础值格式和多态边界测试。 */
+/**
+ * 安全 Redis mapper 的基础值格式和多态边界测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class SecJacksonConfigurationTest {
 
     @Test
@@ -55,10 +61,20 @@ class SecJacksonConfigurationTest {
         assertThat(securityMapper().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)).isTrue();
     }
 
+    /**
+     * 处理安全相关数据。
+     */
     private static ObjectMapper securityMapper() {
         return new SecJacksonConfiguration().redisObjectMapper();
     }
 
+    /**
+     * 为 {@code SecJacksonConfigurationTest} 测试提供 {@code ApplicationPayload} 测试类型。
+     *
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     static class ApplicationPayload {
 
         public String value;

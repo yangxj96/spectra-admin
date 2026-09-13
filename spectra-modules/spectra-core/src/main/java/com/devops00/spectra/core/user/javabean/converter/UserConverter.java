@@ -39,10 +39,10 @@ import org.mapstruct.MappingTarget;
 public interface UserConverter {
 
     /**
-     * 实体转分页VO
+     * 转换用户。
      *
-     * @param source 实体
-     * @return 分页实体
+     * @param source 当前数据或配置的来源。
+     * @return 符合条件的分页结果。
      */
     UserPageVO toVO(User source);
 
@@ -55,10 +55,10 @@ public interface UserConverter {
     User toEntity(UserSaveFrom source);
 
     /**
-     * 转换为分页VO
+     * 按查询条件分页查询用户。
      *
-     * @param source 入参
-     * @return 分页的VO
+     * @param source 当前数据或配置的来源。
+     * @return 符合条件的分页结果。
      */
     @Mapping(target = "pages", ignore = true)
     Page<UserPageVO> toVOPage(Page<User> source);
@@ -72,10 +72,10 @@ public interface UserConverter {
     void updateUser(UserSaveFrom source, @MappingTarget User target);
 
     /**
-     * 实体转用户详情VO
+     * 转换配置档案。
      *
-     * @param source 实体
-     * @return 用户详情VO
+     * @param source 当前数据或配置的来源。
+     * @return 用户配置档案数据。
      */
     UserProfileVO toProfileVO(User source);
 

@@ -32,7 +32,7 @@ import com.devops00.spectra.core.notification.sender.NotificationSender;
 public abstract class AbstractExternalNotificationSender implements NotificationSender {
 
     /**
-     * Provider Runtime。
+     * 运行时环境时间。
      */
     private final NotificationProviderRuntime runtime;
 

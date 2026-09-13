@@ -24,6 +24,10 @@ import java.util.Locale;
 
 /**
  * 认证身份标识摘要。摘要输入先 trim 并使用小写，避免同一邮箱产生多条身份。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
  */
 public final class AuthenticationIdentifierHash {
 

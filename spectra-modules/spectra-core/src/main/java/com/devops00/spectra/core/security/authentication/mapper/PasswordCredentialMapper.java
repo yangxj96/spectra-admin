@@ -20,6 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * 定义密码凭据相关的数据库访问操作。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Mapper
 public interface PasswordCredentialMapper extends BaseMapper<PasswordCredential> {
 }

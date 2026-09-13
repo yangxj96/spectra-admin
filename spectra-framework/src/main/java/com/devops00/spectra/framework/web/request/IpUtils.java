@@ -78,11 +78,7 @@ public final class IpUtils {
     }
 
     /**
-     * 从指定 header 中提取 IP，自动 trim 并转为小写比较
-     *
-     * @param request    请求体
-     * @param headerName 请求头名称
-     * @return 提取出来的IP
+     * 处理IP相关数据。
      */
     private static String extractIpFromHeader(HttpServletRequest request, String headerName) {
         String value = request.getHeader(headerName);

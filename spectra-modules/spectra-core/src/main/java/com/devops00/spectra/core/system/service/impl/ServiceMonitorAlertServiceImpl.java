@@ -3,6 +3,15 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.devops00.spectra.core.system.service.impl;
@@ -50,7 +59,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/** 服务监控告警规则与事件服务实现。 */
+/**
+ * 服务监控告警规则与事件服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -181,6 +196,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         return status == null || status.isBlank() ? DependencyHealthStatus.UNKNOWN.name() : status;
     }
 
+    /**
+     * 处理安全消息相关数据。
+     */
     private static String safeMessage(RuntimeException exception) {
         var message = exception.getMessage();
         if (message == null || message.isBlank()) {
@@ -533,6 +551,18 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .build();
     }
 
+    /**
+     * 实现相关数据相关的应用服务逻辑。
+     *
+     * @param violated       当前检查项是否违反规则
+     * @param currentValue   当前采集到的指标值
+     * @param thresholdValue 触发告警的阈值
+     * @param expectedValue  规则要求达到的预期值
+     * @param message        处理结果或异常原因的说明
+     * @author yangxj96
+     * @version 1.0
+     * @since 2026/09/13
+     */
     private record Observation(boolean violated, String currentValue, String thresholdValue,
                                String expectedValue, String message) {
     }

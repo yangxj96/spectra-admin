@@ -2,7 +2,18 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.core.upload.api.FileErrorCode;
@@ -34,7 +45,13 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 
-/** 独立的上传校验 Worker，负责对象存储确认、流式摘要校验和失败收敛。 */
+/**
+ * 独立的上传校验 Worker，负责对象存储确认、流式摘要校验和失败收敛。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 @Service
 public class UploadVerificationWorker {
 
@@ -115,6 +132,9 @@ public class UploadVerificationWorker {
         }
     }
 
+    /**
+     * 构建资产。
+     */
     private UUID createAsset(FileUploadSession session, String actualHash, long actualSize) {
         FileType fileType = fileTypeMapper.findEnabledByContentType(session.getDeclaredContentType());
         if (fileType == null) {
@@ -138,15 +158,24 @@ public class UploadVerificationWorker {
         return asset.getId();
     }
 
+    /**
+     * 转换分片。
+     */
     private StoredPart toStoredPart(FileUploadPart part) {
         return new StoredPart(part.getPartNumber(), part.getUploadedSize() == null ? 0 : part.getUploadedSize(),
                 part.getActualSha256(), part.getProviderEtag());
     }
 
+    /**
+     * 转换分片上传。
+     */
     private StorageMultipart toMultipart(FileUploadSession session) {
         return new StorageMultipart(session.getStorageContainer(), session.getStagingKey(), session.getProviderUploadId());
     }
 
+    /**
+     * 取消上传。
+     */
     private void abortQuietly(FileStorageProvider provider, StorageMultipart multipart) {
         if (provider == null) {
             return;

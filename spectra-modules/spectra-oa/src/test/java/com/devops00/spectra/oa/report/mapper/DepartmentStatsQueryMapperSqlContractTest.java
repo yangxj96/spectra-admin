@@ -23,7 +23,13 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** 部门统计统一报表查询 SQL 契约测试。 */
+/**
+ * 部门统计统一报表查询 SQL 契约测试。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/09/13
+ */
 class DepartmentStatsQueryMapperSqlContractTest {
 
     @Test
@@ -54,6 +60,9 @@ class DepartmentStatsQueryMapperSqlContractTest {
         assertThat(mapper.split("FULL OUTER JOIN", -1)).hasSize(4);
     }
 
+    /**
+     * 查询部门查询SQL合同。
+     */
     private static String readMapper() throws IOException {
         try (var resource = DepartmentStatsQueryMapperSqlContractTest.class.getClassLoader()
                 .getResourceAsStream("mapper/report/DepartmentStatsQueryMapper.xml")) {
