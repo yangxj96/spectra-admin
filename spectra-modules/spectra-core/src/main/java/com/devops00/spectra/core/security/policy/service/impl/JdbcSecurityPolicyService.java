@@ -146,7 +146,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
             throw new DataException(exception.getMessage(), exception);
         }
         SecurityPasswordPolicyVO after = new SecurityPasswordPolicyVO("SYSTEM", requested.minLength(),
-                requested.requireUppercase(), requested.requireLowercase(), requested.requireDigit(),
+                PasswordPolicy.MAX_LENGTH, requested.requireUppercase(), requested.requireLowercase(), requested.requireDigit(),
                 requested.requireSpecial(), requested.maxAgeDays(), before.version() + 1);
         var event = auditEvent("PASSWORD_POLICY_CHANGED", null, snapshot(before), snapshot(after));
         return securityChangeExecutor.execute(event, () -> {
@@ -207,6 +207,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
                 (resultSet, _) -> new SecurityPasswordPolicyVO(
                         resultSet.getString("policy_key"),
                         resultSet.getInt("min_length"),
+                        PasswordPolicy.MAX_LENGTH,
                         resultSet.getBoolean("require_uppercase"),
                         resultSet.getBoolean("require_lowercase"),
                         resultSet.getBoolean("require_digit"),

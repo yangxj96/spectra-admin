@@ -52,4 +52,16 @@ class PasswordPolicyTest {
 
         assertDoesNotThrow(() -> relaxed.assertAccepts("password"));
     }
+
+    @Test
+    void shouldRejectPolicyMinimumAboveSupportedMaximum() {
+        assertThrows(IllegalArgumentException.class, () -> new PasswordPolicy(21, true, true, true, true, null));
+    }
+
+    @Test
+    void shouldRecognizeSupplementaryUnicodeLettersAndUnlistedSpecialCharacters() {
+        PasswordPolicy unicodePolicy = new PasswordPolicy(8, true, true, true, true, null);
+
+        assertDoesNotThrow(() -> unicodePolicy.assertAccepts("𐐀𐐨abc123-"));
+    }
 }

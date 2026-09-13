@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.user.javabean.from;
 
+import com.devops00.spectra.common.security.policy.PasswordPolicy;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,8 +45,7 @@ public class ChangePasswordFrom {
      * 新密码
      */
     @NotBlank(message = "新密码不能为空")
-    @Size(min = 6, max = 20, message = "密码长度必须在6-20位之间")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$", message = "密码必须包含大小写字母、数字和特殊字符（@$!%*?&）")
+    @Size(max = PasswordPolicy.MAX_LENGTH, message = "密码长度不能超过 20 位")
     private String newPassword;
 
     /**

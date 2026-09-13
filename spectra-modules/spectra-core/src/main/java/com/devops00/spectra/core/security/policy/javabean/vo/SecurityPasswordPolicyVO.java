@@ -21,6 +21,7 @@ package com.devops00.spectra.core.security.policy.javabean.vo;
  *
  * @param policyKey        密码策略的配置键
  * @param minLength        密码允许的最小字符数
+ * @param maxLength        用户主动修改密码时允许的最大字符数
  * @param requireUppercase 密码是否必须包含大写字母
  * @param requireLowercase 密码是否必须包含小写字母
  * @param requireDigit     密码是否必须包含数字
@@ -33,6 +34,7 @@ package com.devops00.spectra.core.security.policy.javabean.vo;
  */
 public record SecurityPasswordPolicyVO(String policyKey,
                                        Integer minLength,
+                                       Integer maxLength,
                                        Boolean requireUppercase,
                                        Boolean requireLowercase,
                                        Boolean requireDigit,

@@ -36,8 +36,11 @@ public record PasswordPolicy(int minLength,
                              boolean requireSpecial,
                              Integer maxAgeDays) {
 
+    /** 用户主动修改密码时允许的最大长度。 */
+    public static final int MAX_LENGTH = 20;
+
     public PasswordPolicy {
-        if (minLength < 8 || maxAgeDays != null && maxAgeDays < 1) {
+        if (minLength < 8 || minLength > MAX_LENGTH || maxAgeDays != null && maxAgeDays < 1) {
             throw new IllegalArgumentException("密码策略参数无效");
         }
     }
@@ -46,10 +49,10 @@ public record PasswordPolicy(int minLength,
     public void assertAccepts(String password) {
         if (password == null
                 || password.length() < minLength
-                || requireUppercase && password.chars().noneMatch(Character::isUpperCase)
-                || requireLowercase && password.chars().noneMatch(Character::isLowerCase)
-                || requireDigit && password.chars().noneMatch(Character::isDigit)
-                || requireSpecial && password.chars().allMatch(Character::isLetterOrDigit)) {
+                || requireUppercase && password.codePoints().noneMatch(Character::isUpperCase)
+                || requireLowercase && password.codePoints().noneMatch(Character::isLowerCase)
+                || requireDigit && password.codePoints().noneMatch(Character::isDigit)
+                || requireSpecial && password.codePoints().allMatch(Character::isLetterOrDigit)) {
             throw new IllegalArgumentException("新密码不符合当前安全策略");
         }
     }

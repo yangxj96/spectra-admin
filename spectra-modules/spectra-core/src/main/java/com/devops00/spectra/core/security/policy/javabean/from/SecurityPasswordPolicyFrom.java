@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.security.policy.javabean.from;
 
+import com.devops00.spectra.common.security.policy.PasswordPolicy;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -38,6 +40,7 @@ public class SecurityPasswordPolicyFrom {
 
     @NotNull(message = "密码最小长度不能为空")
     @Min(value = 8, message = "密码最小长度不能低于 8")
+    @Max(value = PasswordPolicy.MAX_LENGTH, message = "密码最小长度不能超过 20")
     private Integer minLength;
 
     @NotNull(message = "大写字母策略不能为空")

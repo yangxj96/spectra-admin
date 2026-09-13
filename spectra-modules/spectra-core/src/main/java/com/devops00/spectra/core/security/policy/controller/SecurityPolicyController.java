@@ -78,7 +78,7 @@ public class SecurityPolicyController {
      */
     @Audit("'查询密码策略'")
     @GetMapping(value = "/password", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'security:password-policy:update')")
+    @PreAuthorize("isAuthenticated()")
     public SecurityPasswordPolicyVO passwordPolicy() {
         return policyService.passwordPolicy();
     }
