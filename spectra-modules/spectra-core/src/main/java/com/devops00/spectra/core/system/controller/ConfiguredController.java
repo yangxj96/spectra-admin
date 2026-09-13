@@ -16,10 +16,7 @@
 
 package com.devops00.spectra.core.system.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.framework.persistence.pagination.PageFrom;
-import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
-import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
+import com.devops00.spectra.core.system.javabean.from.ConfiguredBatchFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.common.audit.Audit;
@@ -31,6 +28,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 系统配置控制器
@@ -51,26 +50,27 @@ public class ConfiguredController {
     }
 
     /**
-     * 修改系统配置
-     * <p>
-     * 只能修改值和说明
+     * 查询系统配置表单。
      *
-     * @param params 修改参数入参实体
+     * @return 按业务分类组织的系统配置项。
      */
-    @Audit(value = "'修改系统配置'", captureArguments = false)
-    @PutMapping(version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'security:config:update')")
-    public void modify(@Validated @RequestBody ConfiguredFrom params) {
-        bindService.modify(params);
+    @Audit("'查询系统配置表单'")
+    @GetMapping(value = "/settings", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'security:config:read')")
+    public List<ConfiguredVO> settings() {
+        return bindService.settings();
     }
 
     /**
-     * 查询或获取目标数据（{@code page}）。
+     * 原子保存单个业务分类的系统配置表单。
+     *
+     * @param params 分类及配置项。
      */
-    @Audit("'分页查询系统配置'")
-    @GetMapping(value = "/page", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'security:config:read')")
-    public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
-        return bindService.page(page, params);
+    @Audit(value = "'批量修改系统配置'", captureArguments = false)
+    @PutMapping(value = "/batch", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'security:config:update')")
+    public void modifyBatch(@Validated @RequestBody ConfiguredBatchFrom params) {
+        bindService.modifyBatch(params);
     }
+
 }

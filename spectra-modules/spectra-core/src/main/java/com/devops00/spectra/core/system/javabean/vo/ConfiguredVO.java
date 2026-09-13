@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.javabean.vo;
 
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -64,6 +65,12 @@ public class ConfiguredVO implements Serializable {
      * 值类型
      */
     private ConfiguredValueType type;
+
+    /** 配置所属的业务分类。 */
+    private ConfiguredCategory category;
+
+    /** 是否允许通过通用配置表单修改。 */
+    private boolean editable;
 
     /**
      * 字典code

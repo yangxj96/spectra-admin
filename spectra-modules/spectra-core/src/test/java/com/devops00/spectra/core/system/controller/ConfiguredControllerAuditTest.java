@@ -17,10 +17,17 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.audit.Audit;
-import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
+import com.devops00.spectra.core.system.javabean.from.ConfiguredBatchFrom;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * 防止系统配置秘密值进入审计快照。
@@ -32,10 +39,41 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class ConfiguredControllerAuditTest {
 
     @Test
-    void shouldNotCaptureConfiguredValuesInAuditSnapshots() throws NoSuchMethodException {
-        var method = ConfiguredController.class.getDeclaredMethod("modify", ConfiguredFrom.class);
+    void shouldNotCaptureConfiguredValuesInBatchAuditSnapshots() throws NoSuchMethodException {
+        var method = ConfiguredController.class.getDeclaredMethod("modifyBatch", ConfiguredBatchFrom.class);
         var audit = method.getAnnotation(Audit.class);
 
         assertFalse(audit.captureArguments());
+    }
+
+    @Test
+    void shouldExposeSettingsFormEndpoint() {
+        var method = findMethod("settings");
+
+        assertArrayEquals(new String[]{"/settings"}, method.getAnnotation(GetMapping.class).value());
+    }
+
+    @Test
+    void shouldExposeBatchUpdateWithoutCapturingConfigurationValues() {
+        var method = findMethod("modifyBatch");
+        var mapping = method.getAnnotation(PutMapping.class);
+        var audit = method.getAnnotation(Audit.class);
+
+        assertArrayEquals(new String[]{"/batch"}, mapping.value());
+        assertFalse(audit.captureArguments());
+    }
+
+    @Test
+    void shouldRemoveReplacedSingleItemAndPagedEndpoints() {
+        assertFalse(Arrays.stream(ConfiguredController.class.getDeclaredMethods())
+                .anyMatch(method -> method.getName().equals("modify") || method.getName().equals("page")));
+    }
+
+    private static Method findMethod(String name) {
+        var method = Arrays.stream(ConfiguredController.class.getDeclaredMethods())
+                .filter(candidate -> candidate.getName().equals(name))
+                .findFirst();
+        assertNotNull(method.orElse(null), "系统配置控制器应提供 " + name + " 接口");
+        return method.orElseThrow();
     }
 }

@@ -293,12 +293,12 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
                 "系统简称");
         configuredService.upsert(SystemConfigKeys.SYSTEM_LOGO, settings.systemLogo(), ConfiguredValueType.TEXT,
                 "系统 Logo 地址或文件标识");
-        configuredService.upsert(SystemConfigKeys.SYSTEM_DEFAULT_LOCALE, settings.defaultLocale(), ConfiguredValueType.TEXT,
-                "系统默认语言");
-        configuredService.upsert(SystemConfigKeys.SYSTEM_DEFAULT_TIMEZONE, settings.defaultTimezone(), ConfiguredValueType.TEXT,
-                "系统默认时区");
-        configuredService.upsert(SystemConfigKeys.SECURITY_PROFILE, settings.securityProfile(), ConfiguredValueType.SELECT,
-                "初始化时选择的安全策略，STANDARD 或 STRICT");
+        configuredService.upsertWithDictCode(SystemConfigKeys.SYSTEM_DEFAULT_LOCALE, settings.defaultLocale(),
+                ConfiguredValueType.SELECT, "sys_language", "系统默认语言");
+        configuredService.upsertWithDictCode(SystemConfigKeys.SYSTEM_DEFAULT_TIMEZONE, settings.defaultTimezone(),
+                ConfiguredValueType.SELECT, "sys_timezone", "系统默认时区");
+        configuredService.upsertWithDictCode(SystemConfigKeys.SECURITY_PROFILE, settings.securityProfile(),
+                ConfiguredValueType.SELECT, "sys_security_profile", "初始化时选择的安全策略，STANDARD 或 STRICT");
         configuredService.upsert(SystemConfigKeys.CRYPTO_ENABLED, "false", ConfiguredValueType.BOOL,
                 "密钥管理页面配置的接口加解密开关");
     }

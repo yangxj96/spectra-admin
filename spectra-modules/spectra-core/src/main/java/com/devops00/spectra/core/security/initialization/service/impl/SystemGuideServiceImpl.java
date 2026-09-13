@@ -204,7 +204,7 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         }
         configuredService.upsert(SystemConfigKeys.NOTIFICATION_ALLOWED_LINK_PREFIXES,
                 "/login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/",
-                ConfiguredValueType.TEXT, "消息中心允许的站内路由前缀");
+                ConfiguredValueType.TEXTAREA, "消息中心允许的站内路由前缀");
     }
 
     /**

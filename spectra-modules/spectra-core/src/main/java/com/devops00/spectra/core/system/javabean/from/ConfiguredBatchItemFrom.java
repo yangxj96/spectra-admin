@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.javabean.from;
 
-import com.devops00.spectra.common.base.Verify;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,31 +24,25 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 /**
- * 系统配置入参
+ * 系统配置批量修改项。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2025/11/11 00:00
+ * @since 2026/09/13
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfiguredFrom {
+public class ConfiguredBatchItemFrom {
 
-    /**
-     * 主键ID
-     */
-    @NotNull(message = "ID不能为空", groups = Verify.Update.class)
+    /** 配置项 ID。 */
+    @NotNull(message = "配置项ID不能为空")
     private UUID id;
 
-    /**
-     * 配置VALUE
-     */
+    /** 配置值。 */
     @NotNull(message = "配置值不能为空")
     private String value;
 
-    /**
-     * 备注说明
-     */
+    /** 配置说明。 */
     private String remarks;
 }

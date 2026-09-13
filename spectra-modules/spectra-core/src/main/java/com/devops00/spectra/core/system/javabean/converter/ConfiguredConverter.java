@@ -16,14 +16,16 @@
 
 package com.devops00.spectra.core.system.javabean.converter;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredCategory;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 /**
  * 系统配置Mapstruct
@@ -43,6 +45,8 @@ public interface ConfiguredConverter {
      */
     @Mapping(target = "value", expression = "java(exposedValue(source))")
     @Mapping(target = "configured", expression = "java(isSecretConfigured(source))")
+    @Mapping(target = "category", expression = "java(com.devops00.spectra.core.system.javabean.enums.ConfiguredCategory.fromKey(source.getKey()))")
+    @Mapping(target = "editable", expression = "java(!com.devops00.spectra.core.system.javabean.enums.ConfiguredCategory.isSystemManagedKey(source.getKey()))")
     ConfiguredVO toVO(Configured source);
 
     /**
@@ -52,7 +56,9 @@ public interface ConfiguredConverter {
      * @return 普通配置值或秘密配置的空值。
      */
     default String exposedValue(Configured source) {
-        return source.getType() == ConfiguredValueType.SECRET ? null : source.getValue();
+        return source.getType() == ConfiguredValueType.SECRET || ConfiguredCategory.isSystemManagedKey(source.getKey())
+                ? null
+                : source.getValue();
     }
 
     /**
@@ -66,11 +72,10 @@ public interface ConfiguredConverter {
     }
 
     /**
-     * 转换到分页的VO信息
+     * 转换配置表单项集合。
      *
-     * @param source 分页信息
-     * @return IPAGE
+     * @param source 配置实体集合。
+     * @return 表单项响应。
      */
-    @Mapping(target = "pages", ignore = true)
-    Page<ConfiguredVO> toVOPage(Page<Configured> source);
+    List<ConfiguredVO> toVOList(List<Configured> source);
 }

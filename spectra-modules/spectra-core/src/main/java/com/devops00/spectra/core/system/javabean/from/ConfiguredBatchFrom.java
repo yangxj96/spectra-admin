@@ -16,24 +16,36 @@
 
 package com.devops00.spectra.core.system.javabean.from;
 
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredCategory;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * 系统配置分页查询入参
+ * 系统配置分类批量修改入参。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2025/11/6 00:00
+ * @since 2026/09/13
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class ConfiguredPageFrom {
+@AllArgsConstructor
+public class ConfiguredBatchFrom {
 
-    /**
-     * 系统配置的key,模糊查询
-     */
-    private String key;
+    /** 本次提交的配置业务分类。 */
+    @NotNull(message = "配置分类不能为空")
+    private ConfiguredCategory category;
+
+    /** 当前分类的完整表单项。 */
+    @Valid
+    @NotEmpty(message = "至少提交一项系统配置")
+    @Size(max = 100, message = "单次最多保存100项系统配置")
+    private List<ConfiguredBatchItemFrom> items;
 }

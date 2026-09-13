@@ -18,12 +18,14 @@ package com.devops00.spectra.core.system.javabean.converter;
 
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredCategory;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * 系统秘密配置响应脱敏回归测试。
@@ -58,5 +60,47 @@ class ConfiguredConverterTest {
 
         assertNull(result.getValue());
         assertEquals(false, result.getClass().getMethod("isConfigured").invoke(result));
+    }
+
+    @Test
+    void shouldGroupSettingsByBusinessCategory() {
+        var system = setting("copyright.name", ConfiguredValueType.TEXT, "Spectra");
+        var security = setting("user.default-password", ConfiguredValueType.SECRET, "encoded-hash");
+        var notification = setting("notification.enabled", ConfiguredValueType.BOOL, "true");
+        var securityProfile = setting("security.profile", ConfiguredValueType.SELECT, "STANDARD");
+        securityProfile.setDictCode("sys_security_profile");
+
+        assertEquals(ConfiguredCategory.SYSTEM, converter.toVO(system).getCategory());
+        assertEquals(ConfiguredCategory.SECURITY, converter.toVO(security).getCategory());
+        assertEquals(ConfiguredCategory.NOTIFICATION, converter.toVO(notification).getCategory());
+        assertEquals("sys_security_profile", converter.toVO(securityProfile).getDictCode());
+    }
+
+    @Test
+    void shouldHideSystemManagedNotificationKeysAndMarkThemReadOnly() {
+        var source = setting("notification.address-encryption-key", ConfiguredValueType.TEXT, "generated-key");
+
+        var result = converter.toVO(source);
+
+        assertNull(result.getValue());
+        assertFalse(result.isEditable());
+    }
+
+    @Test
+    void shouldKeepProviderConfigurationOutOfTheGenericSettingsForm() {
+        var source = setting("notification.provider.sms", ConfiguredValueType.TEXT, "provider-config");
+
+        var result = converter.toVO(source);
+
+        assertNull(result.getValue());
+        assertFalse(result.isEditable());
+    }
+
+    private static Configured setting(String key, ConfiguredValueType type, String value) {
+        var configured = new Configured();
+        configured.setKey(key);
+        configured.setType(type);
+        configured.setValue(value);
+        return configured;
     }
 }

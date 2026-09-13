@@ -49,6 +49,10 @@ public final class SystemConfigKeys {
 
     public static final String NOTIFICATION_ENABLED = "notification.enabled";
 
+    public static final String NOTIFICATION_ADDRESS_ENCRYPTION_KEY = "notification.address-encryption-key";
+
+    public static final String NOTIFICATION_SENSITIVE_PAYLOAD_KEY = "notification.sensitive-payload-key";
+
     public static final String NOTIFICATION_ALLOWED_LINK_PREFIXES = "notification.allowed-link-prefixes";
 
     public static final String NOTIFICATION_CLEANUP_ENABLED = "notification.cleanup.enabled";

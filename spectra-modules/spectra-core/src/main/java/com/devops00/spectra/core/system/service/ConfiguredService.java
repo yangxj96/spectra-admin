@@ -16,16 +16,14 @@
 
 package com.devops00.spectra.core.system.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.framework.persistence.base.BaseService;
-import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
-import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
-import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
+import com.devops00.spectra.core.system.javabean.from.ConfiguredBatchFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * 系统配置Service层
@@ -37,20 +35,18 @@ import java.util.Optional;
 public interface ConfiguredService extends BaseService<Configured> {
 
     /**
-     * 修改系统配置的值和说明
+     * 查询按业务分类组织的全部配置表单项。
      *
-     * @param params 待修改配置项的键、值、值类型和备注说明。
+     * @return 配置表单项。
      */
-    void modify(ConfiguredFrom params);
+    List<ConfiguredVO> settings();
 
     /**
-     * 分页查询系统配置项
+     * 在单个事务中保存一个配置业务分类的完整表单。
      *
-     * @param page   配置项列表的页码、页大小及排序字段。
-     * @param params 配置键、配置类型和关键字等筛选条件。
-     * @return 返回按配置键、类型等条件分页查询的系统配置项；无匹配时 records 为空、total 为 0，结果对象不返回 null。
+     * @param params 分类及完整配置项。
      */
-    IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params);
+    void modifyBatch(ConfiguredBatchFrom params);
 
     /**
      * 保存或更新配置（按 key 去重）
@@ -61,6 +57,17 @@ public interface ConfiguredService extends BaseService<Configured> {
      * @param remarks 面向管理端展示的配置说明，帮助操作者理解该配置的用途。
      */
     void upsert(String key, String value, ConfiguredValueType type, String remarks);
+
+    /**
+     * 保存或更新需要通过字典组呈现的配置。
+     *
+     * @param key      稳定配置键。
+     * @param value    配置值。
+     * @param type     配置值类型。
+     * @param dictCode 下拉选项对应的字典组编码。
+     * @param remarks  面向管理端展示的配置说明。
+     */
+    void upsertWithDictCode(String key, String value, ConfiguredValueType type, String dictCode, String remarks);
 
     /**
      * 创建默认系统配置项；配置已存在时不覆盖当前值。
