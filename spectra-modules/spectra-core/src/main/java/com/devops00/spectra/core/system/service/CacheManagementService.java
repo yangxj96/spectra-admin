@@ -22,6 +22,7 @@ import com.devops00.spectra.core.system.javabean.from.SecurityLoginFailureClearF
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceGlobalInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeAllFrom;
+import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeOneFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityVerificationClearFrom;
 import com.devops00.spectra.core.system.javabean.vo.CacheMonitorOverviewVO;
@@ -93,6 +94,14 @@ public interface CacheManagementService {
      * @return 返回安全 Session 撤销结果。
      */
     CacheOperationVO revokeSession(SecuritySessionRevokeFrom from);
+
+    /**
+     * 精确撤销由稳定会话句柄标识的单条安全会话。
+     *
+     * @param from 会话句柄、操作理由和二次确认信息。
+     * @return 返回安全 Session 撤销结果。
+     */
+    CacheOperationVO revokeSingleSession(SecuritySessionRevokeOneFrom from);
 
     /**
      * 撤销用户全部安全 Session。

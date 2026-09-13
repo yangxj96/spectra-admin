@@ -25,11 +25,12 @@ import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
+import com.devops00.spectra.core.user.javabean.from.OnlineUserPageFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
-import com.devops00.spectra.common.port.security.UserOnlineVO;
 
 import java.util.List;
 import java.util.UUID;
@@ -103,12 +104,14 @@ public interface UserService extends BaseService<User> {
     UserPasswordResetVO passwordResetById(UUID uid);
 
     /**
-     * 分页获取在线用户
+     * 按用户分组分页获取在线用户和会话摘要。
      *
-     * @return 返回按分页条件查询的在线用户列表；没有在线用户时返回空列表，不返回 null。
-     * @param page 分页条件，包含页码、页大小和排序字段。
+     * @param page   分页条件，包含页码、页大小和排序字段。
+     * @param filter 按登录账号、姓名和部门筛选的条件。
+     * @return 返回用户数作为 total 的在线用户分页；没有匹配记录时 records 为空、total 为 0。
+     * @throws IllegalAccessException 无法访问需要填充的部门名称字段时抛出。
      */
-    List<UserOnlineVO> online(PageFrom page);
+    IPage<OnlineUserPageVO> online(PageFrom page, OnlineUserPageFrom filter) throws IllegalAccessException;
 
     /**
      * 获取当前用户详情

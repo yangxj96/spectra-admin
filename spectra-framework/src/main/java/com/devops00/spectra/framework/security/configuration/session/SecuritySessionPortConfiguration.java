@@ -103,6 +103,12 @@ public class SecuritySessionPortConfiguration {
             public void revokeUserClientSessions(UUID userId, com.devops00.spectra.common.constant.ClientType clientType) {
                 sessionRevoker.deleteByUserIdAndClient(userId.toString(), clientType);
             }
+
+            /** 按随机会话句柄撤销单个 Refresh Token Family。 */
+            @Override
+            public void revokeSessionById(String sessionId) {
+                sessionRevoker.deleteBySessionId(sessionId);
+            }
         };
     }
 

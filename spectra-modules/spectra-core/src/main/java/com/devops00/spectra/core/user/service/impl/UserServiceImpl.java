@@ -42,16 +42,19 @@ import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
+import com.devops00.spectra.core.user.javabean.from.OnlineUserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.user.service.OnlineUserPageAssembler;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.common.audit.AuditRecord;
@@ -61,7 +64,6 @@ import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecuritySessionQueryPort;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.common.port.security.UserOnlineVO;
 import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,9 +75,11 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -144,6 +148,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     /** 查询用户关联的安全会话。 */
     private final SecuritySessionQueryPort securitySessionQueryPort;
+
+    /** 将安全会话和用户资料合并为按用户分页的页面视图。 */
+    private final OnlineUserPageAssembler onlineUserPageAssembler;
 
     /** 撤销用户的安全会话。 */
     private final SecuritySessionRevocationPort securitySessionRevocationPort;
@@ -291,8 +298,21 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
-    public List<UserOnlineVO> online(PageFrom page) {
-        return securitySessionQueryPort.listOnlineUsers();
+    public IPage<OnlineUserPageVO> online(PageFrom page, OnlineUserPageFrom filter) throws IllegalAccessException {
+        var onlineSessions = securitySessionQueryPort.listOnlineUsers();
+        Set<UUID> onlineUserIds = onlineSessions.stream()
+                .map(session -> UUID.fromString(session.getUserId()))
+                .collect(Collectors.toSet());
+        List<User> onlineUsers = onlineUserIds.isEmpty()
+                ? List.of()
+                : this.list(new LambdaQueryWrapper<User>().in(User::getId, onlineUserIds));
+        Set<UUID> matchingDepartmentIds = filter.getDepartmentId() == null
+                ? Set.of()
+                : new HashSet<>(departmentService.getSelfAndDescendantIds(filter.getDepartmentId()));
+        IPage<OnlineUserPageVO> result = onlineUserPageAssembler.page(page, filter, onlineSessions, onlineUsers,
+                matchingDepartmentIds);
+        fillExecutor.fill(result.getRecords());
+        return result;
     }
 
     @Override

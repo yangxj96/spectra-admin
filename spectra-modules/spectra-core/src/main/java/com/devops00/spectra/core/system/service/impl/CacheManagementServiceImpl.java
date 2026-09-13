@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import com.devops00.spectra.common.port.security.SecurityReplayNonceAdminPort;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecuritySessionQueryPort;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
@@ -32,6 +33,7 @@ import com.devops00.spectra.core.system.javabean.from.SecurityLoginFailureClearF
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceGlobalInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeAllFrom;
+import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeOneFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityVerificationClearFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityVerificationType;
@@ -41,6 +43,7 @@ import com.devops00.spectra.core.system.javabean.vo.CacheRegionVO;
 import com.devops00.spectra.core.system.javabean.vo.SecurityRuntimeVO;
 import com.devops00.spectra.core.system.service.CacheManagementService;
 import com.devops00.spectra.framework.security.session.lifecycle.SecurityLoginFailureTracker;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -64,6 +67,7 @@ public class CacheManagementServiceImpl implements CacheManagementService {
     private final CacheInvalidationCoordinator coordinator;
     private final SecuritySessionQueryPort sessionQuery;
     private final SecuritySessionRevocationPort sessionRevocation;
+    private final SecurityContextAccessor securityContextAccessor;
     private final SecurityVerificationCodeStore verificationCodes;
     private final SecurityVerificationAttemptStore verificationAttempts;
     private final SecurityLoginFailureTracker loginFailureTracker;
@@ -73,6 +77,7 @@ public class CacheManagementServiceImpl implements CacheManagementService {
                                       CacheInvalidationCoordinator coordinator,
                                       SecuritySessionQueryPort sessionQuery,
                                       SecuritySessionRevocationPort sessionRevocation,
+                                      SecurityContextAccessor securityContextAccessor,
                                       SecurityVerificationCodeStore verificationCodes,
                                       SecurityVerificationAttemptStore verificationAttempts,
                                       SecurityLoginFailureTracker loginFailureTracker,
@@ -81,6 +86,7 @@ public class CacheManagementServiceImpl implements CacheManagementService {
         this.coordinator = coordinator;
         this.sessionQuery = sessionQuery;
         this.sessionRevocation = sessionRevocation;
+        this.securityContextAccessor = securityContextAccessor;
         this.verificationCodes = verificationCodes;
         this.verificationAttempts = verificationAttempts;
         this.loginFailureTracker = loginFailureTracker;
@@ -155,10 +161,32 @@ public class CacheManagementServiceImpl implements CacheManagementService {
     }
 
     @Override
+    public CacheOperationVO revokeSingleSession(SecuritySessionRevokeOneFrom from) {
+        requireSecurityConfirmation(from.reason(), from.confirmed());
+        if (from.sessionId() == null || from.sessionId().isBlank()) {
+            throw new IllegalArgumentException("会话句柄不能为空");
+        }
+        sessionRevocation.revokeSessionById(from.sessionId());
+        return completed("SESSION_ONE", 1L, "已通过安全 Session 用例撤销目标会话");
+    }
+
+    @Override
     public CacheOperationVO revokeAllSessions(SecuritySessionRevokeAllFrom from) {
         requireSecurityConfirmation(from.reason(), from.confirmed());
         if (from.userId() == null) {
             throw new IllegalArgumentException("用户不能为空");
+        }
+        UUID currentUserId = securityContextAccessor.currentUserId();
+        if (currentUserId == null) {
+            throw new AccessDeniedException("无法确认当前用户，拒绝下线");
+        }
+        if (from.userId().equals(currentUserId)) {
+            String currentToken = securityContextAccessor.currentToken();
+            if (currentToken == null || currentToken.isBlank()) {
+                throw new AccessDeniedException("无法确认当前会话，拒绝下线");
+            }
+            sessionRevocation.revokeUserSessionsExceptToken(from.userId(), currentToken);
+            return completed("SESSION_ALL", 1L, "已撤销当前账号除当前会话外的其他会话");
         }
         sessionRevocation.revokeUserSessions(from.userId());
         return completed("SESSION_ALL", 1L, "已通过安全 Session 用例撤销用户全部会话");

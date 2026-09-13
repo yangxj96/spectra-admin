@@ -22,9 +22,11 @@ import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
+import com.devops00.spectra.core.user.javabean.from.OnlineUserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
@@ -32,7 +34,6 @@ import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.UserOnboardingService;
 import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.common.port.security.UserOnlineVO;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,10 +44,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -210,8 +211,9 @@ public class UserController {
     @Audit("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:read')")
-    public List<UserOnlineVO> online(PageFrom page) {
-        return bindService.online(page);
+    public IPage<OnlineUserPageVO> online(PageFrom page, @ModelAttribute OnlineUserPageFrom filter)
+            throws IllegalAccessException {
+        return bindService.online(page, filter);
     }
 
     /**

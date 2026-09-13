@@ -23,7 +23,9 @@ import com.devops00.spectra.framework.security.redis.store.RefreshTokenRotationS
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import com.devops00.spectra.framework.security.redis.value.SecurityRedisValueParser;
 import com.devops00.spectra.framework.security.session.lifecycle.SecuritySessionRevoker;
+import com.devops00.spectra.framework.security.session.token.SecurityTokenAccessor;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -46,8 +48,14 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
 
     private final SecuritySessionStore store;
 
-    public SecuritySessionRevocationService(SecuritySessionStore store) {
+    private final SecuritySessionHandleStore handleStore;
+
+    private final SecurityTokenAccessor tokenAccessor;
+
+    public SecuritySessionRevocationService(SecuritySessionStore store, SecurityTokenAccessor tokenAccessor) {
         this.store = store;
+        this.handleStore = new SecuritySessionHandleStore(store.redis());
+        this.tokenAccessor = tokenAccessor;
     }
 
     /**
@@ -89,6 +97,7 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         store.redis().opsForSet().remove(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), tokenDigest);
         deleteRefreshFamily(familyId);
         store.redis().opsForSet().remove(SecurityRedisKey.SESSION_FAMILY.format(familyId), tokenDigest);
+        handleStore.deleteFamilyHandle(familyId);
 
         Long remaining = store.redis().opsForSet().size(userTokensKey);
         if (remaining == null) {
@@ -115,6 +124,62 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
     @Override
     public void deleteByRefreshToken(String refreshToken) {
         run("按 Refresh Token 撤销会话", () -> deleteByRefreshTokenInternal(refreshToken));
+    }
+
+    /** 按随机会话句柄撤销其唯一关联的 Refresh Token Family。 */
+    @Override
+    public void deleteBySessionId(String sessionId) {
+        run("按在线管理句柄撤销会话", () -> deleteBySessionIdInternal(sessionId));
+    }
+
+    private void deleteBySessionIdInternal(String sessionId) {
+        String familyId = handleStore.resolveFamily(sessionId);
+        String familyKey = SecurityRedisKey.SESSION_FAMILY.format(familyId);
+        Set<Object> familyTokens = store.members("读取目标 Session Family", familyKey);
+        if (familyTokens.isEmpty()) {
+            handleStore.deleteFamilyHandle(familyId);
+            throw new IllegalArgumentException("会话已失效，请刷新列表");
+        }
+        rejectCurrentSession(familyId);
+        for (Object familyToken : familyTokens) {
+            deleteAccessDigest(SecurityRedisValueParser.requiredText(familyToken, "SessionFamily.accessDigest"));
+        }
+        store.redis().delete(familyKey);
+        handleStore.deleteFamilyHandle(familyId);
+    }
+
+    /** 拒绝通过在线管理句柄撤销发起当前请求的安全会话。 */
+    private void rejectCurrentSession(String targetFamilyId) {
+        Map<Object, Object> currentSession = readCurrentSession();
+        String currentFamilyId = SecurityRedisValueParser.requiredText(currentSession.get("familyId"), "Session.familyId");
+        if (targetFamilyId.equals(currentFamilyId)) {
+            throw new AccessDeniedException("不能下线当前正在使用的会话");
+        }
+    }
+
+    /** 拒绝按客户端批量撤销包含当前请求会话的客户端会话。 */
+    private void rejectCurrentClientSession(String targetUserId, ClientType targetClientType) {
+        Map<Object, Object> currentSession = readCurrentSession();
+        String currentUserId = SecurityRedisValueParser.requiredText(currentSession.get("userId"), "Session.userId");
+        String currentClientType = SecurityRedisValueParser.requiredClientType(currentSession.get("clientType"),
+                "Session.clientType").getName();
+        if (targetUserId.equals(currentUserId) && targetClientType.getName().equals(currentClientType)) {
+            throw new AccessDeniedException("不能下线当前正在使用的客户端会话");
+        }
+    }
+
+    /** 读取并校验当前请求对应的有效会话；无法确认时拒绝会话撤销。 */
+    private Map<Object, Object> readCurrentSession() {
+        String currentToken = tokenAccessor.getCurrentToken();
+        if (currentToken == null || currentToken.isBlank()) {
+            throw new AccessDeniedException("无法确认当前会话，拒绝下线");
+        }
+        String currentAccessDigest = TokenDigestService.digest(currentToken);
+        Map<Object, Object> currentSession = store.hash("读取当前操作会话", SecurityRedisKey.SESSION.format(currentAccessDigest));
+        if (currentSession.isEmpty()) {
+            throw new AccessDeniedException("当前会话已失效，拒绝下线");
+        }
+        return currentSession;
     }
 
     /**
@@ -222,6 +287,7 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         run("按用户和客户端撤销会话", () -> {
             String normalizedUserId = SecurityRedisValueParser.requiredText(userId, "userId");
             Objects.requireNonNull(clientType, "clientType");
+            rejectCurrentClientSession(normalizedUserId, clientType);
             String ucKey = SecurityRedisKey.USER_CLIENT.format(normalizedUserId, clientType.getName());
             Object token = store.value("读取用户客户端会话", ucKey);
             if (token != null) {

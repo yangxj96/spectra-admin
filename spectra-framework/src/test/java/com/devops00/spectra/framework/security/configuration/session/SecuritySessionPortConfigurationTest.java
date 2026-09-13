@@ -46,4 +46,15 @@ class SecuritySessionPortConfigurationTest {
 
         verify(revoker).deleteByUserIdAndClient(userId.toString(), ClientType.WEB);
     }
+
+    @Test
+    void shouldDelegateSingleSessionRevocationByOpaqueHandle() {
+        var revoker = mock(SecuritySessionRevoker.class);
+        SecuritySessionRevocationPort port = new SecuritySessionPortConfiguration()
+                .securitySessionRevocationPort(revoker);
+
+        port.revokeSessionById("opaque-session-handle");
+
+        verify(revoker).deleteBySessionId("opaque-session-handle");
+    }
 }

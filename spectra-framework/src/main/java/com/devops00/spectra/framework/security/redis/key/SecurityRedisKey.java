@@ -48,6 +48,12 @@ public enum SecurityRedisKey implements RedisKey {
     /** Token Family 下的 Access digest 集合。 */
     SESSION_FAMILY(SecurityRedisNamespace.PREFIX + "family:%s"),
 
+    /** 管理端不透明会话句柄摘要到 Token Family 的映射。 */
+    SESSION_HANDLE(SecurityRedisNamespace.PREFIX + "session:handle:%s"),
+
+    /** Token Family 到管理端不透明会话句柄的反向映射。 */
+    FAMILY_HANDLE(SecurityRedisNamespace.PREFIX + "family:handle:%s"),
+
     /** Token Family 下的 Refresh digest 集合，用于整条会话链撤销时清理轮换残留。 */
     REFRESH_FAMILY(SecurityRedisNamespace.PREFIX + "rt:family:%s"),
 

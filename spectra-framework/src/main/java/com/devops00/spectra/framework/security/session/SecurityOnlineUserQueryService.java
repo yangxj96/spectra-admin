@@ -26,8 +26,12 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 在线 Session 查询用例，使用全局摘要索引和一次 MGET 消除逐 Token Hash 查询。
@@ -44,15 +48,18 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
 
     private final UserOnlineConverter userOnlineConverter;
 
+    private final SecuritySessionHandleStore handleStore;
+
     public SecurityOnlineUserQueryService(SecuritySessionStore store, UserOnlineConverter userOnlineConverter) {
         this.store = store;
         this.userOnlineConverter = userOnlineConverter;
+        this.handleStore = new SecuritySessionHandleStore(store.redis());
     }
 
     /**
      * 查询当前仍有有效会话的在线用户。
      *
-     * @return 返回当前安全 Redis 中可解析的在线用户视图列表；没有在线用户或无法解析的记录时返回空列表，不返回 null。
+     * @return 返回当前安全 Redis 中可解析的在线用户视图列表；没有在线用户时返回空列表，过期索引会被清理，畸形数据会拒绝请求。
      */
     @Override
     public List<UserOnlineVO> listOnlineUsers() {
@@ -68,10 +75,12 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
             return List.of();
         }
 
+        List<String> accessDigests = new ArrayList<>(tokenDigests.size());
         List<String> summaryKeys = new ArrayList<>(tokenDigests.size());
         for (Object tokenDigest : tokenDigests) {
-            summaryKeys.add(SecurityRedisKey.SESSION_SUMMARY.format(
-                    SecurityRedisValueParser.requiredText(tokenDigest, "OnlineSessions.accessDigest")));
+            String accessDigest = SecurityRedisValueParser.requiredText(tokenDigest, "OnlineSessions.accessDigest");
+            accessDigests.add(accessDigest);
+            summaryKeys.add(SecurityRedisKey.SESSION_SUMMARY.format(accessDigest));
         }
         List<Object> summaries = store.multiGet("批量读取在线会话摘要", summaryKeys);
         if (summaries.size() != summaryKeys.size()) {
@@ -80,7 +89,13 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
         }
 
         List<UserOnlineVO> result = new ArrayList<>(summaries.size());
-        for (Object rawSummary : summaries) {
+        for (int index = 0; index < summaries.size(); index++) {
+            String accessDigest = accessDigests.get(index);
+            Object rawSummary = summaries.get(index);
+            if (rawSummary == null) {
+                removeExpiredSessionIndex(accessDigest);
+                continue;
+            }
             var summary = SecurityRedisValueParser.requiredMap(rawSummary, "SessionSummary");
             String userId = SecurityRedisValueParser.requiredText(summary.get("userId"), "SessionSummary.userId");
             String username = SecurityRedisValueParser.requiredText(summary.get("username"), "SessionSummary.username");
@@ -88,8 +103,45 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
                     "SessionSummary.clientType").getName();
             String ip = SecurityRedisValueParser.requiredText(summary.get("ip"), "SessionSummary.ip");
             long loginTime = SecurityRedisValueParser.requiredLong(summary.get("loginTime"), "SessionSummary.loginTime");
-            result.add(userOnlineConverter.toVO(userId, username, clientType, ip, loginTime));
+            String sessionId = resolveSessionId(summary, accessDigest, summaryKeys.get(index));
+            result.add(userOnlineConverter.toVO(userId, username, clientType, ip, sessionId, loginTime));
         }
         return result;
+    }
+
+    /** 清理摘要 TTL 已到期后遗留在无 TTL 全局集合中的访问令牌摘要。 */
+    private void removeExpiredSessionIndex(String accessDigest) {
+        SecurityRedisExecutor.require("清理过期在线会话索引", () -> store.redis()
+                .opsForSet()
+                .remove(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), accessDigest));
+    }
+
+    /** 为未升级的在线摘要补齐稳定会话句柄，并持久化到摘要以保持后续 MGET 查询。 */
+    private String resolveSessionId(Map<?, ?> summary, String accessDigest, String summaryKey) {
+        Object rawSessionId = summary.get("sessionId");
+        if (rawSessionId != null && !rawSessionId.toString().isBlank()) {
+            return SecurityRedisValueParser.requiredText(rawSessionId, "SessionSummary.sessionId");
+        }
+
+        Map<Object, Object> session = store.hash("读取旧在线会话 Family", SecurityRedisKey.SESSION.format(accessDigest));
+        String familyId = SecurityRedisValueParser.requiredText(session.get("familyId"), "Session.familyId");
+        Long remainingSeconds = store.redis().getExpire(summaryKey, TimeUnit.SECONDS);
+        Long familyRemainingSeconds = store.redis()
+                .getExpire(
+                        SecurityRedisKey.REFRESH_FAMILY.format(familyId), TimeUnit.SECONDS);
+        if (remainingSeconds == null
+                || remainingSeconds <= 0
+                || familyRemainingSeconds == null
+                || familyRemainingSeconds <= 0) {
+            throw new com.devops00.spectra.common.exception.SecurityRedisUnavailableException(
+                    "安全 Redis 在线会话或 Refresh Family 有效期无效", null);
+        }
+
+        String sessionId = handleStore.ensureExisting(familyId, Duration.ofSeconds(familyRemainingSeconds));
+        Map<String, Object> updatedSummary = new LinkedHashMap<>();
+        summary.forEach((key, value) -> updatedSummary.put(key.toString(), value));
+        updatedSummary.put("sessionId", sessionId);
+        store.redis().opsForValue().set(summaryKey, updatedSummary, Duration.ofSeconds(remainingSeconds));
+        return sessionId;
     }
 }

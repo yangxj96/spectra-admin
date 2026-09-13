@@ -14,42 +14,35 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.port.security;
+package com.devops00.spectra.core.user.javabean.vo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 /**
- * 在线用户会话摘要。
+ * 在线用户页面展示的一条会话摘要。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/09/03
+ * @since 2026/09/13
  */
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserOnlineVO {
+public class OnlineSessionVO {
 
-    /** 在线管理使用的随机会话句柄，不是认证凭据。 */
+    /** 管理端用于精确撤销的随机会话句柄，不是认证凭据。 */
     private String sessionId;
-    /** 用户 ID。 */
-    private String userId;
-    /** 用户名。 */
-    private String username;
-    /** 登录类型。 */
-    private String loginType;
-    /** 客户端类型。 */
+
+    /** 登录客户端类型。 */
     private String clientType;
-    /** 登录 IP。 */
+
+    /** 登录来源 IP。 */
     private String ip;
-    /** IP 所在地。 */
-    private String address;
-    /** 登录时间。 */
+
+    /** 会话登录时间。 */
     private LocalDateTime loginTime;
 }

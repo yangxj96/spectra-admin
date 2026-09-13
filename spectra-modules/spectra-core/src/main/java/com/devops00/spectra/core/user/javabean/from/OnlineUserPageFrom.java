@@ -14,42 +14,32 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.common.port.security;
+package com.devops00.spectra.core.user.javabean.from;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
- * 在线用户会话摘要。
+ * 在线用户分页筛选条件。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/09/03
+ * @since 2026/09/13
  */
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserOnlineVO {
+public class OnlineUserPageFrom {
 
-    /** 在线管理使用的随机会话句柄，不是认证凭据。 */
-    private String sessionId;
-    /** 用户 ID。 */
-    private String userId;
-    /** 用户名。 */
+    /** 按登录账号包含匹配。 */
     private String username;
-    /** 登录类型。 */
-    private String loginType;
-    /** 客户端类型。 */
-    private String clientType;
-    /** 登录 IP。 */
-    private String ip;
-    /** IP 所在地。 */
-    private String address;
-    /** 登录时间。 */
-    private LocalDateTime loginTime;
+
+    /** 按用户姓名包含匹配。 */
+    private String realName;
+
+    /** 按目标部门及其下级部门筛选。 */
+    private UUID departmentId;
 }

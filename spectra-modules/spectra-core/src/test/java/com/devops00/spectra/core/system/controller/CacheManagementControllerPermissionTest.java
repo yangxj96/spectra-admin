@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import com.devops00.spectra.common.audit.Audit;
+import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeOneFrom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -56,6 +58,8 @@ class CacheManagementControllerPermissionTest {
     void shouldProtectSecurityOperationsAndKeepNonceRootOnly() throws Exception {
         assertPost("revokeSession", "/admin/security/session/revoke",
                 "hasPermission(null, 'session:revoke')");
+        assertPost("revokeSingleSession", "/admin/security/session/revoke-one",
+                "hasPermission(null, 'session:revoke')");
         assertPost("revokeAllSessions", "/admin/security/session/revoke-all",
                 "hasPermission(null, 'session:revoke')");
         assertPost("clearVerification", "/admin/security/verification/clear",
@@ -64,6 +68,21 @@ class CacheManagementControllerPermissionTest {
                 "hasPermission(null, 'security:login-failure:manage')");
         assertPost("invalidateNonce", "/admin/security/nonce/invalidate", "hasRole('ROLE_DEV_OPS')");
         assertPost("invalidateAllNonces", "/admin/security/nonce/invalidate-all", "hasRole('ROLE_DEV_OPS')");
+    }
+
+    @Test
+    void shouldAuditSingleSessionRevocationAndAcceptOnlyHandleReasonAndConfirmation() throws Exception {
+        var method = java.util.Arrays.stream(CacheManagementController.class.getMethods())
+                .filter(candidate -> candidate.getName().equals("revokeSingleSession"))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(true, method.isAnnotationPresent(Audit.class));
+        assertEquals(SecuritySessionRevokeOneFrom.class, method.getParameterTypes()[0]);
+        assertEquals(java.util.List.of("sessionId", "reason", "confirmed"),
+                java.util.Arrays.stream(SecuritySessionRevokeOneFrom.class.getRecordComponents())
+                        .map(java.lang.reflect.RecordComponent::getName)
+                        .toList());
     }
 
     /**

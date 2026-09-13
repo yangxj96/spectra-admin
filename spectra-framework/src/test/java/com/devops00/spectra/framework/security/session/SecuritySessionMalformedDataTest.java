@@ -76,8 +76,9 @@ class SecuritySessionMalformedDataTest {
 
         var store = new SecuritySessionStore(redis, new SecurityProperties(), mock(ObjectProvider.class));
         var repository = new SecuritySessionRefreshService(store,
-                new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store), resolver(store)),
-                new SecuritySessionRevocationService(store), mock(SecurityUserLoader.class));
+                new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store, () -> null),
+                        resolver(store)),
+                new SecuritySessionRevocationService(store, () -> null), mock(SecurityUserLoader.class));
 
         assertThrows(SecurityRedisUnavailableException.class,
                 () -> repository.refreshByRefreshToken("refresh-token"));

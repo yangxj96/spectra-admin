@@ -23,6 +23,7 @@ import com.devops00.spectra.core.system.javabean.from.SecurityLoginFailureClearF
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceGlobalInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeAllFrom;
+import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeOneFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityVerificationClearFrom;
 import com.devops00.spectra.core.system.javabean.from.SecurityVerificationType;
@@ -150,6 +151,19 @@ public class CacheManagementController {
     @PreAuthorize("hasPermission(null, 'session:revoke')")
     public CacheOperationVO revokeSession(@Validated @RequestBody SecuritySessionRevokeFrom from) {
         return service.revokeSession(from);
+    }
+
+    /**
+     * 精确撤销单条安全会话。
+     *
+     * @param from 请求表单数据。
+     * @return 缓存操作数据。
+     */
+    @Audit("'撤销指定安全会话'")
+    @PostMapping(value = "/admin/security/session/revoke-one", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'session:revoke')")
+    public CacheOperationVO revokeSingleSession(@Validated @RequestBody SecuritySessionRevokeOneFrom from) {
+        return service.revokeSingleSession(from);
     }
 
     /**

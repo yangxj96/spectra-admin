@@ -42,4 +42,9 @@ public interface SecuritySessionRevocationPort {
     default void revokeUserClientSessions(UUID userId, ClientType clientType) {
         revokeUserSessions(userId);
     }
+
+    /** 按在线管理的不透明会话句柄撤销单个 Refresh Token Family；未实现该能力的适配器必须拒绝操作。 */
+    default void revokeSessionById(String sessionId) {
+        throw new UnsupportedOperationException("当前安全 Session 适配器不支持按会话句柄撤销");
+    }
 }

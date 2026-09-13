@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.security.session;
 
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
+import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
@@ -26,6 +27,7 @@ import com.devops00.spectra.framework.security.session.concurrency.RejectNewSess
 import com.devops00.spectra.framework.security.session.concurrency.SessionConcurrencyStrategyResolver;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
+import com.devops00.spectra.framework.security.session.token.SecurityTokenAccessor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.mockito.ArgumentCaptor;
@@ -33,11 +35,13 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,6 +50,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Redis Security Session 撤销测试。
@@ -68,6 +73,9 @@ class SecuritySessionLifecycleTest {
         when(redis.opsForHash()).thenReturn(hashes);
         when(redis.opsForSet()).thenReturn(sets);
         when(redis.opsForValue()).thenReturn(values);
+        when(values.setIfAbsent(anyString(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(java.time.Duration.class))).thenReturn(true);
+        when(redis.expire(anyString(), org.mockito.ArgumentMatchers.any(java.time.Duration.class))).thenReturn(true);
         when(sets.members(eq(userTokensKey))).thenReturn(Set.of());
         when(redis.hasKey(anyString())).thenReturn(false);
 
@@ -79,7 +87,8 @@ class SecuritySessionLifecycleTest {
         when(policyProvider.find("web")).thenReturn(SessionPolicy.defaults(900, 86400));
 
         var store = new SecuritySessionStore(redis, new SecurityProperties(), provider(policyProvider));
-        var repository = new SecuritySessionIssueService(store, new SecuritySessionRevocationService(store), resolver(store));
+        var repository = new SecuritySessionIssueService(store,
+                new SecuritySessionRevocationService(store, () -> null), resolver(store));
 
         repository.createToken(user, com.devops00.spectra.common.constant.ClientType.WEB);
 
@@ -113,7 +122,7 @@ class SecuritySessionLifecycleTest {
         when(sets.members(SecurityRedisKey.REFRESH_FAMILY.format(familyId)))
                 .thenReturn(Set.of(refreshDigest, rotatedRefreshDigest));
 
-        var repository = new SecuritySessionRevocationService(store(redis, null));
+        var repository = new SecuritySessionRevocationService(store(redis, null), () -> null);
 
         repository.deleteByRefreshToken(refreshToken);
 
@@ -135,7 +144,7 @@ class SecuritySessionLifecycleTest {
         when(redis.opsForHash()).thenReturn(hashes);
         when(hashes.entries(anyString())).thenReturn(Map.of());
 
-        var repository = new SecuritySessionRevocationService(store(redis, null));
+        var repository = new SecuritySessionRevocationService(store(redis, null), () -> null);
 
         repository.deleteByRefreshToken(refreshToken);
 
@@ -169,7 +178,7 @@ class SecuritySessionLifecycleTest {
                 "familyId", familyId));
         when(values.get(anyString())).thenReturn(null);
 
-        var repository = new SecuritySessionRevocationService(store(redis, null));
+        var repository = new SecuritySessionRevocationService(store(redis, null), () -> null);
 
         repository.deleteByUserIdExceptToken(userId, currentToken);
 
@@ -204,7 +213,7 @@ class SecuritySessionLifecycleTest {
         when(values.get(eq(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest)))).thenReturn(refreshDigest);
         when(sets.size(eq(userTokensKey))).thenReturn(0L);
 
-        var repository = new SecuritySessionRevocationService(store(redis, null));
+        var repository = new SecuritySessionRevocationService(store(redis, null), () -> null);
 
         repository.deleteByUserId(userId);
 
@@ -215,6 +224,125 @@ class SecuritySessionLifecycleTest {
         verify(redis).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
         verify(redis).delete(SecurityRedisKey.REFRESH_FAMILY.format(familyId));
         verify(redis).delete(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest));
+    }
+
+    @Test
+    void shouldRevokeOnlyTheFamilyResolvedFromTheManagementHandle() {
+        String handle = "opaque-session-handle";
+        String familyId = "target-family";
+        String otherAccessDigest = "other-access-digest";
+        String accessDigest = "target-access-digest";
+        String refreshDigest = "target-refresh-digest";
+        String userId = "00000000-0000-0000-0000-000000000001";
+        String sessionKey = SecurityRedisKey.SESSION.format(accessDigest);
+        String handleKey = SecurityRedisKey.SESSION_HANDLE.format(TokenDigestService.digest(handle));
+        String familyHandleKey = SecurityRedisKey.FAMILY_HANDLE.format(familyId);
+        String currentToken = "different-client-token";
+        String currentFamilyId = "different-client-family";
+        var redisValues = new ConcurrentHashMap<String, Object>();
+        redisValues.put(handleKey, familyId);
+        redisValues.put(familyHandleKey, handle);
+
+        RedisTemplate<String, Object> redis = mock();
+        HashOperations<String, Object, Object> hashes = mock();
+        SetOperations<String, Object> sets = mock();
+        ValueOperations<String, Object> values = mock();
+        when(redis.opsForHash()).thenReturn(hashes);
+        when(redis.opsForSet()).thenReturn(sets);
+        when(redis.opsForValue()).thenReturn(values);
+        when(redis.delete(anyString())).thenAnswer(invocation -> redisValues.remove(invocation.getArgument(0)) != null);
+        when(values.get(anyString())).thenAnswer(invocation -> redisValues.get(invocation.getArgument(0)));
+        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of(
+                "userId", userId,
+                "clientType", "web",
+                "familyId", familyId));
+        when(hashes.entries(eq(SecurityRedisKey.SESSION.format(TokenDigestService.digest(currentToken)))))
+                .thenReturn(Map.of("familyId", currentFamilyId, "userId", userId, "clientType", "app"));
+        when(sets.members(eq(SecurityRedisKey.SESSION_FAMILY.format(familyId))))
+                .thenReturn(Set.of(accessDigest));
+        when(sets.members(eq(SecurityRedisKey.REFRESH_FAMILY.format(familyId))))
+                .thenReturn(Set.of(refreshDigest));
+        when(sets.size(eq(SecurityRedisKey.USER_TOKENS.format(userId)))).thenReturn(0L);
+
+        SecurityTokenAccessor tokenAccessor = () -> currentToken;
+        var repository = new SecuritySessionRevocationService(store(redis, null), tokenAccessor);
+
+        repository.deleteBySessionId(handle);
+
+        verify(redis).delete(sessionKey);
+        verify(redis).delete(SecurityRedisKey.SESSION_SUMMARY.format(accessDigest));
+        verify(redis).delete(SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest));
+        verify(redis).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
+        verify(redis).delete(handleKey);
+        verify(redis).delete(familyHandleKey);
+        verify(redis, never()).delete(SecurityRedisKey.SESSION.format(otherAccessDigest));
+        verify(sets, never()).remove(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), otherAccessDigest);
+    }
+
+    @Test
+    void shouldRejectRevokingTheCurrentSessionByManagementHandle() {
+        String currentToken = "current-access-token";
+        String currentDigest = TokenDigestService.digest(currentToken);
+        String familyId = "current-family";
+        String handle = "current-session-handle";
+        String userId = "00000000-0000-0000-0000-000000000001";
+        String sessionKey = SecurityRedisKey.SESSION.format(currentDigest);
+        String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
+        String handleKey = SecurityRedisKey.SESSION_HANDLE.format(TokenDigestService.digest(handle));
+        String familyHandleKey = SecurityRedisKey.FAMILY_HANDLE.format(familyId);
+        var redisValues = new ConcurrentHashMap<String, Object>();
+        redisValues.put(handleKey, familyId);
+        redisValues.put(familyHandleKey, handle);
+
+        RedisTemplate<String, Object> redis = mock();
+        HashOperations<String, Object, Object> hashes = mock();
+        SetOperations<String, Object> sets = mock();
+        ValueOperations<String, Object> values = mock();
+        when(redis.opsForHash()).thenReturn(hashes);
+        when(redis.opsForSet()).thenReturn(sets);
+        when(redis.opsForValue()).thenReturn(values);
+        when(redis.delete(anyString())).thenAnswer(invocation -> redisValues.remove(invocation.getArgument(0)) != null);
+        when(values.get(anyString())).thenAnswer(invocation -> redisValues.get(invocation.getArgument(0)));
+        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of(
+                "userId", userId,
+                "clientType", "web",
+                "familyId", familyId));
+        when(sets.members(eq(SecurityRedisKey.SESSION_FAMILY.format(familyId)))).thenReturn(Set.of(currentDigest));
+        when(sets.members(eq(SecurityRedisKey.REFRESH_FAMILY.format(familyId)))).thenReturn(Set.of());
+        when(sets.size(eq(userTokensKey))).thenReturn(0L);
+
+        SecurityTokenAccessor tokenAccessor = () -> currentToken;
+        var repository = new SecuritySessionRevocationService(store(redis, null), tokenAccessor);
+
+        assertThrows(AccessDeniedException.class, () -> repository.deleteBySessionId(handle));
+
+        verify(redis, never()).delete(sessionKey);
+        verify(sets, never()).remove(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), currentDigest);
+    }
+
+    @Test
+    void shouldRejectRevokingTheCurrentClientSession() {
+        String currentToken = "current-access-token";
+        String currentDigest = TokenDigestService.digest(currentToken);
+        String userId = "00000000-0000-0000-0000-000000000001";
+        RedisTemplate<String, Object> redis = mock();
+        HashOperations<String, Object, Object> hashes = mock();
+        ValueOperations<String, Object> values = mock();
+        when(redis.opsForHash()).thenReturn(hashes);
+        when(redis.opsForValue()).thenReturn(values);
+        when(values.get(anyString())).thenReturn(null);
+        when(hashes.entries(eq(SecurityRedisKey.SESSION.format(currentDigest)))).thenReturn(Map.of(
+                "userId", userId,
+                "clientType", "web",
+                "familyId", "current-family"));
+
+        SecurityTokenAccessor tokenAccessor = () -> currentToken;
+        var repository = new SecuritySessionRevocationService(store(redis, null), tokenAccessor);
+
+        assertThrows(AccessDeniedException.class,
+                () -> repository.deleteByUserIdAndClient(userId, ClientType.WEB));
+
+        verify(redis, never()).delete(anyString());
     }
 
     /**

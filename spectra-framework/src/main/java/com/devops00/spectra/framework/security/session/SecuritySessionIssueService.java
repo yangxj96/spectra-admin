@@ -66,12 +66,15 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
 
     private final SessionConcurrencyStrategyResolver concurrencyStrategyResolver;
 
+    private final SecuritySessionHandleStore handleStore;
+
     public SecuritySessionIssueService(SecuritySessionStore store,
                                        SecuritySessionRevocationService revocationService,
                                        SessionConcurrencyStrategyResolver concurrencyStrategyResolver) {
         this.store = store;
         this.revocationService = revocationService;
         this.concurrencyStrategyResolver = concurrencyStrategyResolver;
+        this.handleStore = new SecuritySessionHandleStore(store.redis());
     }
 
     /**
@@ -147,8 +150,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         summary.remove("familyId");
         var keys = new PartialSessionKeys(sessionKey, ucKey, userTokensKey, accessRefreshKey, sessionFamilyKey,
                 refreshKey, refreshFamilyKey, summaryKey);
-        var identity = new PartialSessionIdentity(tokenDigest, refreshDigest, userId);
+        var identity = new PartialSessionIdentity(tokenDigest, refreshDigest, userId, familyId);
         try {
+            summary.put("sessionId", handleStore.createOrGet(familyId, refreshTtl));
             redis.opsForHash().putAll(sessionKey, session);
             redis.expire(sessionKey, accessTtl);
             redis.opsForValue().set(ucKey, tokenDigest, accessTtl);
@@ -162,8 +166,8 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             redis.opsForSet().add(refreshFamilyKey, refreshDigest);
             redis.expire(refreshFamilyKey, refreshTtl);
             redis.opsForSet().add(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
-            redis.opsForSet().add(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), tokenDigest);
             redis.opsForValue().set(summaryKey, summary, accessTtl);
+            redis.opsForSet().add(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), tokenDigest);
 
             var authorities = user.getAuthorityNames()
                     .stream()
@@ -196,6 +200,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
                         identity.tokenDigest()));
         deleteQuietly(() -> redis.opsForSet().remove(SecurityRedisKey.ONLINE_USERS.getPattern(), identity.userId()));
         deleteQuietly(() -> redis.opsForSet().remove(keys.refreshFamilyKey(), identity.refreshDigest()));
+        deleteQuietly(() -> handleStore.deleteFamilyHandle(identity.familyId()));
     }
 
     /**
@@ -224,11 +229,12 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
      * @param tokenDigest   令牌摘要
      * @param refreshDigest 刷新摘要
      * @param userId        用户标识
+     * @param familyId      会话所属的内部 Family 标识
      * @author yangxj96
      * @version 1.0
      * @since 2026/09/13
      */
-    private record PartialSessionIdentity(String tokenDigest, String refreshDigest, String userId) {
+    private record PartialSessionIdentity(String tokenDigest, String refreshDigest, String userId, String familyId) {
     }
 
     /**

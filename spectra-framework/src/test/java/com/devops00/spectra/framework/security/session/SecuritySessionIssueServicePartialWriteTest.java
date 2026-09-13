@@ -20,6 +20,7 @@ import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
+import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.session.concurrency.AllowSessionConcurrencyStrategy;
 import com.devops00.spectra.framework.security.session.concurrency.KickOldSessionConcurrencyStrategy;
 import com.devops00.spectra.framework.security.session.concurrency.RejectNewSessionConcurrencyStrategy;
@@ -37,8 +38,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.devops00.spectra.framework.security.redis.key.SecurityRedisKey.SESSION;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -63,10 +66,15 @@ class SecuritySessionIssueServicePartialWriteTest {
         HashOperations<String, Object, Object> hashes = mock();
         SetOperations<String, Object> sets = mock();
         ValueOperations<String, Object> values = mock();
+        var valuesByKey = new ConcurrentHashMap<String, Object>();
         when(redis.opsForHash()).thenReturn(hashes);
         when(redis.opsForSet()).thenReturn(sets);
         when(redis.opsForValue()).thenReturn(values);
+        when(redis.expire(anyString(), any(Duration.class))).thenReturn(true);
         when(sets.members(anyString())).thenReturn(Set.of());
+        when(values.get(anyString())).thenAnswer(invocation -> valuesByKey.get(invocation.getArgument(0)));
+        when(values.setIfAbsent(anyString(), any(), any(Duration.class)))
+                .thenAnswer(invocation -> valuesByKey.putIfAbsent(invocation.getArgument(0), invocation.getArgument(1)) == null);
         doThrow(new DataAccessResourceFailureException("redis unavailable"))
                 .when(values)
                 .set(anyString(), any(), any(Duration.class));
@@ -94,5 +102,15 @@ class SecuritySessionIssueServicePartialWriteTest {
         ArgumentCaptor<String> sessionKey = ArgumentCaptor.forClass(String.class);
         verify(hashes, atLeastOnce()).putAll(sessionKey.capture(), any());
         verify(redis).delete(SESSION.format(sessionKey.getValue().substring("sec:sess:".length())));
+        ArgumentCaptor<String> deletedKeys = ArgumentCaptor.forClass(String.class);
+        verify(redis, atLeastOnce()).delete(deletedKeys.capture());
+        assertThat(deletedKeys.getAllValues()).anyMatch(key -> key.startsWith(
+                SecurityRedisKey.FAMILY_HANDLE.getPattern()
+                        .substring(0,
+                                SecurityRedisKey.FAMILY_HANDLE.getPattern().indexOf("%s"))));
+        assertThat(deletedKeys.getAllValues()).anyMatch(key -> key.startsWith(
+                SecurityRedisKey.SESSION_HANDLE.getPattern()
+                        .substring(0,
+                                SecurityRedisKey.SESSION_HANDLE.getPattern().indexOf("%s"))));
     }
 }

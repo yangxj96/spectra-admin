@@ -35,6 +35,9 @@ public interface SecuritySessionRevoker {
     /** 按 Refresh Token 撤销其关联会话。 */
     void deleteByRefreshToken(String refreshToken);
 
+    /** 按在线管理的随机会话句柄撤销对应 Refresh Token Family。 */
+    void deleteBySessionId(String sessionId);
+
     /** 撤销用户的全部会话。 */
     void deleteByUserId(UUID userId);
 
