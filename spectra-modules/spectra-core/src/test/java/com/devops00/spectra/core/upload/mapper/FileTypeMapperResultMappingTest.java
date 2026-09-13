@@ -5,40 +5,56 @@
  */
 package com.devops00.spectra.core.upload.mapper;
 
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
+import com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler;
+import com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Ensures annotated file type lookups preserve the JSONB policy columns. */
+/** Ensures XML-backed file type lookups preserve the JSONB policy columns. */
 class FileTypeMapperResultMappingTest {
 
     private static final List<String> JSONB_COLUMNS = List.of("allowed_extensions", "allowed_content_types", "magic_rules");
 
     @Test
-    void everyFileTypeLookupMustMapJsonbPolicyColumns() throws NoSuchMethodException {
+    void everyFileTypeLookupMustMapJsonbPolicyColumns() throws Exception {
+        Configuration configuration = parseMapperXml();
         for (String methodName : List.of("findEnabledByCode", "findEnabledByContentType", "findByIdIncludingDisabled")) {
-            Method method = mapperMethod(methodName);
-            Results results = method.getAnnotation(Results.class);
+            var resultMappings = configuration.getMappedStatement(FileTypeMapper.class.getName() + "." + methodName)
+                    .getResultMaps()
+                    .getFirst()
+                    .getResultMappings();
 
-            assertThat(results).as("JSONB mapping for %s", methodName).isNotNull();
-            assertThat(Arrays.stream(results.value()).map(Result::column).toList())
+            assertThat(resultMappings.stream().map(mapping -> mapping.getColumn()).toList())
                     .as("JSONB columns for %s", methodName)
                     .containsAll(JSONB_COLUMNS);
+            assertThat(resultMappings.stream()
+                    .filter(mapping -> JSONB_COLUMNS.contains(mapping.getColumn()))
+                    .allMatch(mapping -> mapping.getTypeHandler() instanceof PgJsonbNodeTypeHandler))
+                    .as("JSONB type handlers for %s", methodName)
+                    .isTrue();
         }
     }
 
-    private Method mapperMethod(String name) throws NoSuchMethodException {
-        return switch (name) {
-            case "findEnabledByCode" -> FileTypeMapper.class.getMethod(name, String.class);
-            case "findEnabledByContentType" -> FileTypeMapper.class.getMethod(name, String.class);
-            case "findByIdIncludingDisabled" -> FileTypeMapper.class.getMethod(name, java.util.UUID.class);
-            default -> throw new NoSuchMethodException(name);
-        };
+    private Configuration parseMapperXml() throws Exception {
+        Configuration configuration = new Configuration();
+        configuration.getTypeHandlerRegistry().register(UUID.class, UUIDTypeHandler.class);
+        try (InputStream baseMapperXml = getClass().getResourceAsStream("/mapper/common/BaseMapper.xml")) {
+            assertThat(baseMapperXml).as("BaseMapper XML resource").isNotNull();
+            new XMLMapperBuilder(baseMapperXml, configuration, "mapper/common/BaseMapper.xml",
+                    configuration.getSqlFragments()).parse();
+        }
+        try (InputStream mapperXml = getClass().getResourceAsStream("/mapper/upload/FileTypeMapper.xml")) {
+            assertThat(mapperXml).as("FileTypeMapper XML resource").isNotNull();
+            new XMLMapperBuilder(mapperXml, configuration, "mapper/upload/FileTypeMapper.xml",
+                    configuration.getSqlFragments()).parse();
+        }
+        return configuration;
     }
 }

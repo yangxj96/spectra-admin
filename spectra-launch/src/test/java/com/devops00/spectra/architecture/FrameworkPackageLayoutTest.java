@@ -94,7 +94,7 @@ class FrameworkPackageLayoutTest {
             Map.entry("SecurityConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.authentication"),
             Map.entry("SecuritySessionPortConfiguration", FRAMEWORK_PACKAGE + ".security.configuration.session"),
             Map.entry("WebCookiePolicy", FRAMEWORK_PACKAGE + ".web.security"),
-            Map.entry("UserOnlineConverter", FRAMEWORK_PACKAGE + ".security.converter"),
+            Map.entry("UserOnlineConverter", FRAMEWORK_PACKAGE + ".security.session.converter"),
             Map.entry("SpectraPermissionEvaluator", FRAMEWORK_PACKAGE + ".security.authorization"),
             Map.entry("TokenAuthenticationFilter", FRAMEWORK_PACKAGE + ".security.authentication"),
             Map.entry("SecurityLoginFailureTracker", FRAMEWORK_PACKAGE + ".security.session.lifecycle"),

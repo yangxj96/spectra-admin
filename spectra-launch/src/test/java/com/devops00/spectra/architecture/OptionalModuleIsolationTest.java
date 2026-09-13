@@ -134,7 +134,7 @@ class OptionalModuleIsolationTest {
                 .as("旧 ULog Listener 不得恢复")
                 .isFalse();
         assertThat(read(resolveBackendPath(
-                "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/CoreAuditService.java")))
+                "spectra-modules/spectra-core/src/main/java/com/devops00/spectra/core/audit/service/impl/CoreAuditService.java")))
                 .contains("implements AuditService");
     }
 

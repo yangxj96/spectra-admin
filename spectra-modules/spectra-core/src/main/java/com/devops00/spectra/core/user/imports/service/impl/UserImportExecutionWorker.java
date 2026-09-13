@@ -18,8 +18,8 @@ package com.devops00.spectra.core.user.imports.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.core.user.imports.entity.UserImportRow;
-import com.devops00.spectra.core.user.imports.entity.UserImportTask;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportRow;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportTask;
 import com.devops00.spectra.core.user.imports.javabean.enums.UserImportRowState;
 import com.devops00.spectra.core.user.imports.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper;

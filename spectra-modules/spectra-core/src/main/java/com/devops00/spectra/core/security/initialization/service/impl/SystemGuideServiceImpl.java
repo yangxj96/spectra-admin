@@ -30,6 +30,7 @@ import com.devops00.spectra.core.security.initialization.mapper.SystemStateMappe
 import com.devops00.spectra.core.security.initialization.service.SystemGuideService;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.javabean.entity.Department;
+import com.devops00.spectra.core.system.mapper.DepartmentClosureMapper;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -54,6 +55,7 @@ public class SystemGuideServiceImpl implements SystemGuideService {
     private final SystemGuideAuthorization guideAuthorization;
     private final ConfiguredService configuredService;
     private final DepartmentMapper departmentMapper;
+    private final DepartmentClosureMapper departmentClosureMapper;
     private final UserMapper userMapper;
     private final UserDepartmentMembershipMapper userDepartmentMembershipMapper;
     private final SecurityContextAccessor securityContextAccessor;
@@ -155,8 +157,8 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         if (departmentMapper.insert(rootDepartment) != 1) {
             throw new DataSaveException("创建初始化根部门失败");
         }
-        departmentMapper.clearClosure();
-        if (departmentMapper.rebuildClosure() < 1) {
+        departmentClosureMapper.clearClosure();
+        if (departmentClosureMapper.rebuildClosure() < 1) {
             throw new DataSaveException("创建初始化根部门层级关系失败");
         }
 

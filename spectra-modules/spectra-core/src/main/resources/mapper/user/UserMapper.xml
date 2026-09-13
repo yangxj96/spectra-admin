@@ -18,23 +18,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.core.user.mapper.UserMapper">
     <!-- @formatter:off -->
-<resultMap id="BaseResultMap"
+    <resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.core.user.javabean.entity.User">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_user-->
-        <result column="employee_no"   property="employeeNo"/>
-        <result column="avatar"        property="avatar"/>
-        <result column="status"        property="status"/>
-        <result column="status_reason" property="statusReason"/>
-        <result column="departed_at"   property="departedAt"/>
-        <result column="real_name"     property="realName"/>
-        <result column="phone"         property="phone"/>
-        <result column="email"         property="email"/>
-        <result column="language"      property="language"/>
-        <result column="timezone"      property="timezone"/>
+        <result column="employee_no"           property="employeeNo"/>
+        <result column="avatar"                property="avatar"/>
+        <result column="status"                property="status"/>
+        <result column="status_reason"         property="statusReason"/>
+        <result column="departed_at"           property="departedAt"/>
+        <result column="real_name"             property="realName"/>
+        <result column="username"              property="username"/>
+        <result column="language"              property="language"/>
+        <result column="timezone"              property="timezone"/>
         <result column="primary_department_id" property="departmentId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
-        <result column="security_version" property="securityVersion"/>
+        <result column="security_version"      property="securityVersion"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -46,8 +45,7 @@
         status_reason,
         departed_at,
         real_name,
-        phone,
-        email,
+        username,
         "language",
         timezone,
         primary_department_id,

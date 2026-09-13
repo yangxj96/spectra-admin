@@ -56,7 +56,7 @@ class DepartmentStatsQueryMapperSqlContractTest {
 
     private static String readMapper() throws IOException {
         try (var resource = DepartmentStatsQueryMapperSqlContractTest.class.getClassLoader()
-                .getResourceAsStream("mapper/DepartmentStatsQueryMapper.xml")) {
+                .getResourceAsStream("mapper/report/DepartmentStatsQueryMapper.xml")) {
             if (resource == null) {
                 throw new IOException("找不到部门统计 Mapper XML");
             }

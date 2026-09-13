@@ -27,8 +27,8 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.system.service.DictService;
-import com.devops00.spectra.core.user.imports.entity.UserImportRow;
-import com.devops00.spectra.core.user.imports.entity.UserImportTask;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportRow;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportTask;
 import com.devops00.spectra.core.user.imports.javabean.enums.UserImportRowState;
 import com.devops00.spectra.core.user.imports.javabean.enums.UserImportTaskStatus;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportApplyFrom;

@@ -70,4 +70,5 @@
         FROM org_tree
         WHERE id = #{id};
     </select>
+
 </mapper>

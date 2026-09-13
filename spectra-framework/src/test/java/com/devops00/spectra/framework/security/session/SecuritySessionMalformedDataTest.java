@@ -17,7 +17,7 @@
 package com.devops00.spectra.framework.security.session;
 
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
-import com.devops00.spectra.framework.security.converter.UserOnlineConverter;
+import com.devops00.spectra.framework.security.session.converter.UserOnlineConverter;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;

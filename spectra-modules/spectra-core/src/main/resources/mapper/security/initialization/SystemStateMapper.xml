@@ -22,15 +22,25 @@
     <resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.core.security.initialization.javabean.entity.SystemState">
-        <result column="state_key"        property="stateKey"/>
-        <result column="state"            property="state"/>
-        <result column="initialization_id" property="initializationId"
-                typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_system_state-->
+        <result column="state_key"         property="stateKey"/>
+        <result column="state"             property="state"/>
+        <result column="initialization_id" property="initializationId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
         <result column="initialized_at"    property="initializedAt"/>
-        <result column="initialized_by"    property="initializedBy"
-                typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="initialized_by"    property="initializedBy" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        state_key,
+        state,
+        initialization_id,
+        initialized_at,
+        initialized_by,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
 
     <select id="selectForUpdateByStateKey" resultMap="BaseResultMap">
         SELECT state_key,

@@ -21,7 +21,6 @@ import com.devops00.spectra.core.system.port.SystemConfigValueWriter;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.core.notification.javabean.from.NotificationProviderSaveFrom;
-import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.core.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.core.security.secret.service.SecretManagementService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
@@ -32,16 +31,13 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Base64;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -17,15 +17,15 @@
 package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
-import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
-import com.devops00.spectra.core.security.authorization.entity.AuthorizationScope;
-import com.devops00.spectra.core.security.authorization.entity.Permission;
-import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
-import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
-import com.devops00.spectra.core.security.authorization.entity.RolePermission;
-import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
-import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.javabean.entity.AssignmentGrantBoundary;
+import com.devops00.spectra.core.security.authorization.javabean.entity.AssignmentPermissionBoundary;
+import com.devops00.spectra.core.security.authorization.javabean.entity.AuthorizationScope;
+import com.devops00.spectra.core.security.authorization.javabean.entity.Permission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleGrantablePermission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RolePermission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.ScopeRule;
+import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.AssignmentGrantBoundaryMapper;
 import com.devops00.spectra.core.security.authorization.mapper.AssignmentPermissionBoundaryMapper;
 import com.devops00.spectra.core.security.authorization.mapper.AuthorizationScopeMapper;

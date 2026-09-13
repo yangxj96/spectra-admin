@@ -36,7 +36,7 @@
         key,
         value,
         type,
-        dict_code
+        dict_code,
         remarks,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>

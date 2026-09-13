@@ -25,7 +25,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.domain.OrganizationChangeImpact;
-import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationCreateApplyFrom;
@@ -36,6 +36,7 @@ import com.devops00.spectra.core.security.authorization.service.OrganizationChan
 import com.devops00.spectra.core.security.authorization.service.OrganizationImpactAnalyzer;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.javabean.entity.OrganizationVersion;
+import com.devops00.spectra.core.system.mapper.DepartmentClosureMapper;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.mapper.OrganizationVersionMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
@@ -88,6 +89,7 @@ import java.util.stream.Collectors;
 public class OrganizationChangeServiceImpl implements OrganizationChangeService {
 
     private final DepartmentMapper departmentMapper;
+    private final DepartmentClosureMapper departmentClosureMapper;
     private final OrganizationVersionMapper organizationVersionMapper;
     private final RoleAssignmentMapper roleAssignmentMapper;
     private final UserMapper userMapper;
@@ -107,7 +109,6 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private final AuditService auditService;
 
     private final AuditRecordFactory auditRecordFactory;
-
 
     private final TimeMapper timeMapper;
 
@@ -333,8 +334,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
                 throw new DataException("编辑部门失败");
             }
         }
-        departmentMapper.clearClosure();
-        departmentMapper.rebuildClosure();
+        departmentClosureMapper.clearClosure();
+        departmentClosureMapper.rebuildClosure();
         var versionUpdate = new LambdaUpdateWrapper<OrganizationVersion>()
                 .eq(OrganizationVersion::getSingletonKey, "SYSTEM")
                 .eq(OrganizationVersion::getOrganizationVersion, prepared.impact().beforeVersion())

@@ -31,7 +31,7 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.security.authorization.domain.UserAuthorizationStatusCalculator;
-import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
@@ -122,7 +122,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final AuditService auditService;
 
     private final AuditRecordFactory auditRecordFactory;
-
 
     private final SecurityContextAccessor securityContextAccessor;
 

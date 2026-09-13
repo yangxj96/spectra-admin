@@ -20,8 +20,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.upload.javabean.entity.FileUploadPart;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,42 +28,21 @@ import java.util.UUID;
 @Mapper
 public interface FileUploadPartMapper extends BaseMapper<FileUploadPart> {
 
-    @Select("SELECT * FROM spectra_core.file_upload_part WHERE upload_session_id = #{sessionId} "
-            + "AND deleted IS NULL ORDER BY part_number")
     List<FileUploadPart> findBySessionId(@Param("sessionId") UUID sessionId);
 
-    @Select("SELECT * FROM spectra_core.file_upload_part WHERE upload_session_id = #{sessionId} "
-            + "AND part_number = #{partNumber} AND deleted IS NULL FOR UPDATE")
     FileUploadPart selectForUpdate(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber);
 
-    @Select("SELECT COUNT(*) FROM spectra_core.file_upload_part WHERE upload_session_id = #{sessionId} "
-            + "AND status = 'CONFIRMED' AND deleted IS NULL")
     int countConfirmed(@Param("sessionId") UUID sessionId);
 
-    @Update("UPDATE spectra_core.file_upload_part SET expected_sha256 = #{sha256}, upload_attempt = #{attempt}, "
-            + "updated_at = CURRENT_TIMESTAMP WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber} "
-            + "AND status <> 'CONFIRMED' AND deleted IS NULL")
     int prepareTarget(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
                       @Param("sha256") String sha256, @Param("attempt") int attempt);
 
-    @Update("UPDATE spectra_core.file_upload_part SET uploaded_size = #{size}, actual_sha256 = #{sha256}, "
-            + "provider_etag = #{etag}, status = 'UPLOADED', uploaded_at = CURRENT_TIMESTAMP, "
-            + "updated_at = CURRENT_TIMESTAMP WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber} "
-            + "AND status <> 'CONFIRMED' AND deleted IS NULL")
     int markUploaded(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
                      @Param("size") long size, @Param("sha256") String sha256, @Param("etag") String etag);
 
-    @Update("UPDATE spectra_core.file_upload_part SET status = 'CONFIRMED', uploaded_size = #{size}, "
-            + "actual_sha256 = #{sha256}, provider_etag = #{etag}, uploaded_at = COALESCE(uploaded_at, CURRENT_TIMESTAMP), "
-            + "updated_at = CURRENT_TIMESTAMP WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber} "
-            + "AND status IN ('UPLOADED', 'CONFIRMED') AND deleted IS NULL")
     int markConfirmed(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
                       @Param("size") long size, @Param("sha256") String sha256, @Param("etag") String etag);
 
-    @Update("UPDATE spectra_core.file_upload_part SET status = 'CONFIRMED', uploaded_size = #{size}, "
-            + "actual_sha256 = #{sha256}, provider_etag = #{etag}, uploaded_at = COALESCE(uploaded_at, CURRENT_TIMESTAMP), "
-            + "updated_at = CURRENT_TIMESTAMP WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber} "
-            + "AND status = 'PENDING' AND deleted IS NULL")
     int markExternalConfirmed(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
                               @Param("size") long size, @Param("sha256") String sha256, @Param("etag") String etag);
 }

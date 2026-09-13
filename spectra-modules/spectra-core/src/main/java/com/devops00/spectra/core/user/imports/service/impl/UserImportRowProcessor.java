@@ -18,7 +18,7 @@ package com.devops00.spectra.core.user.imports.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
@@ -30,7 +30,7 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.Authorizatio
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
-import com.devops00.spectra.core.user.imports.entity.UserImportRow;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportRow;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportRowFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;

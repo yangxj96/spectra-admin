@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.system.mapper.ServiceMonitorDiagnosticTaskMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.system.javabean.entity.ServiceMonitorDiagnosticTask">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_service_monitor_diagnostic_task-->
+        <result column="task_type"     property="taskType"/>
+        <result column="status"        property="status"/>
+        <result column="file_name"     property="fileName"/>
+        <result column="display_name"  property="displayName"/>
+        <result column="file_size"     property="fileSize"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="requested_at"  property="requestedAt"/>
+        <result column="started_at"    property="startedAt"/>
+        <result column="completed_at"  property="completedAt"/>
+        <result column="expires_at"    property="expiresAt"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        task_type,
+        status,
+        file_name,
+        display_name,
+        file_size,
+        error_message,
+        requested_at,
+        started_at,
+        completed_at,
+        expires_at,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>

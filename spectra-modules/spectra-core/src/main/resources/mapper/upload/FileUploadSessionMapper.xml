@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.upload.mapper.FileUploadSessionMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.file_upload_session-->
+        <result column="owner_user_id"          property="ownerUserId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="original_name"          property="originalName"/>
+        <result column="declared_content_type"  property="declaredContentType"/>
+        <result column="size"                   property="size"/>
+        <result column="content_sha256"         property="contentSha256"/>
+        <result column="chunk_size"             property="chunkSize"/>
+        <result column="total_parts"            property="totalParts"/>
+        <result column="storage_provider"       property="storageProvider"/>
+        <result column="transport_mode"         property="transportMode"/>
+        <result column="storage_container"      property="storageContainer"/>
+        <result column="staging_key"            property="stagingKey"/>
+        <result column="provider_upload_id"     property="providerUploadId"/>
+        <result column="file_asset_id"          property="fileAssetId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="status"                 property="status"/>
+        <result column="expires_at"             property="expiresAt"/>
+        <result column="last_activity_at"       property="lastActivityAt"/>
+        <result column="completed_at"           property="completedAt"/>
+        <result column="verify_started_at"      property="verifyStartedAt"/>
+        <result column="verify_finished_at"     property="verifyFinishedAt"/>
+        <result column="verify_processed_bytes" property="verifyProcessedBytes"/>
+        <result column="verify_total_bytes"     property="verifyTotalBytes"/>
+        <result column="failure_code"           property="failureCode"/>
+        <result column="cleanup_attempts"       property="cleanupAttempts"/>
+        <result column="next_cleanup_at"        property="nextCleanupAt"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        owner_user_id,
+        original_name,
+        declared_content_type,
+        size,
+        content_sha256,
+        chunk_size,
+        total_parts,
+        storage_provider,
+        transport_mode,
+        storage_container,
+        staging_key,
+        provider_upload_id,
+        file_asset_id,
+        status,
+        expires_at,
+        last_activity_at,
+        completed_at,
+        verify_started_at,
+        verify_finished_at,
+        verify_processed_bytes,
+        verify_total_bytes,
+        failure_code,
+        cleanup_attempts,
+        next_cleanup_at,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <select id="countActiveByOwner" resultType="int">
+        SELECT COUNT(*) FROM spectra_core.file_upload_session
+        WHERE owner_user_id = #{ownerUserId} AND status IN ('UPLOADING', 'VERIFYING')
+          AND expires_at &gt; CURRENT_TIMESTAMP AND deleted IS NULL
+    </select>
+
+    <select id="findResumable" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
+        SELECT * FROM spectra_core.file_upload_session
+        WHERE owner_user_id = #{ownerUserId} AND content_sha256 = #{sha256} AND size = #{size}
+          AND status IN ('UPLOADING', 'VERIFYING') AND expires_at &gt; #{now}
+          AND last_activity_at &gt; #{idleBefore} AND deleted IS NULL
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectForUpdate" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
+        SELECT * FROM spectra_core.file_upload_session WHERE id = #{id} AND deleted IS NULL FOR UPDATE
+    </select>
+
+    <select id="findExpiredCandidates" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
+        SELECT * FROM spectra_core.file_upload_session
+        WHERE status IN ('UPLOADING', 'VERIFYING') AND deleted IS NULL
+          AND (expires_at &lt;= #{now} OR (status = 'UPLOADING' AND last_activity_at &lt;= #{idleBefore}))
+        ORDER BY expires_at
+        LIMIT #{limit}
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <select id="findCleanupCandidates" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
+        SELECT * FROM spectra_core.file_upload_session
+        WHERE status IN ('FAILED', 'CANCELED', 'EXPIRED', 'CLEANED') AND deleted IS NULL
+          AND next_cleanup_at IS NOT NULL AND next_cleanup_at &lt;= #{now}
+        ORDER BY next_cleanup_at
+        LIMIT #{limit}
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <update id="claimCleanupCandidate">
+        UPDATE spectra_core.file_upload_session
+        SET next_cleanup_at = #{claimUntil}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status IN ('FAILED', 'CANCELED', 'EXPIRED', 'CLEANED') AND deleted IS NULL
+          AND next_cleanup_at IS NOT NULL AND next_cleanup_at &lt;= #{now}
+    </update>
+
+    <update id="markExpired">
+        UPDATE spectra_core.file_upload_session
+        SET status = 'EXPIRED', failure_code = 'FILE_UPLOAD_EXPIRED',
+            next_cleanup_at = #{nextCleanupAt}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status IN ('UPLOADING', 'VERIFYING') AND deleted IS NULL
+    </update>
+
+    <update id="claimForVerification">
+        UPDATE spectra_core.file_upload_session
+        SET status = 'VERIFYING', verify_started_at = #{startedAt},
+            verify_total_bytes = size, verify_processed_bytes = 0, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status = 'UPLOADING' AND deleted IS NULL
+    </update>
+
+    <update id="markReady">
+        UPDATE spectra_core.file_upload_session
+        SET status = 'READY', file_asset_id = #{fileAssetId}, completed_at = #{completedAt},
+            verify_finished_at = #{completedAt}, verify_processed_bytes = size, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status = 'VERIFYING' AND deleted IS NULL
+    </update>
+
+    <update id="markFailed">
+        UPDATE spectra_core.file_upload_session
+        SET status = 'FAILED', failure_code = #{failureCode}, verify_finished_at = CURRENT_TIMESTAMP,
+            next_cleanup_at = #{nextCleanupAt}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status IN ('UPLOADING', 'VERIFYING') AND deleted IS NULL
+    </update>
+
+    <update id="markCanceled">
+        UPDATE spectra_core.file_upload_session
+        SET status = 'CANCELED', next_cleanup_at = #{nextCleanupAt}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status = 'UPLOADING' AND deleted IS NULL
+    </update>
+
+    <update id="updateVerificationProgress">
+        UPDATE spectra_core.file_upload_session
+        SET verify_processed_bytes = LEAST(verify_total_bytes, #{bytes}), updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status = 'VERIFYING'
+    </update>
+
+    <update id="touchActivity">
+        UPDATE spectra_core.file_upload_session
+        SET last_activity_at = #{lastActivityAt}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status = 'UPLOADING' AND deleted IS NULL
+    </update>
+
+    <update id="markCleanupRetry">
+        UPDATE spectra_core.file_upload_session
+        SET cleanup_attempts = cleanup_attempts + 1,
+            next_cleanup_at = #{nextCleanupAt}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="markCleaned">
+        UPDATE spectra_core.file_upload_session
+        SET status = 'CLEANED', next_cleanup_at = #{cleanedAt}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND status IN ('FAILED', 'CANCELED', 'EXPIRED', 'CLEANED')
+    </update>
+
+    <delete id="deleteByIdPhysically">
+        DELETE FROM spectra_core.file_upload_session
+        WHERE id = #{id} AND status = 'CLEANED'
+          AND next_cleanup_at IS NOT NULL AND next_cleanup_at &lt;= #{cutoff}
+    </delete>
+
+    <delete id="deletePartsPhysically">
+        DELETE FROM spectra_core.file_upload_part WHERE upload_session_id = #{id}
+    </delete>
+</mapper>

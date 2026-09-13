@@ -26,7 +26,6 @@ import com.devops00.spectra.core.security.policy.javabean.vo.SecurityPasswordPol
 import com.devops00.spectra.core.security.policy.javabean.vo.SecuritySessionPolicyVO;
 import com.devops00.spectra.core.security.policy.service.SecurityPolicyService;
 import com.devops00.spectra.common.audit.AuditRecord;
-import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
@@ -266,7 +265,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
      * 处理内部业务逻辑（{@code auditEvent}）。
      */
     private AuditRecord auditEvent(String type, UUID targetId, Map<String, Object> before,
-                                          Map<String, Object> after) {
+                                   Map<String, Object> after) {
         return auditRecordFactory.create(null, type, securityContextAccessor.currentUserId(), targetId,
                 null, null, null, before, after, "安全策略配置变更", null, AuditRecord.Result.STARTED,
                 RequestCorrelationContext.current().correlationId());

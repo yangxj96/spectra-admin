@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.audit.mapper.AuditLogQueryMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               type="com.devops00.spectra.core.audit.javabean.entity.AuditEvent">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_audit_event-->
+        <id     column="event_id"        property="eventId"        typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <id     column="occurred_at"     property="occurredAt"/>
+        <result column="category"        property="category"/>
+        <result column="event_type"      property="eventType"/>
+        <result column="operator_id"     property="operatorId"     typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="target_id"       property="targetId"       typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="result"          property="result"/>
+        <result column="client"          property="client"/>
+        <result column="ip"              property="ip"/>
+        <result column="user_agent"      property="userAgent"/>
+        <result column="request_id"      property="requestId"/>
+        <result column="correlation_id"  property="correlationId"/>
+        <result column="http_method"     property="httpMethod"/>
+        <result column="request_url"     property="requestUrl"/>
+        <result column="http_status"     property="httpStatus"/>
+        <result column="duration_ms"     property="durationMs"/>
+        <result column="before_snapshot" property="beforeSnapshot" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
+        <result column="after_snapshot"  property="afterSnapshot"  typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
+        <result column="reason"          property="reason"/>
+        <result column="failure_code"    property="failureCode"/>
+        <result column="failure_type"    property="failureType"/>
+        <result column="failure_reason"  property="failureReason"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        event_id,
+        occurred_at,
+        category,
+        event_type,
+        operator_id,
+        target_id,
+        result,
+        client,
+        ip,
+        user_agent,
+        request_id,
+        correlation_id,
+        http_method,
+        request_url,
+        http_status,
+        duration_ms,
+        before_snapshot,
+        after_snapshot,
+        reason,
+        failure_code,
+        failure_type,
+        failure_reason
+    </sql>
+
+    <!-- @formatter:off -->
+    <resultMap id="AuditLogQueryRowMap"
+               type="com.devops00.spectra.core.audit.javabean.domain.AuditLogQueryRow">
+        <id     column="event_id"        property="eventId"/>
+        <result column="occurred_at"     property="occurredAt"/>
+        <result column="category"        property="category"/>
+        <result column="event_type"      property="eventType"/>
+        <result column="operator_id"     property="operatorId"/>
+        <result column="operator_name"   property="operatorName"/>
+        <result column="target_id"       property="targetId"/>
+        <result column="client"          property="client"/>
+        <result column="ip"              property="ip"/>
+        <result column="user_agent"      property="userAgent"/>
+        <result column="http_method"     property="httpMethod"/>
+        <result column="request_url"     property="requestUrl"/>
+        <result column="http_status"     property="httpStatus"/>
+        <result column="duration_ms"     property="durationMs"/>
+        <result column="before_snapshot" property="beforeSnapshot"/>
+        <result column="after_snapshot"  property="afterSnapshot"/>
+        <result column="reason"          property="reason"/>
+        <result column="result"          property="result"/>
+        <result column="failure_code"    property="failureCode"/>
+        <result column="failure_type"    property="failureType"/>
+        <result column="failure_reason"  property="failureReason"/>
+        <result column="correlation_id"  property="correlationId"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Projection">
+        event_id, occurred_at, category, event_type, operator_id,
+        (SELECT NULLIF(BTRIM(audit_operator.real_name), '')
+           FROM spectra_core.sys_user audit_operator
+          WHERE audit_operator.id = operator_id) AS operator_name,
+        target_id, client, ip, user_agent, http_method, request_url, http_status, duration_ms,
+        before_snapshot::text AS before_snapshot, after_snapshot::text AS after_snapshot,
+        reason, result, failure_code, failure_type, failure_reason, correlation_id
+    </sql>
+
+    <sql id="VisibilityAndFilterConditions">
+        <if test="!criteria.canViewHighRisk">
+            AND (category &lt;&gt; 'SECURITY' OR NOT (
+                UPPER(event_type) LIKE '%ROOT%'
+                OR UPPER(event_type) LIKE '%BREAK_GLASS%'
+                OR UPPER(event_type) LIKE '%SECURITY%'
+                OR UPPER(event_type) LIKE '%SESSION%'
+                OR UPPER(event_type) LIKE '%PASSWORD%'
+                OR UPPER(event_type) LIKE '%AUDIT%'
+            ))
+        </if>
+        <if test="!criteria.canViewHighRisk and !criteria.canViewAllNonHighRisk">
+            <choose>
+                <when test="criteria.viewerId == null">
+                    AND category &lt;&gt; 'SECURITY'
+                </when>
+                <otherwise>
+                    AND (category &lt;&gt; 'SECURITY' OR operator_id = #{criteria.viewerId}
+                         OR target_id = #{criteria.viewerId})
+                </otherwise>
+            </choose>
+        </if>
+        <if test="criteria.category != null">
+            AND category = #{criteria.category}
+        </if>
+        <if test="criteria.eventTypePattern != null">
+            AND (event_type ILIKE #{criteria.eventTypePattern} OR reason ILIKE #{criteria.eventTypePattern})
+        </if>
+        <if test="criteria.operatorId != null or criteria.operatorPattern != null">
+            AND (
+                <if test="criteria.operatorId != null">
+                    operator_id = #{criteria.operatorId}
+                </if>
+                <if test="criteria.operatorId != null and criteria.operatorPattern != null">
+                    OR
+                </if>
+                <if test="criteria.operatorPattern != null">
+                    EXISTS (
+                        SELECT 1 FROM spectra_core.sys_user audit_operator
+                        WHERE audit_operator.id = operator_id
+                          AND audit_operator.real_name ILIKE #{criteria.operatorPattern}
+                    )
+                </if>
+            )
+        </if>
+        <if test="criteria.targetId != null">
+            AND target_id = #{criteria.targetId}
+        </if>
+        <if test="criteria.result != null">
+            AND result = #{criteria.result}
+        </if>
+        <if test="criteria.from != null">
+            AND occurred_at &gt;= #{criteria.from}
+        </if>
+        <if test="criteria.to != null">
+            AND occurred_at &lt; #{criteria.to}
+        </if>
+    </sql>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*)
+        FROM spectra_core.sys_audit_event
+        <where>
+            <include refid="VisibilityAndFilterConditions"/>
+        </where>
+    </select>
+
+    <select id="selectPage" resultMap="AuditLogQueryRowMap">
+        SELECT <include refid="Projection"/>
+        FROM spectra_core.sys_audit_event
+        <where>
+            <include refid="VisibilityAndFilterConditions"/>
+        </where>
+        ORDER BY occurred_at DESC, event_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectDetail" resultMap="AuditLogQueryRowMap">
+        SELECT <include refid="Projection"/>
+        FROM spectra_core.sys_audit_event
+        <where>
+            <include refid="VisibilityAndFilterConditions"/>
+            AND event_id = #{eventId}
+            AND occurred_at = #{occurredAt}
+        </where>
+    </select>
+
+    <select id="selectExport" resultMap="AuditLogQueryRowMap">
+        SELECT <include refid="Projection"/>
+        FROM spectra_core.sys_audit_event
+        <where>
+            <include refid="VisibilityAndFilterConditions"/>
+        </where>
+        ORDER BY occurred_at DESC, event_id DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

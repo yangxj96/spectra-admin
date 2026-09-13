@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.security.authorization.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.core.security.authorization.entity.Permission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.Permission;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

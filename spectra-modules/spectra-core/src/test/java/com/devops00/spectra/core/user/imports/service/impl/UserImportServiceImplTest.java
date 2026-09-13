@@ -17,8 +17,8 @@
 package com.devops00.spectra.core.user.imports.service.impl;
 
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.core.user.imports.entity.UserImportRow;
-import com.devops00.spectra.core.user.imports.entity.UserImportTask;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportRow;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportTask;
 import com.devops00.spectra.core.user.imports.javabean.enums.UserImportRowState;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportApplyFrom;
 import com.devops00.spectra.core.user.imports.javabean.vo.UserImportTaskVO;

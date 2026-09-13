@@ -79,7 +79,7 @@ class NotificationSqlContractTest {
 
     @Test
     void shouldPutPostgresLockClauseAfterOrderByAndLimit() throws IOException {
-        var mapper = readResource("mapper/NotificationTaskMapper.xml");
+        var mapper = readResource("mapper/notification/NotificationTaskMapper.xml");
         var orderByIndex = mapper.indexOf("ORDER BY priority DESC, scheduled_at ASC, created_at ASC");
         var limitIndex = mapper.indexOf("LIMIT #{limit}");
         var lockIndex = mapper.indexOf("FOR UPDATE SKIP LOCKED");
@@ -91,8 +91,8 @@ class NotificationSqlContractTest {
 
     @Test
     void shouldDefineBatchTemplateLookupAndTaskPersistenceStatements() throws IOException {
-        var taskMapper = readResource("mapper/NotificationTaskMapper.xml");
-        var templateMapper = readResource("mapper/NotificationTemplateMapper.xml");
+        var taskMapper = readResource("mapper/notification/NotificationTaskMapper.xml");
+        var templateMapper = readResource("mapper/notification/NotificationTemplateMapper.xml");
 
         assertTrue(taskMapper.contains("<select id=\"selectExistingTasks\""));
         assertTrue(taskMapper.contains("notification_request_id = #{requestId}"));

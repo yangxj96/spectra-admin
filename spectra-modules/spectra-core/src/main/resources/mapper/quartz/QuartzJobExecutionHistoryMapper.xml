@@ -6,36 +6,90 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.core.quartz.mapper.QuartzJobExecutionHistoryMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.quartz.javabean.entity.QuartzJobExecutionHistoryEntity">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.quartz_job_execution_history-->
+        <result column="fire_instance_id"   property="fireInstanceId"/>
+        <result column="job_key"            property="jobKey"/>
+        <result column="trigger_key"        property="triggerKey"/>
+        <result column="job_type"           property="jobType"/>
+        <result column="job_class_name"     property="jobClassName"/>
+        <result column="trigger_type"       property="triggerType"/>
+        <result column="status"             property="status"/>
+        <result column="scheduled_fire_at"  property="scheduledFireAt"/>
+        <result column="actual_fire_at"     property="actualFireAt"/>
+        <result column="started_at"         property="startedAt"/>
+        <result column="finished_at"        property="finishedAt"/>
+        <result column="duration_ms"        property="durationMs"/>
+        <result column="scheduler_instance" property="schedulerInstance"/>
+        <result column="correlation_id"     property="correlationId"/>
+        <result column="parameter_version"  property="parameterVersion"/>
+        <result column="parameter_sha256"   property="parameterSha256"/>
+        <result column="result_summary"     property="resultSummary"/>
+        <result column="error_code"         property="errorCode"/>
+        <result column="error_message"      property="errorMessage"/>
+    </resultMap>
+    <!-- @formatter:on -->
 
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        fire_instance_id,
+        job_key,
+        trigger_key,
+        job_type,
+        job_class_name,
+        trigger_type,
+        status,
+        scheduled_fire_at,
+        actual_fire_at,
+        started_at,
+        finished_at,
+        duration_ms,
+        scheduler_instance,
+        correlation_id,
+        parameter_version,
+        parameter_sha256,
+        result_summary,
+        error_code,
+        error_message,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+
+    <!-- @formatter:off -->
     <resultMap id="HistoryResultMap"
                type="com.devops00.spectra.core.quartz.javabean.entity.QuartzJobExecutionHistoryEntity">
-        <id column="id" property="id"/>
-        <result column="created_by" property="createdBy"/>
-        <result column="created_at" property="createdAt"/>
-        <result column="updated_by" property="updatedBy"/>
-        <result column="updated_at" property="updatedAt"/>
-        <result column="deleted" property="deleted"/>
-        <result column="version" property="version"/>
-        <result column="fire_instance_id" property="fireInstanceId"/>
-        <result column="job_key" property="jobKey"/>
-        <result column="trigger_key" property="triggerKey"/>
-        <result column="job_type" property="jobType"/>
-        <result column="job_class_name" property="jobClassName"/>
-        <result column="trigger_type" property="triggerType"/>
-        <result column="status" property="status"/>
-        <result column="scheduled_fire_at" property="scheduledFireAt"/>
-        <result column="actual_fire_at" property="actualFireAt"/>
-        <result column="started_at" property="startedAt"/>
-        <result column="finished_at" property="finishedAt"/>
-        <result column="duration_ms" property="durationMs"/>
+        <id     column="id"                 property="id"/>
+        <result column="created_by"         property="createdBy"/>
+        <result column="created_at"         property="createdAt"/>
+        <result column="updated_by"         property="updatedBy"/>
+        <result column="updated_at"         property="updatedAt"/>
+        <result column="deleted"            property="deleted"/>
+        <result column="version"            property="version"/>
+        <result column="fire_instance_id"   property="fireInstanceId"/>
+        <result column="job_key"            property="jobKey"/>
+        <result column="trigger_key"        property="triggerKey"/>
+        <result column="job_type"           property="jobType"/>
+        <result column="job_class_name"     property="jobClassName"/>
+        <result column="trigger_type"       property="triggerType"/>
+        <result column="status"             property="status"/>
+        <result column="scheduled_fire_at"  property="scheduledFireAt"/>
+        <result column="actual_fire_at"     property="actualFireAt"/>
+        <result column="started_at"         property="startedAt"/>
+        <result column="finished_at"        property="finishedAt"/>
+        <result column="duration_ms"        property="durationMs"/>
         <result column="scheduler_instance" property="schedulerInstance"/>
-        <result column="correlation_id" property="correlationId"/>
-        <result column="parameter_version" property="parameterVersion"/>
-        <result column="parameter_sha256" property="parameterSha256"/>
-        <result column="result_summary" property="resultSummary"/>
-        <result column="error_code" property="errorCode"/>
-        <result column="error_message" property="errorMessage"/>
+        <result column="correlation_id"     property="correlationId"/>
+        <result column="parameter_version"  property="parameterVersion"/>
+        <result column="parameter_sha256"   property="parameterSha256"/>
+        <result column="result_summary"     property="resultSummary"/>
+        <result column="error_code"         property="errorCode"/>
+        <result column="error_message"      property="errorMessage"/>
     </resultMap>
+    <!-- @formatter:on -->
 
     <sql id="HistoryColumns">
         id, created_by, created_at, updated_by, updated_at, deleted, version,

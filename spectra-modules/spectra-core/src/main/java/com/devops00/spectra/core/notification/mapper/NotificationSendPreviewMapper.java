@@ -18,7 +18,6 @@ package com.devops00.spectra.core.notification.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationSendPreviewEntity;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,10 +32,5 @@ public interface NotificationSendPreviewMapper extends BaseMapper<NotificationSe
     /**
      * 物理删除过期或已消费的短时快照，避免保留受众范围和参数。
      */
-    @Delete("""
-            DELETE FROM spectra_notification.ntf_send_preview
-             WHERE expires_at < #{now}
-                OR (status = 'APPLIED' AND consumed_at < #{appliedCutoff})
-            """)
     int deleteExpired(@Param("now") Instant now, @Param("appliedCutoff") Instant appliedCutoff);
 }

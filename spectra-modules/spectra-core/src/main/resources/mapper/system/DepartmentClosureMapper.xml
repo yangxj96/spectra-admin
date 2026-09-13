@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.system.mapper.DepartmentClosureMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.system.javabean.entity.DepartmentClosure">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_department_closure-->
+        <result column="ancestor_id"   property="ancestorId"   typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="descendant_id" property="descendantId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="depth"         property="depth"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ancestor_id,
+        descendant_id,
+        depth,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <delete id="clearClosure">
+        DELETE FROM spectra_core.sys_department_closure WHERE id IS NOT NULL
+    </delete>
+
+    <insert id="rebuildClosure">
+        WITH RECURSIVE department_tree AS (
+            SELECT id AS ancestor_id, id AS descendant_id, 0 AS depth, ARRAY[id] AS path
+            FROM spectra_core.sys_department
+            UNION ALL
+            SELECT tree.ancestor_id, child.id, tree.depth + 1, tree.path || child.id
+            FROM department_tree tree
+            JOIN spectra_core.sys_department child ON child.pid = tree.descendant_id
+            WHERE NOT child.id = ANY(tree.path)
+        )
+        INSERT INTO spectra_core.sys_department_closure (ancestor_id, descendant_id, depth)
+        SELECT ancestor_id, descendant_id, depth
+        FROM department_tree
+    </insert>
+</mapper>

@@ -7,10 +7,10 @@
 package com.devops00.spectra.core.audit;
 
 import com.devops00.spectra.common.audit.Audit;
-import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.audit.service.impl.CoreAuditService;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

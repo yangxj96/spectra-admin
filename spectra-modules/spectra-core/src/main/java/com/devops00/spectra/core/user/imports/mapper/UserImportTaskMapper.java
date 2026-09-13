@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.user.imports.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.core.user.imports.entity.UserImportTask;
+import com.devops00.spectra.core.user.imports.javabean.entity.UserImportTask;
 import org.apache.ibatis.annotations.Mapper;
 
 /** 用户导入任务 Mapper。 */

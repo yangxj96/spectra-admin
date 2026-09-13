@@ -14,7 +14,6 @@ import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.core.system.cache.CacheInvalidationCoordinator;
-import com.devops00.spectra.core.system.cache.CacheManagementResult;
 import com.devops00.spectra.core.system.cache.CacheRegionRegistry;
 import com.devops00.spectra.core.system.javabean.from.SecurityNonceGlobalInvalidateFrom;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeFrom;

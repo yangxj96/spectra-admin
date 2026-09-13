@@ -23,7 +23,6 @@ import com.devops00.spectra.common.port.quartz.QuartzJobDefinition;
 import com.devops00.spectra.common.port.quartz.QuartzParameterSchema;
 import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.core.quartz.service.QuartzJobExecutionHistoryService;
 import com.devops00.spectra.core.quartz.catalog.QuartzJobCatalog;
 import com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle;
 import com.devops00.spectra.core.quartz.javabean.from.QuartzJobCreateFrom;

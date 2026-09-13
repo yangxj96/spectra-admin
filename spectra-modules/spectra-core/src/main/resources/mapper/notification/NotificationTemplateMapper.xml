@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity">
+        <!--@mbg.generated-->
+        <!--@Table spectra_notification.ntf_template-->
+        <result column="template_group_code"    property="templateGroupCode"/>
+        <result column="template_name"          property="templateName"/>
+        <result column="channel"                property="channel"/>
+        <result column="purpose"                property="purpose"/>
+        <result column="version_no"             property="versionNo"/>
+        <result column="title_template"         property="titleTemplate"/>
+        <result column="content_template"       property="contentTemplate"/>
+        <result column="html_template"          property="htmlTemplate"/>
+        <result column="parameter_schema"       property="parameterSchema" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
+        <result column="provider_template_code" property="providerTemplateCode"/>
+        <result column="state"                  property="state"/>
+        <result column="version_digest"         property="versionDigest"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        template_group_code,
+        template_name,
+        channel,
+        purpose,
+        version_no,
+        title_template,
+        content_template,
+        html_template,
+        parameter_schema,
+        provider_template_code,
+        state,
+        version_digest,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <!-- 一个通知批次一次加载所有实际渠道使用的已发布模板。 -->
+    <select id="selectPublishedTemplates" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM spectra_notification.ntf_template
+        WHERE deleted IS NULL
+          AND state = 'PUBLISHED'
+          AND purpose = #{purpose}
+        <choose>
+            <when test="channels != null and channels.size() > 0">
+                AND channel IN
+                <foreach collection="channels" item="channel" open="(" separator="," close=")">
+                    #{channel}
+                </foreach>
+            </when>
+            <otherwise>
+                AND 1 = 0
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="templateVersionIds != null and templateVersionIds.size() > 0">
+                AND id IN
+                <foreach collection="templateVersionIds" item="templateVersionId" open="(" separator="," close=")">
+                    #{templateVersionId}
+                </foreach>
+            </when>
+            <otherwise>
+                AND template_group_code = #{templateGroupCode}
+            </otherwise>
+        </choose>
+        ORDER BY channel, version_no DESC
+    </select>
+</mapper>

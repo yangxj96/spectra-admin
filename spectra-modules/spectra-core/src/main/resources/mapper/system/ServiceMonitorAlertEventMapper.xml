@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.system.mapper.ServiceMonitorAlertEventMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertEvent">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_service_monitor_alert_event-->
+        <result column="rule_id"           property="ruleId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="rule_code"         property="ruleCode"/>
+        <result column="rule_name"         property="ruleName"/>
+        <result column="metric_code"       property="metricCode"/>
+        <result column="severity"          property="severity"/>
+        <result column="state"             property="state"/>
+        <result column="current_value"     property="currentValue"/>
+        <result column="threshold_value"   property="thresholdValue"/>
+        <result column="expected_value"    property="expectedValue"/>
+        <result column="message"           property="message"/>
+        <result column="first_occurred_at" property="firstOccurredAt"/>
+        <result column="last_occurred_at"  property="lastOccurredAt"/>
+        <result column="recovered_at"      property="recoveredAt"/>
+        <result column="occurrence_count"  property="occurrenceCount"/>
+        <result column="last_notified_at"  property="lastNotifiedAt"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        rule_id,
+        rule_code,
+        rule_name,
+        metric_code,
+        severity,
+        state,
+        current_value,
+        threshold_value,
+        expected_value,
+        message,
+        first_occurred_at,
+        last_occurred_at,
+        recovered_at,
+        occurrence_count,
+        last_notified_at,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>

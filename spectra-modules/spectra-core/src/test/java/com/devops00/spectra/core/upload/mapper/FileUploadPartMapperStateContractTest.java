@@ -5,8 +5,12 @@
  */
 package com.devops00.spectra.core.upload.mapper;
 
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Test;
+
+import java.io.InputStream;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,13 +18,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FileUploadPartMapperStateContractTest {
 
     @Test
-    void externalConfirmationMustTransitionPendingPartToConfirmed() throws NoSuchMethodException {
-        var method = FileUploadPartMapper.class.getMethod("markExternalConfirmed", java.util.UUID.class, int.class,
-                long.class, String.class, String.class);
-        var update = method.getAnnotation(Update.class);
+    void externalConfirmationMustTransitionPendingPartToConfirmed() throws Exception {
+        Configuration configuration = new Configuration();
+        try (InputStream baseMapperXml = getClass().getResourceAsStream("/mapper/common/BaseMapper.xml")) {
+            assertThat(baseMapperXml).as("BaseMapper XML resource").isNotNull();
+            new XMLMapperBuilder(baseMapperXml, configuration, "mapper/common/BaseMapper.xml",
+                    configuration.getSqlFragments()).parse();
+        }
+        try (InputStream mapperXml = getClass().getResourceAsStream("/mapper/upload/FileUploadPartMapper.xml")) {
+            assertThat(mapperXml).as("FileUploadPartMapper XML resource").isNotNull();
+            new XMLMapperBuilder(mapperXml, configuration, "mapper/upload/FileUploadPartMapper.xml",
+                    configuration.getSqlFragments()).parse();
+        }
+        var statement = configuration.getMappedStatement(
+                FileUploadPartMapper.class.getName() + ".markExternalConfirmed");
+        String sql = statement.getBoundSql(Map.of(
+                "sessionId", java.util.UUID.randomUUID(), "partNumber", 1, "size", 1L,
+                "sha256", "hash", "etag", "etag")).getSql();
 
-        assertThat(update).as("S3 confirmation must have its own state transition").isNotNull();
-        assertThat(String.join(" ", update.value()))
+        assertThat(sql)
                 .contains("status = 'CONFIRMED'")
                 .contains("AND status = 'PENDING'");
     }

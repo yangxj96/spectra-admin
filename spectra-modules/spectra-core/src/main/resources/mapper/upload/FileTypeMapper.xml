@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.upload.mapper.FileTypeMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.upload.javabean.entity.FileType">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.file_type-->
+        <result column="code"                  property="code"/>
+        <result column="display_name"          property="displayName"/>
+        <result column="allowed_extensions"    property="allowedExtensions" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler"/>
+        <result column="allowed_content_types" property="allowedContentTypes" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler"/>
+        <result column="magic_rules"           property="magicRules" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler"/>
+        <result column="max_size"              property="maxSize"/>
+        <result column="preview_enabled"       property="previewEnabled"/>
+        <result column="download_enabled"      property="downloadEnabled"/>
+        <result column="upload_enabled"        property="uploadEnabled"/>
+        <result column="dangerous"             property="dangerous"/>
+        <result column="enabled"               property="enabled"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        code,
+        display_name,
+        allowed_extensions,
+        allowed_content_types,
+        magic_rules,
+        max_size,
+        preview_enabled,
+        download_enabled,
+        upload_enabled,
+        dangerous,
+        enabled,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <!-- @formatter:off -->
+    <resultMap id="FileTypeResultMap"
+               type="com.devops00.spectra.core.upload.javabean.entity.FileType"
+               autoMapping="true">
+        <id     column="id"                    property="id"/>
+        <result column="allowed_extensions"    property="allowedExtensions" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler"/>
+        <result column="allowed_content_types" property="allowedContentTypes" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler"/>
+        <result column="magic_rules"           property="magicRules" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbNodeTypeHandler"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <select id="findEnabledByCode" resultMap="FileTypeResultMap">
+        SELECT * FROM spectra_core.file_type
+        WHERE code = #{code} AND deleted IS NULL AND enabled = true
+        LIMIT 1
+    </select>
+
+    <select id="findEnabledByContentType" resultMap="FileTypeResultMap">
+        SELECT * FROM spectra_core.file_type
+        WHERE enabled = true AND upload_enabled = true AND deleted IS NULL
+          AND EXISTS (
+              SELECT 1 FROM jsonb_array_elements_text(allowed_content_types) AS item(value)
+              WHERE LOWER(item.value) = LOWER(#{contentType})
+          )
+        ORDER BY id
+        LIMIT 1
+    </select>
+
+    <select id="findByIdIncludingDisabled" resultMap="FileTypeResultMap">
+        SELECT * FROM spectra_core.file_type WHERE id = #{id} AND deleted IS NULL LIMIT 1
+    </select>
+</mapper>

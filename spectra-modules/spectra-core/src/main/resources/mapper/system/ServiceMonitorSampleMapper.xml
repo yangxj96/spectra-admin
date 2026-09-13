@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.system.mapper.ServiceMonitorSampleMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_service_monitor_sample-->
+        <result column="collected_at"                  property="collectedAt"/>
+        <result column="cpu_usage"                     property="cpuUsage"/>
+        <result column="cpu_logical_cores"             property="cpuLogicalCores"/>
+        <result column="system_memory_usage"           property="systemMemoryUsage"/>
+        <result column="system_memory_total_bytes"     property="systemMemoryTotalBytes"/>
+        <result column="system_memory_used_bytes"      property="systemMemoryUsedBytes"/>
+        <result column="system_memory_available_bytes" property="systemMemoryAvailableBytes"/>
+        <result column="jvm_heap_usage"                property="jvmHeapUsage"/>
+        <result column="jvm_heap_used_bytes"           property="jvmHeapUsedBytes"/>
+        <result column="jvm_heap_max_bytes"            property="jvmHeapMaxBytes"/>
+        <result column="jvm_non_heap_used_bytes"       property="jvmNonHeapUsedBytes"/>
+        <result column="live_thread_count"             property="liveThreadCount"/>
+        <result column="peak_thread_count"             property="peakThreadCount"/>
+        <result column="gc_count"                      property="gcCount"/>
+        <result column="qps"                           property="qps"/>
+        <result column="error_rate"                    property="errorRate"/>
+        <result column="p95_response_ms"               property="p95ResponseMs"/>
+        <result column="request_metrics_available"     property="requestMetricsAvailable"/>
+        <result column="database_status"               property="databaseStatus"/>
+        <result column="redis_status"                  property="redisStatus"/>
+        <result column="status"                        property="status"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        collected_at,
+        cpu_usage,
+        cpu_logical_cores,
+        system_memory_usage,
+        system_memory_total_bytes,
+        system_memory_used_bytes,
+        system_memory_available_bytes,
+        jvm_heap_usage,
+        jvm_heap_used_bytes,
+        jvm_heap_max_bytes,
+        jvm_non_heap_used_bytes,
+        live_thread_count,
+        peak_thread_count,
+        gc_count,
+        qps,
+        error_rate,
+        p95_response_ms,
+        request_metrics_available,
+        database_status,
+        redis_status,
+        status,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>

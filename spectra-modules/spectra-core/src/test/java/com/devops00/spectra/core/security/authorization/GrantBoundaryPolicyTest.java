@@ -21,6 +21,7 @@ import com.devops00.spectra.common.security.authorization.AuthorizationScope;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
 import com.devops00.spectra.common.security.authorization.PermissionBoundary;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
+import com.devops00.spectra.core.security.authorization.policy.GrantBoundaryPolicy;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

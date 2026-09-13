@@ -25,11 +25,11 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.domain.RoleAuthorizationState;
 import com.devops00.spectra.core.security.authorization.domain.RoleChangeImpact;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
-import com.devops00.spectra.core.security.authorization.entity.Permission;
-import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
-import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
-import com.devops00.spectra.core.security.authorization.entity.RolePermission;
-import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.javabean.entity.Permission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleGrantablePermission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RolePermission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.javabean.from.RoleAuthorizationApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.RoleAuthorizationChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.RoleAuthorizationChangePreviewVO;
@@ -112,7 +112,6 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private final AuditService auditService;
 
     private final AuditRecordFactory auditRecordFactory;
-
 
     private final TimeMapper timeMapper;
 

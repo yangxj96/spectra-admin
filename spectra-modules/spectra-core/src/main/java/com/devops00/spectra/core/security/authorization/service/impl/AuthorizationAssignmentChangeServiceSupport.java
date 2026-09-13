@@ -21,15 +21,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
+import com.devops00.spectra.core.security.authorization.javabean.entity.AssignmentGrantBoundary;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
-import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
-import com.devops00.spectra.core.security.authorization.entity.Permission;
-import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
-import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
-import com.devops00.spectra.core.security.authorization.entity.RolePermission;
-import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
-import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.javabean.entity.AssignmentPermissionBoundary;
+import com.devops00.spectra.core.security.authorization.javabean.entity.Permission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleGrantablePermission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RolePermission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.ScopeRule;
+import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
@@ -127,7 +127,6 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     private final AuditService auditService;
 
     private final AuditRecordFactory auditRecordFactory;
-
 
     private final TimeMapper timeMapper;
 
@@ -504,7 +503,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
      * 更新或推进目标状态（{@code saveScope}）。
      */
     private UUID saveScope(String permission, AuthorizationScope scope) {
-        var entity = new com.devops00.spectra.core.security.authorization.entity.AuthorizationScope();
+        var entity = new com.devops00.spectra.core.security.authorization.javabean.entity.AuthorizationScope();
         entity.setScopeMode(scope.mode().name());
         entity.setResourceCode(permission);
         authorizationScopeMapper.insert(entity);

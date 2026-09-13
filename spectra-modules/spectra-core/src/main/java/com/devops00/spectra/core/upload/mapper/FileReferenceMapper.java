@@ -20,8 +20,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.UUID;
 
@@ -29,36 +27,21 @@ import java.util.UUID;
 @Mapper
 public interface FileReferenceMapper extends BaseMapper<FileReference> {
 
-    @Select("SELECT * FROM spectra_core.file_reference WHERE file_asset_id = #{fileAssetId} "
-            + "AND reference_type = #{referenceType} AND reference_id = #{referenceId} AND purpose = #{purpose} "
-            + "AND deleted IS NULL LIMIT 1")
     FileReference findByKey(@Param("fileAssetId") UUID fileAssetId, @Param("referenceType") String referenceType,
                             @Param("referenceId") UUID referenceId, @Param("purpose") String purpose);
 
-    @Select("SELECT * FROM spectra_core.file_reference WHERE reference_type = #{referenceType} "
-            + "AND reference_id = #{referenceId} AND purpose = #{purpose} AND deleted IS NULL LIMIT 1")
     FileReference findByBusinessKey(@Param("referenceType") String referenceType, @Param("referenceId") UUID referenceId,
                                     @Param("purpose") String purpose);
 
-    @Select("SELECT COUNT(*) FROM spectra_core.file_reference WHERE file_asset_id = #{fileAssetId} AND deleted IS NULL")
     int countByAssetId(@Param("fileAssetId") UUID fileAssetId);
 
-    @Update("UPDATE spectra_core.file_reference SET deleted = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
-            + "WHERE file_asset_id = #{fileAssetId} AND reference_type = #{referenceType} AND reference_id = #{referenceId} "
-            + "AND purpose = #{purpose} AND deleted IS NULL")
     int softDeleteByKey(@Param("fileAssetId") UUID fileAssetId, @Param("referenceType") String referenceType,
                         @Param("referenceId") UUID referenceId, @Param("purpose") String purpose);
 
-    @Update("UPDATE spectra_core.file_reference SET deleted = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
-            + "WHERE reference_type = #{referenceType} AND reference_id = #{referenceId} AND purpose = #{purpose} AND deleted IS NULL")
     int softDeleteByBusinessKeyAndPurpose(@Param("referenceType") String referenceType, @Param("referenceId") UUID referenceId,
                                           @Param("purpose") String purpose);
 
-    @Update("UPDATE spectra_core.file_reference SET deleted = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
-            + "WHERE id = #{id} AND deleted IS NULL")
     int softDeleteById(@Param("id") UUID id);
 
-    @Update("UPDATE spectra_core.file_reference SET deleted = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
-            + "WHERE reference_type = #{referenceType} AND reference_id = #{referenceId} AND deleted IS NULL")
     int softDeleteByBusinessKey(@Param("referenceType") String referenceType, @Param("referenceId") UUID referenceId);
 }

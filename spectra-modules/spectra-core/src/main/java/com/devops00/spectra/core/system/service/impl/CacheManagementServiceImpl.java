@@ -30,7 +30,6 @@ import com.devops00.spectra.framework.security.session.lifecycle.SecurityLoginFa
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -232,7 +231,9 @@ public class CacheManagementServiceImpl implements CacheManagementService {
     }
 
     private static String normalizeTarget(String target) {
-        if (target == null || target.isBlank() || target.length() > 128
+        if (target == null
+                || target.isBlank()
+                || target.length() > 128
                 || !target.matches("[A-Za-z0-9@._+:-]+")) {
             throw new IllegalArgumentException("安全目标格式无效");
         }

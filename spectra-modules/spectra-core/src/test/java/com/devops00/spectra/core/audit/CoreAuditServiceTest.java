@@ -10,6 +10,7 @@ import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditContext;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.core.audit.service.impl.CoreAuditService;
 import com.devops00.spectra.core.audit.repository.JdbcAuditEventWriter;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;

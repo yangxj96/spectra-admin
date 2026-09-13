@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.user.imports.javabean.entity.UserImportTask">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_user_import_task-->
+        <result column="operator_id"           property="operatorId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
+        <result column="idempotency_key"       property="idempotencyKey"/>
+        <result column="file_name"             property="fileName"/>
+        <result column="file_hash"             property="fileHash"/>
+        <result column="skip_existing"         property="skipExisting"/>
+        <result column="status"                property="status"/>
+        <result column="request_hash"          property="requestHash"/>
+        <result column="profile_version_hash"  property="profileVersionHash"/>
+        <result column="preview_token_hash"    property="previewTokenHash"/>
+        <result column="preview_expires_at"    property="previewExpiresAt"/>
+        <result column="expires_at"            property="expiresAt"/>
+        <result column="total_rows"            property="totalRows"/>
+        <result column="valid_rows"            property="validRows"/>
+        <result column="error_rows"            property="errorRows"/>
+        <result column="skipped_rows"          property="skippedRows"/>
+        <result column="applied_rows"          property="appliedRows"/>
+        <result column="completed_rows"        property="completedRows"/>
+        <result column="assignment_count"      property="assignmentCount"/>
+        <result column="access_boundary_count" property="accessBoundaryCount"/>
+        <result column="grant_boundary_count"  property="grantBoundaryCount"/>
+        <result column="preview_consumed_at"   property="previewConsumedAt"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        operator_id,
+        idempotency_key,
+        file_name,
+        file_hash,
+        skip_existing,
+        status,
+        request_hash,
+        profile_version_hash,
+        preview_token_hash,
+        preview_expires_at,
+        expires_at,
+        total_rows,
+        valid_rows,
+        error_rows,
+        skipped_rows,
+        applied_rows,
+        completed_rows,
+        assignment_count,
+        access_boundary_count,
+        grant_boundary_count,
+        preview_consumed_at,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>

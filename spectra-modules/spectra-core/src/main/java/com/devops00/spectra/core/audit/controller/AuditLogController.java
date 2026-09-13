@@ -7,10 +7,10 @@
 package com.devops00.spectra.core.audit.controller;
 
 import com.devops00.spectra.common.audit.Audit;
-import com.devops00.spectra.core.audit.query.AuditLogPageVO;
-import com.devops00.spectra.core.audit.query.AuditLogQueryFrom;
-import com.devops00.spectra.core.audit.query.AuditLogQueryService;
-import com.devops00.spectra.core.audit.query.AuditLogVO;
+import com.devops00.spectra.core.audit.javabean.vo.AuditLogPageVO;
+import com.devops00.spectra.core.audit.javabean.from.AuditLogQueryFrom;
+import com.devops00.spectra.core.audit.service.AuditLogQueryService;
+import com.devops00.spectra.core.audit.javabean.vo.AuditLogVO;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;

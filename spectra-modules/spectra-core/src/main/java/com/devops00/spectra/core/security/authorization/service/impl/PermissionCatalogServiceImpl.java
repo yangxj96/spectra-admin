@@ -8,7 +8,7 @@
 package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.core.security.authorization.entity.Permission;
+import com.devops00.spectra.core.security.authorization.javabean.entity.Permission;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.PermissionMapper;
 import com.devops00.spectra.core.security.authorization.service.PermissionCatalogService;

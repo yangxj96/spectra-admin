@@ -7,7 +7,6 @@
 
 package com.devops00.spectra.core.user.mapper;
 
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,14 +22,6 @@ public interface UserDepartmentMembershipMapper {
      * @param userId       用户 ID
      * @param departmentId 部门 ID
      * @return 受影响行数
-     */
-    @Insert("""
-            INSERT INTO spectra_core.sys_user_department_membership
-                (user_id, department_id, membership_type, created_by, updated_by)
-            VALUES (#{userId}, #{departmentId}, 'PRIMARY', #{userId}, #{userId})
-            """)
-    /**
-     * 处理内部业务逻辑（{@code insertPrimary}）。
      */
     int insertPrimary(@Param("userId") UUID userId, @Param("departmentId") UUID departmentId);
 }
