@@ -61,14 +61,6 @@
             <artifactId>tika-core</artifactId>
         </dependency>
 
-        <!-- 测试上下文复用集中管理的 application-dev.yml，不进入核心模块运行时依赖。 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-config</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- === 工具 === -->
         <!-- ip 转区域 -->
         <dependency>
@@ -85,25 +77,10 @@
             <artifactId>mica-core</artifactId>
         </dependency>
 
-        <!-- 可显式启用的目标 schema PostgreSQL/Flyway 集成测试依赖。 -->
+        <!-- 保留的删除副作用回归用例使用 JUnit 与 Mockito。 -->
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-database-postgresql</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers-junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers-postgresql</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
 

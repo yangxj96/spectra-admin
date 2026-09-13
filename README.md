@@ -6,7 +6,6 @@
 
 | 模块 | 职责 |
 |---|---|
-| `spectra-config` | 集中管理 `application-*.yml` 配置 |
 | `spectra-common` | DTO、Entity 基类、安全公共端口、公共工具和共享依赖 |
 | `spectra-framework` | MVC、JSON、MyBatis-Plus、Redis、缓存、Spring Security、安全 Redis 适配和接口加解密 |
 | `spectra-modules/spectra-core` | 用户、认证、角色权限、组织、菜单、字典、区域、配置、安全审计、日志、统一通知和文件上传 |
@@ -80,7 +79,7 @@ mise exec -- java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED \
 | 基础设施 | `docs/后端/10-后端模块/12-基础设施.md` |
 | API 总览 | `docs/后端/10-后端模块/16-API总览.md` |
 | 数据模型 | `docs/后端/20-数据模型/` |
-| 数据库迁移 | `spectra-config/src/main/resources/db/migration/` |
+| 启动配置与数据库迁移 | `spectra-launch/src/main/resources/` |
 | 环境与命令 | `docs/开发指南/` |
 
 在线文档：[https://www.devops00.com/spectra-admin/](https://www.devops00.com/spectra-admin/)

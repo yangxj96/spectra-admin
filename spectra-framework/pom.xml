@@ -146,19 +146,6 @@
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- 仅供显式 integration profile 的真实 Redis 合约测试使用。 -->
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers-junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.redis</groupId>
-            <artifactId>testcontainers-redis</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
         <!-- === 工具 === -->
         <!-- MapStruct -->
         <!-- 这三个的顺序不能调整,不然生成的mapstruct实现类会出问题 -->

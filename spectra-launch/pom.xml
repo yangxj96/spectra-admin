@@ -29,7 +29,7 @@
 
     <artifactId>spectra-launch</artifactId>
 
-    <description>启动模块,使用者的业务也应该在这个包中进行扩展</description>
+    <description>Spring Boot 组合根，集中管理启动配置和 Flyway migrations</description>
 
     <properties>
         <java.version>25</java.version>
@@ -40,12 +40,6 @@
     </properties>
 
     <dependencies>
-        <!-- 全量后端架构规则通过启动模块的完整业务 classpath 执行。 -->
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -66,13 +60,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
-        <!-- 配置资源属于启动装配边界，不通过 common 传递。 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- === 项目模块-基础功能 === -->
         <!-- 工作流 -->
         <dependency>
