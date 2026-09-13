@@ -105,7 +105,7 @@ public class KaptchaConfiguration {
      * @throws Exception 组件初始化或配置失败时抛出。
      */
     @Bean
-    @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
+    @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math", matchIfMissing = true)
     public DefaultKaptcha getKaptchaBeanMath() throws Exception {
         log.debug(LogPrefix.KAPTCHA.f("开始配置图片验证码,算术模式"));
         var defaultKaptcha = new DefaultKaptcha();

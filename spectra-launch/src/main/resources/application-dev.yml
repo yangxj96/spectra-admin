@@ -11,9 +11,6 @@ spectra:
     verify: false
   file:
     upload:
-      local:
-        storage-root: ${spectra.system.base-dir}/uploads
-        staging-root: ${spectra.system.base-dir}/temp
       s3:
         endpoint: ${S3_ENDPOINT}
         accessKey: ${S3_ACCESS_KEY}
@@ -27,7 +24,7 @@ server:
   port: 4004
   forward-headers-strategy: framework
   ssl:
-    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
+    key-store: ${spectra.system.base-dir:files}/ssl/keystore.p12
     key-store-password: ${SSL_PASSWORD}
     key-store-type: ${SSL_TYPE}
     key-alias: ${SSL_ALIAS}
@@ -120,7 +117,8 @@ mybatis-plus:
   type-aliases-package: com.devops00.**.entity
   type-handlers-package: com.devops00.spectra.framework.persistence.mybatis
   configuration:
-    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    #log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
     local-cache-scope: statement
   global-config:
     banner: false
@@ -161,12 +159,8 @@ logging:
   group:
     spectra: >-
       com.devops00.spectra
-    other:
-      - com.ulisesbocchio.jasyptspringboot.configuration
-      - io.agentscope.harness.agent.middleware
   level:
     root: info
-    other: error
     spectra: debug
 
 # ==================== 健康检查 ====================

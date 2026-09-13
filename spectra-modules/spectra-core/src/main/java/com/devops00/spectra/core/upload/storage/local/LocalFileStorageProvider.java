@@ -28,6 +28,7 @@ import com.devops00.spectra.core.upload.storage.StorageObject;
 import com.devops00.spectra.core.upload.storage.StorageObjectMetadata;
 import com.devops00.spectra.core.upload.storage.StoragePaths;
 import com.devops00.spectra.core.upload.storage.StoredPart;
+import com.devops00.spectra.framework.properties.SystemProperties;
 import org.springframework.stereotype.Component;
 
 import java.io.FilterInputStream;
@@ -56,9 +57,9 @@ public class LocalFileStorageProvider implements FileStorageProvider {
     private final Path storageRoot;
     private final Path stagingRoot;
 
-    public LocalFileStorageProvider(LocalProperties properties) {
-        this.storageRoot = Path.of(properties.getStorageRoot()).toAbsolutePath().normalize();
-        this.stagingRoot = Path.of(properties.getStagingRoot()).toAbsolutePath().normalize();
+    public LocalFileStorageProvider(LocalProperties properties, SystemProperties systemProperties) {
+        this.storageRoot = resolveRoot(systemProperties.getBaseDir(), properties.getStorageRoot());
+        this.stagingRoot = resolveRoot(systemProperties.getBaseDir(), properties.getStagingRoot());
     }
 
     @Override
@@ -212,6 +213,17 @@ public class LocalFileStorageProvider implements FileStorageProvider {
      */
     private Path stagingPath(UUID uploadId) {
         return stagingRoot.resolve(uploadId.toString()).normalize();
+    }
+
+    /**
+     * 将相对目录解析到系统文件根目录下，绝对目录保持独立配置。
+     */
+    private static Path resolveRoot(String baseDir, String configuredRoot) {
+        Path root = Path.of(configuredRoot);
+        if (root.isAbsolute()) {
+            return root.normalize();
+        }
+        return Path.of(baseDir).toAbsolutePath().normalize().resolve(root).normalize();
     }
 
     /**

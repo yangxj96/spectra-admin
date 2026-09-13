@@ -8,9 +8,6 @@ spectra:
       required: true
   file:
     upload:
-      local:
-        storage-root: ${spectra.system.base-dir}/uploads
-        staging-root: ${spectra.system.base-dir}/temp
       s3:
         endpoint: ${S3_ENDPOINT}
         accessKey: ${S3_ACCESS_KEY}
@@ -170,12 +167,8 @@ logging:
   group:
     spectra: >-
       com.devops00.spectra
-    other:
-      - com.ulisesbocchio.jasyptspringboot.configuration
-      - io.agentscope.harness.agent.middleware
   level:
     root: info
-    other: error
     spectra: debug
 
 # ==================== 健康检查 ====================

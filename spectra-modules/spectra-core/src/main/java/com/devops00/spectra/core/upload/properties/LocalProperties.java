@@ -31,12 +31,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class LocalProperties {
 
     /**
-     * 上传的文件夹位置
+     * 上传文件存储根目录；相对路径按系统文件基础目录解析。
      */
     private String storageRoot = "uploads";
 
     /**
-     * 上传文件的时候临时文件路径
+     * 上传分片和临时文件目录；相对路径按系统文件基础目录解析。
      */
     private String stagingRoot = "temp";
 }
