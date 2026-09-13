@@ -3,30 +3,9 @@ spectra:
   security:
     secret:
       master-key: ${SPECTRA_SECURITY_SECRET_MASTER_KEY:}
-    verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
-    refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:__Host-spectra-refresh}
-    refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:true}
-    allow-insecure-refresh-cookie: ${SPECTRA_SECURITY_ALLOW_INSECURE_REFRESH_COOKIE:false}
-    refresh-cookie-same-site: ${SPECTRA_SECURITY_REFRESH_COOKIE_SAME_SITE:Strict}
-    refresh-cookie-same-site-none-allowed: ${SPECTRA_SECURITY_REFRESH_COOKIE_SAME_SITE_NONE_ALLOWED:false}
-    refresh-cookie-path: ${SPECTRA_SECURITY_REFRESH_COOKIE_PATH:/}
-    refresh-cookie-domain: ${SPECTRA_SECURITY_REFRESH_COOKIE_DOMAIN:}
-    csrf-cookie-name: ${SPECTRA_SECURITY_CSRF_COOKIE_NAME:XSRF-TOKEN}
-    csrf-header-name: ${SPECTRA_SECURITY_CSRF_HEADER_NAME:X-XSRF-TOKEN}
-    crypto-request-max-body-bytes: ${SPECTRA_SECURITY_CRYPTO_REQUEST_MAX_BODY_BYTES:1048576}
-    crypto-replay-window-seconds: ${SPECTRA_SECURITY_CRYPTO_REPLAY_WINDOW_SECONDS:300}
-    redis:
-      namespace: "sec:"
-      fail-closed: true
-      worker-batch-size: ${SPECTRA_SECURITY_REDIS_WORKER_BATCH_SIZE:100}
   system:
-    base-dir: files
     cors:
-      required: ${SPECTRA_CORS_REQUIRED:true}
-      origin-patterns: ${SPECTRA_CORS_ORIGIN_ALLOWLIST:}
-  kaptcha:
-    type: math
-    verify: true
+      required: true
   file:
     upload:
       local:
@@ -39,45 +18,11 @@ spectra:
         bucket: ${S3_BUCKET}
         region: ${S3_REGION}
       default-storage: s3
-      chunk-size: 8388608
-      min-chunk-size: 5242880
-      max-chunk-size: 67108864
-      max-parts: 10000
-      parallelism: 3
-      task-ttl: 24h
-      idle-timeout: 2h
-      record-retention: 7d
-      orphan-retention: 7d
-      presign-ttl: 15m
-  notification:
-    enabled: true
-    allowed-link-prefixes: /login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/
-    worker:
-      fixed-delay-ms: 5000
-      processing-timeout-seconds: 300
-      retry-base-delay-seconds: 5
-    cleanup:
-      enabled: true
-      fixed-delay-ms: 3600000
-      batch-size: 100
-      retention-seconds: 86400
-  scheduler:
-    quartz:
-      enabled: true
-      table-prefix: spectra_quartz.QRTZ_
-      clustered: true
-      jdbc-store: true
-      job-store-class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
-      thread-count: 10
-      history-retention-days: 90
-      history-cleanup-batch-size: 500
-      history-running-timeout: 24h
-      database-retry-interval: 10s
 
 # ==================== 服务器配置 ====================
 server:
-  port: ${SERVER_PORT:80}
-  forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:framework}
+  port: 4004
+  forward-headers-strategy: framework
   shutdown: graceful
   compression:
     enabled: true
@@ -152,7 +97,7 @@ spring:
         sslmode: disable
         prepareThreshold: 5
   flyway:
-    enabled: ${SPECTRA_FLYWAY_ENABLED:true}
+    enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: false
     validate-on-migrate: true
@@ -161,15 +106,15 @@ spring:
   data:
     redis:
       url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}
-      timeout: ${SPECTRA_REDIS_COMMAND_TIMEOUT:10s}
-      connect-timeout: ${SPECTRA_REDIS_CONNECT_TIMEOUT:5s}
+      timeout: 10s
+      connect-timeout: 5s
       lettuce:
         pool:
           enabled: true
-          max-idle: ${SPECTRA_REDIS_POOL_MAX_IDLE:10}
-          min-idle: ${SPECTRA_REDIS_POOL_MIN_IDLE:2}
-          max-active: ${SPECTRA_REDIS_POOL_MAX_ACTIVE:20}
-          max-wait: ${SPECTRA_REDIS_POOL_MAX_WAIT:5000ms}
+          max-idle: 10
+          min-idle: 2
+          max-active: 20
+          max-wait: 5000ms
         shutdown-timeout: 100ms
   security:
     user:
