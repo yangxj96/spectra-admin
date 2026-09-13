@@ -49,6 +49,7 @@ public record PasswordPolicy(int minLength,
     public void assertAccepts(String password) {
         if (password == null
                 || password.length() < minLength
+                || password.length() > MAX_LENGTH
                 || requireUppercase && password.codePoints().noneMatch(Character::isUpperCase)
                 || requireLowercase && password.codePoints().noneMatch(Character::isLowerCase)
                 || requireDigit && password.codePoints().noneMatch(Character::isDigit)

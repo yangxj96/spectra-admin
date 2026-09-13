@@ -21,11 +21,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
+import com.devops00.spectra.common.exception.BusinessRuleViolationException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
-import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
@@ -51,8 +51,8 @@ import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
-import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.user.provider.DefaultUserPasswordProvider;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.OnlineUserPageAssembler;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
@@ -71,10 +71,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -95,14 +92,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
-    /** 生成临时密码时使用的密码学安全随机数生成器。 */
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-
     /** 批量查找授权候选项时允许读取的最大记录数。 */
     private static final int SECURITY_CANDIDATE_LIMIT = 20;
-
-    /** 临时密码的有效时长。 */
-    private static final Duration TEMPORARY_PASSWORD_VALIDITY = Duration.ofHours(24);
 
     /** 将用户实体转换为接口返回数据。 */
     private final UserConverter userConverter;
@@ -158,6 +149,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     /** 提供当前生效的密码策略。 */
     private final SecurityPasswordPolicyProvider securityPasswordPolicyProvider;
 
+    /** 提供新建、导入和重置用户使用的默认密码哈希。 */
+    private final DefaultUserPasswordProvider defaultUserPasswordProvider;
+
     /** 转换应用使用的时间类型。 */
     private final TimeMapper timeMapper;
 
@@ -200,6 +194,15 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public UserCreatedVO create(UserSaveFrom params) {
+        return createWithDefaultPasswordHash(params, defaultUserPasswordProvider.requireEncodedPassword());
+    }
+
+    @Override
+    @Transactional
+    public UserCreatedVO createWithDefaultPasswordHash(UserSaveFrom params, String encodedPasswordHash) {
+        if (StrUtils.isBlank(encodedPasswordHash)) {
+            throw new DataException("系统默认密码未配置，请先在系统设置中配置");
+        }
         if (params.getStatus() != UserStatus.ACTIVE) {
             throw new DataException("新用户必须以 ACTIVE 状态创建");
         }
@@ -208,10 +211,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!this.save(entity)) {
             throw new DataSaveException("保存用户信息异常");
         }
-        // 目标认证模型将身份标识和密码凭证拆分保存；临时密码只保存其哈希。
+        // 目标认证模型将身份标识和密码凭证拆分保存；默认密码只保存其哈希。
         authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getUsername());
         syncProvisionedContacts(entity.getId(), params);
-        passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
+        passwordCredentialService.createOrReplace(entity.getId(), encodedPasswordHash, true);
         authorizationAssignmentChangeService.ensureDefaultUserRole(entity.getId());
         appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
         return new UserCreatedVO(entity.getId(), entity.getRealName());
@@ -245,7 +248,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public UserPasswordResetVO passwordResetById(UUID uid) {
+    public void passwordResetById(UUID uid) {
         var user = this.getById(uid);
         if (user == null) {
             throw new DataNotExistException("用户不存在");
@@ -254,14 +257,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (credential == null) {
             throw new DataNotExistException("密码凭证不存在");
         }
-        String temporaryPassword = generateTemporaryPassword();
-        Instant expiresAt = Instant.now().plus(TEMPORARY_PASSWORD_VALIDITY);
-        passwordCredentialService.updatePassword(user.getId(), passwordEncoder.encode(temporaryPassword), true, expiresAt);
-        appendAudit("PASSWORD_RESET", uid, Map.of(),
-                Map.of("mustChange", true, "expiresAt", expiresAt.toString()), "管理员重置密码");
+        String defaultPasswordHash = defaultUserPasswordProvider.requireEncodedPassword();
+        passwordCredentialService.updatePassword(user.getId(), defaultPasswordHash, true, null);
+        appendAudit("PASSWORD_RESET", uid, Map.of(), Map.of("mustChange", true), "管理员重置密码");
         // 密码凭证变化后，所有设备必须重新认证。
         securitySessionRevocationPort.revokeUserSessions(uid);
-        return new UserPasswordResetVO(temporaryPassword, timeMapper.toLocalDateTime(expiresAt), true);
     }
 
     @Override
@@ -364,20 +364,25 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         // 3. 验证旧密码
         if (!passwordEncoder.matches(params.getOldPassword(), credential.getPasswordHash())) {
-            throw new SpectraException("旧密码错误");
+            throw new BusinessRuleViolationException("旧密码错误");
         }
 
         // 4. 验证新密码和确认密码是否一致
         if (!params.getNewPassword().equals(params.getVerifyPassword())) {
-            throw new SpectraException("两次输入的新密码不一致");
+            throw new BusinessRuleViolationException("两次输入的新密码不一致");
         }
 
         // 5. 验证新密码不能与旧密码相同
         if (passwordEncoder.matches(params.getNewPassword(), credential.getPasswordHash())) {
-            throw new SpectraException("新密码不能与旧密码相同");
+            throw new BusinessRuleViolationException("新密码不能与旧密码相同");
         }
 
-        securityPasswordPolicyProvider.current().assertAccepts(params.getNewPassword());
+        var passwordPolicy = securityPasswordPolicyProvider.current();
+        try {
+            passwordPolicy.assertAccepts(params.getNewPassword());
+        } catch (IllegalArgumentException exception) {
+            throw new BusinessRuleViolationException(exception.getMessage());
+        }
 
         // 6. 加密新密码并更新
         passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false, null);
@@ -550,17 +555,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private UUID currentOperatorId() {
         var currentUser = securityContextAccessor.currentUser();
         return currentUser == null ? null : currentUser.getId();
-    }
-
-    /**
-     * 生成仅用于占位的随机凭证，避免所有新账号共享一个可猜测的默认密码。
-     *
-     * @return 随机临时凭证
-     */
-    private String generateTemporaryPassword() {
-        var bytes = new byte[32];
-        SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     /**

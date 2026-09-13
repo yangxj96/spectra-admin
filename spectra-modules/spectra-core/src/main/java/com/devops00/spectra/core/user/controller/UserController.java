@@ -28,7 +28,6 @@ import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
-import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.UserOnboardingService;
@@ -101,10 +100,10 @@ public class UserController {
     @Audit("'重置用户密码'")
     @PutMapping(value = "/password/reset/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:reset-password')")
-    public UserPasswordResetVO passwordResetById(@PathVariable UUID uid, HttpServletResponse response) {
+    public void passwordResetById(@PathVariable UUID uid, HttpServletResponse response) {
         response.setHeader("Cache-Control", "no-store");
         response.setHeader("Pragma", "no-cache");
-        return bindService.passwordResetById(uid);
+        bindService.passwordResetById(uid);
     }
 
     /**

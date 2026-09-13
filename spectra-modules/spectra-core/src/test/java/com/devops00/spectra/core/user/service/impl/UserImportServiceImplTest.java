@@ -24,6 +24,7 @@ import com.devops00.spectra.core.user.javabean.from.UserImportApplyFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserImportTaskVO;
 import com.devops00.spectra.core.user.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.mapper.UserImportTaskMapper;
+import com.devops00.spectra.core.user.provider.DefaultUserPasswordProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +58,8 @@ class UserImportServiceImplTest {
 
     private static final UUID OPERATOR_ID = UUID.randomUUID();
 
+    private static final String DEFAULT_PASSWORD_HASH = "{bcrypt}encoded-default-password";
+
     @Mock
     private UserImportTaskMapper taskMapper;
 
@@ -76,6 +79,9 @@ class UserImportServiceImplTest {
     private UserImportExecutionWorker executionWorker;
 
     @Mock
+    private DefaultUserPasswordProvider defaultUserPasswordProvider;
+
+    @Mock
     private TaskExecutor taskExecutor;
 
     @InjectMocks
@@ -85,6 +91,7 @@ class UserImportServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        when(defaultUserPasswordProvider.requireEncodedPassword()).thenReturn(DEFAULT_PASSWORD_HASH);
         when(securityContextAccessor.currentUserId()).thenReturn(OPERATOR_ID);
         when(taskMapper.update(any(), any())).thenReturn(1);
         when(taskMapper.updateById(any(UserImportTask.class))).thenReturn(1);
@@ -130,7 +137,7 @@ class UserImportServiceImplTest {
         when(resultService.requireTask(task.getId())).thenReturn(task);
         when(resultService.findTask(task.getId(), OPERATOR_ID)).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of(row));
-        when(executionWorker.processChunk(any(), any(), any(), any(Boolean.TYPE), any()))
+        when(executionWorker.processChunk(any(), any(), any(), any(Boolean.TYPE), any(), any()))
                 .thenReturn(new UserImportExecutionWorker.ChunkResult(1, 0, 0, 1));
 
         service.apply(task.getId(), applyRequest());

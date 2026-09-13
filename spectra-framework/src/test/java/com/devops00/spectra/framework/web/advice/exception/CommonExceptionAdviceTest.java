@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.framework.web.advice.exception;
 
+import com.devops00.spectra.common.exception.BusinessRuleViolationException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.framework.web.response.R;
@@ -73,6 +74,18 @@ class CommonExceptionAdviceTest {
         assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
         assertEquals(HttpServletResponse.SC_CONFLICT, result.getCode());
         assertEquals("任务已归档，请重新注册", result.getMsg());
+    }
+
+    @Test
+    void businessRuleViolationShouldReturnBadRequestAndPreserveMessage() throws Exception {
+        var response = new MockHttpServletResponse();
+
+        var result = new CommonExceptionAdvice().businessRuleViolationException(
+                new BusinessRuleViolationException("新密码不能与旧密码相同"), response);
+
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, result.getCode());
+        assertEquals("新密码不能与旧密码相同", result.getMsg());
     }
 
     @Test

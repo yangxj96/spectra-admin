@@ -93,10 +93,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private boolean isPasswordChangeRequest(HttpServletRequest request) {
         String path = request.getRequestURI();
         if ("GET".equalsIgnoreCase(request.getMethod())) {
-            return path.endsWith("/menu/current")
-                    || path.endsWith("/security/context")
-                    || path.endsWith("/user/profile")
-                    || path.endsWith("/system/guide/status")
+            return path.endsWith("/security/policy/password")
                     || path.endsWith("/system/crypto/keypair/client-private");
         }
         return ("PUT".equalsIgnoreCase(request.getMethod()) && path.endsWith("/user/password"))

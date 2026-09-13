@@ -45,6 +45,8 @@ public final class SystemConfigKeys {
 
     public static final String CRYPTO_ENABLED = "crypto.enabled";
 
+    public static final String USER_DEFAULT_PASSWORD = "user.default-password";
+
     public static final String NOTIFICATION_ENABLED = "notification.enabled";
 
     public static final String NOTIFICATION_ALLOWED_LINK_PREFIXES = "notification.allowed-link-prefixes";

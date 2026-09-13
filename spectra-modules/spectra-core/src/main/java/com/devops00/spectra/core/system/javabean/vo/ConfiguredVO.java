@@ -56,6 +56,11 @@ public class ConfiguredVO implements Serializable {
     private String value;
 
     /**
+     * 秘密配置是否已经设置；秘密配置不通过该响应返回实际值。
+     */
+    private boolean configured;
+
+    /**
      * 值类型
      */
     private ConfiguredValueType type;

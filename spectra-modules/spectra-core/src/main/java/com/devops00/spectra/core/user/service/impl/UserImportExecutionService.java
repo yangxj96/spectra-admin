@@ -28,6 +28,7 @@ import com.devops00.spectra.core.user.javabean.from.UserImportApplyFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserImportTaskVO;
 import com.devops00.spectra.core.user.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.mapper.UserImportTaskMapper;
+import com.devops00.spectra.core.user.provider.DefaultUserPasswordProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -74,10 +75,18 @@ public class UserImportExecutionService {
 
     private final UserImportExecutionWorker executionWorker;
 
+    private final DefaultUserPasswordProvider defaultUserPasswordProvider;
+
     @Qualifier("userImportTaskExecutor")
     private final TaskExecutor userImportTaskExecutor;
 
-    /** 校验并消费 Preview token，提交异步 Apply 任务。 */
+    /**
+     * 校验并消费 Preview token，提交异步 Apply 任务。
+     *
+     * @param id     待应用的导入任务标识。
+     * @param params Preview Apply 确认参数。
+     * @return 返回任务进入异步处理时的状态摘要。
+     */
     @Transactional
     public UserImportTaskVO apply(UUID id, UserImportApplyFrom params) {
         var task = resultService.requireTask(id);
@@ -91,6 +100,7 @@ public class UserImportExecutionService {
             throw new DataException("当前导入任务不可 Apply: " + task.getStatus());
         }
         previewService.validateApply(task, params);
+        var encodedDefaultPasswordHash = defaultUserPasswordProvider.requireEncodedPassword();
 
         var claimedAt = Instant.now();
         var operatorId = currentOperatorId();
@@ -118,7 +128,7 @@ public class UserImportExecutionService {
         var securityContext = SecurityContextHolder.getContext();
         try {
             userImportTaskExecutor.execute(new DelegatingSecurityContextRunnable(
-                    () -> processApply(task.getId(), operatorId), securityContext));
+                    () -> processApply(task.getId(), operatorId, encodedDefaultPasswordHash), securityContext));
         } catch (RuntimeException exception) {
             markApplyFailed(task.getId(), operatorId, exception);
             throw new DataException("无法启动用户导入任务: " + safeMessage(exception), exception);
@@ -127,9 +137,13 @@ public class UserImportExecutionService {
     }
 
     /**
-     * 处理应用相关数据。
+     * 使用 Apply 开始时读取的默认密码哈希处理整批导入数据。
+     *
+     * @param taskId                     待处理的导入任务标识。
+     * @param operatorId                 发起 Apply 的操作者标识。
+     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希。
      */
-    private void processApply(UUID taskId, UUID operatorId) {
+    private void processApply(UUID taskId, UUID operatorId, String encodedDefaultPasswordHash) {
         try {
             var task = resultService.findTask(taskId, operatorId);
             if (task == null) {
@@ -149,7 +163,7 @@ public class UserImportExecutionService {
             for (int start = 0; start < validRows.size(); start += UserImportExecutionWorker.CHUNK_SIZE) {
                 var end = Math.min(start + UserImportExecutionWorker.CHUNK_SIZE, validRows.size());
                 var chunk = executionWorker.processChunk(taskId, operatorId, validRows.subList(start, end),
-                        task.isSkipExisting(), referenceData);
+                        task.isSkipExisting(), referenceData, encodedDefaultPasswordHash);
                 processed += chunk.processedRows();
                 applied = chunk.appliedRows();
                 skipped = chunk.skippedRows();

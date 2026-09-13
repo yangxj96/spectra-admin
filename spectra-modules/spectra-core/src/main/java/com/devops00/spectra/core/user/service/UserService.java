@@ -30,7 +30,6 @@ import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
-import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 
 import java.util.List;
 import java.util.UUID;
@@ -89,6 +88,15 @@ public interface UserService extends BaseService<User> {
     UserCreatedVO create(UserSaveFrom params);
 
     /**
+     * 在一个批量导入操作中使用同一份已编码默认密码创建用户。
+     *
+     * @param params              待创建用户的账号资料及部门等字段。
+     * @param encodedPasswordHash 本次导入开始时读取的默认密码哈希，不得传入明文。
+     * @return 返回新建用户的标识和姓名；校验或写入失败时抛出业务异常。
+     */
+    UserCreatedVO createWithDefaultPasswordHash(UserSaveFrom params, String encodedPasswordHash);
+
+    /**
      * 根据用户ID更新用户
      *
      * @param params 待修改用户的唯一标识及账号、资料、部门和状态等字段。
@@ -99,9 +107,9 @@ public interface UserService extends BaseService<User> {
      * 重置用户密码
      *
      * @param uid 需要重置密码的用户唯一标识。
-     * @return 返回密码重置结果；处理失败时抛出业务异常，不返回 null。
+     *            该操作将凭据更新为系统默认密码并要求用户立即修改，响应不包含密码信息。
      */
-    UserPasswordResetVO passwordResetById(UUID uid);
+    void passwordResetById(UUID uid);
 
     /**
      * 按用户分组分页获取在线用户和会话摘要。

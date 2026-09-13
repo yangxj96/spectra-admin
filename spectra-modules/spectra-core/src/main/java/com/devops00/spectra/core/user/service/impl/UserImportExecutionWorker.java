@@ -60,11 +60,20 @@ public class UserImportExecutionWorker {
     private final UserImportRowProcessor rowProcessor;
 
     /**
-     * 处理用户相关数据。
+     * 在独立事务中处理导入分块，并使用本次 Apply 固定的默认密码哈希。
+     *
+     * @param taskId                     导入任务标识。
+     * @param operatorId                 发起 Apply 的操作者标识。
+     * @param rows                       当前需要处理的导入行。
+     * @param skipExisting               是否跳过已存在的用户。
+     * @param referenceData              Preview 确认时的部门和授权方案数据。
+     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希。
+     * @return 当前分块的处理、成功、跳过和失败数量。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ChunkResult processChunk(UUID taskId, UUID operatorId, List<UserImportRow> rows, boolean skipExisting,
-                                    UserImportPreviewService.ReferenceData referenceData) {
+                                    UserImportPreviewService.ReferenceData referenceData,
+                                    String encodedDefaultPasswordHash) {
         var task = taskMapper.selectOne(new LambdaQueryWrapper<UserImportTask>()
                 .eq(UserImportTask::getId, taskId)
                 .eq(UserImportTask::getOperatorId, operatorId));
@@ -83,7 +92,7 @@ public class UserImportExecutionWorker {
             }
             try {
                 var result = rowProcessor.processInCurrentTransaction(row, skipExisting,
-                        referenceData.departmentIds(), referenceData.profiles());
+                        referenceData.departmentIds(), referenceData.profiles(), encodedDefaultPasswordHash);
                 row.setUserId(result.userId());
                 if (result.skipped()) {
                     row.setState(STATE_SKIPPED);

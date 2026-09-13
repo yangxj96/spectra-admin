@@ -63,6 +63,16 @@ public interface ConfiguredService extends BaseService<Configured> {
     void upsert(String key, String value, ConfiguredValueType type, String remarks);
 
     /**
+     * 创建默认系统配置项；配置已存在时不覆盖当前值。
+     *
+     * @param key     配置键。
+     * @param value   仅在配置不存在时使用的初始值。
+     * @param type    配置值类型。
+     * @param remarks 配置用途说明。
+     */
+    void ensureExists(String key, String value, ConfiguredValueType type, String remarks);
+
+    /**
      * 查询值。
      *
      * @param key 查询或操作所用的键。

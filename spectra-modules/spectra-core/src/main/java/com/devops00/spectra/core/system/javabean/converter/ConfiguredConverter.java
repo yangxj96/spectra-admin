@@ -18,6 +18,7 @@ package com.devops00.spectra.core.system.javabean.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
+import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
@@ -40,7 +41,29 @@ public interface ConfiguredConverter {
      * @param source 数据库实体
      * @return VO
      */
+    @Mapping(target = "value", expression = "java(exposedValue(source))")
+    @Mapping(target = "configured", expression = "java(isSecretConfigured(source))")
     ConfiguredVO toVO(Configured source);
+
+    /**
+     * SECRET 配置只返回空值，避免将存储的密码哈希暴露给调用方。
+     *
+     * @param source 配置实体。
+     * @return 普通配置值或秘密配置的空值。
+     */
+    default String exposedValue(Configured source) {
+        return source.getType() == ConfiguredValueType.SECRET ? null : source.getValue();
+    }
+
+    /**
+     * 判断秘密配置是否已有编码值。
+     *
+     * @param source 配置实体。
+     * @return 存在非空秘密配置时为 true。
+     */
+    default boolean isSecretConfigured(Configured source) {
+        return source.getType() == ConfiguredValueType.SECRET && source.getValue() != null && !source.getValue().isBlank();
+    }
 
     /**
      * 转换到分页的VO信息

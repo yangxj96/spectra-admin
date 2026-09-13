@@ -31,7 +31,8 @@ public enum ConfiguredValueType implements IEnum<Integer> {
 
     TEXT(0, "文本"),
     BOOL(1, "是否"),
-    SELECT(2, "选择");
+    SELECT(2, "选择"),
+    SECRET(3, "秘密");
 
     /**
      * 持久化到系统配置表的数值编码。

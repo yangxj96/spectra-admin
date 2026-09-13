@@ -72,28 +72,50 @@ public class UserImportRowProcessor {
     private final AuthorizationAssignmentChangeService assignmentChangeService;
 
     /**
-     * 处理用户行数据相关数据。
+     * 在当前调用事务中处理单行用户数据。
+     *
+     * @param row           待处理导入行。
+     * @param skipExisting  是否跳过已存在的用户。
+     * @param departmentIds 部门编码到部门标识的映射。
+     * @param profiles      授权方案编码到方案详情的映射。
+     * @return 当前导入行创建或跳过后的结果。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ProcessResult process(UserImportRow row, boolean skipExisting, Map<String, UUID> departmentIds,
                                  Map<String, AuthorizationProfileVO> profiles) {
-        return processInternal(row, skipExisting, departmentIds, profiles);
+        return processInternal(row, skipExisting, departmentIds, profiles, null);
     }
 
     /**
      * 处理当前事务相关数据。
+     *
+     * @param row                        待处理导入行。
+     * @param skipExisting               是否跳过已存在的用户。
+     * @param departmentIds              部门编码到部门标识的映射。
+     * @param profiles                   授权方案编码到方案详情的映射。
+     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希。
+     * @return 当前导入行创建或跳过后的结果。
      */
     public ProcessResult processInCurrentTransaction(UserImportRow row, boolean skipExisting,
                                                      Map<String, UUID> departmentIds,
-                                                     Map<String, AuthorizationProfileVO> profiles) {
-        return processInternal(row, skipExisting, departmentIds, profiles);
+                                                     Map<String, AuthorizationProfileVO> profiles,
+                                                     String encodedDefaultPasswordHash) {
+        return processInternal(row, skipExisting, departmentIds, profiles, encodedDefaultPasswordHash);
     }
 
     /**
-     * 处理内部相关数据。
+     * 校验导入行并创建用户、应用授权方案。
+     *
+     * @param row                        待处理导入行。
+     * @param skipExisting               是否跳过已存在的用户。
+     * @param departmentIds              部门编码到部门标识的映射。
+     * @param profiles                   授权方案编码到方案详情的映射。
+     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希；空值时由用户服务读取当前设置。
+     * @return 当前导入行创建或跳过后的结果。
      */
     private ProcessResult processInternal(UserImportRow row, boolean skipExisting, Map<String, UUID> departmentIds,
-                                          Map<String, AuthorizationProfileVO> profiles) {
+                                          Map<String, AuthorizationProfileVO> profiles,
+                                          String encodedDefaultPasswordHash) {
         var source = toSource(row.getNormalizedData());
         var existing = findExisting(source);
         if (existing != null) {
@@ -120,7 +142,9 @@ public class UserImportRowProcessor {
         user.setTimezone(source.getTimezone());
         user.setDepartmentId(departmentId);
         user.setStatus(UserStatus.ACTIVE);
-        UserCreatedVO created = userService.create(user);
+        UserCreatedVO created = encodedDefaultPasswordHash == null
+                ? userService.create(user)
+                : userService.createWithDefaultPasswordHash(user, encodedDefaultPasswordHash);
         applyProfile(created.getId(), profile, departmentIds);
         return new ProcessResult(created.getId(), false);
     }

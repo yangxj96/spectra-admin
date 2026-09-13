@@ -21,6 +21,9 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -84,8 +87,83 @@ class TokenAuthenticationFilterTest {
     }
 
     @Test
-    void shouldBlockBusinessRequestForTemporaryPasswordSession() throws Exception {
-        var request = new MockHttpServletRequest("GET", "/api/department/tree");
+    void shouldAllowPasswordPolicyForTemporaryPasswordSession() throws Exception {
+        var request = new MockHttpServletRequest("GET", "/api/security/policy/password");
+        var response = new MockHttpServletResponse();
+        var chain = mock(FilterChain.class);
+        var contextAccessor = mock(SecurityContextAccessor.class);
+        var userLookupPort = mock(SecurityUserLookupPort.class);
+        var user = mock(SecurityPrincipal.class);
+        when(user.isPasswordChangeRequired()).thenReturn(true);
+        when(user.getAuthorityNames()).thenReturn(java.util.List.of());
+        when(contextAccessor.currentToken()).thenReturn("temporary-token");
+        when(userLookupPort.findByToken("temporary-token")).thenReturn(user);
+        var filter = new TokenAuthenticationFilter(contextAccessor, userLookupPort);
+
+        try {
+            filter.doFilter(request, response, chain);
+
+            assertEquals(200, response.getStatus());
+            verify(chain).doFilter(request, response);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
+
+    @Test
+    void shouldBlockProfileForTemporaryPasswordSession() throws Exception {
+        var request = new MockHttpServletRequest("GET", "/api/user/profile");
+        var response = new MockHttpServletResponse();
+        var chain = mock(FilterChain.class);
+        var contextAccessor = mock(SecurityContextAccessor.class);
+        var userLookupPort = mock(SecurityUserLookupPort.class);
+        var user = mock(SecurityPrincipal.class);
+        when(user.isPasswordChangeRequired()).thenReturn(true);
+        when(contextAccessor.currentToken()).thenReturn("temporary-token");
+        when(userLookupPort.findByToken("temporary-token")).thenReturn(user);
+        var filter = new TokenAuthenticationFilter(contextAccessor, userLookupPort);
+
+        filter.doFilter(request, response, chain);
+
+        assertEquals(403, response.getStatus());
+        verify(chain, never()).doFilter(request, response);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"PUT,/api/user/password", "POST,/api/security/authentication/logout"})
+    void shouldAllowPasswordChangeAndLogoutForTemporaryPasswordSession(String method, String path) throws Exception {
+        var request = new MockHttpServletRequest(method, path);
+        var response = new MockHttpServletResponse();
+        var chain = mock(FilterChain.class);
+        var contextAccessor = mock(SecurityContextAccessor.class);
+        var userLookupPort = mock(SecurityUserLookupPort.class);
+        var user = mock(SecurityPrincipal.class);
+        when(user.isPasswordChangeRequired()).thenReturn(true);
+        when(user.getAuthorityNames()).thenReturn(java.util.List.of());
+        when(contextAccessor.currentToken()).thenReturn("temporary-token");
+        when(userLookupPort.findByToken("temporary-token")).thenReturn(user);
+        var filter = new TokenAuthenticationFilter(contextAccessor, userLookupPort);
+
+        try {
+            filter.doFilter(request, response, chain);
+
+            assertEquals(200, response.getStatus());
+            verify(chain).doFilter(request, response);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "/api/department/tree",
+            "/api/menu/current",
+            "/api/security/context",
+            "/api/system/guide/status",
+            "/api/user/profile"
+    })
+    void shouldBlockBusinessRequestForTemporaryPasswordSession(String path) throws Exception {
+        var request = new MockHttpServletRequest("GET", path);
         var response = new MockHttpServletResponse();
         var chain = mock(FilterChain.class);
         var contextAccessor = mock(SecurityContextAccessor.class);

@@ -40,7 +40,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 /**
  * 验证 {@code UserImportExecutionWorkerTest} 的主要行为、边界条件和回归约束。
@@ -51,6 +53,8 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class UserImportExecutionWorkerTest {
+
+    private static final String DEFAULT_PASSWORD_HASH = "{bcrypt}encoded-default-password";
 
     @Mock
     private UserImportTaskMapper taskMapper;
@@ -86,11 +90,13 @@ class UserImportExecutionWorkerTest {
         var row = new UserImportRow();
         row.setState(UserImportRowState.VALID.name());
         when(taskMapper.selectOne(any())).thenReturn(task);
-        when(rowProcessor.processInCurrentTransaction(any(), any(Boolean.TYPE), any(), any()))
+        when(rowProcessor.processInCurrentTransaction(any(), any(Boolean.TYPE), any(), any(),
+                eq(DEFAULT_PASSWORD_HASH)))
                 .thenThrow(new DataException("用户已存在"));
 
         var result = worker.processChunk(taskId, operatorId, List.of(row), false,
-                new UserImportPreviewService.ReferenceData(Map.of(), Set.of(), Set.of(), Map.of()));
+                new UserImportPreviewService.ReferenceData(Map.of(), Set.of(), Set.of(), Map.of()),
+                DEFAULT_PASSWORD_HASH);
 
         assertThat(result.processedRows()).isEqualTo(1);
         assertThat(result.errorRows()).isEqualTo(1);
@@ -98,5 +104,7 @@ class UserImportExecutionWorkerTest {
         assertThat(task.getErrorRows()).isEqualTo(1);
         assertThat(row.getState()).isEqualTo(UserImportRowState.ERROR.name());
         assertThat(row.getErrors()).containsKey("apply");
+        verify(rowProcessor).processInCurrentTransaction(any(), org.mockito.ArgumentMatchers.eq(false), any(), any(),
+                eq(DEFAULT_PASSWORD_HASH));
     }
 }

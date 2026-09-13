@@ -22,7 +22,9 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
+import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
 import com.devops00.spectra.core.system.javabean.converter.ConfiguredConverter;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
@@ -32,6 +34,7 @@ import com.devops00.spectra.core.system.mapper.ConfiguredMapper;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -49,8 +52,16 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
 
     private final ConfiguredConverter configuredConverter;
 
-    public ConfiguredServiceImpl(ConfiguredConverter configuredConverter) {
+    private final PasswordEncoder passwordEncoder;
+
+    private final SecurityPasswordPolicyProvider securityPasswordPolicyProvider;
+
+    public ConfiguredServiceImpl(ConfiguredConverter configuredConverter,
+                                 PasswordEncoder passwordEncoder,
+                                 SecurityPasswordPolicyProvider securityPasswordPolicyProvider) {
         this.configuredConverter = configuredConverter;
+        this.passwordEncoder = passwordEncoder;
+        this.securityPasswordPolicyProvider = securityPasswordPolicyProvider;
     }
 
     @Override
@@ -60,7 +71,18 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
         if (db == null) {
             throw new DataNotExistException("系统配置不存在");
         }
-        db.setValue(params.getValue());
+        if (db.getType() == ConfiguredValueType.SECRET) {
+            if (StrUtils.isNotBlank(params.getValue())) {
+                try {
+                    securityPasswordPolicyProvider.current().assertAccepts(params.getValue());
+                } catch (IllegalArgumentException exception) {
+                    throw new DataException("秘密配置不符合当前密码策略", exception);
+                }
+                db.setValue(passwordEncoder.encode(params.getValue()));
+            }
+        } else {
+            db.setValue(params.getValue());
+        }
         db.setRemarks(params.getRemarks());
         this.updateById(db);
     }
@@ -90,6 +112,23 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
             entity.setType(type);
             entity.setRemarks(remarks);
             this.save(entity);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void ensureExists(String key, String value, ConfiguredValueType type, String remarks) {
+        var existing = this.getOne(new LambdaQueryWrapper<Configured>().eq(Configured::getKey, key));
+        if (existing != null) {
+            return;
+        }
+        var entity = new Configured();
+        entity.setKey(key);
+        entity.setValue(value);
+        entity.setType(type);
+        entity.setRemarks(remarks);
+        if (!this.save(entity)) {
+            throw new DataException("初始化系统配置失败");
         }
     }
 

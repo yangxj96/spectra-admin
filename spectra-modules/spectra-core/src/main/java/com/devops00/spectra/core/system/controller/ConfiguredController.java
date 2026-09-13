@@ -57,7 +57,7 @@ public class ConfiguredController {
      *
      * @param params 修改参数入参实体
      */
-    @Audit("'修改系统配置'")
+    @Audit(value = "'修改系统配置'", captureArguments = false)
     @PutMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:config:update')")
     public void modify(@Validated @RequestBody ConfiguredFrom params) {

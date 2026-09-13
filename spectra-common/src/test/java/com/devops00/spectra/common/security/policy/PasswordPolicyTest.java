@@ -59,6 +59,11 @@ class PasswordPolicyTest {
     }
 
     @Test
+    void shouldRejectPasswordAboveSupportedMaximum() {
+        assertThrows(IllegalArgumentException.class, () -> POLICY.assertAccepts("StrongPassword123456!"));
+    }
+
+    @Test
     void shouldRecognizeSupplementaryUnicodeLettersAndUnlistedSpecialCharacters() {
         PasswordPolicy unicodePolicy = new PasswordPolicy(8, true, true, true, true, null);
 

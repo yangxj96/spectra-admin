@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.web.advice.exception;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.BusinessRuleViolationException;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
@@ -102,6 +103,20 @@ public class CommonExceptionAdvice {
         response.setStatus(HttpStatus.CONFLICT.value());
         log.error("{}数据已存在异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    /**
+     * 将可恢复的业务规则校验失败返回为客户端错误。
+     *
+     * @param e        业务规则异常，包含面向用户的校验说明。
+     * @param response 当前 HTTP 响应，用于设置请求错误状态。
+     * @return HTTP 400 统一失败响应，并保留可展示的规则说明。
+     */
+    @ExceptionHandler(BusinessRuleViolationException.class)
+    public R<Object> businessRuleViolationException(BusinessRuleViolationException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        log.warn("{}业务规则校验失败，correlationId={}", LogPrefix.WEB.p(), correlationId());
+        return R.failure(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     /**
