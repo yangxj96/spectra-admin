@@ -23,8 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 /**
  * OA 申请类型配置。
  *
@@ -49,12 +47,6 @@ public class ApplicationType extends BaseEntity {
      */
     @TableField("name")
     private String name;
-
-    /**
-     * 表单定义 ID。
-     */
-    @TableField("form_definition_id")
-    private UUID formDefinitionId;
 
     /**
      * 流程定义 Key。

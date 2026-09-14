@@ -46,11 +46,6 @@ public class ApplicationTypeVO {
     private String name;
 
     /**
-     * 表单定义 ID。
-     */
-    private UUID formDefinitionId;
-
-    /**
      * 流程定义 Key。
      */
     private String processDefinitionKey;

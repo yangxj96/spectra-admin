@@ -69,7 +69,7 @@ public interface ApplicationService {
     /**
      * 创建申请类型。
      *
-     * @param from 申请类型编码、名称、表单定义、流程定义、启用状态和排序等配置字段。
+     * @param from 申请类型编码、名称、流程定义、启用状态和排序等配置字段。
      * @return 返回新建申请类型的唯一标识，供申请表单和申请校验引用；编码冲突或写入失败时抛出业务异常，不返回 null。
      */
     UUID createdType(ApplicationTypeSaveFrom from);
@@ -78,7 +78,7 @@ public interface ApplicationService {
      * 修改申请类型。
      *
      * @param id   待修改申请类型的唯一标识。
-     * @param from 申请类型编码、名称、表单定义、流程定义、启用状态和排序等修改字段。
+     * @param from 申请类型编码、名称、流程定义、启用状态和排序等修改字段。
      */
     void modifyType(UUID id, ApplicationTypeSaveFrom from);
 

@@ -19,8 +19,6 @@ package com.devops00.spectra.oa.application.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.util.UUID;
-
 /**
  * OA 申请类型保存参数。
  *
@@ -42,11 +40,6 @@ public class ApplicationTypeSaveFrom {
      */
     @NotBlank(message = "申请类型名称不能为空")
     private String name;
-
-    /**
-     * 表单定义 ID。
-     */
-    private UUID formDefinitionId;
 
     /**
      * 流程定义 Key。
