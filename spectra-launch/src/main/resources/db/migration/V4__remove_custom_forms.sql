@@ -1,3 +1,4 @@
+-- 删除已废弃的自定义表单权限及其关联数据。
 DELETE FROM spectra_security.sec_role_permission rp
 USING spectra_security.sec_permission p
 WHERE rp.permission_id = p.id
