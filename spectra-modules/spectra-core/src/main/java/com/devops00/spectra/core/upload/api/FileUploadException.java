@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.upload.api;
 
+import com.devops00.spectra.common.exception.SpectraException;
+
 /**
  * 文件上传领域异常。
  *
@@ -23,7 +25,7 @@ package com.devops00.spectra.core.upload.api;
  * @version 1.0
  * @since 2026/09/13
  */
-public class FileUploadException extends RuntimeException {
+public class FileUploadException extends SpectraException {
 
     private final FileErrorCode errorCode;
 

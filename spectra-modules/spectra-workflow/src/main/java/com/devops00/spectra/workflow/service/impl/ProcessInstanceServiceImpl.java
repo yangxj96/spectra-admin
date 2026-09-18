@@ -19,6 +19,7 @@ package com.devops00.spectra.workflow.service.impl;
 import com.devops00.spectra.workflow.service.diagram.BpmnDiagramSupport;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.api.ApprovalCallback;
@@ -74,9 +75,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
             log.info("流程已启动: processInstanceId={}, businessKey={}", instance.getId(), businessKey);
             return instance.getId();
+        } catch (SpectraException exception) {
+            throw exception;
         } catch (Exception e) {
             // 3. 统一异常
-            throw new DataException("启动流程失败: " + e.getMessage(), e);
+            throw new DataException("启动流程失败", e);
         }
     }
 
@@ -148,8 +151,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 throw new DataException("无法生成流程图: " + processInstanceId);
             }
             return diagramStream.readAllBytes();
+        } catch (SpectraException exception) {
+            throw exception;
         } catch (Exception e) {
-            throw new DataException("读取流程图失败: " + e.getMessage(), e);
+            throw new DataException("读取流程图失败", e);
         }
     }
 }

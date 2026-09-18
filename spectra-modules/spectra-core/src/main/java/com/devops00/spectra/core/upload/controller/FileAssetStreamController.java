@@ -20,6 +20,7 @@ import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileAccessContext;
 import com.devops00.spectra.common.port.file.FileDownload;
+import com.devops00.spectra.common.exception.BusinessRuleViolationException;
 import com.devops00.spectra.core.upload.service.FileAssetApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -136,14 +137,14 @@ public class FileAssetStreamController {
             if (value == null || value.isBlank())
                 return new Range(null, null);
             if (!value.startsWith("bytes=") || value.indexOf(',') >= 0)
-                throw new IllegalArgumentException("invalid range");
+                throw new BusinessRuleViolationException("请求范围无效");
             String[] bounds = value.substring(6).split("-", -1);
             if (bounds.length != 2 || bounds[0].isBlank())
-                throw new IllegalArgumentException("invalid range");
+                throw new BusinessRuleViolationException("请求范围无效");
             long start = Long.parseLong(bounds[0]);
             Long end = bounds[1].isBlank() ? null : Long.valueOf(bounds[1]);
             if (start < 0 || (end != null && end < start))
-                throw new IllegalArgumentException("invalid range");
+                throw new BusinessRuleViolationException("请求范围无效");
             return new Range(start, end);
         }
     }

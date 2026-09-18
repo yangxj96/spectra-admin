@@ -19,7 +19,10 @@ package com.devops00.spectra.core.security.authentication.exception;
 import org.springframework.security.authentication.BadCredentialsException;
 
 /**
- * 登录异常
+ * 登录异常。
+ *
+ * <p>本类保留 Spring Security 要求的 BadCredentialsException 父类，以便参与认证失败处理流程；
+ * 这是已审核的框架契约例外，不属于项目自定义 RuntimeException 平行根类。</p>
  *
  * @author yangxj96
  * @version 1.0

@@ -24,6 +24,7 @@ import com.devops00.spectra.common.security.crypto.symmetric.AESUtils;
 import com.devops00.spectra.common.security.crypto.asymmetric.RSAUtils;
 import com.devops00.spectra.common.security.crypto.digest.SHA256Utils;
 import com.devops00.spectra.framework.web.crypto.CryptoKeyManager;
+import com.devops00.spectra.framework.web.response.R;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -65,6 +66,7 @@ import java.util.regex.Pattern;
 @NullMarked
 public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
+    /** 默认只覆盖项目 Controller，具体接口仍可通过 {@link Encrypt} 注解细化加密范围。 */
     private static final Pattern CONTROLLER_PACKAGE = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller(?:\\..*)?");
 
     private final ObjectMapper om;
@@ -86,19 +88,25 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
      */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // 忽略流式
+        // 流式响应无法作为单个对象加密，必须交给流式写出链路处理。
         if (Flux.class.isAssignableFrom(returnType.getParameterType())) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: 流式返回类型"));
             return false;
         }
 
-        // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
+        // 统一响应和 ResponseEntity 已经表达了完整响应语义，尤其不能加密错误响应。
+        if (R.class.isAssignableFrom(returnType.getParameterType())
+                || ResponseEntity.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
+
+        // 二进制响应保持原始字节，否则文件下载内容会被序列化或加密破坏。
         if (ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: 字节数组转换器"));
             return false;
         }
 
-        // 忽略 ResourceHttpMessageConverter（避免把文件下载响应序列化并加密）
+        // Resource 响应由资源转换器直接写出，不进入 JSON 加密协议。
         if (ResourceHttpMessageConverter.class.isAssignableFrom(converterType)) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: Resource 转换器"));
             return false;
@@ -108,7 +116,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             return false;
         }
 
-        // 检查 @Encrypt 注解（方法级优先于类级）
+        // 方法级注解优先于类级注解；显式关闭时不能被包名兜底规则重新打开。
         Method method = returnType.getMethod();
         if (method != null) {
             Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
@@ -135,7 +143,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             return false;
         }
 
-        // 兜底：包名匹配
+        // 没有显式注解时，使用项目 Controller 包作为默认加密边界。
         var declaringClass = returnType.getContainingClass();
         boolean matched = CONTROLLER_PACKAGE.matcher(declaringClass.getPackageName()).matches();
         if (!matched) {
@@ -159,17 +167,18 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
     public @Nullable Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
                                             Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request,
                                             ServerHttpResponse response) {
-        // 第一：流式直接放行
+        // 流式、资源、统一响应和异常响应原样放行，避免破坏已有协议或重复加密。
         if (MediaType.TEXT_EVENT_STREAM.includes(contentType)
                 || body instanceof Flux
                 || body instanceof Resource
-                || (body instanceof ResponseEntity<?> entity && entity.getBody() instanceof Resource)
+                || body instanceof R<?>
+                || body instanceof ResponseEntity<?>
                 || Flux.class.isAssignableFrom(returnType.getParameterType())) {
             log.debug(LogPrefix.WEB.f("跳过流式响应包装"));
             return body;
         }
 
-        // 第二：null 处理（必须放后面），直接返回 null 交给 ResponseModifyAdvice 处理
+        // 空响应交给 ResponseModifyAdvice 处理 HTTP 状态和统一响应格式。
         if (body == null) {
             log.debug(LogPrefix.WEB.f("body为null，跳过加密"));
             return null;
@@ -182,34 +191,34 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         try {
             long start = System.currentTimeMillis();
 
-            // 获取密钥（从 CryptoKeyManager 内存缓存）
+            // 获取密钥（从 CryptoKeyManager 内存缓存）；密钥不可用属于配置/基础设施异常。
             PublicKey clientPublicKey = cryptoKeyManager.getClientPublicKey();
             PrivateKey serverPrivateKey = cryptoKeyManager.getServerPrivateKey();
             if (clientPublicKey == null || serverPrivateKey == null) {
                 throw new EncryptException("加密密钥不可用");
             }
 
-            // 随机生成AES密钥和IV
+            // 每个响应使用独立 AES 密钥和 IV，避免重复使用对称加密随机量。
             SecretKey aesKey = AESUtils.generateKey();
             byte[] iv = AESUtils.generateIv();
 
-            // AES-GCM加密业务数据
+            // AES-GCM 加密业务数据，密文不会直接暴露原始响应内容。
             long t1 = System.currentTimeMillis();
             String encryptedData = AESUtils.encrypt(om.writeValueAsString(body), aesKey, iv);
             log.debug("{}AES加密耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
 
-            // RSA-OAEP客户端公钥加密AES密钥
+            // 使用客户端公钥封装本次响应的 AES 密钥，只有对应客户端私钥可以解开。
             long t2 = System.currentTimeMillis();
             String encryptedAesKey = RSAUtils.encrypt(aesKey.getEncoded(), clientPublicKey);
             log.debug("{}RSA加密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
 
-            // 组织待签名字符串
+            // 签名覆盖密文、随机数和时间戳，客户端可据此校验完整性和新鲜度。
             long t3 = System.currentTimeMillis();
             String nonce = SHA256Utils.generateNonce();
             long timestamp = System.currentTimeMillis() / 1000;
             String signContent = String.format("data=%s&nonce=%s&timestamp=%d", encryptedData, nonce, timestamp);
 
-            // RSA私钥签名（SHA256withRSA）
+            // 服务端私钥签名（SHA256withRSA），客户端使用服务端公钥验证。
             String signature = RSAUtils.sign(signContent, serverPrivateKey);
             log.debug("{}签名耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t3);
 

@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.framework.web.crypto;
 
+import com.devops00.spectra.common.exception.SpectraException;
+
 /**
  * 加密密钥配置读取或解析失败时使用的类型化异常。
  *
@@ -23,7 +25,7 @@ package com.devops00.spectra.framework.web.crypto;
  * @version 1.0
  * @since 2026/9/8
  */
-public final class CryptoConfigurationException extends RuntimeException {
+public final class CryptoConfigurationException extends SpectraException {
 
     /** 创建带消息的加密配置异常。 */
     public CryptoConfigurationException(String message) {

@@ -19,6 +19,7 @@ package com.devops00.spectra.workflow.service.impl;
 import com.devops00.spectra.workflow.service.diagram.BpmnDiagramSupport;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.from.DeployProcessFrom;
@@ -93,8 +94,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 throw new DataException("无法生成流程图: " + id);
             }
             return diagramStream.readAllBytes();
+        } catch (SpectraException exception) {
+            throw exception;
         } catch (Exception e) {
-            throw new DataException("读取流程图失败: " + e.getMessage(), e);
+            throw new DataException("读取流程图失败", e);
         }
     }
 
@@ -122,7 +125,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             return new ProcessDefinitionResourceVO(new String(resource.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new DataException("读取流程资源失败: " + e.getMessage(), e);
+            throw new DataException("读取流程资源失败", e);
         }
     }
 

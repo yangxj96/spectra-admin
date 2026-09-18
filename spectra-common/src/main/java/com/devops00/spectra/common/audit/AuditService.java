@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.common.audit;
 
+import com.devops00.spectra.common.exception.SpectraException;
+
 /**
  * 统一审计写入端口。
  *
@@ -54,7 +56,7 @@ public interface AuditService {
      * @version 1.0
      * @since 2026/09/13
      */
-    class AuditRecordingException extends RuntimeException {
+    class AuditRecordingException extends SpectraException {
 
         public AuditRecordingException(String message) {
             super(message);

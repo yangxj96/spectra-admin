@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
 import com.devops00.spectra.core.user.javabean.from.RoleEditorSaveFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
@@ -158,6 +159,8 @@ public class RoleController {
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleMenuService.get(roleId);
+        } catch (SpectraException exception) {
+            throw exception;
         } catch (Exception e) {
             log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new DataException("参数转换失败", e);

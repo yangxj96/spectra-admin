@@ -18,6 +18,7 @@ package com.devops00.spectra.core.upload.controller;
 
 import com.devops00.spectra.framework.web.response.R;
 import com.devops00.spectra.core.upload.api.FileUploadException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -39,10 +40,12 @@ public class FileUploadExceptionAdvice {
      * 处理文件上传异常。
      *
      * @param exception 异常参数。
+     * @param response 当前 HTTP 响应，用于同步写入异常对应的 HTTP 状态。
      * @return 处理后的结果。
      */
     @ExceptionHandler(FileUploadException.class)
-    public R<Object> handle(FileUploadException exception) {
+    public R<Object> handle(FileUploadException exception, HttpServletResponse response) {
+        // 文件接口的错误码比异常父类更具体，因此在这里映射为前端可直接处理的 HTTP 语义。
         HttpStatus status = switch (exception.getErrorCode()) {
             case FILE_UPLOAD_NOT_FOUND, FILE_ASSET_NOT_READY, FILE_TYPE_NOT_FOUND -> HttpStatus.NOT_FOUND;
             case FILE_UPLOAD_PERMISSION_DENIED -> HttpStatus.FORBIDDEN;
@@ -53,6 +56,7 @@ public class FileUploadExceptionAdvice {
             case FILE_STORAGE_UNAVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE;
             default -> HttpStatus.BAD_REQUEST;
         };
+        response.setStatus(status.value());
         return R.failure(status, exception.getErrorCode().name() + ": " + exception.getMessage());
     }
 }

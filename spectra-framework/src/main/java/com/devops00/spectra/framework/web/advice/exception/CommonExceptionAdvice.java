@@ -23,9 +23,11 @@ import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.NotImplementedException;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.framework.web.response.R;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.framework.web.advice.crypto.RequestCryptoException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -36,6 +38,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -51,14 +55,15 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class CommonExceptionAdvice {
 
+    /** 负责把不同异常类型转换为统一的 HTTP 状态、消息和日志策略。 */
+    private final ExceptionResponseResolver exceptionResponseResolver = new ExceptionResponseResolver();
+
     /**
      * 处理访问异常相关数据。
      */
     @ExceptionHandler(AccessDeniedException.class)
     public R<Object> accessDeniedException(AccessDeniedException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.FORBIDDEN.value());
-        log.warn("{}权限不足,{}", LogPrefix.WEB.p(), e.getMessage());
-        return R.failure(HttpStatus.FORBIDDEN, "权限不足");
+        return writeResolved(e, response);
     }
 
     /**
@@ -70,39 +75,31 @@ public class CommonExceptionAdvice {
      */
     @ExceptionHandler(DataScopeViolationException.class)
     public R<Object> dataScopeViolationException(DataScopeViolationException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.FORBIDDEN.value());
-        log.warn("{}数据范围校验失败,{}", LogPrefix.WEB.p(), e.getMessage());
-        return R.failure(HttpStatus.FORBIDDEN, "数据范围不足");
+        return writeResolved(e, response);
     }
 
     /**
      * 处理异常相关数据。
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}未找到资源,{}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure("未找到资源");
+    public R<Object> noResourceFoundException(NoResourceFoundException e, HttpServletResponse response) {
+        return writeResolved(e, response);
     }
 
     /**
-     * 处理不异常相关数据。
+     * 返回暂未实现功能的明确错误，避免被通用未知异常处理器改写成内部错误。
      */
     @ExceptionHandler(NotImplementedException.class)
-    public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}未进行功能实现异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure("功能暂未实现");
+    public R<Object> notImplementedException(NotImplementedException e, HttpServletResponse response) {
+        return writeResolved(e, response);
     }
 
     /**
      * 处理异常相关数据。
      */
     @ExceptionHandler(DataExistException.class)
-    public R<Object> dataExistException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.CONFLICT.value());
-        log.error("{}数据已存在异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.CONFLICT, e.getMessage());
+    public R<Object> dataExistException(DataExistException e, HttpServletResponse response) {
+        return writeResolved(e, response);
     }
 
     /**
@@ -114,23 +111,23 @@ public class CommonExceptionAdvice {
      */
     @ExceptionHandler(BusinessRuleViolationException.class)
     public R<Object> businessRuleViolationException(BusinessRuleViolationException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        log.warn("{}业务规则校验失败，correlationId={}", LogPrefix.WEB.p(), correlationId());
-        return R.failure(HttpStatus.BAD_REQUEST, e.getMessage());
+        return writeResolved(e, response);
     }
 
     /**
      * 处理不异常相关数据。
      */
     @ExceptionHandler(DataNotExistException.class)
-    public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.NOT_FOUND.value());
-        log.error("{}数据不存在异常,{} ", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.NOT_FOUND);
+    public R<Object> dataNotExistException(DataNotExistException e, HttpServletResponse response) {
+        return writeResolved(e, response);
     }
 
     /**
-     * 处理方法不有效异常相关数据。
+     * 将 Bean Validation 的第一条可展示消息返回给调用方。
+     *
+     * @param e        参数校验异常
+     * @param response 当前 HTTP 响应
+     * @return HTTP 400 的统一失败响应
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
@@ -141,7 +138,7 @@ public class CommonExceptionAdvice {
         if (!errors.isEmpty()) {
             String message = errors.getFirst().getDefaultMessage();
             if (message == null || StrUtils.isEmpty(message)) {
-                message = "参数验证一场";
+                message = "参数验证异常";
             }
             return R.failure(HttpStatus.BAD_REQUEST, message);
         } else {
@@ -174,28 +171,80 @@ public class CommonExceptionAdvice {
     }
 
     /**
-     * 处理运行时环境异常相关数据。
+     * 处理项目自定义异常，避免它们落入未知运行时异常兜底。
+     */
+    @ExceptionHandler(SpectraException.class)
+    public R<Object> spectraException(SpectraException e, HttpServletResponse response) {
+        return writeResolved(e, response);
+    }
+
+    /**
+     * 处理已审核的应用层参数异常。
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public R<Object> illegalArgumentException(IllegalArgumentException e, HttpServletResponse response) {
+        return writeResolved(e, response);
+    }
+
+    /**
+     * 处理已审核的应用层状态异常。
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public R<Object> illegalStateException(IllegalStateException e, HttpServletResponse response) {
+        return writeResolved(e, response);
+    }
+
+    /**
+     * 处理未被更具体处理器接收的运行时异常，并由解析器决定它是否属于已知异常。
      */
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}运行时异常，correlationId={}", LogPrefix.WEB.p(), correlationId(), e);
-        return R.failure("系统内部错误,请联系管理员");
+        return writeResolved(e, response);
     }
 
     /**
-     * 处理异常。
+     * 处理非运行时异常；未知异常最终只返回安全保底消息。
      */
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("{}兜底异常处理，correlationId={}", LogPrefix.WEB.p(), correlationId(), e);
-        return R.failure("系统内部错误,请联系管理员");
+        return writeResolved(e, response);
     }
 
     /**
-     * 处理关联标识相关数据。
+     * 统一写入异常响应，并根据解析结果区分业务告警和未知异常堆栈日志。
+     *
+     * @param exception 原始异常
+     * @param response  当前 HTTP 响应
+     * @return 与 HTTP 状态一致的统一失败响应
      */
+    private R<Object> writeResolved(Throwable exception, HttpServletResponse response) {
+        var resolution = exceptionResponseResolver.resolve(exception);
+        response.setStatus(resolution.status().value());
+        var requestContext = requestContext();
+        if (resolution.logStackTrace()) {
+            log.error("{}异常，method={}, uri={}, correlationId={}, status={}", LogPrefix.WEB.p(), requestContext.method(),
+                    requestContext.uri(), correlationId(), resolution.status().value(), exception);
+        } else {
+            log.warn("{}请求失败，method={}, uri={}, correlationId={}, status={}, message={}", LogPrefix.WEB.p(),
+                    requestContext.method(), requestContext.uri(), correlationId(), resolution.status().value(), resolution.message());
+        }
+        return R.failure(resolution.status(), resolution.message());
+    }
+
+    /** 获取当前请求的 method 和 URI；异步或非 Web 调用没有上下文时使用安全占位值。 */
+    private static RequestContext requestContext() {
+        var attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes instanceof ServletRequestAttributes servletAttributes) {
+            HttpServletRequest request = servletAttributes.getRequest();
+            return new RequestContext(request.getMethod(), request.getRequestURI());
+        }
+        return new RequestContext("unknown", "unknown");
+    }
+
+    private record RequestContext(String method, String uri) {
+    }
+
+    /** 获取当前请求关联标识，便于从日志定位一次完整请求。 */
     private static String correlationId() {
         String correlationId = RequestCorrelationContext.current().correlationId();
         return correlationId == null ? "unknown" : correlationId;

@@ -24,6 +24,7 @@ import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.framework.web.request.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -445,7 +446,7 @@ public class AuditAspect {
      * @version 1.0
      * @since 2026/09/13
      */
-    private static final class AuditedInvocationException extends RuntimeException {
+    private static final class AuditedInvocationException extends SpectraException {
 
         private final Throwable original;
 

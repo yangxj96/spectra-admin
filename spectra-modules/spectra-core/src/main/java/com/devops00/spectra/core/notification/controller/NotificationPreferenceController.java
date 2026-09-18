@@ -23,6 +23,7 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,7 +80,7 @@ public class NotificationPreferenceController {
     private UUID currentUserId() {
         var userId = securityContextAccessor.currentUserId();
         if (userId == null) {
-            throw new IllegalStateException("当前用户未登录");
+            throw new InsufficientAuthenticationException("当前用户未登录");
         }
         return userId;
     }

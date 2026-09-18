@@ -23,7 +23,7 @@ package com.devops00.spectra.common.exception;
  * @version 1.0
  * @since 2026/09/03
  */
-public final class SecurityRedisUnavailableException extends RuntimeException {
+public final class SecurityRedisUnavailableException extends SpectraException {
 
     /** 创建安全 Redis 不可用异常。 */
     public SecurityRedisUnavailableException(String message, Throwable cause) {

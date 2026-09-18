@@ -57,7 +57,7 @@ public class SqlExceptionAdvice {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         var message = e.getMessage();
         var pattern = Pattern.compile("键值\"\\(name\\)=\\((?<value>[^)]+)\\)\" 已经存在");
-        var matcher = pattern.matcher(message);
+        var matcher = pattern.matcher(message == null ? "" : message);
         var errorMessage = "数据重复,请检查输入内容";
         if (matcher.find()) {
             var value = matcher.group("value");
@@ -124,7 +124,7 @@ public class SqlExceptionAdvice {
     public R<Object> handleDataAccessException(DataAccessException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         log.error("{}数据访问异常（兜底）: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
-        return R.failure("系统内部错误,请联系管理员");
+        return R.failure("系统内部错误，请联系管理员");
     }
 
     /**

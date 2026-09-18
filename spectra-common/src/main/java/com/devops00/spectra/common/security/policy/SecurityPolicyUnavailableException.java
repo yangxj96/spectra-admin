@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.common.security.policy;
 
+import com.devops00.spectra.common.exception.SpectraException;
+
 /**
  * 安全策略存储不可用时的 fail-closed 异常。
  *
@@ -23,7 +25,7 @@ package com.devops00.spectra.common.security.policy;
  * @version 1.0
  * @since 2026/09/13
  */
-public class SecurityPolicyUnavailableException extends RuntimeException {
+public class SecurityPolicyUnavailableException extends SpectraException {
 
     /** 创建策略不可用异常。 */
     public SecurityPolicyUnavailableException(String message, Throwable cause) {

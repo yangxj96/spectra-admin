@@ -49,6 +49,7 @@ public class LoginExceptionAdvice {
     public R<Object> handleLoginException(BadCredentialsException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.warn("{}登录失败: {}", LogPrefix.SECURITY.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.UNAUTHORIZED, e.getMessage());
+        var message = e.getMessage();
+        return R.failure(HttpStatus.UNAUTHORIZED, message == null || message.isBlank() ? "账号或密码错误" : message);
     }
 }

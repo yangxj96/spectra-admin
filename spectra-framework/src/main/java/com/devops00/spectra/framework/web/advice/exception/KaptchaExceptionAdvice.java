@@ -46,9 +46,9 @@ public class KaptchaExceptionAdvice {
      */
     @ExceptionHandler(KaptchaNotMatchException.class)
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.error("{}验证码不匹配,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
-        return R.failure("验证码不匹配");
+        return R.failure(HttpStatus.BAD_REQUEST, "验证码不匹配");
     }
 
     /**
@@ -56,8 +56,8 @@ public class KaptchaExceptionAdvice {
      */
     @ExceptionHandler(KaptchaExpiresException.class)
     public R<Object> kaptchaExpiresException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.error("{}验证码过期,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
-        return R.failure("验证码过期");
+        return R.failure(HttpStatus.BAD_REQUEST, "验证码过期");
     }
 }

@@ -19,7 +19,10 @@ package com.devops00.spectra.common.exception;
 import java.io.Serial;
 
 /**
- * 光谱平台基础异常
+ * 光谱平台项目自定义异常根类。
+ *
+ * <p>所有项目自定义运行时异常都必须直接或间接继承本类。标准库和第三方异常保持其原有类型，
+ * 在边界层转换为本类体系中的具体异常；只有业务或框架契约明确要求其他父类时才允许例外。</p>
  *
  * @author yangxj96
  * @version 1.0

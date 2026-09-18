@@ -23,7 +23,7 @@ package com.devops00.spectra.common.exception;
  * @version 1.0
  * @since 2026/09/13
  */
-public final class SecuritySecretUnavailableException extends RuntimeException {
+public final class SecuritySecretUnavailableException extends SpectraException {
 
     /** 创建密钥运行态不可用异常。 */
     public SecuritySecretUnavailableException(String message, Throwable cause) {
