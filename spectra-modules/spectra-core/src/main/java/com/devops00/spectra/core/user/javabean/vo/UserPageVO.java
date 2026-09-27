@@ -105,16 +105,15 @@ public class UserPageVO implements Serializable {
      */
     private List<RoleVO> roles;
 
-    /**
-     * 组织机构ID
-     */
-    private UUID departmentId;
+    /** 主部门 ID。 */
+    private UUID primaryDepartmentId;
 
-    /**
-     * 组织机构名称
-     */
-    @NameFill(lookup = DepartmentNameLookup.class, sourceField = "departmentId")
-    private String departmentName;
+    /** 主部门名称。 */
+    @NameFill(lookup = DepartmentNameLookup.class, sourceField = "primaryDepartmentId")
+    private String primaryDepartmentName;
+
+    /** 关联部门摘要。 */
+    private List<UserDepartmentSummaryVO> associatedDepartments;
 
     /**
      * 创建时间

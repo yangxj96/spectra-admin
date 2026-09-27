@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 /**
- * 用户与部门之间的主部门或关联部门关系。
+ * 用户与关联部门之间的关系；主部门单独存于用户记录。
  *
  * @author yangxj96
  * @version 1.0
@@ -52,9 +52,4 @@ public class UserDepartmentMembership extends BaseEntity {
     @TableField(value = "department_id")
     private UUID departmentId;
 
-    /**
-     * 用户与该部门关系的类型，例如主部门或关联部门。
-     */
-    @TableField(value = "membership_type")
-    private String membershipType;
 }

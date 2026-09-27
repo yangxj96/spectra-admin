@@ -50,6 +50,7 @@ import com.devops00.spectra.common.port.file.FileAssetPort;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.oa.file.reference.OaFileReferenceBinder;
 import com.devops00.spectra.oa.file.reference.OaFileReferenceType;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,19 +87,23 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private final DirectoryQueryPort directoryQueryPort;
     private final DocumentConverter documentConverter;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Document>();
         var user = securityContextAccessor.currentUser();
         var userId = securityContextAccessor.currentUserId();
-        if (user == null || userId == null || user.getDepartmentId() == null) {
+        if (user == null || userId == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        wrapper.and(query -> query.eq(Document::getOwnerId, userId)
-                .or()
-                .eq(Document::getVisibility, VISIBILITY_PUBLIC)
-                .or(q -> q.eq(Document::getVisibility, VISIBILITY_DEPARTMENT).eq(Document::getDepartmentId, user.getDepartmentId())));
+        var departmentIds = currentDepartmentMemberships.departmentIds();
+        wrapper.and(query -> {
+            query.eq(Document::getOwnerId, userId).or().eq(Document::getVisibility, VISIBILITY_PUBLIC);
+            if (!departmentIds.isEmpty()) {
+                query.or(q -> q.eq(Document::getVisibility, VISIBILITY_DEPARTMENT).in(Document::getDepartmentId, departmentIds));
+            }
+        });
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.like(Document::getTitle, params.getKeyword());
         }
@@ -221,15 +226,15 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     @Override
     public List<DocumentFolderVO> folders() {
-        var user = securityContextAccessor.currentUser();
-        if (user == null || user.getDepartmentId() == null) {
-            return List.of();
-        }
+        var departmentIds = currentDepartmentMemberships.departmentIds();
         var wrapper = new LambdaQueryWrapper<DocumentFolder>()
-                .and(query -> query.eq(DocumentFolder::getVisibility, VISIBILITY_PUBLIC)
-                        .or(
-                                q -> q.eq(DocumentFolder::getVisibility, VISIBILITY_DEPARTMENT)
-                                        .eq(DocumentFolder::getDepartmentId, user.getDepartmentId())))
+                .and(query -> {
+                    query.eq(DocumentFolder::getVisibility, VISIBILITY_PUBLIC);
+                    if (!departmentIds.isEmpty()) {
+                        query.or(q -> q.eq(DocumentFolder::getVisibility, VISIBILITY_DEPARTMENT)
+                                .in(DocumentFolder::getDepartmentId, departmentIds));
+                    }
+                })
                 .orderByAsc(DocumentFolder::getSort)
                 .orderByAsc(DocumentFolder::getName);
         return folderMapper.selectList(wrapper).stream().map(documentConverter::toFolderVO).toList();
@@ -299,10 +304,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         var entity = require(id);
         var user = securityContextAccessor.currentUser();
         if (user == null
-                || user.getDepartmentId() == null
                 || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
                         && !(VISIBILITY_DEPARTMENT.equals(entity.getVisibility())
-                                && Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
+                                && currentDepartmentMemberships.contains(entity.getDepartmentId()))
                         && !Objects.equals(entity.getOwnerId(), user.getId()))) {
             throw new DataNotExistException("文档不存在或无权访问");
         }

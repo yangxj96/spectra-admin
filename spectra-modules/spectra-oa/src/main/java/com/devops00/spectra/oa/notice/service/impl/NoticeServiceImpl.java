@@ -40,6 +40,7 @@ import com.devops00.spectra.oa.notice.mapper.NoticeMapper;
 import com.devops00.spectra.oa.notice.mapper.NoticeReaderMapper;
 import com.devops00.spectra.oa.notice.service.NoticeService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +68,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     private final NoticeConverter noticeConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     @Transactional
@@ -77,15 +79,16 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
             return new Page<>(page.getPageNum(), page.getPageSize());
         }
         var wrapper = new LambdaQueryWrapper<Notice>();
+        var departmentIds = currentDepartmentMemberships.departmentIds();
         wrapper.and(q -> q.eq(Notice::getPublisherId, userId)
                 .or()
                 .eq(Notice::getStatus, NoticeStatus.PUBLISHED.getValue())
                 .or(w -> w.eq(Notice::getStatus, NoticeStatus.SCHEDULED.getValue()).le(Notice::getPublishAt, Instant.now())));
         wrapper.and(q -> {
             q.eq(Notice::getTargetType, "ALL");
-            if (currentUser.getDepartmentId() != null) {
+            if (!departmentIds.isEmpty()) {
                 q.or(w -> w.eq(Notice::getTargetType, "DEPARTMENT")
-                        .eq(Notice::getTargetDepartmentId, currentUser.getDepartmentId()));
+                        .in(Notice::getTargetDepartmentId, departmentIds));
             }
         });
         if (params != null && StringUtils.hasText(params.getKeyword())) {
@@ -222,7 +225,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
             return true;
         }
         var user = directoryQueryPort.findUsersByIds(List.of(userId)).stream().findFirst().orElse(null);
-        return user != null && notice.getTargetDepartmentId() != null && notice.getTargetDepartmentId().equals(user.departmentId());
+        return user != null && currentDepartmentMemberships.contains(notice.getTargetDepartmentId());
     }
 
     /**

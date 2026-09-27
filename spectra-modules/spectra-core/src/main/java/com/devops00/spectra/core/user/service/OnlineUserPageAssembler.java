@@ -65,7 +65,8 @@ public class OnlineUserPageAssembler {
      */
     public Page<OnlineUserPageVO> page(PageFrom page, OnlineUserPageFrom filter,
                                        List<UserOnlineVO> onlineSessions, List<User> onlineUsers,
-                                       Set<UUID> matchingDepartmentIds) {
+                                       Set<UUID> matchingDepartmentIds,
+                                       Map<UUID, Set<UUID>> departmentIdsByUser) {
         long pageNum = page.getPageNum() == null ? 1L : page.getPageNum();
         long pageSize = page.getPageSize() == null ? 15L : page.getPageSize();
         if (pageNum < 1 || pageSize < 1) {
@@ -85,7 +86,7 @@ public class OnlineUserPageAssembler {
         List<OnlineUserPageVO> records = new ArrayList<>();
         for (Map.Entry<UUID, List<UserOnlineVO>> entry : sessionsByUser.entrySet()) {
             User user = usersById.get(entry.getKey());
-            if (user == null || !matches(user, filter, matchingDepartmentIds)) {
+            if (user == null || !matches(user, filter, matchingDepartmentIds, departmentIdsByUser)) {
                 continue;
             }
             List<UserOnlineVO> sortedSessions = entry.getValue().stream().sorted(SESSION_ORDER).toList();
@@ -95,7 +96,7 @@ public class OnlineUserPageAssembler {
                             session.getLoginTime()))
                     .toList();
             records.add(new OnlineUserPageVO(user.getId(), user.getUsername(), user.getRealName(),
-                    user.getDepartmentId(), null, sessionViews.size(), latestSession.getLoginTime(), sessionViews));
+                    user.getPrimaryDepartmentId(), null, null, sessionViews.size(), latestSession.getLoginTime(), sessionViews));
         }
         records.sort(USER_ORDER);
 
@@ -109,7 +110,8 @@ public class OnlineUserPageAssembler {
         return result;
     }
 
-    private static boolean matches(User user, OnlineUserPageFrom filter, Set<UUID> matchingDepartmentIds) {
+    private static boolean matches(User user, OnlineUserPageFrom filter, Set<UUID> matchingDepartmentIds,
+                                   Map<UUID, Set<UUID>> departmentIdsByUser) {
         if (filter == null) {
             return true;
         }
@@ -117,8 +119,11 @@ public class OnlineUserPageAssembler {
                 || !containsIgnoreCase(user.getRealName(), filter.getRealName())) {
             return false;
         }
-        return filter.getDepartmentId() == null
-                || matchingDepartmentIds.contains(user.getDepartmentId());
+        if (filter.getDepartmentId() == null) {
+            return true;
+        }
+        Set<UUID> userDepartmentIds = departmentIdsByUser.getOrDefault(user.getId(), Set.of());
+        return userDepartmentIds.stream().anyMatch(matchingDepartmentIds::contains);
     }
 
     private static boolean containsIgnoreCase(String value, String keyword) {

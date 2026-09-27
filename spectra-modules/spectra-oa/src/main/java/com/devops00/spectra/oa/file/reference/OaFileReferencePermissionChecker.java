@@ -30,6 +30,7 @@ import com.devops00.spectra.oa.document.mapper.DocumentMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,7 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
     private final ApplicationAttachmentMapper attachmentMapper;
     private final ApplicationMapper applicationMapper;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public boolean supports(String referenceType) {
@@ -106,7 +108,7 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
         Application application = applicationMapper.selectById(attachment.getApplicationId());
         return application != null
                 && (Objects.equals(application.getApplicantId(), userId)
-                        || Objects.equals(application.getDepartmentId(), currentDepartmentId()));
+                        || currentDepartmentMemberships.contains(application.getDepartmentId()));
     }
 
     /**
@@ -115,14 +117,6 @@ public class OaFileReferencePermissionChecker implements FileReferencePermission
     private boolean visible(UUID ownerId, UUID departmentId, String visibility, UUID userId) {
         if (Objects.equals(ownerId, userId) || "PUBLIC".equals(visibility))
             return true;
-        return "DEPARTMENT".equals(visibility) && Objects.equals(departmentId, currentDepartmentId());
-    }
-
-    /**
-     * 查询部门标识。
-     */
-    private UUID currentDepartmentId() {
-        var user = securityContextAccessor.currentUser();
-        return user == null ? null : user.getDepartmentId();
+        return "DEPARTMENT".equals(visibility) && currentDepartmentMemberships.contains(departmentId);
     }
 }

@@ -46,6 +46,11 @@ public interface DirectoryQueryPort {
     List<DirectoryUserSnapshot> findUsersByDepartmentId(UUID departmentId);
 
     /**
+     * 查询用户当前有效的主部门与关联部门 ID。
+     */
+    List<UUID> findDepartmentIdsByUserId(UUID userId);
+
+    /**
      * 批量查询用户。
      *
      * @param userIds 用户 ID 集合

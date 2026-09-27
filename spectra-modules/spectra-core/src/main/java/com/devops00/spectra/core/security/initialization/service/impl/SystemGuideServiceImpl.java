@@ -34,7 +34,6 @@ import com.devops00.spectra.core.system.mapper.DepartmentClosureMapper;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +62,6 @@ public class SystemGuideServiceImpl implements SystemGuideService {
     private final DepartmentMapper departmentMapper;
     private final DepartmentClosureMapper departmentClosureMapper;
     private final UserMapper userMapper;
-    private final UserDepartmentMembershipMapper userDepartmentMembershipMapper;
     private final SecurityContextAccessor securityContextAccessor;
 
     @Override
@@ -170,12 +168,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
 
         var userUpdate = new LambdaUpdateWrapper<User>()
                 .eq(User::getId, userId)
-                .set(User::getDepartmentId, rootDepartment.getId());
+                .set(User::getPrimaryDepartmentId, rootDepartment.getId());
         if (userMapper.update(null, userUpdate) != 1) {
             throw new DataSaveException("关联 DEV_OPS 根部门失败");
-        }
-        if (userDepartmentMembershipMapper.insertPrimary(userId, rootDepartment.getId()) != 1) {
-            throw new DataSaveException("建立 DEV_OPS 根部门关系失败");
         }
         return rootDepartment;
     }

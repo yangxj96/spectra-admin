@@ -71,4 +71,34 @@
         WHERE id = #{id};
     </select>
 
+    <select id="selectActiveIdsByIds" resultType="java.util.UUID">
+        SELECT id
+        FROM spectra_core.sys_department
+        WHERE deleted IS NULL
+          AND id IN
+        <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+    </select>
+
+    <select id="selectActiveByIds" resultMap="BaseResultMap">
+        SELECT
+            pid,
+            name,
+            code,
+            type,
+            region_id,
+            path,
+            sort,
+            remark,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_department
+        WHERE deleted IS NULL
+          AND id IN
+        <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+        ORDER BY name, id
+    </select>
+
 </mapper>

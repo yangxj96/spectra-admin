@@ -16,9 +16,11 @@
 
 package com.devops00.spectra.core.user.mapper;
 
+import com.devops00.spectra.core.user.javabean.entity.UserDepartmentMembership;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,11 +34,51 @@ import java.util.UUID;
 public interface UserDepartmentMembershipMapper {
 
     /**
-     * 为用户建立主部门关系。
+     * 查询用户当前有效的关联部门 ID。
      *
-     * @param userId       用户 ID
-     * @param departmentId 部门 ID
-     * @return 受影响行数
+     * @param userId 用户 ID
+     * @return 当前有效的关联部门 ID 列表
      */
-    int insertPrimary(@Param("userId") UUID userId, @Param("departmentId") UUID departmentId);
+    List<UUID> selectActiveDepartmentIdsByUserId(@Param("userId") UUID userId);
+
+    /**
+     * 查询用于授权的数据范围成员部门，包括用户主部门与有效关联部门。
+     */
+    List<UUID> selectDepartmentIdsForAuthorization(@Param("userId") UUID userId);
+
+    /**
+     * 查询匹配指定任一部门成员关系的用户 ID；以 EXISTS 防止多部门产生重复用户。
+     */
+    List<UUID> selectUserIdsByDepartmentIds(@Param("departmentIds") List<UUID> departmentIds,
+                                            @Param("status") String status);
+
+    /**
+     * 批量查询用户当前有效的关联部门关系。
+     *
+     * @param userIds 用户 ID
+     * @return 有效关联关系
+     */
+    List<UserDepartmentMembership> selectActiveByUserIds(@Param("userIds") List<UUID> userIds);
+
+    /**
+     * 软删除用户当前全部关联部门。
+     *
+     * @param userId     用户 ID
+     * @param operatorId 操作人 ID
+     * @return 更新行数
+     */
+    int softDeleteActiveByUserId(@Param("userId") UUID userId, @Param("operatorId") UUID operatorId);
+
+    /**
+     * 批量建立用户关联部门。
+     *
+     * @param userId        用户 ID
+     * @param departmentIds 关联部门 ID 列表
+     * @param operatorId    操作人 ID
+     * @return 插入行数
+     */
+    int batchInsertAssociated(
+                              @Param("userId") UUID userId,
+                              @Param("departmentIds") List<UUID> departmentIds,
+                              @Param("operatorId") UUID operatorId);
 }

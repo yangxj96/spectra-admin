@@ -35,6 +35,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleGrantablePerm
 import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.common.security.authorization.AuthorizationAssignment;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
@@ -83,11 +84,16 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
 
     private final AssignmentGrantBoundaryMapper grantBoundaryMapper;
 
+    private final UserDepartmentMembershipMapper userDepartmentMembershipMapper;
+
     @Override
     public AuthorizationSnapshot load(UUID userId) {
         if (userId == null) {
             return AuthorizationSnapshot.of(List.of());
         }
+
+        var departmentMembershipIds = Set.copyOf(
+                userDepartmentMembershipMapper.selectDepartmentIdsForAuthorization(userId));
 
         var now = Instant.now();
         var assignmentQuery = new LambdaQueryWrapper<RoleAssignment>()
@@ -101,7 +107,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                         || assignment.getValidUntil().isAfter(now))
                 .toList();
         if (assignments.isEmpty()) {
-            return AuthorizationSnapshot.of(List.of());
+            return AuthorizationSnapshot.of(List.of(), departmentMembershipIds);
         }
 
         var roleIds = assignments.stream()
@@ -179,7 +185,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                                     roleGrantablePermissions.getOrDefault(roleId, Set.of())));
                 })
                 .toList();
-        return AuthorizationSnapshot.of(result);
+        return AuthorizationSnapshot.of(result, departmentMembershipIds);
     }
 
     /**

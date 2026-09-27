@@ -95,10 +95,10 @@ public class User extends BaseEntity {
     private String timezone;
 
     /**
-     * 主部门 ID；用户的完整组织关系由 sys_user_department_membership 保存。
+     * 主部门 ID；其他关联部门保存在 sys_user_department_membership。
      */
     @TableField(value = "primary_department_id")
-    private UUID departmentId;
+    private UUID primaryDepartmentId;
 
     /**
      * 安全相关变化版本；每次生命周期变化递增，用于 Session/Authorization epoch 校验。

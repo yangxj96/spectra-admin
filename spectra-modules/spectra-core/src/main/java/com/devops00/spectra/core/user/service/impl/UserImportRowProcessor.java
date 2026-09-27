@@ -31,13 +31,16 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.Authorizatio
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.user.javabean.entity.UserImportRow;
+import com.devops00.spectra.core.user.javabean.enums.UserImportRowState;
 import com.devops00.spectra.core.user.javabean.from.UserImportRowFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.user.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.user.service.UserDepartmentMembershipService;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,16 +66,20 @@ public class UserImportRowProcessor {
 
     private final UserMapper userMapper;
 
+    private final UserImportRowMapper rowMapper;
+
     private final AuthenticationIdentityService authenticationIdentityService;
 
     private final UserService userService;
+
+    private final UserDepartmentMembershipService membershipService;
 
     private final SecurityRoleMapper roleMapper;
 
     private final AuthorizationAssignmentChangeService assignmentChangeService;
 
     /**
-     * 在当前调用事务中处理单行用户数据。
+     * 在独立事务中处理单行用户数据。
      *
      * @param row           待处理导入行。
      * @param skipExisting  是否跳过已存在的用户。
@@ -81,39 +88,32 @@ public class UserImportRowProcessor {
      * @return 当前导入行创建或跳过后的结果。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ProcessResult process(UserImportRow row, boolean skipExisting, Map<String, UUID> departmentIds,
-                                 Map<String, AuthorizationProfileVO> profiles) {
-        return processInternal(row, skipExisting, departmentIds, profiles, null);
-    }
-
-    /**
-     * 处理当前事务相关数据。
-     *
-     * @param row                        待处理导入行。
-     * @param skipExisting               是否跳过已存在的用户。
-     * @param departmentIds              部门编码到部门标识的映射。
-     * @param profiles                   授权方案编码到方案详情的映射。
-     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希。
-     * @return 当前导入行创建或跳过后的结果。
-     */
-    public ProcessResult processInCurrentTransaction(UserImportRow row, boolean skipExisting,
-                                                     Map<String, UUID> departmentIds,
-                                                     Map<String, AuthorizationProfileVO> profiles,
-                                                     String encodedDefaultPasswordHash) {
-        return processInternal(row, skipExisting, departmentIds, profiles, encodedDefaultPasswordHash);
+    public ProcessResult process(UserImportRow row, UUID operatorId, boolean skipExisting,
+                                 Map<String, UUID> departmentIds, Map<String, AuthorizationProfileVO> profiles,
+                                 String encodedDefaultPasswordHash) {
+        var result = processInternal(row, operatorId, skipExisting, departmentIds, profiles,
+                encodedDefaultPasswordHash);
+        row.setUserId(result.userId());
+        row.setState(result.skipped() ? UserImportRowState.SKIPPED.name() : UserImportRowState.APPLIED.name());
+        if (rowMapper.updateById(row) != 1) {
+            throw new DataException("保存用户导入行结果失败");
+        }
+        return result;
     }
 
     /**
      * 校验导入行并创建用户、应用授权方案。
      *
      * @param row                        待处理导入行。
+     * @param operatorId                 发起导入的操作人。
      * @param skipExisting               是否跳过已存在的用户。
      * @param departmentIds              部门编码到部门标识的映射。
      * @param profiles                   授权方案编码到方案详情的映射。
      * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希；空值时由用户服务读取当前设置。
      * @return 当前导入行创建或跳过后的结果。
      */
-    private ProcessResult processInternal(UserImportRow row, boolean skipExisting, Map<String, UUID> departmentIds,
+    private ProcessResult processInternal(UserImportRow row, UUID operatorId, boolean skipExisting,
+                                          Map<String, UUID> departmentIds,
                                           Map<String, AuthorizationProfileVO> profiles,
                                           String encodedDefaultPasswordHash) {
         var source = toSource(row.getNormalizedData());
@@ -132,6 +132,8 @@ public class UserImportRowProcessor {
         if (profile == null || !SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             throw new DataException("授权方案不存在或已停用: " + source.getAuthorizationProfileCode());
         }
+        var associatedDepartmentIds = UserImportDepartmentCodes.resolveIds(
+                source.getAssociatedDepartmentCodes(), source.getDepartmentCode(), departmentIds);
         var user = new UserSaveFrom();
         user.setEmployeeNo(source.getEmployeeNo());
         user.setRealName(source.getRealName());
@@ -140,11 +142,13 @@ public class UserImportRowProcessor {
         user.setEmail(source.getEmail());
         user.setLanguage(source.getLanguage());
         user.setTimezone(source.getTimezone());
-        user.setDepartmentId(departmentId);
+        user.setPrimaryDepartmentId(departmentId);
+        user.setAssociatedDepartmentIds(associatedDepartmentIds);
         user.setStatus(UserStatus.ACTIVE);
         UserCreatedVO created = encodedDefaultPasswordHash == null
                 ? userService.create(user)
                 : userService.createWithDefaultPasswordHash(user, encodedDefaultPasswordHash);
+        membershipService.replace(created.getId(), departmentId, associatedDepartmentIds, operatorId);
         applyProfile(created.getId(), profile, departmentIds);
         return new ProcessResult(created.getId(), false);
     }
@@ -253,6 +257,7 @@ public class UserImportRowProcessor {
         source.setPhone(value(values, "phone"));
         source.setEmail(value(values, "email"));
         source.setDepartmentCode(value(values, "department_code"));
+        source.setAssociatedDepartmentCodes(value(values, "associated_department_codes"));
         source.setLanguage(value(values, "language"));
         source.setTimezone(value(values, "timezone"));
         source.setAuthorizationProfileCode(value(values, "authorization_profile_code"));

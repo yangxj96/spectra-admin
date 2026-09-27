@@ -34,6 +34,7 @@ import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -94,12 +95,21 @@ public final class ScopeSqlPolicy {
      */
     public static Expression build(Table table, DataScope annotation, List<PermissionBoundary> boundaries,
                                    UUID subjectId) {
+        return build(table, annotation, boundaries, subjectId, Set.of());
+    }
+
+    /**
+     * 将 RULES 边界与用户部门成员集合求交，并将同一 Permission 的多个 Boundary 以 OR 合并。
+     */
+    public static Expression build(Table table, DataScope annotation, List<PermissionBoundary> boundaries,
+                                   UUID subjectId, Set<UUID> departmentMembershipIds) {
         if (table == null || annotation == null || boundaries == null || boundaries.isEmpty()) {
             return falsePredicate();
         }
         Expression combined = null;
         for (PermissionBoundary boundary : boundaries) {
-            Expression current = buildBoundary(table, annotation, boundary.scope(), subjectId);
+            Expression current = buildBoundary(table, annotation, boundary.scope(), subjectId,
+                    departmentMembershipIds == null ? Set.of() : departmentMembershipIds);
             if (current == null) {
                 return null;
             }
@@ -111,12 +121,16 @@ public final class ScopeSqlPolicy {
     /**
      * 创建或构建目标数据（{@code buildBoundary}）。
      */
-    private static Expression buildBoundary(Table table, DataScope annotation, AuthorizationScope scope, UUID subjectId) {
-        if (scope.mode() == ScopeMode.NONE || scope.mode() == ScopeMode.ALL) {
+    private static Expression buildBoundary(Table table, DataScope annotation, AuthorizationScope scope, UUID subjectId,
+                                            Set<UUID> departmentMembershipIds) {
+        if (scope.mode() == ScopeMode.NONE) {
+            return falsePredicate();
+        }
+        if (scope.mode() == ScopeMode.ALL) {
             return null;
         }
 
-        Expression structural = structuralPredicate(table, annotation, scope, subjectId);
+        Expression structural = structuralPredicate(table, annotation, scope, subjectId, departmentMembershipIds);
         Expression relations = relationPredicates(table, annotation, scope, subjectId);
         return combineWithOr(structural, relations);
     }
@@ -125,12 +139,12 @@ public final class ScopeSqlPolicy {
      * 处理内部业务逻辑（{@code structuralPredicate}）。
      */
     private static Expression structuralPredicate(Table table, DataScope annotation, AuthorizationScope scope,
-                                                  UUID subjectId) {
+                                                  UUID subjectId, Set<UUID> departmentMembershipIds) {
         if (scope.mode() == ScopeMode.SELF && subjectId != null && !annotation.ownerColumn().isBlank()) {
             return new EqualsTo(new Column(table, annotation.ownerColumn()), new StringValue(subjectId.toString()));
         }
         if (scope.mode() == ScopeMode.RULES && !annotation.column().isBlank()) {
-            return departmentPredicate(table, annotation.column(), scope);
+            return rulesDepartmentPredicate(table, annotation.column(), scope, departmentMembershipIds);
         }
         return null;
     }
@@ -155,7 +169,8 @@ public final class ScopeSqlPolicy {
         Expression department = null;
         if (scope.mode() == ScopeMode.RULES && !relation.departmentColumn().isBlank()) {
             department = relationSubquery(table, relation,
-                    departmentPredicate(new Table(relation.schema(), relation.table()), relation.departmentColumn(), scope));
+                    departmentPredicate(new Table(relation.schema(), relation.table()), relation.departmentColumn(),
+                            scope.departmentIds(), scope.includeDescendants()));
         }
         Expression user = null;
         if (subjectId != null && !relation.userColumn().isBlank()) {
@@ -192,17 +207,25 @@ public final class ScopeSqlPolicy {
     /**
      * 处理内部业务逻辑（{@code departmentPredicate}）。
      */
-    private static Expression departmentPredicate(Table table, String column, AuthorizationScope scope) {
-        if (scope.departmentIds().isEmpty()) {
+    private static Expression rulesDepartmentPredicate(Table table, String column, AuthorizationScope scope,
+                                                       Set<UUID> departmentMembershipIds) {
+        return combineWithAnd(
+                departmentPredicate(table, column, scope.departmentIds(), scope.includeDescendants()),
+                departmentPredicate(table, column, departmentMembershipIds, scope.includeDescendants()));
+    }
+
+    private static Expression departmentPredicate(Table table, String column, Set<UUID> departmentIds,
+                                                  boolean includeDescendants) {
+        if (departmentIds == null || departmentIds.isEmpty()) {
             return falsePredicate();
         }
         Column left = new Column(table, column);
-        ExpressionList<Expression> ids = new ExpressionList<>(scope.departmentIds()
+        ExpressionList<Expression> ids = new ExpressionList<>(departmentIds
                 .stream()
                 .map(id -> (Expression) new StringValue(id.toString()))
                 .collect(Collectors.toList()));
         InExpression direct = new InExpression(left, ids);
-        if (!scope.includeDescendants()) {
+        if (!includeDescendants) {
             return direct;
         }
 

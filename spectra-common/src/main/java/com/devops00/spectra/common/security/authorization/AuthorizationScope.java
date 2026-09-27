@@ -71,7 +71,8 @@ public record AuthorizationScope(ScopeMode mode, Set<UUID> departmentIds, boolea
             return false;
         }
         return switch (mode) {
-            case NONE, ALL -> true;
+            case NONE -> false;
+            case ALL -> true;
             case SELF -> query.subjectId() != null && query.subjectId().equals(query.ownerId());
             case RULES -> query.departmentId() != null
                     && (departmentIds.contains(query.departmentId())

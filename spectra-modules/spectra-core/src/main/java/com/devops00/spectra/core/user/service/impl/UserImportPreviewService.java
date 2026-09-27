@@ -239,6 +239,7 @@ public class UserImportPreviewService {
     public ReferenceData loadReferenceData() {
         var departmentIds = departmentService.list()
                 .stream()
+                .filter(department -> department.getDeleted() == null)
                 .filter(department -> department.getCode() != null)
                 .collect(Collectors.toMap(Department::getCode, Department::getId, (left, right) -> left));
         var languages = dictService.listDictDataByGroupCode("sys_language")
@@ -317,6 +318,8 @@ public class UserImportPreviewService {
         if (!referenceData.departmentIds().containsKey(source.getDepartmentCode())) {
             errors.add("部门编码不存在");
         }
+        errors.addAll(UserImportDepartmentCodes.parse(source.getAssociatedDepartmentCodes(),
+                source.getDepartmentCode(), referenceData.departmentIds()).errors());
         if (!referenceData.languages().contains(source.getLanguage())) {
             errors.add("语言不在当前系统字典中");
         }
@@ -357,6 +360,8 @@ public class UserImportPreviewService {
             normalized.put(entry.getKey(), entry.getValue() == null ? "" : trim(String.valueOf(entry.getValue())));
         }
         var normalizedSource = toSource(normalized);
+        normalizedSource.setAssociatedDepartmentCodes(
+                UserImportDepartmentCodes.normalize(normalizedSource.getAssociatedDepartmentCodes()));
         if (blank(normalizedSource.getEmployeeNo())) {
             normalizedSource.setEmployeeNo(generateEmployeeNo(generationSeed, rowIndex));
         }
@@ -384,6 +389,7 @@ public class UserImportPreviewService {
         result.put("phone", source.getPhone());
         result.put("email", source.getEmail());
         result.put("department_code", source.getDepartmentCode());
+        result.put("associated_department_codes", source.getAssociatedDepartmentCodes());
         result.put("language", source.getLanguage());
         result.put("timezone", source.getTimezone());
         result.put("authorization_profile_code", source.getAuthorizationProfileCode());
@@ -401,6 +407,7 @@ public class UserImportPreviewService {
         source.setPhone(value(values, "phone"));
         source.setEmail(value(values, "email"));
         source.setDepartmentCode(value(values, "department_code"));
+        source.setAssociatedDepartmentCodes(value(values, "associated_department_codes"));
         source.setLanguage(value(values, "language"));
         source.setTimezone(value(values, "timezone"));
         source.setAuthorizationProfileCode(value(values, "authorization_profile_code"));

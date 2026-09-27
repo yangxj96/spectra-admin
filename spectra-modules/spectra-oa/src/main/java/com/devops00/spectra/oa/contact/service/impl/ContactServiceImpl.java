@@ -69,7 +69,7 @@ public class ContactServiceImpl implements ContactService {
         int fromIndex = Math.toIntExact(Math.min(pageOffset(page), total));
         var toIndex = Math.min(fromIndex + pageSize(page), total);
         var currentUsers = users.subList(fromIndex, toIndex);
-        var departmentIds = currentUsers.stream().map(DirectoryUserSnapshot::departmentId).filter(Objects::nonNull).distinct().toList();
+        var departmentIds = currentUsers.stream().map(DirectoryUserSnapshot::primaryDepartmentId).filter(Objects::nonNull).distinct().toList();
         Map<UUID, DirectoryDepartmentSnapshot> departments = directoryQueryPort.findDepartmentsByIds(departmentIds)
                 .stream()
                 .filter(Objects::nonNull)
@@ -82,8 +82,8 @@ public class ContactServiceImpl implements ContactService {
             var userContacts = contacts.getOrDefault(user.id(), List.of());
             vo.setPhone(contactValue(userContacts, PHONE));
             vo.setEmail(contactValue(userContacts, EMAIL));
-            var department = user.departmentId() == null ? null : departments.get(user.departmentId());
-            vo.setDepartmentName(department == null ? null : StringUtils.hasText(department.path()) ? department.path() : department.name());
+            var department = user.primaryDepartmentId() == null ? null : departments.get(user.primaryDepartmentId());
+            vo.setPrimaryDepartmentName(department == null ? null : StringUtils.hasText(department.path()) ? department.path() : department.name());
             return vo;
         }).toList());
         return result;

@@ -133,7 +133,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                     continue;
                 }
                 addParticipant(entity, participantId, StringUtils.hasText(fromParticipant.getRole()) ? fromParticipant.getRole() : "attendee",
-                        participant.departmentId(), MeetingParticipantStatus.PENDING.getValue());
+                        participant.primaryDepartmentId(), MeetingParticipantStatus.PENDING.getValue());
                 receivers.add(participantId);
             }
         }

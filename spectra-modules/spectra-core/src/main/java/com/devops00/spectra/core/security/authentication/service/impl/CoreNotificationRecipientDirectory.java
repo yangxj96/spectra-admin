@@ -29,6 +29,7 @@ import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotP
 import com.devops00.spectra.common.security.authorization.ScopeMode;
 import com.devops00.spectra.common.security.authorization.ScopeQuery;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -59,6 +60,8 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
     private final DepartmentService departmentService;
 
     private final SecurityContextAccessor securityContextAccessor;
+
+    private final UserDepartmentMembershipMapper membershipMapper;
 
     @Override
     public List<NotificationRecipient> resolve(List<UUID> userIds) {
@@ -131,11 +134,13 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
             return true;
         }
         var recipient = userService.getById(recipientUserId);
-        if (recipient == null || recipient.getDepartmentId() == null) {
+        if (recipient == null) {
             return false;
         }
-        return snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId,
-                recipient.getDepartmentId(), departmentLineage(recipient.getDepartmentId())));
+        return membershipMapper.selectDepartmentIdsForAuthorization(recipientUserId)
+                .stream()
+                .anyMatch(departmentId -> snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId,
+                        departmentId, departmentLineage(departmentId))));
     }
 
     /**

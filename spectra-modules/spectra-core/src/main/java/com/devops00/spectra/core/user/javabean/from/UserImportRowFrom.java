@@ -60,6 +60,10 @@ public class UserImportRowFrom {
     @Size(max = 80, message = "部门编码不能超过 80 个字符")
     private String departmentCode;
 
+    /** 可选关联部门编码，以分号分隔。 */
+    @Size(max = 1000, message = "关联部门编码不能超过 1000 个字符")
+    private String associatedDepartmentCodes;
+
     @NotBlank(message = "语言不能为空")
     @Size(max = 40, message = "语言不能超过 40 个字符")
     private String language;

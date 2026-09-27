@@ -53,6 +53,7 @@ import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptItemMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptMapper;
 import com.devops00.spectra.oa.purchase.service.PurchaseService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import com.devops00.spectra.workflow.api.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,16 +95,23 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     private final OaApplicationWorkflowSupport workflowSupport;
     private final PurchaseConverter purchaseConverter;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public IPage<PurchaseVO> page(PageFrom page, PurchasePageFrom params) {
         var wrapper = new LambdaQueryWrapper<Purchase>();
         var user = securityContextAccessor.currentUser();
-        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+        if (user == null || user.getId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
+        var departmentIds = currentDepartmentMemberships.departmentIds();
         var applicationWrapper = new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, TYPE_CODE)
-                .and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
+                .and(query -> {
+                    query.eq(Application::getApplicantId, user.getId());
+                    if (!departmentIds.isEmpty()) {
+                        query.or().in(Application::getDepartmentId, departmentIds);
+                    }
+                });
         if (params != null && StringUtils.hasText(params.getStatus())) {
             applicationWrapper.eq(Application::getStatus, params.getStatus());
         }

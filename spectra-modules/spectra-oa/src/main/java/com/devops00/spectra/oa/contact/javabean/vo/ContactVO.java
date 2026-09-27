@@ -19,6 +19,8 @@ package com.devops00.spectra.oa.contact.javabean.vo;
 import lombok.Data;
 
 import java.util.UUID;
+import java.util.List;
+import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
 
 /**
  * OA 通讯录公开信息。
@@ -66,10 +68,13 @@ public class ContactVO {
     /**
      * 部门 ID。
      */
-    private UUID departmentId;
+    private UUID primaryDepartmentId;
 
     /**
      * 部门名称字段。
      */
-    private String departmentName;
+    private String primaryDepartmentName;
+
+    /** 有效关联部门摘要。 */
+    private List<DirectoryDepartmentSnapshot> associatedDepartments;
 }

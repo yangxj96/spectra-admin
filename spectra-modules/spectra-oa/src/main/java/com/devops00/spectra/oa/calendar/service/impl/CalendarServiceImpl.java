@@ -32,6 +32,7 @@ import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 import com.devops00.spectra.oa.calendar.mapper.CalendarMapper;
 import com.devops00.spectra.oa.calendar.service.CalendarService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
     private final CalendarConverter calendarConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
@@ -64,10 +66,11 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
             return new Page<>(page.getPageNum(), page.getPageSize());
         }
         var wrapper = new LambdaQueryWrapper<Calendar>();
+        var departmentIds = currentDepartmentMemberships.departmentIds();
         wrapper.and(q -> {
             q.eq(Calendar::getOwnerId, userId).or().eq(Calendar::getVisibility, "ALL");
-            if (user.getDepartmentId() != null) {
-                q.or(w -> w.eq(Calendar::getVisibility, "DEPARTMENT").eq(Calendar::getDepartmentId, user.getDepartmentId()));
+            if (!departmentIds.isEmpty()) {
+                q.or(w -> w.eq(Calendar::getVisibility, "DEPARTMENT").in(Calendar::getDepartmentId, departmentIds));
             }
         });
         wrapper.orderByAsc(Calendar::getStartTime);

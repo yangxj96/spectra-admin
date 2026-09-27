@@ -38,6 +38,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMap
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.system.service.DepartmentService;
+import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -51,7 +52,9 @@ import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
+import com.devops00.spectra.core.user.javabean.vo.UserDepartmentSummaryVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import com.devops00.spectra.core.user.provider.DefaultUserPasswordProvider;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.OnlineUserPageAssembler;
@@ -72,13 +75,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 用户service层-实现
@@ -109,6 +115,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     /** 提供用户部门信息及部门关系操作。 */
     private final DepartmentService departmentService;
+
+    /** 查询用户的关联部门关系和部门摘要。 */
+    private final UserDepartmentMembershipMapper membershipMapper;
+
+    private final DepartmentMapper departmentMapper;
 
     /** 对用户密码执行编码和校验。 */
     private final PasswordEncoder passwordEncoder;
@@ -270,14 +281,30 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var wrapper = new LambdaQueryWrapper<User>().like(StrUtils.isNotBlank(params.getRealName()), User::getRealName, params.getRealName())
                 .like(StrUtils.isNotBlank(params.getEmployeeNo()), User::getEmployeeNo, params.getEmployeeNo())
                 .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
-                .in(params.getDepartmentId() != null, User::getDepartmentId, departmentService.getSelfAndDescendantIds(params.getDepartmentId()))
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
+        if (params.getDepartmentId() != null) {
+            var departmentIds = departmentService.getSelfAndDescendantIds(params.getDepartmentId());
+            if (departmentIds == null || departmentIds.isEmpty()) {
+                wrapper.apply("1 = 0");
+            } else {
+                var placeholders = IntStream.range(0, departmentIds.size())
+                        .mapToObj(index -> "{" + index + "}")
+                        .collect(Collectors.joining(","));
+                var membershipQuery = "SELECT 1 FROM spectra_core.sys_user_department_membership AS membership "
+                        + "WHERE membership.user_id = sys_user.id AND membership.deleted IS NULL "
+                        + "AND membership.department_id IN (" + placeholders + ")";
+                wrapper.and(query -> query.in(User::getPrimaryDepartmentId, departmentIds)
+                        .or()
+                        .exists(membershipQuery, departmentIds.toArray()));
+            }
+        }
 
         var db = this.page(page.toPage(), wrapper);
         var result = userConverter.toVOPage(db);
 
         // 字段填充
         fillExecutor.fill(result.getRecords());
+        fillAssociatedDepartments(result.getRecords());
 
         // 扩展字段补充
         result.getRecords().forEach(this::fillAuthorization);
@@ -293,6 +320,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         var result = userConverter.toVO(user);
         fillExecutor.fill(List.of(result));
+        fillAssociatedDepartments(List.of(result));
         fillAuthorization(result);
         return result;
     }
@@ -309,9 +337,26 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         Set<UUID> matchingDepartmentIds = filter.getDepartmentId() == null
                 ? Set.of()
                 : new HashSet<>(departmentService.getSelfAndDescendantIds(filter.getDepartmentId()));
+        Map<UUID, Set<UUID>> departmentIdsByUser = new HashMap<>();
+        onlineUsers.forEach(user -> {
+            var departmentIds = new HashSet<UUID>();
+            if (user.getPrimaryDepartmentId() != null) {
+                departmentIds.add(user.getPrimaryDepartmentId());
+            }
+            departmentIdsByUser.put(user.getId(), departmentIds);
+        });
+        if (!departmentIdsByUser.isEmpty()) {
+            membershipMapper.selectActiveByUserIds(new ArrayList<>(departmentIdsByUser.keySet()))
+                    .forEach(membership -> departmentIdsByUser.computeIfAbsent(membership.getUserId(), ignored -> new HashSet<>())
+                            .add(membership.getDepartmentId()));
+        }
         IPage<OnlineUserPageVO> result = onlineUserPageAssembler.page(page, filter, onlineSessions, onlineUsers,
-                matchingDepartmentIds);
+                matchingDepartmentIds, departmentIdsByUser);
         fillExecutor.fill(result.getRecords());
+        var summariesByUser = associatedDepartmentSummaries(result.getRecords().stream().map(OnlineUserPageVO::getUserId).toList());
+        result.getRecords()
+                .forEach(user -> user.setAssociatedDepartments(
+                        summariesByUser.getOrDefault(user.getUserId(), List.of())));
         return result;
     }
 
@@ -323,12 +368,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         var vo = userConverter.toProfileVO(user);
         // 填充部门名称
-        if (user.getDepartmentId() != null) {
-            var dept = departmentService.getById(user.getDepartmentId());
+        if (user.getPrimaryDepartmentId() != null) {
+            var dept = departmentService.getById(user.getPrimaryDepartmentId());
             if (dept != null) {
-                vo.setDepartmentName(dept.getName());
+                vo.setPrimaryDepartmentName(dept.getName());
             }
         }
+        vo.setAssociatedDepartments(associatedDepartmentSummaries(List.of(userId))
+                .getOrDefault(userId, List.of()));
         // 填充角色列表
         vo.setRoles(targetRoles(userId));
         return vo;
@@ -518,6 +565,42 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         vo.setRoles(targetRoles(assignments));
         vo.setAuthorizationStatus(UserAuthorizationStatusCalculator.calculate(
                 assignments, timeMapper.toLocalDateTime(Instant.now())));
+    }
+
+    /** 一次批量装配一页用户的关联部门名称，避免逐用户查询。 */
+    private void fillAssociatedDepartments(List<UserPageVO> users) {
+        var summariesByUser = associatedDepartmentSummaries(
+                users.stream().map(UserPageVO::getId).toList());
+        users.forEach(user -> user.setAssociatedDepartments(
+                summariesByUser.getOrDefault(user.getId(), List.of())));
+    }
+
+    /** 一次批量装配关联部门摘要。 */
+    private Map<UUID, List<UserDepartmentSummaryVO>> associatedDepartmentSummaries(List<UUID> userIds) {
+        if (userIds.isEmpty()) {
+            return Map.of();
+        }
+        var memberships = membershipMapper.selectActiveByUserIds(userIds);
+        if (memberships.isEmpty()) {
+            return Map.of();
+        }
+        var departmentIds = memberships.stream()
+                .map(membership -> membership.getDepartmentId())
+                .distinct()
+                .toList();
+        var departmentNames = new HashMap<UUID, String>();
+        departmentMapper.selectActiveByIds(departmentIds)
+                .forEach(department -> departmentNames.put(department.getId(), department.getName()));
+
+        Map<UUID, List<UserDepartmentSummaryVO>> summariesByUser = new LinkedHashMap<>();
+        for (var membership : memberships) {
+            var name = departmentNames.get(membership.getDepartmentId());
+            if (name != null) {
+                summariesByUser.computeIfAbsent(membership.getUserId(), ignored -> new ArrayList<>())
+                        .add(new UserDepartmentSummaryVO(membership.getDepartmentId(), name));
+            }
+        }
+        return summariesByUser;
     }
 
     /**

@@ -48,11 +48,14 @@ public class OnlineUserPageVO {
     private String realName;
 
     /** 用户主部门 ID。 */
-    private UUID departmentId;
+    private UUID primaryDepartmentId;
 
     /** 用户主部门名称。 */
-    @NameFill(lookup = DepartmentNameLookup.class, sourceField = "departmentId")
-    private String departmentName;
+    @NameFill(lookup = DepartmentNameLookup.class, sourceField = "primaryDepartmentId")
+    private String primaryDepartmentName;
+
+    /** 关联部门摘要。 */
+    private List<UserDepartmentSummaryVO> associatedDepartments;
 
     /** 用户当前有效会话数。 */
     private Integer sessionCount;

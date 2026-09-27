@@ -26,8 +26,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMap
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +51,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CoreNotificationAudienceDirectory implements NotificationAudienceDirectory {
 
-    private final UserService userService;
-
     private final DepartmentService departmentService;
+
+    private final UserDepartmentMembershipMapper membershipMapper;
 
     private final RoleAssignmentMapper roleAssignmentMapper;
 
@@ -92,13 +91,7 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
         if (expandedDepartments.isEmpty()) {
             return;
         }
-        userService.list(new LambdaQueryWrapper<User>()
-                .select(User::getId)
-                .eq(User::getStatus, UserStatus.ACTIVE)
-                .in(User::getDepartmentId, expandedDepartments))
-                .stream()
-                .map(User::getId)
-                .forEach(userIds::add);
+        userIds.addAll(membershipMapper.selectUserIdsByDepartmentIds(List.copyOf(expandedDepartments), UserStatus.ACTIVE.name()));
     }
 
     /**

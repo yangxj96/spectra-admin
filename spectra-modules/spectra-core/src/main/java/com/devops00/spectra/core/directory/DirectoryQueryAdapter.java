@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.directory;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.port.directory.DirectoryContactSnapshot;
 import com.devops00.spectra.common.port.directory.DirectoryDepartmentSnapshot;
 import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
@@ -26,6 +25,8 @@ import com.devops00.spectra.core.security.authentication.service.UserContactServ
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.javabean.entity.UserDepartmentMembership;
+import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +53,8 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
 
     private final UserContactService userContactService;
 
+    private final UserDepartmentMembershipMapper membershipMapper;
+
     /**
      * 创建目录查询适配器。
      *
@@ -61,19 +64,17 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
      */
     public DirectoryQueryAdapter(UserMapper userMapper,
                                  DepartmentMapper departmentMapper,
-                                 UserContactService userContactService) {
+                                 UserContactService userContactService,
+                                 UserDepartmentMembershipMapper membershipMapper) {
         this.userMapper = userMapper;
         this.departmentMapper = departmentMapper;
         this.userContactService = userContactService;
+        this.membershipMapper = membershipMapper;
     }
 
     @Override
     public List<DirectoryUserSnapshot> listUsers() {
-        return userMapper.selectList(null)
-                .stream()
-                .filter(Objects::nonNull)
-                .map(DirectoryQueryAdapter::toUserSnapshot)
-                .toList();
+        return toUserSnapshots(userMapper.selectList(null));
     }
 
     @Override
@@ -81,11 +82,13 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         if (departmentId == null) {
             return List.of();
         }
-        return userMapper.selectList(new LambdaQueryWrapper<User>().eq(User::getDepartmentId, departmentId))
-                .stream()
-                .filter(Objects::nonNull)
-                .map(DirectoryQueryAdapter::toUserSnapshot)
-                .toList();
+        return toUserSnapshots(userMapper.selectByIds(
+                membershipMapper.selectUserIdsByDepartmentIds(List.of(departmentId), null)));
+    }
+
+    @Override
+    public List<UUID> findDepartmentIdsByUserId(UUID userId) {
+        return userId == null ? List.of() : membershipMapper.selectDepartmentIdsForAuthorization(userId);
     }
 
     @Override
@@ -94,11 +97,7 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         if (distinctIds.isEmpty()) {
             return List.of();
         }
-        return userMapper.selectByIds(distinctIds)
-                .stream()
-                .filter(Objects::nonNull)
-                .map(DirectoryQueryAdapter::toUserSnapshot)
-                .toList();
+        return toUserSnapshots(userMapper.selectByIds(distinctIds));
     }
 
     @Override
@@ -163,15 +162,43 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
     /**
      * 转换用户快照。
      */
-    private static DirectoryUserSnapshot toUserSnapshot(User user) {
-        return new DirectoryUserSnapshot(
-                user.getId(),
-                user.getEmployeeNo(),
-                user.getRealName(),
-                user.getUsername(),
-                user.getAvatar(),
-                user.getStatus() == null ? null : user.getStatus().name(),
-                user.getDepartmentId());
+    private List<DirectoryUserSnapshot> toUserSnapshots(List<User> users) {
+        var records = users == null ? List.<User>of() : users.stream().filter(Objects::nonNull).toList();
+        if (records.isEmpty()) {
+            return List.of();
+        }
+        var userIds = records.stream().map(User::getId).filter(Objects::nonNull).distinct().toList();
+        var memberships = userIds.isEmpty()
+                ? List.<UserDepartmentMembership>of()
+                : membershipMapper.selectActiveByUserIds(userIds);
+        var departmentIds = memberships.stream()
+                .map(UserDepartmentMembership::getDepartmentId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        var departments = departmentIds.isEmpty()
+                ? List.<Department>of()
+                : departmentMapper.selectActiveByIds(departmentIds);
+        var departmentsById = departments.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        Department::getId, DirectoryQueryAdapter::toDepartmentSnapshot, (left, right) -> left));
+        var membershipsByUser = memberships.stream()
+                .filter(membership -> membership.getUserId() != null
+                        && departmentsById.containsKey(membership.getDepartmentId()))
+                .map(membership -> Map.entry(membership.getUserId(), departmentsById.get(membership.getDepartmentId())))
+                .collect(java.util.stream.Collectors.groupingBy(Map.Entry::getKey,
+                        java.util.stream.Collectors.mapping(Map.Entry::getValue, java.util.stream.Collectors.toList())));
+        return records.stream()
+                .map(user -> new DirectoryUserSnapshot(
+                        user.getId(),
+                        user.getEmployeeNo(),
+                        user.getRealName(),
+                        user.getUsername(),
+                        user.getAvatar(),
+                        user.getStatus() == null ? null : user.getStatus().name(),
+                        user.getPrimaryDepartmentId(),
+                        membershipsByUser.getOrDefault(user.getId(), List.of())))
+                .toList();
     }
 
     /**

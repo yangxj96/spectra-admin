@@ -35,6 +35,7 @@ import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import com.devops00.spectra.workflow.api.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,15 +69,22 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     private final ApplicationConverter applicationConverter;
     private final TaskService taskService;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Application>();
         var user = securityContextAccessor.currentUser();
-        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+        if (user == null || user.getId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        wrapper.and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        var departmentIds = currentDepartmentMemberships.departmentIds();
+        wrapper.and(query -> {
+            query.eq(Application::getApplicantId, user.getId());
+            if (!departmentIds.isEmpty()) {
+                query.or().in(Application::getDepartmentId, departmentIds);
+            }
+        });
         if (params != null && StringUtils.hasText(params.getTypeCode())) {
             wrapper.eq(Application::getTypeCode, params.getTypeCode());
         }
@@ -105,11 +113,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         var user = securityContextAccessor.currentUser();
         var applicantId = entity.getApplicantId();
         var departmentId = entity.getDepartmentId();
-        var userDepartmentId = user == null ? null : user.getDepartmentId();
         if (user != null
                 && user.getId() != null
-                && userDepartmentId != null
-                && (user.getId().equals(applicantId) || userDepartmentId.equals(departmentId))) {
+                && (user.getId().equals(applicantId) || currentDepartmentMemberships.contains(departmentId))) {
             return entity;
         }
         String username = securityContextAccessor.currentUsername();

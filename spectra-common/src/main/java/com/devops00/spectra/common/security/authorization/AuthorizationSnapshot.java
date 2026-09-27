@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Assignment-preserving 授权快照。
@@ -44,19 +45,31 @@ public final class AuthorizationSnapshot {
 
     private final Map<String, List<PermissionBoundary>> grantBoundaries;
 
-    private AuthorizationSnapshot(List<AuthorizationAssignment> assignments) {
+    private final Set<UUID> departmentMembershipIds;
+
+    private AuthorizationSnapshot(List<AuthorizationAssignment> assignments, Set<UUID> departmentMembershipIds) {
         this.assignments = List.copyOf(assignments == null ? List.of() : assignments);
         this.root = this.assignments.stream()
                 .anyMatch(assignment -> RootAuthorizationPolicy.ROOT_ROLE.equals(assignment.roleCode()));
         this.accessBoundaries = index(this.assignments, true);
         this.grantBoundaries = index(this.assignments, false);
+        this.departmentMembershipIds = departmentMembershipIds == null
+                ? Set.of()
+                : Collections.unmodifiableSet(new LinkedHashSet<>(departmentMembershipIds));
     }
 
     /**
      * 创建或构建目标数据（{@code of}）。
      */
     public static AuthorizationSnapshot of(List<AuthorizationAssignment> assignments) {
-        return new AuthorizationSnapshot(assignments);
+        return new AuthorizationSnapshot(assignments, Set.of());
+    }
+
+    /**
+     * 创建包含当前有效部门成员关系的授权快照。
+     */
+    public static AuthorizationSnapshot of(List<AuthorizationAssignment> assignments, Set<UUID> departmentMembershipIds) {
+        return new AuthorizationSnapshot(assignments, departmentMembershipIds);
     }
 
     /**
@@ -64,6 +77,11 @@ public final class AuthorizationSnapshot {
      */
     public List<AuthorizationAssignment> assignments() {
         return assignments;
+    }
+
+    /** 当前用户的主部门与有效关联部门集合。 */
+    public Set<UUID> departmentMembershipIds() {
+        return Set.copyOf(departmentMembershipIds);
     }
 
     /**
@@ -106,7 +124,7 @@ public final class AuthorizationSnapshot {
      * 判断条件是否满足（{@code canAccess}）。
      */
     public boolean canAccess(String permission, ScopeQuery query) {
-        return permission != null && (root || allows(accessBoundaries.get(permission), query));
+        return permission != null && (root || allows(accessBoundaries.get(permission), query, departmentMembershipIds));
     }
 
     /**
@@ -135,6 +153,25 @@ public final class AuthorizationSnapshot {
      */
     private static boolean allows(List<PermissionBoundary> boundaries, ScopeQuery query) {
         return boundaries != null && boundaries.stream().anyMatch(boundary -> boundary.scope().allows(query));
+    }
+
+    /** RULES 必须同时命中授权部门和用户成员部门；ALL/SELF 保持各自语义。 */
+    private static boolean allows(List<PermissionBoundary> boundaries, ScopeQuery query,
+                                  Set<UUID> departmentMembershipIds) {
+        return boundaries != null && boundaries.stream().anyMatch(boundary -> {
+            var scope = boundary.scope();
+            if (!scope.allows(query)) {
+                return false;
+            }
+            if (scope.mode() != ScopeMode.RULES) {
+                return true;
+            }
+            return query.departmentId() != null
+                    && departmentMembershipIds != null
+                    && (departmentMembershipIds.contains(query.departmentId())
+                            || (scope.includeDescendants()
+                                    && query.departmentLineage().stream().anyMatch(departmentMembershipIds::contains)));
+        });
     }
 
     /**

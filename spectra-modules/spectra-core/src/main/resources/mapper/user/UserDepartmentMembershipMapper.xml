@@ -24,7 +24,6 @@
         <!--@Table spectra_core.sys_user_department_membership-->
         <result column="user_id"         property="userId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
         <result column="department_id"   property="departmentId" typeHandler="com.devops00.spectra.framework.persistence.mybatis.handler.UUIDTypeHandler"/>
-        <result column="membership_type" property="membershipType"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -32,13 +31,109 @@
         <!--@mbg.generated-->
         user_id,
         department_id,
-        membership_type,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 
-    <insert id="insertPrimary">
+    <select id="selectActiveDepartmentIdsByUserId" resultType="java.util.UUID">
+        SELECT department_id
+        FROM spectra_core.sys_user_department_membership
+        WHERE user_id = #{userId}
+          AND deleted IS NULL
+        ORDER BY department_id
+    </select>
+
+    <select id="selectDepartmentIdsForAuthorization" resultType="java.util.UUID">
+        SELECT department_id
+        FROM (
+            SELECT department.id AS department_id
+            FROM spectra_core.sys_user AS user_record
+            JOIN spectra_core.sys_department AS department
+              ON department.id = user_record.primary_department_id
+             AND department.deleted IS NULL
+            WHERE user_record.id = #{userId}
+              AND user_record.deleted IS NULL
+
+            UNION
+
+            SELECT membership.department_id
+            FROM spectra_core.sys_user_department_membership AS membership
+            JOIN spectra_core.sys_user AS user_record
+              ON user_record.id = membership.user_id
+             AND user_record.deleted IS NULL
+            JOIN spectra_core.sys_department AS department
+              ON department.id = membership.department_id
+             AND department.deleted IS NULL
+            WHERE membership.user_id = #{userId}
+              AND membership.deleted IS NULL
+        ) AS department_memberships
+        ORDER BY department_id
+    </select>
+
+    <select id="selectUserIdsByDepartmentIds" resultType="java.util.UUID">
+        SELECT user_record.id
+        FROM spectra_core.sys_user AS user_record
+        WHERE user_record.deleted IS NULL
+          <if test="status != null and status != ''">
+              AND user_record.status = #{status}
+          </if>
+          AND (
+              user_record.primary_department_id IN
+              <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+                  #{departmentId}
+              </foreach>
+              AND EXISTS (
+                  SELECT 1
+                  FROM spectra_core.sys_department AS primary_department
+                  WHERE primary_department.id = user_record.primary_department_id
+                    AND primary_department.deleted IS NULL
+              )
+              OR EXISTS (
+                  SELECT 1
+                  FROM spectra_core.sys_user_department_membership AS membership
+                  JOIN spectra_core.sys_department AS department
+                    ON department.id = membership.department_id
+                   AND department.deleted IS NULL
+                  WHERE membership.user_id = user_record.id
+                    AND membership.department_id IN
+                    <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+                        #{departmentId}
+                    </foreach>
+                    AND membership.deleted IS NULL
+              )
+          )
+        ORDER BY user_record.id
+    </select>
+
+    <select id="selectActiveByUserIds" resultMap="BaseResultMap">
+        SELECT
+            user_id,
+            department_id,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_user_department_membership
+        WHERE deleted IS NULL
+          AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+        ORDER BY user_id, department_id
+    </select>
+
+    <update id="softDeleteActiveByUserId">
+        UPDATE spectra_core.sys_user_department_membership
+        SET deleted = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId},
+            version = version + 1
+        WHERE user_id = #{userId}
+          AND deleted IS NULL
+    </update>
+
+    <insert id="batchInsertAssociated">
         INSERT INTO spectra_core.sys_user_department_membership
-            (user_id, department_id, membership_type, created_by, updated_by)
-        VALUES (#{userId}, #{departmentId}, 'PRIMARY', #{userId}, #{userId})
+            (user_id, department_id, created_by, updated_by)
+        VALUES
+        <foreach collection="departmentIds" item="departmentId" separator=",">
+            (#{userId}, #{departmentId}, #{operatorId}, #{operatorId})
+        </foreach>
     </insert>
 </mapper>

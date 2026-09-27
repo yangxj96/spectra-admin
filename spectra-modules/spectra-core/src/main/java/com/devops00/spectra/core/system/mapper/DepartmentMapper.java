@@ -21,6 +21,7 @@ import com.devops00.spectra.core.system.javabean.entity.Department;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -43,4 +44,20 @@ public interface DepartmentMapper extends BaseMapper<Department> {
      * @return 组织机构路径
      */
     String generatePath(@Param("id") UUID id);
+
+    /**
+     * 查询未软删除的部门 ID。
+     *
+     * @param departmentIds 待检查部门 ID
+     * @return 当前有效的部门 ID
+     */
+    List<UUID> selectActiveIdsByIds(@Param("departmentIds") List<UUID> departmentIds);
+
+    /**
+     * 批量查询未软删除的部门摘要。
+     *
+     * @param departmentIds 部门 ID
+     * @return 未软删除的部门记录
+     */
+    List<Department> selectActiveByIds(@Param("departmentIds") List<UUID> departmentIds);
 }

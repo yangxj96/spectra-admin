@@ -91,17 +91,13 @@ public class UserImportExecutionWorker {
                 continue;
             }
             try {
-                var result = rowProcessor.processInCurrentTransaction(row, skipExisting,
+                var result = rowProcessor.process(row, operatorId, skipExisting,
                         referenceData.departmentIds(), referenceData.profiles(), encodedDefaultPasswordHash);
-                row.setUserId(result.userId());
                 if (result.skipped()) {
-                    row.setState(STATE_SKIPPED);
                     skipped++;
                 } else {
-                    row.setState(STATE_APPLIED);
                     applied++;
                 }
-                rowMapper.updateById(row);
             } catch (RuntimeException exception) {
                 row.setState(STATE_ERROR);
                 row.setErrors(Map.of("apply", safeMessage(exception)));

@@ -48,6 +48,7 @@ import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
 import com.devops00.spectra.oa.reimbursement.service.ReimbursementService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.oa.file.reference.OaFileReferenceBinder;
 import com.devops00.spectra.oa.file.reference.OaFileReferenceType;
@@ -96,16 +97,23 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private final FileAssetPort fileAssetPort;
     private final FileReferenceService fileReferenceService;
     private final OaFileReferenceBinder fileReferenceBinder;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Reimbursement>();
         var user = securityContextAccessor.currentUser();
-        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+        if (user == null || user.getId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
+        var departmentIds = currentDepartmentMemberships.departmentIds();
         var visibleApplications = new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, TYPE_CODE)
-                .and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
+                .and(query -> {
+                    query.eq(Application::getApplicantId, user.getId());
+                    if (!departmentIds.isEmpty()) {
+                        query.or().in(Application::getDepartmentId, departmentIds);
+                    }
+                });
         var applicationIds = applicationMapper.selectList(visibleApplications).stream().map(Application::getId).toList();
         if (applicationIds.isEmpty()) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);

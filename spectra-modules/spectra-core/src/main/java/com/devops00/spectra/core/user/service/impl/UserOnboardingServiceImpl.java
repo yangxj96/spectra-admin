@@ -16,19 +16,26 @@
 
 package com.devops00.spectra.core.user.service.impl;
 
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.core.audit.AuditRecordFactory;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
+import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
-import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentsChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentRemovalFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentsChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationChangePreviewVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
-import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
-import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
+import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
+import com.devops00.spectra.core.user.service.UserDepartmentMembershipService;
 import com.devops00.spectra.core.user.service.UserOnboardingService;
 import com.devops00.spectra.core.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +43,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.UUID;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -58,11 +67,30 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
 
     private final AuthorizationAssignmentQueryService assignmentQueryService;
 
+    private final UserDepartmentMembershipService membershipService;
+
+    private final AuditRecordFactory auditRecordFactory;
+
+    private final AuditService auditService;
+
+    private final SecurityContextAccessor securityContextAccessor;
+
     @Override
     @Transactional
     public UserOnboardingVO submit(UserOnboardingFrom params) {
         var userParams = params.getUser();
+        User previous = userParams.getId() == null ? null : userService.getById(userParams.getId());
+        var previousAssociatedIds = previous == null
+                ? List.<UUID>of()
+                : membershipService.findAssociatedDepartmentIds(previous.getId());
+        var previousPrimaryDepartmentId = previous == null ? null : previous.getPrimaryDepartmentId();
+
         UserOnboardingVO user = submitUser(userParams);
+        UUID operatorId = securityContextAccessor.currentUserId();
+        membershipService.replace(user.getId(), userParams.getPrimaryDepartmentId(),
+                userParams.getAssociatedDepartmentIds(), operatorId);
+        recordDepartmentMembershipChange(user.getId(), operatorId, previousPrimaryDepartmentId,
+                previousAssociatedIds, userParams.getPrimaryDepartmentId(), userParams.getAssociatedDepartmentIds());
         submitAuthorization(user.getId(), params.getAuthorization());
         return user;
     }
@@ -77,6 +105,36 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         }
         userService.modify(params);
         return new UserOnboardingVO(params.getId(), params.getRealName());
+    }
+
+    /**
+     * 记录主部门和关联部门列表的变更前后快照。
+     */
+    private void recordDepartmentMembershipChange(UUID userId, UUID operatorId, UUID previousPrimaryDepartmentId,
+                                                  List<UUID> previousAssociatedIds, UUID primaryDepartmentId,
+                                                  List<UUID> associatedDepartmentIds) {
+        Map<String, Object> before = departmentSnapshot(previousPrimaryDepartmentId, previousAssociatedIds);
+        Map<String, Object> after = departmentSnapshot(primaryDepartmentId, associatedDepartmentIds);
+        if (before.equals(after)) {
+            return;
+        }
+        var event = auditRecordFactory.create(null, "USER_DEPARTMENT_MEMBERSHIP_CHANGED", operatorId, userId,
+                null, null, null, before, after, "更新用户部门成员关系", null, AuditRecord.Result.SUCCEEDED,
+                RequestCorrelationContext.current().correlationId());
+        auditService.record(event);
+    }
+
+    /**
+     * 规范化部门快照，避免列表输入顺序影响审计比较。
+     */
+    private Map<String, Object> departmentSnapshot(UUID primaryDepartmentId, List<UUID> associatedDepartmentIds) {
+        var snapshot = new LinkedHashMap<String, Object>();
+        snapshot.put("primaryDepartmentId", primaryDepartmentId);
+        var normalizedAssociatedIds = associatedDepartmentIds == null
+                ? List.<UUID>of()
+                : associatedDepartmentIds.stream().sorted().toList();
+        snapshot.put("associatedDepartmentIds", normalizedAssociatedIds);
+        return snapshot;
     }
 
     /**

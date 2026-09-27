@@ -85,15 +85,14 @@ public class UserProfileVO implements Serializable {
      */
     private String timezone;
 
-    /**
-     * 部门ID
-     */
-    private UUID departmentId;
+    /** 主部门 ID。 */
+    private UUID primaryDepartmentId;
 
-    /**
-     * 部门名称
-     */
-    private String departmentName;
+    /** 主部门名称。 */
+    private String primaryDepartmentName;
+
+    /** 关联部门摘要。 */
+    private List<UserDepartmentSummaryVO> associatedDepartments;
 
     /**
      * 角色列表

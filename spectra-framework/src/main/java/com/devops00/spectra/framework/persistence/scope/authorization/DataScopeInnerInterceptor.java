@@ -122,7 +122,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
             return null;
         }
         Expression scopeExpression = ScopeSqlPolicy.build(table, annotation,
-                snapshot.accessBoundaries(permission), userId);
+                snapshot.accessBoundaries(permission), userId, snapshot.departmentMembershipIds());
         return scopeExpression;
     }
 

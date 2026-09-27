@@ -49,6 +49,7 @@ import com.devops00.spectra.oa.contract.mapper.ContractVersionMapper;
 import com.devops00.spectra.oa.contract.service.ContractService;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
+import com.devops00.spectra.oa.common.security.CurrentDepartmentMemberships;
 import com.devops00.spectra.common.port.file.FileAssetPort;
 import com.devops00.spectra.common.port.file.FileReferenceService;
 import com.devops00.spectra.oa.file.reference.OaFileReferenceBinder;
@@ -94,6 +95,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final ContractConverter contractConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
+    private final CurrentDepartmentMemberships currentDepartmentMemberships;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
@@ -102,10 +104,11 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (user == null || user.getId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
+        var departmentIds = currentDepartmentMemberships.departmentIds();
         wrapper.and(query -> {
             query.eq(Contract::getOwnerId, user.getId()).or().eq(Contract::getVisibility, "PUBLIC");
-            if (user.getDepartmentId() != null) {
-                query.or(q -> q.eq(Contract::getVisibility, "DEPARTMENT").eq(Contract::getDepartmentId, user.getDepartmentId()));
+            if (!departmentIds.isEmpty()) {
+                query.or(q -> q.eq(Contract::getVisibility, "DEPARTMENT").in(Contract::getDepartmentId, departmentIds));
             }
         });
         if (params != null && StringUtils.hasText(params.getKeyword())) {
@@ -452,7 +455,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if ("PRIVATE".equals(entity.getVisibility()) && !Objects.equals(entity.getOwnerId(), user.getId())) {
             throw new DataNotExistException("合同不存在或无权访问");
         }
-        if ("DEPARTMENT".equals(entity.getVisibility()) && !Objects.equals(entity.getDepartmentId(), user.getDepartmentId())) {
+        if ("DEPARTMENT".equals(entity.getVisibility()) && !currentDepartmentMemberships.contains(entity.getDepartmentId())) {
             throw new DataNotExistException("合同不存在或无权访问");
         }
         return entity;

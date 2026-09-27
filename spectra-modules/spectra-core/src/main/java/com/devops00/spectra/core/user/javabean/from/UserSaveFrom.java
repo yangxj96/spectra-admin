@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -92,10 +93,11 @@ public class UserSaveFrom {
      */
     private String timezone;
 
-    /**
-     * 所属组织机构ID
-     */
+    /** 主部门 ID。 */
     @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private UUID departmentId;
+    private UUID primaryDepartmentId;
+
+    /** 关联部门 ID；未提供时按空列表处理。 */
+    private List<UUID> associatedDepartmentIds;
 
 }

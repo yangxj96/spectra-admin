@@ -21,13 +21,14 @@ import java.util.UUID;
 /**
  * 定义用户快照相关的跨模块调用契约。
  *
- * @param id           用户 ID
- * @param employeeNo   员工编号
- * @param displayName  显示名称
- * @param username     登录用户名
- * @param avatar       组件 avatar 对应的业务含义
- * @param status       生命周期状态名称
- * @param departmentId 主部门 ID
+ * @param id                    用户 ID
+ * @param employeeNo            员工编号
+ * @param displayName           显示名称
+ * @param username              登录用户名
+ * @param avatar                组件 avatar 对应的业务含义
+ * @param status                生命周期状态名称
+ * @param primaryDepartmentId   主部门 ID
+ * @param associatedDepartments 有效关联部门摘要
  * @author yangxj96
  * @version 1.0
  * @since 2026/9/7
@@ -39,5 +40,10 @@ public record DirectoryUserSnapshot(
                                     String username,
                                     String avatar,
                                     String status,
-                                    UUID departmentId) {
+                                    UUID primaryDepartmentId,
+                                    java.util.List<DirectoryDepartmentSnapshot> associatedDepartments) {
+
+    public DirectoryUserSnapshot {
+        associatedDepartments = associatedDepartments == null ? java.util.List.of() : java.util.List.copyOf(associatedDepartments);
+    }
 }
