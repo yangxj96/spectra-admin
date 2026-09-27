@@ -1,68 +1,29 @@
 # spectra-admin Agent 指令
 
-## 运行时与安全
+## 环境与边界
 
-- 使用 mise 管理的 Java 25 和本项目的 `./mvnw`；不要依赖全局 Maven。
-- `.mise.local.toml` 只保存本机配置和凭据，不读取后输出，不复制到代码、文档或日志。
-- PostgreSQL、Redis、S3 等外部依赖按当前任务需要验证，不因普通检查自动启动服务。
-- 安全 Redis 是安全事实源；连接、命令或脚本状态无法确认时必须 fail-closed，不得降级为“Token/Challenge 不存在”。
-- 启动时使用 UTC；API 契约版本为 `1.0.0`。
+- 使用 mise 管理的 Java 25 和本项目的 `.\mvnw.cmd`；不要依赖全局 Maven。
+- 命令在本目录执行；`-pl spectra-launch -am` 使用 Maven reactor，无需预先 `install`。
+- 应用启动时使用 UTC；PostgreSQL、Redis、S3 等外部依赖按任务需要验证，不自动启动。
 
-## 本地开发启动流程
+## 开发与验证
 
-- 命令均在本目录（`spectra-admin/`）根目录执行；`-pl spectra-launch -am` 使用 Maven reactor 内的模块输出，不需要为日常启动预先 `install`。
-- 启动后端统一使用：
+- 开发中优先目标模块的编译或测试；模块完成时执行格式检查和 `verify`，交付前按需执行全项目门禁。完整命令见根目录常见命令文档。
+- 本地启动使用 `dev` profile；`-Dmaven.test.skip=true` 会跳过测试资源处理、测试编译和测试执行，运行单元测试时必须省略。
+- `verify` 会执行编译、打包及 Spotless、Checkstyle、PMD、SpotBugs、Enforcer 检查；加上测试跳过参数时不执行单元测试。Spotless 检查只验证格式。
+- 直接调用 `spring-boot:run` 不触发生命周期绑定的 Enforcer 或质量检查；其工作目录由 `spectra-launch/pom.xml` 指向项目根目录，以解析 `files/` 资源。
+- Java 25 下 Mockito inline 若出现 Byte Buddy self-attach 错误，检查 JDK 动态 agent 权限；必要时临时指定本机 Byte Buddy agent，勿将本机绝对路径写入仓库。
 
-  ```bash
-  mise exec -- ./mvnw -pl spectra-launch -am spring-boot:run \
-      -Dspring-boot.run.profiles=dev \
-      -Dmaven.test.skip=true
-  ```
+## 数据库迁移
 
-  `-Dmaven.test.skip=true` 会跳过测试资源处理、测试编译和测试执行；通过 mise 加载 `.mise.local.toml` 环境，但不得读取或输出该文件中的凭据。
-- 执行单元测试使用：
-
-  ```bash
-  mise exec -- ./mvnw -pl spectra-launch -am test
-  ```
-
-  单元测试命令不得携带 `-Dmaven.test.skip=true`。如果 Java 25 下 Mockito inline 报 Byte Buddy self-attach 错误，先确认本机 JDK 的动态 agent 权限，再按本机 Maven 仓库中实际的 Byte Buddy agent 路径临时传入 `-DargLine=-javaagent:<path>`；不要把本机绝对路径写入仓库。
-- 阶段性完成后执行质量门禁：
-
-  ```bash
-  mise exec -- ./mvnw -pl spectra-launch -am verify \
-      -Dmaven.test.skip=true
-  ```
-
-  该命令执行编译、打包、Spotless、Checkstyle、PMD、SpotBugs 和 Enforcer，但不执行单元测试；Spotless 的 `check` 只验证格式，不自动修改文件。
-- `spring-boot:run` 不进入 `verify` 阶段，因此日常启动不会执行 Spotless、Checkstyle、PMD 和 SpotBugs；Enforcer 位于 `validate` 阶段，仍然执行。
-- `spring-boot:run` 的工作目录由 `spectra-launch/pom.xml` 指向 `spectra-admin/` 根目录，以便正确解析 `files/` 下的本地开发资源。
-
-## 本地 Flyway 状态
-
-- 当前 Flyway 目录只保留完整 V1 初始化基线；后续结构变更通过递增 migration 表达。不得通过打开 `baseline-on-migrate`、`repair`、删除 `flyway_schema_history` 记录或忽略缺失 migration 来掩盖版本漂移。
-- V1 重整后，执行过旧版本链的开发库应重建，再由当前基线初始化。需要保留数据的环境必须先设计并审查一次性结构/数据迁移。
+- `spectra-launch/src/main/resources/db/migration/` 中 V1 为初始化基线，后续变更使用递增 migration；不要改写已发布的迁移。
+- 不得用 `baseline-on-migrate`、`repair`、删除 `flyway_schema_history` 记录或忽略缺失 migration 掩盖版本漂移。需要保留数据时，先设计并审查一次性迁移。
 
 ## 实现约束
 
-- 修改或审查 Java 代码时使用 `$spectra-admin-spec`。
 - 保持 `launch → modules/starter → framework → common → config` 的分层关系。
 - 业务模块位于 `spectra-modules/`；跨模块调用优先通过明确的 Facade、Port 或事件，不引用对方内部 Entity、Mapper 或实现类。
-- 详细后端规范和示例由 Skill 及其按需 reference 提供，不在本文件复制。
 
 ## 领域文档路由
 
-- 后端架构、业务模块、API 和基础设施：`docs/后端/10-后端模块/`
-- 数据模型：`docs/后端/20-数据模型/`
-- 后端规范：`docs/后端/30-规范/`
-- 后端配置：`docs/后端/40-配置说明/`
-
-只读取当前任务涉及的领域；架构、新模块或跨模块任务再读取项目总览和架构分层。
-
-## 验证
-
-- 开发中优先执行目标模块的 `compile` 或 `test`。
-- 模块完成时执行目标模块的格式化和 `verify`。
-- 交付或提交前按需执行全项目 `spotless` 和 `verify`。
-- 详细命令和环境排障见 `docs/开发指南/01-常见命令.md`，Docker 说明见 `docs/部署运维/`。
-- 新增或修改 Entity、Controller、配置、SQL 后，按根仓库文档同步规则更新知识库。
+- 领域文档按根目录 `AGENTS.md` 路由；后端规范见 `docs/后端/30-规范/`，Docker 运维见 `docs/部署运维/`。
