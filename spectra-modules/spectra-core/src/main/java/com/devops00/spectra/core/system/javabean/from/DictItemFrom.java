@@ -74,11 +74,6 @@ public class DictItemFrom {
     private Short state;
 
     /**
-     * 是否默认
-     */
-    private Boolean defaultFlag;
-
-    /**
      * 备注
      */
     private String remark;

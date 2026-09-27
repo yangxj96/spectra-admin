@@ -20,12 +20,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.foundation.tree.TreeBuilder;
 import com.devops00.spectra.core.system.javabean.converter.DictGroupConverter;
 import com.devops00.spectra.core.system.javabean.converter.DictItemConverter;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;
 import com.devops00.spectra.core.system.javabean.entity.DictItem;
+import com.devops00.spectra.core.system.javabean.enums.DictItemState;
 import com.devops00.spectra.core.system.javabean.from.DictGroupFrom;
+import com.devops00.spectra.core.system.javabean.from.DictItemDefaultFrom;
 import com.devops00.spectra.core.system.javabean.from.DictItemFrom;
 import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.DictItemVO;
@@ -39,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -85,10 +89,9 @@ public class DictServiceImpl implements DictService {
         if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法删除");
         }
-        // 获取他的字典数据
-        var dictData = dataService.listByGid(id);
-        dataService.removeBatchByIds(dictData.stream().map(DictItem::getId).toList());
-        // 删除字典组
+        if (!dataService.listByGid(id).isEmpty()) {
+            throw new DataSaveException("字典组包含字典项，不能删除");
+        }
         groupService.removeById(id);
     }
 
@@ -106,33 +109,65 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void createData(DictItemFrom params) {
+        DictItemState.fromValue(params.getState());
+        requireEditableGroup(params.getGid());
         var entity = dictItemConverter.toEntity(params);
         dataService.save(entity);
     }
 
     @Override
     @Transactional
-    public void deleteData(UUID id) {
-        var dictData = dataService.getById(id);
-        if (null == dictData) {
-            throw new DataNotExistException("字典项不存在");
+    public void modifyData(DictItemFrom params) {
+        var current = requireDictItem(params.getId());
+        if (!Objects.equals(current.getGid(), params.getGid()) || !Objects.equals(current.getValue(), params.getValue())) {
+            throw new DataSaveException("字典项所属字典组和值创建后不能修改，请禁用原项并新增字典项");
         }
-        var group = groupService.getById(dictData.getGid());
-        if (group.getBuiltin()) {
-            throw new BuiltinDataException("内置字典,无法删除");
+        requireEditableGroup(current.getGid());
+        var targetState = DictItemState.fromValue(params.getState());
+        var entity = dictItemConverter.toEntity(params);
+        if (targetState == DictItemState.DISABLED) {
+            entity.setDefaultFlag(false);
         }
-        dataService.removeById(id);
+        dataService.updateById(entity);
     }
 
     @Override
     @Transactional
-    public void modifyData(DictItemFrom params) {
-        var group = groupService.getById(params.getGid());
-        if (group.getBuiltin()) {
-            throw new BuiltinDataException("内置字典,无法修改");
+    public void enableData(UUID id) {
+        changeDataState(id, DictItemState.ENABLED);
+    }
+
+    @Override
+    @Transactional
+    public void disableData(UUID id) {
+        changeDataState(id, DictItemState.DISABLED);
+    }
+
+    @Override
+    @Transactional
+    public void setDataDefault(UUID id, DictItemDefaultFrom params) {
+        var item = requireDictItem(id);
+        requireEditableGroup(item.getGid());
+        if (Boolean.TRUE.equals(params.getDefaultFlag())) {
+            if (DictItemState.fromValue(item.getState()) != DictItemState.ENABLED) {
+                throw new DataSaveException("禁用的字典项不能设为默认");
+            }
+            for (var sibling : dataService.listByGid(item.getGid())) {
+                if (!sibling.getId().equals(item.getId()) && Boolean.TRUE.equals(sibling.getDefaultFlag())) {
+                    sibling.setDefaultFlag(false);
+                    dataService.updateById(sibling);
+                }
+            }
+            if (!Boolean.TRUE.equals(item.getDefaultFlag())) {
+                item.setDefaultFlag(true);
+                dataService.updateById(item);
+            }
+        } else {
+            if (Boolean.TRUE.equals(item.getDefaultFlag())) {
+                item.setDefaultFlag(false);
+                dataService.updateById(item);
+            }
         }
-        var entity = dictItemConverter.toEntity(params);
-        dataService.updateById(entity);
     }
 
     @Override
@@ -153,5 +188,52 @@ public class DictServiceImpl implements DictService {
         // 根据sort字段进行一个排序
         dictData.sort(Comparator.comparing(DictItem::getSort));
         return dictItemConverter.toVOList(dictData);
+    }
+
+    /**
+     * 修改字典项的启用状态。
+     *
+     * @param id    对应字典项ID
+     * @param state 目标状态
+     */
+    private void changeDataState(UUID id, DictItemState state) {
+        var item = requireDictItem(id);
+        requireEditableGroup(item.getGid());
+        item.setState(state.value());
+        if (state == DictItemState.DISABLED) {
+            item.setDefaultFlag(false);
+        }
+        dataService.updateById(item);
+    }
+
+    /**
+     * 查询字典项，不存在时抛出业务异常。
+     *
+     * @param id 字典项ID
+     * @return 字典项
+     */
+    private DictItem requireDictItem(UUID id) {
+        var item = dataService.getById(id);
+        if (item == null) {
+            throw new DataNotExistException("字典项不存在");
+        }
+        return item;
+    }
+
+    /**
+     * 查询可维护的字典组。
+     *
+     * @param id 字典组ID
+     * @return 字典组
+     */
+    private DictGroup requireEditableGroup(UUID id) {
+        var group = groupService.getById(id);
+        if (group == null) {
+            throw new DataNotExistException("字典组不存在");
+        }
+        if (Boolean.TRUE.equals(group.getBuiltin())) {
+            throw new BuiltinDataException("内置字典,无法修改");
+        }
+        return group;
     }
 }

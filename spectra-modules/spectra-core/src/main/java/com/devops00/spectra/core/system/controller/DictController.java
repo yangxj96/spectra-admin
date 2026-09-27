@@ -18,6 +18,7 @@ package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.core.system.javabean.from.DictGroupFrom;
+import com.devops00.spectra.core.system.javabean.from.DictItemDefaultFrom;
 import com.devops00.spectra.core.system.javabean.from.DictItemFrom;
 import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.DictItemVO;
@@ -105,18 +106,6 @@ public class DictController {
     }
 
     /**
-     * 删除字典项
-     *
-     * @param id 字典项ID
-     */
-    @Audit("'删除字典项'")
-    @DeleteMapping(value = "/data/{id}", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'dictionary:disable')")
-    public void deleteData(@PathVariable UUID id) {
-        bindService.deleteData(id);
-    }
-
-    /**
      * 修改字典项
      *
      * @param params 请求参数
@@ -126,6 +115,43 @@ public class DictController {
     @PreAuthorize("hasPermission(null, 'dictionary:update')")
     public void modifyData(@Validated(Verify.Update.class) @RequestBody DictItemFrom params) {
         bindService.modifyData(params);
+    }
+
+    /**
+     * 启用字典项。
+     *
+     * @param id 字典项ID
+     */
+    @Audit("'启用字典项'")
+    @PostMapping(value = "/data/{id}/enable", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
+    public void enableData(@PathVariable UUID id) {
+        bindService.enableData(id);
+    }
+
+    /**
+     * 禁用字典项并保留历史引用。
+     *
+     * @param id 字典项ID
+     */
+    @Audit("'禁用字典项'")
+    @PostMapping(value = "/data/{id}/disable", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'dictionary:disable')")
+    public void disableData(@PathVariable UUID id) {
+        bindService.disableData(id);
+    }
+
+    /**
+     * 设置或取消字典项默认状态。
+     *
+     * @param id     对应字典项ID
+     * @param params 默认状态
+     */
+    @Audit("'修改字典项默认状态'")
+    @PutMapping(value = "/data/{id}/default", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
+    public void setDataDefault(@PathVariable UUID id, @Validated @RequestBody DictItemDefaultFrom params) {
+        bindService.setDataDefault(id, params);
     }
 
     /**

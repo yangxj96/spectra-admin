@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.service;
 
 import com.devops00.spectra.core.system.javabean.from.DictGroupFrom;
+import com.devops00.spectra.core.system.javabean.from.DictItemDefaultFrom;
 import com.devops00.spectra.core.system.javabean.from.DictItemFrom;
 import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.DictItemVO;
@@ -44,7 +45,7 @@ public interface DictService {
     /**
      * 根据ID删除字典组
      *
-     * @param id 待删除字典组的唯一标识；删除时同时处理其字典项关联。
+     * @param id 待删除字典组的唯一标识；包含字典项的字典组不能删除。
      */
     void deleteGroup(UUID id);
 
@@ -63,18 +64,33 @@ public interface DictService {
     void createData(DictItemFrom params);
 
     /**
-     * 根据ID删除字典数据
-     *
-     * @param id 待删除字典项的唯一标识。
-     */
-    void deleteData(UUID id);
-
-    /**
      * 修改字典数据
      *
-     * @param params 待修改字典项的唯一标识及编码、名称、值、排序和启用状态字段。
+     * @param params 待修改字典项的标签、排序和启用状态等字段；字典组和值创建后不可变。
      */
     void modifyData(DictItemFrom params);
+
+    /**
+     * 启用字典项。
+     *
+     * @param id 对应字典项的唯一标识
+     */
+    void enableData(UUID id);
+
+    /**
+     * 禁用字典项并保留其历史引用。
+     *
+     * @param id 字典项唯一标识
+     */
+    void disableData(UUID id);
+
+    /**
+     * 设置或取消字典项默认状态。
+     *
+     * @param id     对应字典项的唯一标识
+     * @param params 默认状态
+     */
+    void setDataDefault(UUID id, DictItemDefaultFrom params);
 
     /**
      * 获取字典类型列表且转换为树
