@@ -26,7 +26,15 @@ import com.baomidou.mybatisplus.annotation.IEnum;
  * @since 2026/09/13
  */
 public enum StorageProviderType implements IEnum<String> {
+
+    /**
+     * 本地存储
+     */
     LOCAL,
+
+    /**
+     * 支持S3协议的存储,比如MinIO,Rustfs等
+     */
     S3;
 
     @Override
