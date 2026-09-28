@@ -18,7 +18,12 @@ package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationAssignment;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
+import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.user.javabean.from.DepartmentMemberPageFrom;
 import com.devops00.spectra.core.user.javabean.vo.DepartmentMemberCandidateVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
@@ -26,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -50,13 +56,23 @@ class DepartmentMemberQueryServiceImplTest {
 
     private DepartmentMapper departmentMapper;
     private UserMapper userMapper;
+    private AuthorizationSnapshotProvider authorizationSnapshotProvider;
+    private SecurityContextAccessor securityContextAccessor;
     private DepartmentMemberQueryServiceImpl service;
 
     @BeforeEach
     void setUp() {
         departmentMapper = mock(DepartmentMapper.class);
         userMapper = mock(UserMapper.class);
-        service = new DepartmentMemberQueryServiceImpl(departmentMapper, userMapper);
+        authorizationSnapshotProvider = mock(AuthorizationSnapshotProvider.class);
+        securityContextAccessor = mock(SecurityContextAccessor.class);
+        when(securityContextAccessor.currentUserId()).thenReturn(UUID.randomUUID());
+        when(authorizationSnapshotProvider.load(any())).thenReturn(rootSnapshot());
+        var department = new Department();
+        department.setId(DEPARTMENT_ID);
+        when(departmentMapper.selectList(any())).thenReturn(List.of(department));
+        service = new DepartmentMemberQueryServiceImpl(departmentMapper, userMapper,
+                authorizationSnapshotProvider, securityContextAccessor);
     }
 
     @Test
@@ -86,6 +102,12 @@ class DepartmentMemberQueryServiceImplTest {
         assertThrows(DataNotExistException.class, () -> service.page(request));
 
         verify(userMapper, never()).selectDepartmentMemberCandidates(any(), eq(DEPARTMENT_ID), any());
+    }
+
+    private static AuthorizationSnapshot rootSnapshot() {
+        var root = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", 100,
+                Map.of(), Map.of());
+        return AuthorizationSnapshot.of(List.of(root));
     }
 
 }

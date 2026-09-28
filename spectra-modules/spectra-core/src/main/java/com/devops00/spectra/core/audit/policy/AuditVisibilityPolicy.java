@@ -60,7 +60,8 @@ public interface AuditVisibilityPolicy {
      */
     default boolean canViewAllNonHighRisk(Authentication viewer) {
         return canViewHighRisk(viewer)
-                || hasAuthority(viewer, "ROLE_SYSTEM_ADMIN", "SYSTEM_ADMIN", "system:admin");
+                || hasAuthority(viewer, "ROLE_ADMIN_SYSTEM", "ROLE_AUDIT", "ROLE_SYSTEM_ADMIN", "SYSTEM_ADMIN",
+                        "system:admin");
     }
 
     /**

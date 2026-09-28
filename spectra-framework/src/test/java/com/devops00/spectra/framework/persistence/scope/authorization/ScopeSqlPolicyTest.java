@@ -31,6 +31,7 @@ class ScopeSqlPolicyTest {
         var sql = expression.toString();
         assertTrue(sql.contains(BOUNDARY.toString()));
         assertTrue(sql.contains(MEMBERSHIP.toString()));
+        assertEquals(2, occurrences(sql, " IN ("), "RULES department lists must be valid SQL IN expressions");
         assertTrue(sql.contains(" AND "));
     }
 

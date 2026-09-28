@@ -112,14 +112,14 @@
 
     <sql id="VisibilityAndFilterConditions">
         <if test="!criteria.canViewHighRisk">
-            AND (category &lt;&gt; 'SECURITY' OR NOT (
+            AND NOT (
                 UPPER(event_type) LIKE '%ROOT%'
                 OR UPPER(event_type) LIKE '%BREAK_GLASS%'
                 OR UPPER(event_type) LIKE '%SECURITY%'
                 OR UPPER(event_type) LIKE '%SESSION%'
                 OR UPPER(event_type) LIKE '%PASSWORD%'
                 OR UPPER(event_type) LIKE '%AUDIT%'
-            ))
+            )
         </if>
         <if test="!criteria.canViewHighRisk and !criteria.canViewAllNonHighRisk">
             <choose>

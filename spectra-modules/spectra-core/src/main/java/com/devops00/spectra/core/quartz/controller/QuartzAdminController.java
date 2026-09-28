@@ -64,7 +64,7 @@ public class QuartzAdminController {
      */
     @Audit("'查询 Quartz Job 类型目录'")
     @GetMapping(value = "/job-types", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS', 'ROLE_AUDIT')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public List<QuartzJobTypeVO> jobTypes() {
         return managementService.jobTypes();
     }
@@ -77,7 +77,7 @@ public class QuartzAdminController {
      */
     @Audit("'查询 Quartz Job'")
     @GetMapping(value = "/jobs", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS', 'ROLE_AUDIT')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<QuartzJobVO> jobs(PageFrom page) {
         return managementService.jobs(page);
     }
@@ -90,7 +90,7 @@ public class QuartzAdminController {
      */
     @Audit("'查询 Quartz Job 详情'")
     @GetMapping(value = "/jobs/{jobKey}", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS', 'ROLE_AUDIT')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public QuartzJobVO job(@PathVariable String jobKey) {
         return managementService.job(jobKey);
     }
@@ -103,7 +103,7 @@ public class QuartzAdminController {
      */
     @Audit("'创建 Quartz Job'")
     @PostMapping(value = "/jobs", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public QuartzJobVO created(@Valid @Validated @RequestBody QuartzJobCreateFrom from) {
         return managementService.create(from);
     }
@@ -117,7 +117,7 @@ public class QuartzAdminController {
      */
     @Audit("'修改 Quartz Job'")
     @PutMapping(value = "/jobs/{jobKey}", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public QuartzJobVO modify(@PathVariable String jobKey,
                               @Valid @Validated @RequestBody QuartzJobUpdateFrom from) {
         return managementService.update(jobKey, from);
@@ -130,7 +130,7 @@ public class QuartzAdminController {
      */
     @Audit("'删除 Quartz Job'")
     @DeleteMapping(value = "/jobs/{jobKey}", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void delete(@PathVariable String jobKey) {
         managementService.delete(jobKey);
     }
@@ -142,7 +142,7 @@ public class QuartzAdminController {
      */
     @Audit("'暂停 Quartz Job'")
     @PostMapping(value = "/jobs/{jobKey}/pause", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void pause(@PathVariable String jobKey) {
         managementService.pause(jobKey);
     }
@@ -154,7 +154,7 @@ public class QuartzAdminController {
      */
     @Audit("'恢复 Quartz Job'")
     @PostMapping(value = "/jobs/{jobKey}/resume", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void resume(@PathVariable String jobKey) {
         managementService.resume(jobKey);
     }
@@ -179,7 +179,7 @@ public class QuartzAdminController {
      */
     @Audit("'查询 Quartz Trigger'")
     @GetMapping(value = "/triggers/{triggerKey}", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS', 'ROLE_AUDIT')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public QuartzTriggerVO triggerDetail(@PathVariable String triggerKey) {
         return managementService.triggerDetail(triggerKey);
     }
@@ -193,7 +193,7 @@ public class QuartzAdminController {
      */
     @Audit("'查询 Quartz 执行历史'")
     @GetMapping(value = "/execution-history", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS', 'ROLE_AUDIT')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<QuartzExecutionHistoryVO> executionHistory(PageFrom page, QuartzHistoryQueryFrom from) {
         return managementService.executionHistory(page, from);
     }
@@ -206,7 +206,7 @@ public class QuartzAdminController {
      */
     @Audit("'查询 Quartz 执行历史详情'")
     @GetMapping(value = "/execution-history/{id}", version = "1.0.0")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN_SYSTEM', 'ROLE_DEV_OPS', 'ROLE_AUDIT')")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public QuartzExecutionHistoryVO executionHistory(@PathVariable UUID id) {
         return managementService.executionHistory(id);
     }

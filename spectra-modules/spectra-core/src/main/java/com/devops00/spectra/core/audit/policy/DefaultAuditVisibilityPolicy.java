@@ -36,11 +36,14 @@ public class DefaultAuditVisibilityPolicy implements AuditVisibilityPolicy {
         if (viewer == null || !viewer.isAuthenticated() || event == null) {
             return false;
         }
-        if (event.category() == AuditCategory.OPERATION || canViewHighRisk(viewer)) {
+        if (canViewHighRisk(viewer)) {
             return true;
         }
         if (isHighRiskEvent(event.eventType())) {
             return false;
+        }
+        if (event.category() == AuditCategory.OPERATION) {
+            return true;
         }
         if (canViewAllNonHighRisk(viewer)) {
             return true;

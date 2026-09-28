@@ -19,6 +19,8 @@ package com.devops00.spectra.core.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authorization.AuthorizationDepartmentScope;
 import com.devops00.spectra.core.user.security.PreviewTokenDigest;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
@@ -102,6 +104,8 @@ public class UserImportPreviewService {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
     private final UserImportResultService resultService;
 
     /** 为用户导入预览凭证生成不可预测的随机字节。 */
@@ -125,6 +129,11 @@ public class UserImportPreviewService {
         }
 
         var referenceData = loadReferenceData();
+        var authorization = authorizationSnapshotProvider.load(operatorId);
+        var allowedDepartmentIds = AuthorizationDepartmentScope.isUnrestricted(authorization, "user:create")
+                ? referenceData.departments().stream().map(Department::getId).collect(Collectors.toSet())
+                : AuthorizationDepartmentScope.visibleDepartmentIds(
+                        authorization, "user:create", referenceData.departments());
         var task = new UserImportTask();
         task.setOperatorId(operatorId);
         task.setIdempotencyKey(params.getIdempotencyKey().trim());
@@ -157,7 +166,11 @@ public class UserImportPreviewService {
             row.setRowKey((index + 1) + ":" + normalized.source().getEmployeeNo());
             row.setRawData(normalized.rawData());
             row.setNormalizedData(normalized.normalizedData());
-            var errors = validate(normalized.source(), referenceData, params.isSkipExisting(), usernames, emails, phones);
+            boolean departmentReferencesValid = rowDepartmentReferencesValid(normalized.source(), referenceData);
+            var errors = rowDepartmentsInScope(normalized.source(), referenceData, allowedDepartmentIds)
+                    ? validate(normalized.source(), referenceData, params.isSkipExisting(), usernames, emails, phones,
+                            departmentReferencesValid)
+                    : List.of("用户创建部门超出当前数据范围");
             if (errors.isEmpty()) {
                 row.setState(STATE_VALID);
                 validRows++;
@@ -237,9 +250,12 @@ public class UserImportPreviewService {
 
     /** 提供给异步执行块的当前引用数据快照。 */
     public ReferenceData loadReferenceData() {
-        var departmentIds = departmentService.list()
+        var departments = departmentService.list()
                 .stream()
                 .filter(department -> department.getDeleted() == null)
+                .toList();
+        var departmentIds = departments
+                .stream()
                 .filter(department -> department.getCode() != null)
                 .collect(Collectors.toMap(Department::getCode, Department::getId, (left, right) -> left));
         var languages = dictService.listDictDataByGroupCode("sys_language")
@@ -257,7 +273,33 @@ public class UserImportPreviewService {
                 .filter(profile -> profile.getCode() != null)
                 .collect(Collectors.toMap(AuthorizationProfileVO::getCode, Function.identity(), (left, right) -> left,
                         LinkedHashMap::new));
-        return new ReferenceData(departmentIds, languages, timezones, profiles);
+        return new ReferenceData(departmentIds, languages, timezones, profiles, departments);
+    }
+
+    private boolean rowDepartmentsInScope(UserImportRowFrom source, ReferenceData referenceData,
+                                          Set<UUID> allowedDepartmentIds) {
+        UUID primaryDepartmentId = referenceData.departmentIds().get(source.getDepartmentCode());
+        if (primaryDepartmentId == null) {
+            return true;
+        }
+        Set<UUID> requestedDepartmentIds = new HashSet<>();
+        requestedDepartmentIds.add(primaryDepartmentId);
+        var associatedCodes = UserImportDepartmentCodes.parse(source.getAssociatedDepartmentCodes(),
+                source.getDepartmentCode(), referenceData.departmentIds());
+        if (!associatedCodes.errors().isEmpty()) {
+            return true;
+        }
+        associatedCodes.codes().stream()
+                .map(referenceData.departmentIds()::get)
+                .filter(java.util.Objects::nonNull)
+                .forEach(requestedDepartmentIds::add);
+        return allowedDepartmentIds.containsAll(requestedDepartmentIds);
+    }
+
+    private boolean rowDepartmentReferencesValid(UserImportRowFrom source, ReferenceData referenceData) {
+        return referenceData.departmentIds().containsKey(source.getDepartmentCode())
+                && UserImportDepartmentCodes.parse(source.getAssociatedDepartmentCodes(),
+                        source.getDepartmentCode(), referenceData.departmentIds()).errors().isEmpty();
     }
 
     /** 将 Preview 任务标记为过期并清理一次性 token。 */
@@ -291,7 +333,8 @@ public class UserImportPreviewService {
      * 校验用户。
      */
     private List<String> validate(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
-                                  Set<String> usernames, Set<String> emails, Set<String> phones) {
+                                  Set<String> usernames, Set<String> emails, Set<String> phones,
+                                  boolean checkExisting) {
         var errors = new ArrayList<String>();
         if (blank(source.getRealName())) {
             errors.add("姓名不能为空");
@@ -330,9 +373,11 @@ public class UserImportPreviewService {
         if (profile == null || !SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             errors.add("授权方案不存在或已停用");
         }
-        var existing = findExisting(source);
-        if (existing != null && !skipExisting) {
-            errors.add("登录用户名、邮箱或手机号码已存在");
+        if (checkExisting) {
+            var existing = findExisting(source);
+            if (existing != null && !skipExisting) {
+                errors.add("登录用户名、邮箱或手机号码已存在");
+            }
         }
         return errors;
     }
@@ -525,13 +570,14 @@ public class UserImportPreviewService {
      * @since 2026/09/13
      */
     public record ReferenceData(Map<String, UUID> departmentIds, Set<String> languages, Set<String> timezones,
-                                Map<String, AuthorizationProfileVO> profiles) {
+                                Map<String, AuthorizationProfileVO> profiles, List<Department> departments) {
 
         public ReferenceData {
             departmentIds = Map.copyOf(departmentIds);
             languages = Set.copyOf(languages);
             timezones = Set.copyOf(timezones);
             profiles = Map.copyOf(profiles);
+            departments = List.copyOf(departments);
         }
     }
 

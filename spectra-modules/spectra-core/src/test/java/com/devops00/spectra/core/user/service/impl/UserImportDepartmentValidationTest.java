@@ -19,6 +19,12 @@ package com.devops00.spectra.core.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationAssignment;
+import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.authorization.PermissionBoundary;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
@@ -39,6 +45,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,22 +72,27 @@ class UserImportDepartmentValidationTest {
     private UserImportRowMapper rowMapper;
     private DepartmentService departmentService;
     private UserImportPreviewService previewService;
+    private AuthorizationSnapshotProvider authorizationSnapshotProvider;
+    private UserMapper userMapper;
 
     @BeforeEach
     void setUp() {
         taskMapper = mock(UserImportTaskMapper.class);
         rowMapper = mock(UserImportRowMapper.class);
-        var userMapper = mock(UserMapper.class);
+        userMapper = mock(UserMapper.class);
         var identityService = mock(AuthenticationIdentityService.class);
         departmentService = mock(DepartmentService.class);
         var dictService = mock(DictService.class);
         var profileService = mock(AuthorizationProfileService.class);
         var securityContextAccessor = mock(SecurityContextAccessor.class);
         var resultService = mock(UserImportResultService.class);
+        authorizationSnapshotProvider = mock(AuthorizationSnapshotProvider.class);
 
         previewService = new UserImportPreviewService(taskMapper, rowMapper, userMapper, identityService,
-                departmentService, dictService, profileService, securityContextAccessor, resultService);
+                departmentService, dictService, profileService, securityContextAccessor,
+                authorizationSnapshotProvider, resultService);
         when(securityContextAccessor.currentUserId()).thenReturn(OPERATOR_ID);
+        when(authorizationSnapshotProvider.load(OPERATOR_ID)).thenReturn(rootSnapshot());
         when(taskMapper.selectOne(any(Wrapper.class))).thenReturn(null);
         when(taskMapper.insert(any(UserImportTask.class))).thenAnswer(invocation -> {
             ((UserImportTask) invocation.getArgument(0)).setId(UUID.randomUUID());
@@ -127,6 +140,22 @@ class UserImportDepartmentValidationTest {
         previewService.preview(request("MAIN"));
 
         assertTrue(validationErrors(capturedRow()).contains("主部门不能重复作为关联部门"));
+    }
+
+    @Test
+    void rejectsDepartmentsOutsideTheOperatorsUserCreateScopeBeforeCheckingDuplicates() {
+        var mainDepartmentId = department("MAIN").getId();
+        var boundary = new PermissionBoundary("user:create",
+                new AuthorizationScope(ScopeMode.RULES, Set.of(mainDepartmentId), false));
+        var assignment = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_ADMIN_SYSTEM", 2,
+                Map.of("user:create", boundary), Map.of());
+        when(authorizationSnapshotProvider.load(OPERATOR_ID))
+                .thenReturn(AuthorizationSnapshot.of(List.of(assignment), Set.of(mainDepartmentId)));
+
+        previewService.preview(request("OTHER"));
+
+        assertEquals(List.of("用户创建部门超出当前数据范围"), validationErrors(capturedRow()));
+        org.mockito.Mockito.verify(userMapper, org.mockito.Mockito.never()).selectOne(any(Wrapper.class));
     }
 
     @Test
@@ -191,5 +220,11 @@ class UserImportDepartmentValidationTest {
         profile.setCode("BASIC");
         profile.setState(SecurityAuthorizationState.ACTIVE.name());
         return profile;
+    }
+
+    private static AuthorizationSnapshot rootSnapshot() {
+        var root = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", 100,
+                Map.of(), Map.of());
+        return AuthorizationSnapshot.of(List.of(root));
     }
 }

@@ -20,6 +20,9 @@ import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authorization.AuthorizationDepartmentScope;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
@@ -36,8 +39,11 @@ import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
 import com.devops00.spectra.core.user.service.UserDepartmentMembershipService;
+import com.devops00.spectra.core.system.javabean.entity.Department;
+import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.user.service.UserOnboardingService;
 import com.devops00.spectra.core.user.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +53,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -75,6 +82,10 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    private final DepartmentMapper departmentMapper;
+
     @Override
     @Transactional
     public UserOnboardingVO submit(UserOnboardingFrom params) {
@@ -85,6 +96,8 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 : membershipService.findAssociatedDepartmentIds(previous.getId());
         var previousPrimaryDepartmentId = previous == null ? null : previous.getPrimaryDepartmentId();
 
+        assertUserAndDepartmentScope(userParams, previous, previousAssociatedIds);
+
         UserOnboardingVO user = submitUser(userParams);
         UUID operatorId = securityContextAccessor.currentUserId();
         membershipService.replace(user.getId(), userParams.getPrimaryDepartmentId(),
@@ -93,6 +106,41 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 previousAssociatedIds, userParams.getPrimaryDepartmentId(), userParams.getAssociatedDepartmentIds());
         submitAuthorization(user.getId(), params.getAuthorization());
         return user;
+    }
+
+    private void assertUserAndDepartmentScope(UserSaveFrom requested, User previous,
+                                              List<UUID> previousAssociatedDepartmentIds) {
+        UUID viewerId = securityContextAccessor.currentUserId();
+        AuthorizationSnapshot authorization = viewerId == null
+                ? null
+                : authorizationSnapshotProvider.load(viewerId);
+        var departments = departmentMapper.selectList(new QueryWrapper<Department>().select("id", "pid"));
+
+        String permission = previous == null ? "user:create" : "user:update";
+        if (previous != null) {
+            Set<UUID> previousDepartmentIds = new HashSet<>(previousAssociatedDepartmentIds);
+            if (previous.getPrimaryDepartmentId() != null) {
+                previousDepartmentIds.add(previous.getPrimaryDepartmentId());
+            }
+            if (!AuthorizationDepartmentScope.canAccessUser(authorization, permission, viewerId,
+                    previous.getId(), previousDepartmentIds, departments)) {
+                throw new com.devops00.spectra.common.exception.DataNotExistException("用户不存在");
+            }
+        }
+
+        Set<UUID> requestedDepartmentIds = new HashSet<>();
+        if (requested.getPrimaryDepartmentId() != null) {
+            requestedDepartmentIds.add(requested.getPrimaryDepartmentId());
+        }
+        if (requested.getAssociatedDepartmentIds() != null) {
+            requestedDepartmentIds.addAll(requested.getAssociatedDepartmentIds());
+        }
+        var allowedDepartmentIds = AuthorizationDepartmentScope.isUnrestricted(authorization, permission)
+                ? departments.stream().map(Department::getId).collect(Collectors.toSet())
+                : AuthorizationDepartmentScope.visibleDepartmentIds(authorization, permission, departments);
+        if (!allowedDepartmentIds.containsAll(requestedDepartmentIds)) {
+            throw new com.devops00.spectra.common.exception.DataNotExistException("部门不存在或无权访问");
+        }
     }
 
     /**

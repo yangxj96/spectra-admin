@@ -26,8 +26,8 @@ import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
@@ -220,7 +220,7 @@ public final class ScopeSqlPolicy {
             return falsePredicate();
         }
         Column left = new Column(table, column);
-        ExpressionList<Expression> ids = new ExpressionList<>(departmentIds
+        ParenthesedExpressionList<Expression> ids = new ParenthesedExpressionList<>(departmentIds
                 .stream()
                 .map(id -> (Expression) new StringValue(id.toString()))
                 .collect(Collectors.toList()));

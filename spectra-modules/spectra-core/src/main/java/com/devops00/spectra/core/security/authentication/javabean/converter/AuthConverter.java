@@ -21,6 +21,7 @@ import com.devops00.spectra.framework.serialization.mapper.GlobalMapperConfig;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * 用户认证和登录相关的转换器
@@ -36,7 +37,8 @@ public interface AuthConverter {
      * 用户信息转换为UserDTO,用于认证
      *
      * @param source 用户信息
-     * @return 转换结果
-     */
+    * @return 转换结果
+    */
+    @Mapping(source = "primaryDepartmentId", target = "departmentId")
     SecurityUser toSecurityUser(User source);
 }

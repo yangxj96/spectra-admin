@@ -92,7 +92,8 @@ public class UserImportExecutionWorker {
             }
             try {
                 var result = rowProcessor.process(row, operatorId, skipExisting,
-                        referenceData.departmentIds(), referenceData.profiles(), encodedDefaultPasswordHash);
+                        referenceData.departmentIds(), referenceData.profiles(), referenceData.departments(),
+                        encodedDefaultPasswordHash);
                 if (result.skipped()) {
                     skipped++;
                 } else {

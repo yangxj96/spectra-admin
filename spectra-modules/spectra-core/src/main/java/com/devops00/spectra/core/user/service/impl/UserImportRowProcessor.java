@@ -18,6 +18,8 @@ package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authorization.AuthorizationDepartmentScope;
 import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
@@ -41,6 +43,7 @@ import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.UserDepartmentMembershipService;
+import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,8 +51,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 单行导入事务处理器。
@@ -78,6 +84,8 @@ public class UserImportRowProcessor {
 
     private final AuthorizationAssignmentChangeService assignmentChangeService;
 
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
     /**
      * 在独立事务中处理单行用户数据。
      *
@@ -90,8 +98,9 @@ public class UserImportRowProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ProcessResult process(UserImportRow row, UUID operatorId, boolean skipExisting,
                                  Map<String, UUID> departmentIds, Map<String, AuthorizationProfileVO> profiles,
+                                 List<Department> departments,
                                  String encodedDefaultPasswordHash) {
-        var result = processInternal(row, operatorId, skipExisting, departmentIds, profiles,
+        var result = processInternal(row, operatorId, skipExisting, departmentIds, profiles, departments,
                 encodedDefaultPasswordHash);
         row.setUserId(result.userId());
         row.setState(result.skipped() ? UserImportRowState.SKIPPED.name() : UserImportRowState.APPLIED.name());
@@ -115,8 +124,24 @@ public class UserImportRowProcessor {
     private ProcessResult processInternal(UserImportRow row, UUID operatorId, boolean skipExisting,
                                           Map<String, UUID> departmentIds,
                                           Map<String, AuthorizationProfileVO> profiles,
+                                          List<Department> departments,
                                           String encodedDefaultPasswordHash) {
         var source = toSource(row.getNormalizedData());
+        var departmentId = departmentIds.get(source.getDepartmentCode());
+        if (departmentId == null) {
+            throw new DataException("部门不存在: " + source.getDepartmentCode());
+        }
+        var associatedDepartmentIds = UserImportDepartmentCodes.resolveIds(
+                source.getAssociatedDepartmentCodes(), source.getDepartmentCode(), departmentIds);
+        var authorization = authorizationSnapshotProvider.load(operatorId);
+        var allowedDepartmentIds = AuthorizationDepartmentScope.isUnrestricted(authorization, "user:create")
+                ? departments.stream().map(Department::getId).collect(Collectors.toSet())
+                : AuthorizationDepartmentScope.visibleDepartmentIds(authorization, "user:create", departments);
+        Set<UUID> requestedDepartmentIds = new HashSet<>(associatedDepartmentIds);
+        requestedDepartmentIds.add(departmentId);
+        if (!allowedDepartmentIds.containsAll(requestedDepartmentIds)) {
+            throw new DataException("导入部门超出当前数据范围");
+        }
         var existing = findExisting(source);
         if (existing != null) {
             if (skipExisting) {
@@ -124,16 +149,10 @@ public class UserImportRowProcessor {
             }
             throw new DataException("用户已存在: " + source.getEmployeeNo());
         }
-        var departmentId = departmentIds.get(source.getDepartmentCode());
-        if (departmentId == null) {
-            throw new DataException("部门不存在: " + source.getDepartmentCode());
-        }
         var profile = profiles.get(source.getAuthorizationProfileCode());
         if (profile == null || !SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             throw new DataException("授权方案不存在或已停用: " + source.getAuthorizationProfileCode());
         }
-        var associatedDepartmentIds = UserImportDepartmentCodes.resolveIds(
-                source.getAssociatedDepartmentCodes(), source.getDepartmentCode(), departmentIds);
         var user = new UserSaveFrom();
         user.setEmployeeNo(source.getEmployeeNo());
         user.setRealName(source.getRealName());

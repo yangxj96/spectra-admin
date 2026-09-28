@@ -27,6 +27,9 @@ import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authorization.AuthorizationDepartmentScope;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cache.annotation.CacheConfig;
@@ -59,9 +62,17 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
 
     private final NameFillExecutor nameFillExecutor;
 
-    public DepartmentServiceImpl(OrganizationConverter organizationConverter, NameFillExecutor nameFillExecutor) {
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    private final SecurityContextAccessor securityContextAccessor;
+
+    public DepartmentServiceImpl(OrganizationConverter organizationConverter, NameFillExecutor nameFillExecutor,
+                                 AuthorizationSnapshotProvider authorizationSnapshotProvider,
+                                 SecurityContextAccessor securityContextAccessor) {
         this.organizationConverter = organizationConverter;
         this.nameFillExecutor = nameFillExecutor;
+        this.authorizationSnapshotProvider = authorizationSnapshotProvider;
+        this.securityContextAccessor = securityContextAccessor;
     }
 
     @Override
@@ -74,6 +85,21 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
         var list = this.list();
         if (CollUtils.isEmpty(list)) {
             return Collections.emptyList();
+        }
+        var viewerId = securityContextAccessor.currentUserId();
+        if (viewerId == null) {
+            return Collections.emptyList();
+        }
+        var authorization = authorizationSnapshotProvider.load(viewerId);
+        if (!AuthorizationDepartmentScope.isUnrestricted(authorization, "department:read")) {
+            var visibleDepartmentIds = AuthorizationDepartmentScope.treeDepartmentIds(
+                    authorization, "department:read", list);
+            if (visibleDepartmentIds.isEmpty()) {
+                return Collections.emptyList();
+            }
+            list = list.stream()
+                    .filter(department -> visibleDepartmentIds.contains(department.getId()))
+                    .toList();
         }
         var vos = organizationConverter.toTreeVOList(list);
         nameFillExecutor.fill(vos);

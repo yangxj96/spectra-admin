@@ -18,6 +18,7 @@ package com.devops00.spectra.core.user.service.impl;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
@@ -39,6 +40,7 @@ import com.devops00.spectra.core.security.authorization.service.AuthorizationAss
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
+import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -67,6 +69,9 @@ import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecuritySessionQueryPort;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authorization.AuthorizationDepartmentScope;
 import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -147,6 +152,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     /** 获取当前请求中的安全主体和操作者信息。 */
     private final SecurityContextAccessor securityContextAccessor;
+
+    /** 按权限边界约束用户查询与详情可见范围。 */
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
     /** 查询用户关联的安全会话。 */
     private final SecuritySessionQueryPort securitySessionQueryPort;
@@ -239,6 +247,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
         }
+        assertUserWithinPermission(entity, "user:update");
         if (params.getStatus() != entity.getStatus()) {
             throw new DataException("用户生命周期状态必须通过专用状态接口变更");
         }
@@ -264,6 +273,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (user == null) {
             throw new DataNotExistException("用户不存在");
         }
+        assertUserWithinPermission(user, "user:reset-password");
         var credential = passwordCredentialService.getByUserId(user.getId());
         if (credential == null) {
             throw new DataNotExistException("密码凭证不存在");
@@ -299,6 +309,20 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             }
         }
 
+        UUID viewerId = securityContextAccessor.currentUserId();
+        AuthorizationSnapshot authorization = viewerId == null
+                ? null
+                : authorizationSnapshotProvider.load(viewerId);
+        if (!AuthorizationDepartmentScope.isUnrestricted(authorization, "user:read")) {
+            Set<UUID> visibleDepartmentIds = authorization == null
+                    ? Set.of()
+                    : AuthorizationDepartmentScope.visibleDepartmentIds(authorization, "user:read",
+                            departmentMapper.selectList(new QueryWrapper<Department>().select("id", "pid")));
+            boolean includeSelf = AuthorizationDepartmentScope.allowsOwnUser(
+                    authorization, "user:read", viewerId, viewerId);
+            appendUserReadScope(wrapper, viewerId, includeSelf, visibleDepartmentIds);
+        }
+
         var db = this.page(page.toPage(), wrapper);
         var result = userConverter.toVOPage(db);
 
@@ -318,11 +342,63 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (user == null) {
             throw new DataNotExistException("用户不存在");
         }
+        assertUserReadable(user);
         var result = userConverter.toVO(user);
         fillExecutor.fill(List.of(result));
         fillAssociatedDepartments(List.of(result));
         fillAuthorization(result);
         return result;
+    }
+
+    private void assertUserReadable(User target) {
+        assertUserWithinPermission(target, "user:read");
+    }
+
+    private void assertUserWithinPermission(User target, String permission) {
+        UUID viewerId = securityContextAccessor.currentUserId();
+        AuthorizationSnapshot authorization = viewerId == null
+                ? null
+                : authorizationSnapshotProvider.load(viewerId);
+        Set<UUID> targetDepartmentIds = new HashSet<>();
+        if (target.getPrimaryDepartmentId() != null) {
+            targetDepartmentIds.add(target.getPrimaryDepartmentId());
+        }
+        targetDepartmentIds.addAll(membershipMapper.selectActiveDepartmentIdsByUserId(target.getId()));
+        var departments = departmentMapper.selectList(new QueryWrapper<Department>().select("id", "pid"));
+        if (!AuthorizationDepartmentScope.canAccessUser(
+                authorization, permission, viewerId, target.getId(), targetDepartmentIds, departments)) {
+            throw new DataNotExistException("用户不存在");
+        }
+    }
+
+    private void appendUserReadScope(LambdaQueryWrapper<User> wrapper, UUID viewerId,
+                                     boolean includeSelf, Set<UUID> visibleDepartmentIds) {
+        wrapper.and(scope -> {
+            boolean hasPredicate = false;
+            if (includeSelf && viewerId != null) {
+                scope.eq(User::getId, viewerId);
+                hasPredicate = true;
+            }
+            if (!visibleDepartmentIds.isEmpty()) {
+                if (hasPredicate) {
+                    scope.or();
+                }
+                List<UUID> departmentIds = List.copyOf(visibleDepartmentIds);
+                var placeholders = IntStream.range(0, departmentIds.size())
+                        .mapToObj(index -> "{" + index + "}")
+                        .collect(Collectors.joining(","));
+                var membershipQuery = "SELECT 1 FROM spectra_core.sys_user_department_membership AS membership "
+                        + "WHERE membership.user_id = sys_user.id AND membership.deleted IS NULL "
+                        + "AND membership.department_id IN (" + placeholders + ")";
+                scope.in(User::getPrimaryDepartmentId, departmentIds)
+                        .or()
+                        .exists(membershipQuery, departmentIds.toArray());
+                hasPredicate = true;
+            }
+            if (!hasPredicate) {
+                scope.apply("1 = 0");
+            }
+        });
     }
 
     @Override
@@ -349,6 +425,27 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             membershipMapper.selectActiveByUserIds(new ArrayList<>(departmentIdsByUser.keySet()))
                     .forEach(membership -> departmentIdsByUser.computeIfAbsent(membership.getUserId(), ignored -> new HashSet<>())
                             .add(membership.getDepartmentId()));
+        }
+        UUID viewerId = securityContextAccessor.currentUserId();
+        AuthorizationSnapshot authorization = viewerId == null
+                ? null
+                : authorizationSnapshotProvider.load(viewerId);
+        if (!AuthorizationDepartmentScope.isUnrestricted(authorization, "session:read")) {
+            var departments = departmentMapper.selectList(new QueryWrapper<Department>().select("id", "pid"));
+            var visibleDepartmentIds = AuthorizationDepartmentScope.visibleDepartmentIds(
+                    authorization, "session:read", departments);
+            boolean includeSelf = AuthorizationDepartmentScope.allowsOwnUser(
+                    authorization, "session:read", viewerId, viewerId);
+            Set<UUID> visibleUserIds = onlineUsers.stream()
+                    .filter(user -> includeSelf && user.getId().equals(viewerId)
+                            || departmentIdsByUser.getOrDefault(user.getId(), Set.of()).stream()
+                                    .anyMatch(visibleDepartmentIds::contains))
+                    .map(User::getId)
+                    .collect(Collectors.toSet());
+            onlineUsers = onlineUsers.stream().filter(user -> visibleUserIds.contains(user.getId())).toList();
+            onlineSessions = onlineSessions.stream()
+                    .filter(session -> visibleUserIds.contains(UUID.fromString(session.getUserId())))
+                    .toList();
         }
         IPage<OnlineUserPageVO> result = onlineUserPageAssembler.page(page, filter, onlineSessions, onlineUsers,
                 matchingDepartmentIds, departmentIdsByUser);
@@ -449,6 +546,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (current == null) {
             throw new DataNotExistException("用户不存在");
         }
+        assertUserWithinPermission(current, target == UserStatus.ACTIVE ? "user:unlock" : "user:disable");
         var previous = current.getStatus();
         if (previous == null) {
             throw new DataException("用户状态缺失，拒绝执行生命周期变更");

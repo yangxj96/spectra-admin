@@ -21,6 +21,12 @@ import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationAssignment;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.PermissionBoundary;
+import com.devops00.spectra.common.security.authorization.ScopeMode;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
@@ -31,12 +37,16 @@ import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.service.UserDepartmentMembershipService;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.system.javabean.entity.Department;
+import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,6 +82,8 @@ class UserOnboardingServiceImplTest {
     private UserDepartmentMembershipService membershipService;
     private AuditService auditService;
     private SecurityContextAccessor securityContextAccessor;
+    private AuthorizationSnapshotProvider authorizationSnapshotProvider;
+    private DepartmentMapper departmentMapper;
     private UserOnboardingServiceImpl onboardingService;
 
     @BeforeEach
@@ -82,11 +94,17 @@ class UserOnboardingServiceImplTest {
         membershipService = mock(UserDepartmentMembershipService.class);
         auditService = mock(AuditService.class);
         securityContextAccessor = mock(SecurityContextAccessor.class);
+        authorizationSnapshotProvider = mock(AuthorizationSnapshotProvider.class);
+        departmentMapper = mock(DepartmentMapper.class);
         AuditSanitizer sanitizer = snapshot -> new LinkedHashMap<>(snapshot);
         onboardingService = new UserOnboardingServiceImpl(userService, assignmentChangeService,
                 assignmentQueryService, membershipService, new AuditRecordFactory(sanitizer), auditService,
-                securityContextAccessor);
+                securityContextAccessor, authorizationSnapshotProvider, departmentMapper);
         when(securityContextAccessor.currentUserId()).thenReturn(OPERATOR_ID);
+        when(authorizationSnapshotProvider.load(OPERATOR_ID)).thenReturn(rootSnapshot());
+        when(departmentMapper.selectList(any())).thenReturn(List.of(
+                department(OLD_PRIMARY_ID), department(NEW_PRIMARY_ID),
+                department(OLD_ASSOCIATED_ID), department(NEW_ASSOCIATED_ID)));
     }
 
     @Test
@@ -129,6 +147,22 @@ class UserOnboardingServiceImplTest {
                 .isAnnotationPresent(Transactional.class));
     }
 
+    @Test
+    void rejectsNewUserInDepartmentOutsideUserCreateBoundary() {
+        var boundary = new PermissionBoundary("user:create",
+                new AuthorizationScope(ScopeMode.RULES, Set.of(OLD_PRIMARY_ID), false));
+        var assignment = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_ADMIN_SYSTEM", 2,
+                Map.of("user:create", boundary), Map.of());
+        when(authorizationSnapshotProvider.load(OPERATOR_ID))
+                .thenReturn(AuthorizationSnapshot.of(List.of(assignment), Set.of(OLD_PRIMARY_ID)));
+
+        assertThrows(com.devops00.spectra.common.exception.DataNotExistException.class,
+                () -> onboardingService.submit(request(null, NEW_PRIMARY_ID, List.of())));
+
+        verify(userService, never()).create(any(UserSaveFrom.class));
+        verify(membershipService, never()).replace(any(), any(), any(), any());
+    }
+
     private static UserOnboardingFrom request(UUID userId, UUID primaryDepartmentId,
                                               List<UUID> associatedDepartmentIds) {
         var user = new UserSaveFrom();
@@ -143,5 +177,17 @@ class UserOnboardingServiceImplTest {
         request.setUser(user);
         request.setAuthorization(authorization);
         return request;
+    }
+
+    private static Department department(UUID id) {
+        var department = new Department();
+        department.setId(id);
+        return department;
+    }
+
+    private static AuthorizationSnapshot rootSnapshot() {
+        var root = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", 100,
+                Map.of(), Map.of());
+        return AuthorizationSnapshot.of(List.of(root));
     }
 }
