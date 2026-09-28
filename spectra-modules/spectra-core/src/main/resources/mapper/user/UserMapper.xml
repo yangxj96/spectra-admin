@@ -52,4 +52,85 @@
         security_version,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
+
+    <select id="selectActiveByIdsForUpdate" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM spectra_core.sys_user
+        WHERE deleted IS NULL
+          AND id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+        ORDER BY id
+        FOR UPDATE
+    </select>
+
+    <select id="selectDepartmentMemberCandidates" resultType="com.devops00.spectra.core.user.javabean.vo.DepartmentMemberCandidateVO">
+        SELECT
+            user_record.id,
+            user_record.username,
+            user_record.real_name,
+            user_record.status,
+            user_record.primary_department_id = #{departmentId} AS primary_member,
+            EXISTS (
+                SELECT 1
+                FROM spectra_core.sys_user_department_membership AS membership
+                WHERE membership.user_id = user_record.id
+                  AND membership.department_id = #{departmentId}
+                  AND membership.deleted IS NULL
+            ) AS associated_member
+        FROM spectra_core.sys_user AS user_record
+        WHERE user_record.deleted IS NULL
+          AND EXISTS (
+              SELECT 1
+              FROM spectra_core.sys_department AS department
+              WHERE department.id = #{departmentId}
+                AND department.deleted IS NULL
+          )
+          AND (
+              user_record.primary_department_id = #{departmentId}
+              OR EXISTS (
+                  SELECT 1
+                  FROM spectra_core.sys_user_department_membership AS membership
+                  WHERE membership.user_id = user_record.id
+                    AND membership.department_id = #{departmentId}
+                    AND membership.deleted IS NULL
+              )
+          )
+          <if test="keyword != null and keyword != ''">
+              AND (
+                  user_record.username ILIKE CONCAT('%', #{keyword}, '%')
+                  OR user_record.real_name ILIKE CONCAT('%', #{keyword}, '%')
+              )
+          </if>
+        ORDER BY user_record.real_name, user_record.username, user_record.id
+    </select>
+
+    <update id="reassignPrimaryDepartmentsByIds">
+        UPDATE spectra_core.sys_user
+        SET primary_department_id = #{targetDepartmentId},
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId},
+            version = version + 1
+        WHERE deleted IS NULL
+          AND primary_department_id IN
+          <foreach collection="sourceDepartmentIds" item="departmentId" open="(" separator="," close=")">
+              #{departmentId}
+          </foreach>
+    </update>
+
+    <update id="reassignPrimaryDepartmentForUsers">
+        UPDATE spectra_core.sys_user
+        SET primary_department_id = #{targetDepartmentId},
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId},
+            version = version + 1
+        WHERE deleted IS NULL
+          AND primary_department_id = #{sourceDepartmentId}
+          AND id IN
+          <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+              #{userId}
+          </foreach>
+    </update>
 </mapper>

@@ -118,6 +118,25 @@
         ORDER BY user_id, department_id
     </select>
 
+    <select id="selectActiveByUsersAndDepartmentsForUpdate" resultMap="BaseResultMap">
+        SELECT
+            user_id,
+            department_id,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_user_department_membership
+        WHERE deleted IS NULL
+          AND user_id IN
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+          AND department_id IN
+        <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+        ORDER BY user_id, department_id
+        FOR UPDATE
+    </select>
+
     <update id="softDeleteActiveByUserId">
         UPDATE spectra_core.sys_user_department_membership
         SET deleted = CURRENT_TIMESTAMP,
@@ -134,6 +153,32 @@
         VALUES
         <foreach collection="departmentIds" item="departmentId" separator=",">
             (#{userId}, #{departmentId}, #{operatorId}, #{operatorId})
+        </foreach>
+    </insert>
+
+    <update id="softDeleteActiveByUsersAndDepartments">
+        UPDATE spectra_core.sys_user_department_membership
+        SET deleted = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId},
+            version = version + 1
+        WHERE deleted IS NULL
+          AND user_id IN
+          <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+              #{userId}
+          </foreach>
+          AND department_id IN
+          <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+              #{departmentId}
+          </foreach>
+    </update>
+
+    <insert id="batchInsertAssociations">
+        INSERT INTO spectra_core.sys_user_department_membership
+            (user_id, department_id, created_by, updated_by)
+        VALUES
+        <foreach collection="memberships" item="membership" separator=",">
+            (#{membership.userId}, #{membership.departmentId}, #{operatorId}, #{operatorId})
         </foreach>
     </insert>
 </mapper>

@@ -24,13 +24,16 @@ import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.OnlineUserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
+import com.devops00.spectra.core.user.javabean.from.DepartmentMemberPageFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.OnlineUserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
+import com.devops00.spectra.core.user.javabean.vo.DepartmentMemberCandidateVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.UserOnboardingService;
+import com.devops00.spectra.core.user.service.DepartmentMemberQueryService;
 import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -67,11 +70,15 @@ public class UserController {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final DepartmentMemberQueryService departmentMemberQueryService;
+
     public UserController(UserService bindService, UserOnboardingService onboardingService,
-                          SecurityContextAccessor securityContextAccessor) {
+                          SecurityContextAccessor securityContextAccessor,
+                          DepartmentMemberQueryService departmentMemberQueryService) {
         this.bindService = bindService;
         this.onboardingService = onboardingService;
         this.securityContextAccessor = securityContextAccessor;
+        this.departmentMemberQueryService = departmentMemberQueryService;
     }
 
     /**
@@ -192,6 +199,17 @@ public class UserController {
     @PreAuthorize("hasPermission(null, 'user:read')")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
+    }
+
+    /**
+     * 按部门主/关联成员关系分页查询直属用户，不展开下级部门。
+     */
+    @Audit("'查询部门直属成员候选'")
+    @GetMapping(value = "/department-members", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'department:read') and hasPermission(null, 'user:read')")
+    public IPage<DepartmentMemberCandidateVO> departmentMembers(
+            @Validated @ModelAttribute DepartmentMemberPageFrom params) {
+        return departmentMemberQueryService.page(params);
     }
 
     /**

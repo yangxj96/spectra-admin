@@ -101,4 +101,138 @@
         ORDER BY name, id
     </select>
 
+    <select id="selectActiveByIdsForUpdate" resultMap="BaseResultMap">
+        SELECT
+            pid,
+            name,
+            code,
+            type,
+            region_id,
+            path,
+            sort,
+            remark,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_department
+        WHERE deleted IS NULL
+          AND id IN
+        <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+        ORDER BY id
+        FOR UPDATE
+    </select>
+
+    <select id="selectActiveChildrenByParentIds" resultMap="BaseResultMap">
+        SELECT
+            pid,
+            name,
+            code,
+            type,
+            region_id,
+            path,
+            sort,
+            remark,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_department
+        WHERE deleted IS NULL
+          AND pid IN
+        <foreach collection="parentIds" item="parentId" open="(" separator="," close=")">
+            #{parentId}
+        </foreach>
+        ORDER BY id
+    </select>
+
+    <select id="selectActiveChildrenByParentIdsForUpdate" resultMap="BaseResultMap">
+        SELECT
+            pid,
+            name,
+            code,
+            type,
+            region_id,
+            path,
+            sort,
+            remark,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_department
+        WHERE deleted IS NULL
+          AND pid IN
+        <foreach collection="parentIds" item="parentId" open="(" separator="," close=")">
+            #{parentId}
+        </foreach>
+        ORDER BY id
+        FOR UPDATE
+    </select>
+
+    <update id="moveActiveChildrenToParent">
+        UPDATE spectra_core.sys_department
+        SET pid = #{targetParentId},
+            updated_by = #{operatorId},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE deleted IS NULL
+          AND id IN
+        <foreach collection="childIds" item="childId" open="(" separator="," close=")">
+            #{childId}
+        </foreach>
+          AND pid IN
+        <foreach collection="sourceParentIds" item="sourceParentId" open="(" separator="," close=")">
+            #{sourceParentId}
+        </foreach>
+    </update>
+
+    <update id="softDeleteActiveByIds">
+        UPDATE spectra_core.sys_department
+        SET deleted = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE deleted IS NULL
+          AND id IN
+        <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+    </update>
+
+    <update id="rebuildActivePaths">
+        WITH RECURSIVE organization_path AS (
+            SELECT id, pid, name, name::text AS path
+            FROM spectra_core.sys_department
+            WHERE deleted IS NULL AND pid IS NULL
+            UNION ALL
+            SELECT department.id, department.pid, department.name,
+                   organization_path.path || '/' || department.name AS path
+            FROM spectra_core.sys_department AS department
+            JOIN organization_path ON organization_path.id = department.pid
+            WHERE department.deleted IS NULL
+        )
+        UPDATE spectra_core.sys_department AS department
+        SET path = organization_path.path,
+            updated_by = #{operatorId},
+            updated_at = CURRENT_TIMESTAMP,
+            version = department.version + 1
+        FROM organization_path
+        WHERE department.id = organization_path.id
+          AND department.deleted IS NULL
+          AND department.path IS DISTINCT FROM organization_path.path
+    </update>
+
+    <select id="selectByIdsIncludingDeleted" resultMap="BaseResultMap">
+        SELECT
+            pid,
+            name,
+            code,
+            type,
+            region_id,
+            path,
+            sort,
+            remark,
+            <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_department
+        WHERE id IN
+        <foreach collection="departmentIds" item="departmentId" open="(" separator="," close=")">
+            #{departmentId}
+        </foreach>
+        ORDER BY id
+    </select>
+
 </mapper>

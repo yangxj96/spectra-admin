@@ -21,14 +21,21 @@ import com.devops00.spectra.core.security.authorization.javabean.from.Authorizat
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationCreateApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.DepartmentMergeApplyFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.DepartmentMergePreviewFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.DepartmentSplitApplyFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.DepartmentSplitPreviewFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.RoleAuthorizationApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.RoleAuthorizationChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationChangePreviewVO;
+import com.devops00.spectra.core.security.authorization.javabean.vo.DepartmentRestructureApplyVO;
+import com.devops00.spectra.core.security.authorization.javabean.vo.DepartmentRestructurePreviewVO;
 import com.devops00.spectra.core.security.authorization.javabean.vo.OrganizationChangePreviewVO;
 import com.devops00.spectra.core.security.authorization.javabean.vo.RoleAuthorizationChangePreviewVO;
 import com.devops00.spectra.core.security.authorization.javabean.vo.RoleAuthorizationStateVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
+import com.devops00.spectra.core.security.authorization.service.DepartmentRestructureService;
 import com.devops00.spectra.core.security.authorization.service.OrganizationChangeService;
 import com.devops00.spectra.core.security.authorization.service.RoleAuthorizationChangeService;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
@@ -68,6 +75,8 @@ public class AuthorizationController {
 
     private final OrganizationChangeService organizationChangeService;
 
+    private final DepartmentRestructureService departmentRestructureService;
+
     /**
      * 查询或获取目标数据（{@code organizationVersion}）。
      */
@@ -99,6 +108,42 @@ public class AuthorizationController {
     public void departmentCreateApply(@Validated @RequestBody OrganizationCreateApplyFrom from) {
         log.debug("提交新增部门变更: expectedOrganizationVersion={}", from.getExpectedOrganizationVersion());
         organizationChangeService.applyCreate(from);
+    }
+
+    /** 预览将多个同级部门合并到新部门的影响。 */
+    @Audit("'预览部门合并影响'")
+    @PostMapping(value = "/departments/merge/impact-preview", version = "1.0.0")
+    @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
+    public DepartmentRestructurePreviewVO departmentMergePreview(
+            @Validated @RequestBody DepartmentMergePreviewFrom from) {
+        return departmentRestructureService.previewMerge(from);
+    }
+
+    /** 提交通过 Preview 校验的部门合并。 */
+    @Audit("'提交部门合并'")
+    @PostMapping(value = "/departments/merge/impact-apply", version = "1.0.0")
+    @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
+    public DepartmentRestructureApplyVO departmentMergeApply(
+            @Validated @RequestBody DepartmentMergeApplyFrom from) {
+        return departmentRestructureService.applyMerge(from);
+    }
+
+    /** 预览将指定直属成员拆分到新部门的影响。 */
+    @Audit("'预览部门拆分影响'")
+    @PostMapping(value = "/departments/split/impact-preview", version = "1.0.0")
+    @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
+    public DepartmentRestructurePreviewVO departmentSplitPreview(
+            @Validated @RequestBody DepartmentSplitPreviewFrom from) {
+        return departmentRestructureService.previewSplit(from);
+    }
+
+    /** 提交通过 Preview 校验的部门拆分。 */
+    @Audit("'提交部门拆分'")
+    @PostMapping(value = "/departments/split/impact-apply", version = "1.0.0")
+    @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
+    public DepartmentRestructureApplyVO departmentSplitApply(
+            @Validated @RequestBody DepartmentSplitApplyFrom from) {
+        return departmentRestructureService.applySplit(from);
     }
 
     /**

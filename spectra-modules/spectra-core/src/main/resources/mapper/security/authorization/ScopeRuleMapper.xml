@@ -39,4 +39,12 @@
         rule_payload,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
+
+    <delete id="deleteDuplicateDepartmentRule">
+        DELETE FROM spectra_security.sec_scope_rule
+        WHERE id = #{id}
+          AND version = #{version}
+          AND deleted IS NULL
+          AND rule_type = 'DEPARTMENT'
+    </delete>
 </mapper>

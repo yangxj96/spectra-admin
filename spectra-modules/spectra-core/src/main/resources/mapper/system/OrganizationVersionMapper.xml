@@ -35,4 +35,21 @@
         changed_at,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
+
+    <select id="selectSystem" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM spectra_core.sys_organization_version
+        WHERE singleton_key = 'SYSTEM'
+          AND deleted IS NULL
+    </select>
+
+    <select id="selectSystemForUpdate" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List"/>
+        FROM spectra_core.sys_organization_version
+        WHERE singleton_key = 'SYSTEM'
+          AND deleted IS NULL
+        FOR UPDATE
+    </select>
 </mapper>

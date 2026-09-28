@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.authorization.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.security.authorization.javabean.entity.ScopeRule;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 定义范围规则相关的数据库访问操作。
@@ -29,4 +30,13 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ScopeRuleMapper extends BaseMapper<ScopeRule> {
+
+    /**
+     * 删除部门合并导致的重复部门规则。sec_scope_rule 的唯一索引包含软删除行，重复行需要物理移除。
+     *
+     * @param id      规则 ID
+     * @param version 预期版本
+     * @return 删除行数
+     */
+    int deleteDuplicateDepartmentRule(@Param("id") java.util.UUID id, @Param("version") Long version);
 }

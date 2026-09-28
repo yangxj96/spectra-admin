@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.lookup;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.framework.assembler.NameLookup;
@@ -67,9 +66,7 @@ public class DepartmentNameLookup implements NameLookup<UUID> {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyMap();
         }
-        return departmentMapper.selectList(Wrappers.<Department>lambdaQuery()
-                .select(Department::getId, Department::getPath)
-                .in(Department::getId, ids))
+        return departmentMapper.selectByIdsIncludingDeleted(ids.stream().sorted().toList())
                 .stream()
                 .collect(Collectors.toMap(Department::getId, Department::getPath));
     }

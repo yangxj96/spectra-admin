@@ -60,6 +60,11 @@ public interface UserDepartmentMembershipMapper {
      */
     List<UserDepartmentMembership> selectActiveByUserIds(@Param("userIds") List<UUID> userIds);
 
+    /** 锁定指定用户在源部门中的活动关联关系，部门重组 Apply 调用方必须处于事务中。 */
+    List<UserDepartmentMembership> selectActiveByUsersAndDepartmentsForUpdate(
+            @Param("userIds") List<UUID> userIds,
+            @Param("departmentIds") List<UUID> departmentIds);
+
     /**
      * 软删除用户当前全部关联部门。
      *
@@ -81,4 +86,26 @@ public interface UserDepartmentMembershipMapper {
                               @Param("userId") UUID userId,
                               @Param("departmentIds") List<UUID> departmentIds,
                               @Param("operatorId") UUID operatorId);
+
+    /**
+     * 软删除指定用户在指定部门中的当前关系。
+     *
+     * @param userIds       用户 ID
+     * @param departmentIds 部门 ID
+     * @param operatorId    操作者 ID
+     * @return 更新行数
+     */
+    int softDeleteActiveByUsersAndDepartments(@Param("userIds") List<UUID> userIds,
+                                              @Param("departmentIds") List<UUID> departmentIds,
+                                              @Param("operatorId") UUID operatorId);
+
+    /**
+     * 批量插入重组后的关联部门关系。
+     *
+     * @param memberships 关联关系
+     * @param operatorId  操作者 ID
+     * @return 插入行数
+     */
+    int batchInsertAssociations(@Param("memberships") List<UserDepartmentMembership> memberships,
+                                @Param("operatorId") UUID operatorId);
 }

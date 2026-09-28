@@ -14,25 +14,26 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.system.mapper;
+package com.devops00.spectra.core.user.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.core.system.javabean.entity.OrganizationVersion;
-import org.apache.ibatis.annotations.Mapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.core.user.javabean.from.DepartmentMemberPageFrom;
+import com.devops00.spectra.core.user.javabean.vo.DepartmentMemberCandidateVO;
 
 /**
- * 组织树安全版本 Mapper。
+ * 查询指定活动部门的直属用户成员。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/14
+ * @since 2026/09/28
  */
-@Mapper
-public interface OrganizationVersionMapper extends BaseMapper<OrganizationVersion> {
+public interface DepartmentMemberQueryService {
 
-    /** 查询 SYSTEM 组织版本单例。 */
-    OrganizationVersion selectSystem();
-
-    /** 锁定 SYSTEM 组织版本单例，Apply 调用方必须处于事务中。 */
-    OrganizationVersion selectSystemForUpdate();
+    /**
+     * 分页查询直接使用主部门或关联部门关系的用户。
+     *
+     * @param from 部门及分页筛选条件
+     * @return 部门直属成员页
+     */
+    IPage<DepartmentMemberCandidateVO> page(DepartmentMemberPageFrom from);
 }

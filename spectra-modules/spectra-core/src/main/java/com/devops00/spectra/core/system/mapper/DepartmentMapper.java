@@ -60,4 +60,29 @@ public interface DepartmentMapper extends BaseMapper<Department> {
      * @return 未软删除的部门记录
      */
     List<Department> selectActiveByIds(@Param("departmentIds") List<UUID> departmentIds);
+
+    /** 锁定并查询未软删除的源部门。 */
+    List<Department> selectActiveByIdsForUpdate(@Param("departmentIds") List<UUID> departmentIds);
+
+    /** 查询源部门的活动直属子部门。 */
+    List<Department> selectActiveChildrenByParentIds(@Param("parentIds") List<UUID> parentIds);
+
+    /** 锁定源部门的活动直属子部门。 */
+    List<Department> selectActiveChildrenByParentIdsForUpdate(@Param("parentIds") List<UUID> parentIds);
+
+    /** 将源部门直属子部门重挂到新部门。 */
+    int moveActiveChildrenToParent(@Param("childIds") List<UUID> childIds,
+                                   @Param("sourceParentIds") List<UUID> sourceParentIds,
+                                   @Param("targetParentId") UUID targetParentId,
+                                   @Param("operatorId") UUID operatorId);
+
+    /** 软删除源部门并推进乐观锁版本。 */
+    int softDeleteActiveByIds(@Param("departmentIds") List<UUID> departmentIds,
+                              @Param("operatorId") UUID operatorId);
+
+    /** 根据父子关系重算所有活动部门路径。 */
+    int rebuildActivePaths(@Param("operatorId") UUID operatorId);
+
+    /** 按 ID 读取部门路径，包含逻辑删除部门，供历史名称解析专用。 */
+    List<Department> selectByIdsIncludingDeleted(@Param("departmentIds") List<UUID> departmentIds);
 }
