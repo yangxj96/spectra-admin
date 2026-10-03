@@ -21,8 +21,11 @@
 
 ## 实现约束
 
-- 保持 `launch → modules/starter → framework → common → config` 的分层关系。
-- 业务模块位于 `spectra-modules/`；跨模块调用优先通过明确的 Facade、Port 或事件，不引用对方内部 Entity、Mapper 或实现类。
+- 工程主标准见 `../docs/开发指南/04-工作区工程标准.md`；领域细则或 Skill 与主标准冲突时按已确认标准处理，实现状态另见治理台账。
+- Launch 统一装配业务模块，模块依赖必要的 Framework 技术能力和 Common 公共契约；Common 不反向承载 ORM、Web 或数据库实现。
+- 平台能力保留在 Core，仅新增业务功能使用独立模块。应用 Service 使用接口 + Impl，内部协作者按职责组织；编排服务不机械继承实体 CRUD。
+- Core 跨域调用公开 Service 或必要 Facade 的业务操作，不操作对方 Mapper、Impl 或继承的通用 CRUD；跨模块不引用对方内部 Entity、Mapper 或实现类。
+- 公共变更先分析全工作区直接与间接影响，受影响的暂缓 OA/Workflow 也需一致性改造及验证；不能只验证当前模块编译。
 
 ## 领域文档路由
 
