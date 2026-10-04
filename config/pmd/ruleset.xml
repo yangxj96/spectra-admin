@@ -4,7 +4,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.github.io/schema/ruleset_2_0_0.xsd">
     <description>
-        Spectra 的高信噪比 PMD 规则。格式化由 Spotless 负责，架构约束由 ArchUnit 负责。
+        Spectra 的 PMD 规则。复杂度按普通方法超过 15、NPath 超过 200、显式参数超过 5 报告；
+        混合控制流嵌套另做评审。格式化由 Spotless 负责。
     </description>
 
     <!-- Best Practices：未使用的局部变量或私有方法通常代表可删除代码。 -->
@@ -19,7 +20,7 @@
     <rule ref="category/java/bestpractices.xml/PreserveStackTrace"/>
     <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
 
-    <!-- Design：仅报告明显过高的复杂度和参数数量，避免把合理的 Spring 配置类误报为坏味道。 -->
+    <!-- 该规则只统计 if 嵌套；混合 if/loop/switch/try 嵌套须另行评审。 -->
     <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">
         <properties>
             <property name="problemDepth" value="4"/>
@@ -27,21 +28,19 @@
     </rule>
     <rule ref="category/java/design.xml/CyclomaticComplexity">
         <properties>
-            <!-- Existing notification orchestration is retained; 30 is the migration gate for new code. -->
-        <!-- The Redis session repository is a legacy security workflow under staged decomposition. -->
-        <property name="classReportLevel" value="200"/>
-            <property name="methodReportLevel" value="30"/>
+            <property name="classReportLevel" value="200"/>
+            <!-- PMD reports at the configured value, so 16 means >15. -->
+            <property name="methodReportLevel" value="16"/>
         </properties>
     </rule>
     <rule ref="category/java/design.xml/NPathComplexity">
         <properties>
-            <!-- Existing notification orchestration currently reaches 8,704 paths; retain a high-signal 10,000 gate. -->
-            <property name="reportLevel" value="10000"/>
+            <property name="reportLevel" value="201"/>
         </properties>
     </rule>
     <rule ref="category/java/design.xml/ExcessiveParameterList">
         <properties>
-            <property name="minimum" value="10"/>
+            <property name="minimum" value="5"/>
         </properties>
     </rule>
 </ruleset>
