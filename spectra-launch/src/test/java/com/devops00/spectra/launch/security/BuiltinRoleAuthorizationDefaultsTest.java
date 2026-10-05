@@ -92,7 +92,8 @@ class BuiltinRoleAuthorizationDefaultsTest {
 
         var exclusions = new HashSet<String>();
         var stringMatcher = SQL_STRING.matcher(excludedMatcher.group("codes"));
-        while (stringMatcher.find()) exclusions.add(stringMatcher.group(1));
+        while (stringMatcher.find())
+            exclusions.add(stringMatcher.group(1));
         assertEquals(Set.of(
                 "user:assign-role", "role:assign", "role:create", "role:update", "role:delete", "role:disable",
                 "role:grant", "role:authority-level:update"), exclusions);

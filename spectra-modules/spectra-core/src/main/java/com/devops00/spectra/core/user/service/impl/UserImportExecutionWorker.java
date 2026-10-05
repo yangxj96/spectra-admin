@@ -71,12 +71,10 @@ public class UserImportExecutionWorker {
      * @return 当前分块的处理、成功、跳过和失败数量。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ChunkResult processChunk(UUID taskId, UUID operatorId, List<UserImportRow> rows, boolean skipExisting,
-                                    UserImportPreviewService.ReferenceData referenceData,
-                                    String encodedDefaultPasswordHash) {
+    public ChunkResult processChunk(ChunkRequest request) {
         var task = taskMapper.selectOne(new LambdaQueryWrapper<UserImportTask>()
-                .eq(UserImportTask::getId, taskId)
-                .eq(UserImportTask::getOperatorId, operatorId));
+                .eq(UserImportTask::getId, request.taskId())
+                .eq(UserImportTask::getOperatorId, request.operatorId()));
         if (task == null) {
             return new ChunkResult(0, 0, 0, 0);
         }
@@ -86,14 +84,14 @@ public class UserImportExecutionWorker {
         var skipped = task.getSkippedRows();
         var failed = task.getErrorRows();
         var processed = 0;
-        for (var row : rows) {
+        for (var row : request.rows()) {
             if (!STATE_VALID.equals(row.getState())) {
                 continue;
             }
             try {
-                var result = rowProcessor.process(row, operatorId, skipExisting,
-                        referenceData.departmentIds(), referenceData.profiles(), referenceData.departments(),
-                        encodedDefaultPasswordHash);
+                var result = rowProcessor.process(new UserImportRowProcessor.ProcessRequest(row, request.operatorId(),
+                        request.skipExisting(), request.referenceData().departmentIds(), request.referenceData().profiles(),
+                        request.referenceData().departments(), request.encodedDefaultPasswordHash()));
                 if (result.skipped()) {
                     skipped++;
                 } else {
@@ -116,6 +114,11 @@ public class UserImportExecutionWorker {
             throw new DataException("更新用户导入分块进度失败");
         }
         return new ChunkResult(processed, applied, skipped, failed);
+    }
+
+    public record ChunkRequest(UUID taskId, UUID operatorId, List<UserImportRow> rows, boolean skipExisting,
+                               UserImportPreviewService.ReferenceData referenceData,
+                               String encodedDefaultPasswordHash) {
     }
 
     /**

@@ -48,22 +48,21 @@ public interface QuartzJobExecutionHistoryMapper extends BaseMapper<QuartzJobExe
 
     /** 分页查询执行历史，不返回参数原文。 */
     IPage<QuartzJobExecutionHistoryEntity> selectHistoryPage(
-                                                             IPage<QuartzJobExecutionHistoryEntity> page,
-                                                             @Param("jobKey") String jobKey,
-                                                             @Param("triggerKey") String triggerKey,
-                                                             @Param("status") QuartzExecutionHistoryStatus status,
-                                                             @Param("startedAtFrom") Instant startedAtFrom,
-                                                             @Param("startedAtTo") Instant startedAtTo);
+            IPage<QuartzJobExecutionHistoryEntity> page, @Param("query") HistoryPageQuery query);
+
+    /** 执行历史分页筛选条件。 */
+    record HistoryPageQuery(String jobKey, String triggerKey, QuartzExecutionHistoryStatus status,
+                            Instant startedAtFrom, Instant startedAtTo) {
+    }
 
     /** 按 Quartz fire instance 查询已经存在的历史主键，支持重复回调幂等处理。 */
     UUID selectIdByFireInstanceId(@Param("fireInstanceId") String fireInstanceId);
 
     /** 使用受保护的 ID 更新一次执行的最终结果。 */
-    int finish(@Param("id") UUID id,
-               @Param("status") QuartzExecutionHistoryStatus status,
-               @Param("finishedAt") Instant finishedAt,
-               @Param("durationMs") Long durationMs,
-               @Param("resultSummary") String resultSummary,
-               @Param("errorCode") String errorCode,
-               @Param("errorMessage") String errorMessage);
+    int finish(@Param("result") FinishResult result);
+
+    /** 执行历史完成结果。 */
+    record FinishResult(UUID id, QuartzExecutionHistoryStatus status, Instant finishedAt, Long durationMs,
+                        String resultSummary, String errorCode, String errorMessage) {
+    }
 }

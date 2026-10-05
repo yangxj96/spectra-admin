@@ -273,23 +273,37 @@ public class CryptoKeyManager {
         String serverPriBase64 = getSecret(CONFIG_SERVER_PRIVATE_KEY);
         String clientPubBase64 = getSecret(CONFIG_CLIENT_PUBLIC_KEY);
         String clientPriBase64 = getSecret(CONFIG_CLIENT_PRIVATE_KEY);
-        if (serverPubBase64 == null
-                && serverPriBase64 == null
-                && clientPubBase64 == null
-                && clientPriBase64 == null) {
+        if (allKeysMissing(serverPubBase64, serverPriBase64, clientPubBase64, clientPriBase64)) {
             log.warn(LogPrefix.WEB.f("接口加解密已开启但统一密钥服务中没有密钥"));
             return new CryptoKeys(State.UNAVAILABLE, null, null, null, null, null, null);
         }
 
-        PublicKey serverPub = serverPubBase64 != null ? RSAUtils.restorePublicKey(serverPubBase64) : null;
-        PrivateKey serverPri = serverPriBase64 != null ? RSAUtils.restorePrivateKey(serverPriBase64) : null;
-        PublicKey clientPub = clientPubBase64 != null ? RSAUtils.restorePublicKey(clientPubBase64) : null;
-        PrivateKey clientPri = clientPriBase64 != null ? RSAUtils.restorePrivateKey(clientPriBase64) : null;
+        PublicKey serverPub = restorePublicKey(serverPubBase64);
+        PrivateKey serverPri = restorePrivateKey(serverPriBase64);
+        PublicKey clientPub = restorePublicKey(clientPubBase64);
+        PrivateKey clientPri = restorePrivateKey(clientPriBase64);
 
         State state = serverPub != null && serverPri != null && clientPub != null && clientPri != null
                 ? State.READY
                 : State.UNAVAILABLE;
         return new CryptoKeys(state, serverPub, serverPri, clientPub, clientPri,
                 serverPubBase64, clientPriBase64);
+    }
+
+    private static boolean allKeysMissing(String... keys) {
+        for (String key : keys) {
+            if (key != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static PublicKey restorePublicKey(String value) throws Exception {
+        return value == null ? null : RSAUtils.restorePublicKey(value);
+    }
+
+    private static PrivateKey restorePrivateKey(String value) throws Exception {
+        return value == null ? null : RSAUtils.restorePrivateKey(value);
     }
 }

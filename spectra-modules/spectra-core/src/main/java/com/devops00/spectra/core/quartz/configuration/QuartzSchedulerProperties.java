@@ -66,6 +66,12 @@ public class QuartzSchedulerProperties {
     /** 绑定完成后校验不可安全覆盖的 Quartz 设置。 */
     @PostConstruct
     public void validateConfiguration() {
+        validateQuartzMode();
+        validateHistorySettings();
+        validateRetrySettings();
+    }
+
+    private void validateQuartzMode() {
         if (tablePrefix == null || !tablePrefix.startsWith("spectra_quartz.QRTZ_")) {
             throw new IllegalArgumentException("Quartz 表前缀必须使用 spectra_quartz.QRTZ_ 开头");
         }
@@ -83,12 +89,18 @@ public class QuartzSchedulerProperties {
         if (threadCount <= 0) {
             throw new IllegalArgumentException("Quartz 工作线程数必须大于 0");
         }
+    }
+
+    private void validateHistorySettings() {
         if (historyRetentionDays <= 0) {
             throw new IllegalArgumentException("执行历史保留天数必须大于 0");
         }
         if (historyCleanupBatchSize <= 0) {
             throw new IllegalArgumentException("执行历史清理批次必须大于 0");
         }
+    }
+
+    private void validateRetrySettings() {
         if (databaseRetryInterval == null
                 || databaseRetryInterval.isZero()
                 || databaseRetryInterval.isNegative()) {

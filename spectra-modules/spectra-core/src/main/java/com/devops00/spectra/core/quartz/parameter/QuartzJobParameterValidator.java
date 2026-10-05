@@ -50,42 +50,13 @@ public class QuartzJobParameterValidator {
         if (schema == null || json == null || json.isBlank()) {
             throw new IllegalArgumentException("Quartz Job 参数和 schema 不能为空");
         }
-        final JsonNode root;
-        try {
-            root = objectMapper.readTree(json);
-        } catch (RuntimeException exception) {
-            throw new IllegalArgumentException("Quartz Job 参数必须是合法 JSON", exception);
-        }
-        if (root == null || !root.isObject()) {
-            throw new IllegalArgumentException("Quartz Job 参数必须是单个 JSON 对象");
-        }
-        var version = root.get("version");
-        if (version == null || !version.isTextual() || !schema.version().equals(version.asString())) {
-            throw new IllegalArgumentException("Quartz Job 参数 schema 版本不匹配");
-        }
+        final JsonNode root = readObject(json);
+        validateVersion(schema, root);
         var values = new LinkedHashMap<String, Object>();
         for (Map.Entry<String, JsonNode> field : root.properties()) {
-            var name = field.getKey();
-            if ("version".equals(name)) {
-                continue;
-            }
-            var definition = schema.fields().get(name);
-            if (looksSensitive(name) || definition != null && definition.sensitive()) {
-                throw new IllegalArgumentException("Quartz Job 参数包含敏感字段: " + name);
-            }
-            if (definition == null && !schema.allowUnknownFields()) {
-                throw new IllegalArgumentException("Quartz Job 参数包含未声明字段: " + name);
-            }
-            if (definition != null && !matches(definition.type(), field.getValue())) {
-                throw new IllegalArgumentException("Quartz Job 参数字段类型不匹配: " + name);
-            }
-            values.put(name, objectMapper.convertValue(field.getValue(), Object.class));
+            addValue(schema, values, field);
         }
-        schema.fields().forEach((name, definition) -> {
-            if (definition.required() && !values.containsKey(name)) {
-                throw new IllegalArgumentException("Quartz Job 缺少必填参数: " + name);
-            }
-        });
+        validateRequired(schema, values);
         try {
             var persisted = new LinkedHashMap<String, Object>();
             persisted.put("version", schema.version());
@@ -94,6 +65,54 @@ public class QuartzJobParameterValidator {
         } catch (RuntimeException exception) {
             throw new IllegalArgumentException("Quartz Job 参数规范化失败", exception);
         }
+    }
+
+    private JsonNode readObject(String json) {
+        try {
+            var root = objectMapper.readTree(json);
+            if (root == null || !root.isObject()) {
+                throw new IllegalArgumentException("Quartz Job 参数必须是单个 JSON 对象");
+            }
+            return root;
+        } catch (IllegalArgumentException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            throw new IllegalArgumentException("Quartz Job 参数必须是合法 JSON", exception);
+        }
+    }
+
+    private void validateVersion(QuartzParameterSchema schema, JsonNode root) {
+        var version = root.get("version");
+        if (version == null || !version.isTextual() || !schema.version().equals(version.asString())) {
+            throw new IllegalArgumentException("Quartz Job 参数 schema 版本不匹配");
+        }
+    }
+
+    private void addValue(QuartzParameterSchema schema, Map<String, Object> values,
+                          Map.Entry<String, JsonNode> field) {
+        var name = field.getKey();
+        if ("version".equals(name)) {
+            return;
+        }
+        var definition = schema.fields().get(name);
+        if (looksSensitive(name) || definition != null && definition.sensitive()) {
+            throw new IllegalArgumentException("Quartz Job 参数包含敏感字段: " + name);
+        }
+        if (definition == null && !schema.allowUnknownFields()) {
+            throw new IllegalArgumentException("Quartz Job 参数包含未声明字段: " + name);
+        }
+        if (definition != null && !matches(definition.type(), field.getValue())) {
+            throw new IllegalArgumentException("Quartz Job 参数字段类型不匹配: " + name);
+        }
+        values.put(name, objectMapper.convertValue(field.getValue(), Object.class));
+    }
+
+    private void validateRequired(QuartzParameterSchema schema, Map<String, Object> values) {
+        schema.fields().forEach((name, definition) -> {
+            if (definition.required() && !values.containsKey(name)) {
+                throw new IllegalArgumentException("Quartz Job 缺少必填参数: " + name);
+            }
+        });
     }
 
     /** 判断字段名是否属于凭据或密钥语义。 */

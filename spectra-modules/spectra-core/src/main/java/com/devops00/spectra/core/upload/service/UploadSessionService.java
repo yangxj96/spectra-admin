@@ -89,14 +89,9 @@ public class UploadSessionService {
     /** 创建新的上传会话，或返回当前用户可恢复的会话。 */
     @Transactional
     public UploadSessionVO create(CreateUploadRequest request, UUID userId) {
-        String sha256 = request.getContentSha256().toLowerCase(Locale.ROOT);
-        String contentType = request.getContentType().toLowerCase(Locale.ROOT);
-        FileType type = fileTypeMapper.findEnabledByCode(request.getFileTypeCode());
-        declarationValidator.validate(request, type);
-        if (request.getSize() > properties.getMaxFileSize()) {
-            throw invalid("文件大小超过系统限制");
-        }
-        validateChunkConfiguration();
+        var input = validateCreateRequest(request);
+        String sha256 = input.sha256();
+        String contentType = input.contentType();
         Instant now = Instant.now();
         FileAsset ready = fileAssetMapper.findReady(sha256, request.getSize());
         if (ready != null) {
@@ -107,33 +102,14 @@ public class UploadSessionService {
         if (resumable != null) {
             return toView(resumable, "RESUMABLE");
         }
-        if (sessionMapper.countActiveByOwner(userId) >= properties.getMaxConcurrentTasksPerUser()) {
-            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_CONCURRENCY_LIMIT, "当前用户的活动上传任务已达到上限");
-        }
+        validateConcurrency(userId);
 
         long chunkSize = properties.getChunkSize();
         int totalParts = (int) Math.max(1, (request.getSize() + chunkSize - 1) / chunkSize);
         if (totalParts > properties.getMaxParts()) {
             throw invalid("文件分片数量超过系统限制");
         }
-        StorageProviderType providerType = properties.getDefaultStorage();
-        TransportMode transportMode = providerType == StorageProviderType.S3
-                ? TransportMode.PRESIGNED
-                : TransportMode.LOCAL_PROXY;
-        FileStorageProvider provider = providerRegistry.require(providerType);
-
-        // storageSessionId 只用于存储 Key 和 Provider 会话，数据库实体主键由 MetaObjectHandler 生成。
-        UUID storageSessionId = UUID.randomUUID();
-        String container = providerType == StorageProviderType.S3 ? s3Properties.getBucket() : "local";
-        String key = "assets/" + storageSessionId + "/content.bin";
-        StorageMultipart multipart;
-        try {
-            multipart = provider.createMultipart(storageSessionId, container, key, totalParts);
-        } catch (FileUploadException exception) {
-            throw exception;
-        } catch (RuntimeException exception) {
-            throw new FileUploadException(FileErrorCode.FILE_STORAGE_UNAVAILABLE, "创建文件存储会话失败", exception);
-        }
+        var storage = createStorageSession(totalParts);
 
         var session = new FileUploadSession();
         session.setOwnerUserId(userId);
@@ -143,11 +119,11 @@ public class UploadSessionService {
         session.setContentSha256(sha256);
         session.setChunkSize(chunkSize);
         session.setTotalParts(totalParts);
-        session.setStorageProvider(providerType);
-        session.setTransportMode(transportMode);
-        session.setStorageContainer(container);
-        session.setStagingKey(key);
-        session.setProviderUploadId(multipart.providerUploadId());
+        session.setStorageProvider(storage.providerType());
+        session.setTransportMode(storage.transportMode());
+        session.setStorageContainer(storage.container());
+        session.setStagingKey(storage.key());
+        session.setProviderUploadId(storage.multipart().providerUploadId());
         session.setStatus(UploadSessionStatus.UPLOADING);
         session.setExpiresAt(now.plus(properties.getTaskTtl()));
         session.setLastActivityAt(now);
@@ -160,10 +136,53 @@ public class UploadSessionService {
             }
             partService.createParts(session.getId(), request.getSize(), chunkSize, totalParts);
         } catch (RuntimeException exception) {
-            abortQuietly(provider, multipart);
+            abortQuietly(storage.provider(), storage.multipart());
             throw exception;
         }
         return toView(session, "CREATED");
+    }
+
+    private CreateInput validateCreateRequest(CreateUploadRequest request) {
+        String sha256 = request.getContentSha256().toLowerCase(Locale.ROOT);
+        String contentType = request.getContentType().toLowerCase(Locale.ROOT);
+        FileType type = fileTypeMapper.findEnabledByCode(request.getFileTypeCode());
+        declarationValidator.validate(request, type);
+        if (request.getSize() > properties.getMaxFileSize()) {
+            throw invalid("文件大小超过系统限制");
+        }
+        validateChunkConfiguration();
+        return new CreateInput(sha256, contentType);
+    }
+
+    private void validateConcurrency(UUID userId) {
+        if (sessionMapper.countActiveByOwner(userId) >= properties.getMaxConcurrentTasksPerUser()) {
+            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_CONCURRENCY_LIMIT, "当前用户的活动上传任务已达到上限");
+        }
+    }
+
+    private StorageSession createStorageSession(int totalParts) {
+        StorageProviderType providerType = properties.getDefaultStorage();
+        TransportMode transportMode = providerType == StorageProviderType.S3 ? TransportMode.PRESIGNED : TransportMode.LOCAL_PROXY;
+        FileStorageProvider provider = providerRegistry.require(providerType);
+        UUID storageSessionId = UUID.randomUUID();
+        String container = providerType == StorageProviderType.S3 ? s3Properties.getBucket() : "local";
+        String key = "assets/" + storageSessionId + "/content.bin";
+        try {
+            var multipart = provider.createMultipart(storageSessionId, container, key, totalParts);
+            return new StorageSession(providerType, transportMode, provider, container, key, multipart);
+        } catch (FileUploadException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            throw new FileUploadException(FileErrorCode.FILE_STORAGE_UNAVAILABLE, "创建文件存储会话失败", exception);
+        }
+    }
+
+    private record StorageSession(StorageProviderType providerType, TransportMode transportMode,
+                                  FileStorageProvider provider, String container, String key,
+                                  StorageMultipart multipart) {
+    }
+
+    private record CreateInput(String sha256, String contentType) {
     }
 
     /** 查询当前用户有权访问的上传会话。 */

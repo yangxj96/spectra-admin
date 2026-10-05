@@ -438,7 +438,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                     authorization, "session:read", viewerId, viewerId);
             Set<UUID> visibleUserIds = onlineUsers.stream()
                     .filter(user -> includeSelf && user.getId().equals(viewerId)
-                            || departmentIdsByUser.getOrDefault(user.getId(), Set.of()).stream()
+                            || departmentIdsByUser.getOrDefault(user.getId(), Set.of())
+                                    .stream()
                                     .anyMatch(visibleDepartmentIds::contains))
                     .map(User::getId)
                     .collect(Collectors.toSet());
@@ -447,8 +448,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                     .filter(session -> visibleUserIds.contains(UUID.fromString(session.getUserId())))
                     .toList();
         }
-        IPage<OnlineUserPageVO> result = onlineUserPageAssembler.page(page, filter, onlineSessions, onlineUsers,
-                matchingDepartmentIds, departmentIdsByUser);
+        IPage<OnlineUserPageVO> result = onlineUserPageAssembler.page(new OnlineUserPageAssembler.PageRequest(
+                page, filter, onlineSessions, onlineUsers, matchingDepartmentIds, departmentIdsByUser));
         fillExecutor.fill(result.getRecords());
         var summariesByUser = associatedDepartmentSummaries(result.getRecords().stream().map(OnlineUserPageVO::getUserId).toList());
         result.getRecords()
@@ -525,7 +526,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         try {
             passwordPolicy.assertAccepts(params.getNewPassword());
         } catch (IllegalArgumentException exception) {
-            throw new BusinessRuleViolationException(exception.getMessage());
+            throw new BusinessRuleViolationException(exception.getMessage(), exception);
         }
 
         // 6. 加密新密码并更新

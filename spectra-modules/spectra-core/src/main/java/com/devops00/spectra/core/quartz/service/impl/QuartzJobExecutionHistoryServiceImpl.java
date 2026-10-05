@@ -73,10 +73,11 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
         }
         var startedAt = context.getJobRunTime() < 0 ? finishedAt : finishedAt.minusMillis(context.getJobRunTime());
         var status = exception == null ? QuartzExecutionHistoryStatus.SUCCEEDED : QuartzExecutionHistoryStatus.FAILED;
-        mapper.finish(id, status, finishedAt, Math.max(0L, Duration.between(startedAt, finishedAt).toMillis()),
+        mapper.finish(new QuartzJobExecutionHistoryMapper.FinishResult(id, status, finishedAt,
+                Math.max(0L, Duration.between(startedAt, finishedAt).toMillis()),
                 exception == null ? resultSummary(context) : null,
                 exception == null ? null : safeErrorCode(exception),
-                exception == null ? null : safeErrorMessage(exception));
+                exception == null ? null : safeErrorMessage(exception)));
     }
 
     @Override
@@ -108,13 +109,12 @@ public class QuartzJobExecutionHistoryServiceImpl implements QuartzJobExecutionH
     }
 
     @Override
-    public IPage<QuartzJobExecutionHistoryEntity> page(long current, long size, String jobKey,
-                                                       String triggerKey, QuartzExecutionHistoryStatus status,
-                                                       Instant startedAtFrom, Instant startedAtTo) {
-        var safeCurrent = Math.max(1L, current);
-        var safeSize = Math.max(1L, Math.min(size, 200L));
-        return mapper.selectHistoryPage(new Page<>(safeCurrent, safeSize), normalize(jobKey), normalize(triggerKey),
-                status, startedAtFrom, startedAtTo);
+    public IPage<QuartzJobExecutionHistoryEntity> page(HistoryPageRequest request) {
+        var safeCurrent = Math.max(1L, request.current());
+        var safeSize = Math.max(1L, Math.min(request.size(), 200L));
+        return mapper.selectHistoryPage(new Page<>(safeCurrent, safeSize),
+                new QuartzJobExecutionHistoryMapper.HistoryPageQuery(normalize(request.jobKey()),
+                        normalize(request.triggerKey()), request.status(), request.startedAtFrom(), request.startedAtTo()));
     }
 
     @Override

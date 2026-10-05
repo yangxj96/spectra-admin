@@ -129,14 +129,23 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
                               UUID targetDepartmentId,
                               String targetDepartmentCode,
                               UUID operatorId) {
-        var ids = sourceDepartmentIds == null ? Set.<UUID>of()
+        var ids = sourceDepartmentIds == null
+                ? Set.<UUID>of()
                 : sourceDepartmentIds.stream().filter(Objects::nonNull).collect(Collectors.toCollection(LinkedHashSet::new));
-        var codes = sourceDepartmentCodes == null ? Set.<String>of()
-                : sourceDepartmentCodes.stream().filter(Objects::nonNull).map(String::trim)
-                .filter(code -> !code.isEmpty()).collect(Collectors.toCollection(LinkedHashSet::new));
+        var codes = sourceDepartmentCodes == null
+                ? Set.<String>of()
+                : sourceDepartmentCodes.stream()
+                        .filter(Objects::nonNull)
+                        .map(String::trim)
+                        .filter(code -> !code.isEmpty())
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
         var targetCode = targetDepartmentCode == null ? null : targetDepartmentCode.trim();
-        if (ids.size() < 2 || codes.size() != ids.size() || targetDepartmentId == null
-                || targetCode == null || targetCode.isEmpty() || codes.contains(targetCode)) {
+        if (ids.size() < 2
+                || codes.size() != ids.size()
+                || targetDepartmentId == null
+                || targetCode == null
+                || targetCode.isEmpty()
+                || codes.contains(targetCode)) {
             throw new DataException("授权引用重写参数无效");
         }
         return new Request(Set.copyOf(ids), Set.copyOf(codes), targetDepartmentId, targetCode, operatorId);
@@ -145,51 +154,79 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     private Snapshot loadSnapshot(Request request) {
         var activeAssignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())
-                .isNull(RoleAssignment::getDeleted)).stream()
+                .isNull(RoleAssignment::getDeleted))
+                .stream()
                 .filter(row -> SecurityAuthorizationState.ACTIVE.name().equals(row.getState()) && row.getDeleted() == null)
                 .toList();
-        var activeAssignmentIds = activeAssignments.stream().map(RoleAssignment::getId).filter(Objects::nonNull)
+        var activeAssignmentIds = activeAssignments.stream()
+                .map(RoleAssignment::getId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        var accessBoundaries = activeAssignmentIds.isEmpty() ? List.<AssignmentPermissionBoundary>of()
+        var accessBoundaries = activeAssignmentIds.isEmpty()
+                ? List.<AssignmentPermissionBoundary>of()
                 : permissionBoundaryMapper.selectList(new LambdaQueryWrapper<AssignmentPermissionBoundary>()
                         .in(AssignmentPermissionBoundary::getAssignmentId, activeAssignmentIds)
-                        .isNull(AssignmentPermissionBoundary::getDeleted)).stream()
-                .filter(row -> activeAssignmentIds.contains(row.getAssignmentId()) && row.getDeleted() == null).toList();
-        var grantBoundaries = activeAssignmentIds.isEmpty() ? List.<AssignmentGrantBoundary>of()
+                        .isNull(AssignmentPermissionBoundary::getDeleted))
+                        .stream()
+                        .filter(row -> activeAssignmentIds.contains(row.getAssignmentId()) && row.getDeleted() == null)
+                        .toList();
+        var grantBoundaries = activeAssignmentIds.isEmpty()
+                ? List.<AssignmentGrantBoundary>of()
                 : grantBoundaryMapper.selectList(new LambdaQueryWrapper<AssignmentGrantBoundary>()
                         .in(AssignmentGrantBoundary::getAssignmentId, activeAssignmentIds)
-                        .isNull(AssignmentGrantBoundary::getDeleted)).stream()
-                .filter(row -> activeAssignmentIds.contains(row.getAssignmentId()) && row.getDeleted() == null).toList();
+                        .isNull(AssignmentGrantBoundary::getDeleted))
+                        .stream()
+                        .filter(row -> activeAssignmentIds.contains(row.getAssignmentId()) && row.getDeleted() == null)
+                        .toList();
         var scopeIds = new LinkedHashSet<UUID>();
         accessBoundaries.stream().map(AssignmentPermissionBoundary::getScopeId).filter(Objects::nonNull).forEach(scopeIds::add);
         grantBoundaries.stream().map(AssignmentGrantBoundary::getScopeId).filter(Objects::nonNull).forEach(scopeIds::add);
-        var scopes = scopeIds.isEmpty() ? List.<AuthorizationScope>of() : scopeMapper.selectBatchIds(scopeIds).stream()
-                .filter(scope -> scope.getDeleted() == null).toList();
-        var rulesScopeIds = scopes.stream().filter(scope -> RULES_MODE.equals(scope.getScopeMode()))
-                .map(AuthorizationScope::getId).filter(Objects::nonNull).collect(Collectors.toSet());
-        var scopeRules = rulesScopeIds.isEmpty() ? List.<ScopeRule>of()
+        var scopes = scopeIds.isEmpty()
+                ? List.<AuthorizationScope>of()
+                : scopeMapper.selectBatchIds(scopeIds)
+                        .stream()
+                        .filter(scope -> scope.getDeleted() == null)
+                        .toList();
+        var rulesScopeIds = scopes.stream()
+                .filter(scope -> RULES_MODE.equals(scope.getScopeMode()))
+                .map(AuthorizationScope::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        var scopeRules = rulesScopeIds.isEmpty()
+                ? List.<ScopeRule>of()
                 : scopeRuleMapper.selectList(new LambdaQueryWrapper<ScopeRule>()
                         .in(ScopeRule::getScopeId, rulesScopeIds)
-                        .isNull(ScopeRule::getDeleted)).stream()
-                .filter(rule -> rule.getDeleted() == null && rulesScopeIds.contains(rule.getScopeId())).toList();
+                        .isNull(ScopeRule::getDeleted))
+                        .stream()
+                        .filter(rule -> rule.getDeleted() == null && rulesScopeIds.contains(rule.getScopeId()))
+                        .toList();
 
         var profiles = profileMapper.selectList(new LambdaQueryWrapper<AuthorizationProfile>()
                 .isNull(AuthorizationProfile::getDeleted)).stream().filter(profile -> profile.getDeleted() == null).toList();
         var profileIds = profiles.stream().map(AuthorizationProfile::getId).filter(Objects::nonNull).collect(Collectors.toSet());
-        var profileAssignments = profileIds.isEmpty() ? List.<AuthorizationProfileAssignment>of()
+        var profileAssignments = profileIds.isEmpty()
+                ? List.<AuthorizationProfileAssignment>of()
                 : profileAssignmentMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileAssignment>()
                         .in(AuthorizationProfileAssignment::getProfileId, profileIds)
-                        .isNull(AuthorizationProfileAssignment::getDeleted)).stream()
-                .filter(row -> profileIds.contains(row.getProfileId()) && row.getDeleted() == null).toList();
-        var profileAssignmentIds = profileAssignments.stream().map(AuthorizationProfileAssignment::getId)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
-        var profileBoundaries = profileAssignmentIds.isEmpty() ? List.<AuthorizationProfileBoundary>of()
+                        .isNull(AuthorizationProfileAssignment::getDeleted))
+                        .stream()
+                        .filter(row -> profileIds.contains(row.getProfileId()) && row.getDeleted() == null)
+                        .toList();
+        var profileAssignmentIds = profileAssignments.stream()
+                .map(AuthorizationProfileAssignment::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        var profileBoundaries = profileAssignmentIds.isEmpty()
+                ? List.<AuthorizationProfileBoundary>of()
                 : profileBoundaryMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileBoundary>()
                         .in(AuthorizationProfileBoundary::getProfileAssignmentId, profileAssignmentIds)
-                        .isNull(AuthorizationProfileBoundary::getDeleted)).stream()
-                .filter(row -> profileAssignmentIds.contains(row.getProfileAssignmentId()) && row.getDeleted() == null).toList();
-        var profileIdByAssignmentId = profileAssignments.stream().filter(row -> row.getId() != null)
+                        .isNull(AuthorizationProfileBoundary::getDeleted))
+                        .stream()
+                        .filter(row -> profileAssignmentIds.contains(row.getProfileAssignmentId()) && row.getDeleted() == null)
+                        .toList();
+        var profileIdByAssignmentId = profileAssignments.stream()
+                .filter(row -> row.getId() != null)
                 .collect(Collectors.toMap(AuthorizationProfileAssignment::getId,
                         AuthorizationProfileAssignment::getProfileId, (first, ignored) -> first));
         return new Snapshot(activeAssignments, accessBoundaries, grantBoundaries, scopes, scopeRules,
@@ -197,20 +234,33 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     }
 
     private DepartmentAuthorizationReferenceImpact impact(Snapshot snapshot, Request request) {
-        var rulesByScope = snapshot.scopeRules().stream().filter(this::isDepartmentRule)
+        var rulesByScope = snapshot.scopeRules()
+                .stream()
+                .filter(this::isDepartmentRule)
                 .collect(Collectors.groupingBy(ScopeRule::getScopeId));
         var accessScopeIds = relevantAccessScopeIds(snapshot.accessBoundaries(), rulesByScope, request.sourceIds());
         var grantScopeIds = relevantGrantScopeIds(snapshot.grantBoundaries(), rulesByScope, request.sourceIds());
         var accessRules = matchingRules(accessScopeIds, rulesByScope, request.sourceIds());
         var grantRules = matchingRules(grantScopeIds, rulesByScope, request.sourceIds());
         var impactedAssignmentIds = new HashSet<UUID>();
-        snapshot.accessBoundaries().stream().filter(row -> accessScopeIds.contains(row.getScopeId()))
-                .map(AssignmentPermissionBoundary::getAssignmentId).filter(Objects::nonNull).forEach(impactedAssignmentIds::add);
-        snapshot.grantBoundaries().stream().filter(row -> grantScopeIds.contains(row.getScopeId()))
-                .map(AssignmentGrantBoundary::getAssignmentId).filter(Objects::nonNull).forEach(impactedAssignmentIds::add);
-        var affectedUserIds = snapshot.activeAssignments().stream()
+        snapshot.accessBoundaries()
+                .stream()
+                .filter(row -> accessScopeIds.contains(row.getScopeId()))
+                .map(AssignmentPermissionBoundary::getAssignmentId)
+                .filter(Objects::nonNull)
+                .forEach(impactedAssignmentIds::add);
+        snapshot.grantBoundaries()
+                .stream()
+                .filter(row -> grantScopeIds.contains(row.getScopeId()))
+                .map(AssignmentGrantBoundary::getAssignmentId)
+                .filter(Objects::nonNull)
+                .forEach(impactedAssignmentIds::add);
+        var affectedUserIds = snapshot.activeAssignments()
+                .stream()
                 .filter(assignment -> impactedAssignmentIds.contains(assignment.getId()))
-                .map(RoleAssignment::getUserId).filter(Objects::nonNull).collect(Collectors.toSet());
+                .map(RoleAssignment::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         var profileIdsByAssignment = snapshot.profileIdByAssignmentId();
         var impactedProfileIds = new HashSet<UUID>();
@@ -219,14 +269,20 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
         boolean expands = expandsRuleScopes(accessScopeIds, rulesByScope, request.sourceIds())
                 || expandsRuleScopes(grantScopeIds, rulesByScope, request.sourceIds());
         var fingerprintParts = new ArrayList<String>();
-        snapshot.activeAssignments().stream().filter(assignment -> impactedAssignmentIds.contains(assignment.getId()))
+        snapshot.activeAssignments()
+                .stream()
+                .filter(assignment -> impactedAssignmentIds.contains(assignment.getId()))
                 .sorted(java.util.Comparator.comparing(RoleAssignment::getId))
                 .forEach(assignment -> fingerprintParts.add("ASSIGNMENT:" + assignment.getId() + ":"
                         + assignment.getVersion() + ":" + assignment.getState() + ":" + assignment.getUserId()));
-        snapshot.accessBoundaries().stream().filter(boundary -> accessScopeIds.contains(boundary.getScopeId()))
+        snapshot.accessBoundaries()
+                .stream()
+                .filter(boundary -> accessScopeIds.contains(boundary.getScopeId()))
                 .sorted(java.util.Comparator.comparing(AssignmentPermissionBoundary::getId))
                 .forEach(boundary -> fingerprintParts.add("ACCESS:" + boundary.getAssignmentId() + ":" + boundary.getScopeId()));
-        snapshot.grantBoundaries().stream().filter(boundary -> grantScopeIds.contains(boundary.getScopeId()))
+        snapshot.grantBoundaries()
+                .stream()
+                .filter(boundary -> grantScopeIds.contains(boundary.getScopeId()))
                 .sorted(java.util.Comparator.comparing(AssignmentGrantBoundary::getId))
                 .forEach(boundary -> fingerprintParts.add("GRANT:" + boundary.getAssignmentId() + ":" + boundary.getScopeId()));
         accessRules.stream().map(this::canonicalRule).sorted().forEach(fingerprintParts::add);
@@ -271,14 +327,18 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
         if (scope == null) {
             return "-";
         }
-        return scope.entrySet().stream().sorted(Map.Entry.comparingByKey())
+        return scope.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
                 .map(entry -> entry.getKey() + "=" + canonicalValue(entry.getValue()))
                 .collect(Collectors.joining(",", "{", "}"));
     }
 
     private String canonicalValue(Object value) {
         if (value instanceof Map<?, ?> map) {
-            return map.entrySet().stream().filter(entry -> entry.getKey() != null)
+            return map.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey() != null)
                     .sorted(java.util.Comparator.comparing(entry -> String.valueOf(entry.getKey())))
                     .map(entry -> entry.getKey() + "=" + canonicalValue(entry.getValue()))
                     .collect(Collectors.joining(",", "{", "}"));
@@ -291,8 +351,9 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
 
     private String fingerprint(List<String> parts) {
         try {
-            var digest = MessageDigest.getInstance("SHA-256").digest(
-                    String.join("|", parts).getBytes(StandardCharsets.UTF_8));
+            var digest = MessageDigest.getInstance("SHA-256")
+                    .digest(
+                            String.join("|", parts).getBytes(StandardCharsets.UTF_8));
             var result = new StringBuilder(digest.length * 2);
             for (byte value : digest) {
                 result.append(String.format("%02x", value));
@@ -304,7 +365,9 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     }
 
     private void rewriteActiveScopeRules(Snapshot snapshot, Request request) {
-        var rulesByScope = snapshot.scopeRules().stream().filter(this::isDepartmentRule)
+        var rulesByScope = snapshot.scopeRules()
+                .stream()
+                .filter(this::isDepartmentRule)
                 .collect(Collectors.groupingBy(ScopeRule::getScopeId));
         var accessScopeIds = relevantAccessScopeIds(snapshot.accessBoundaries(), rulesByScope, request.sourceIds());
         var grantScopeIds = relevantGrantScopeIds(snapshot.grantBoundaries(), rulesByScope, request.sourceIds());
@@ -348,7 +411,9 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     }
 
     private void rewriteProfileBoundaries(Snapshot snapshot, Request request) {
-        var profileById = snapshot.profiles().stream().filter(profile -> profile.getId() != null)
+        var profileById = snapshot.profiles()
+                .stream()
+                .filter(profile -> profile.getId() != null)
                 .collect(Collectors.toMap(AuthorizationProfile::getId, Function.identity(), (first, ignored) -> first));
         var changedProfiles = new HashSet<UUID>();
         for (var boundary : snapshot.profileBoundaries()) {
@@ -396,17 +461,21 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     }
 
     private Set<UUID> relevantAccessScopeIds(List<AssignmentPermissionBoundary> boundaries,
-                                            Map<UUID, List<ScopeRule>> rulesByScope,
-                                            Set<UUID> sourceIds) {
-        return boundaries.stream().map(AssignmentPermissionBoundary::getScopeId).filter(Objects::nonNull)
+                                             Map<UUID, List<ScopeRule>> rulesByScope,
+                                             Set<UUID> sourceIds) {
+        return boundaries.stream()
+                .map(AssignmentPermissionBoundary::getScopeId)
+                .filter(Objects::nonNull)
                 .filter(scopeId -> hasSourceRule(rulesByScope.getOrDefault(scopeId, List.of()), sourceIds))
                 .collect(Collectors.toSet());
     }
 
     private Set<UUID> relevantGrantScopeIds(List<AssignmentGrantBoundary> boundaries,
-                                           Map<UUID, List<ScopeRule>> rulesByScope,
-                                           Set<UUID> sourceIds) {
-        return boundaries.stream().map(AssignmentGrantBoundary::getScopeId).filter(Objects::nonNull)
+                                            Map<UUID, List<ScopeRule>> rulesByScope,
+                                            Set<UUID> sourceIds) {
+        return boundaries.stream()
+                .map(AssignmentGrantBoundary::getScopeId)
+                .filter(Objects::nonNull)
                 .filter(scopeId -> hasSourceRule(rulesByScope.getOrDefault(scopeId, List.of()), sourceIds))
                 .collect(Collectors.toSet());
     }
@@ -414,18 +483,26 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     private List<ScopeRule> matchingRules(Set<UUID> scopeIds,
                                           Map<UUID, List<ScopeRule>> rulesByScope,
                                           Set<UUID> sourceIds) {
-        return scopeIds.stream().flatMap(scopeId -> rulesByScope.getOrDefault(scopeId, List.of()).stream())
-                .filter(rule -> sourceIds.contains(rule.getDepartmentId())).toList();
+        return scopeIds.stream()
+                .flatMap(scopeId -> rulesByScope.getOrDefault(scopeId, List.of()).stream())
+                .filter(rule -> sourceIds.contains(rule.getDepartmentId()))
+                .toList();
     }
 
     private boolean expandsRuleScopes(Set<UUID> scopeIds,
                                       Map<UUID, List<ScopeRule>> rulesByScope,
                                       Set<UUID> sourceIds) {
-        return scopeIds.stream().map(rulesByScope::get).filter(Objects::nonNull)
-                .anyMatch(rules -> rules.stream().filter(rule -> sourceIds.contains(rule.getDepartmentId()))
+        return scopeIds.stream()
+                .map(rulesByScope::get)
+                .filter(Objects::nonNull)
+                .anyMatch(rules -> rules.stream()
+                        .filter(rule -> sourceIds.contains(rule.getDepartmentId()))
                         .anyMatch(rule -> Boolean.TRUE.equals(rule.getIncludeDescendants()))
-                        && rules.stream().filter(rule -> sourceIds.contains(rule.getDepartmentId()))
-                        .map(ScopeRule::getDepartmentId).collect(Collectors.toSet()).size() < sourceIds.size());
+                        && rules.stream()
+                                .filter(rule -> sourceIds.contains(rule.getDepartmentId()))
+                                .map(ScopeRule::getDepartmentId)
+                                .collect(Collectors.toSet())
+                                .size() < sourceIds.size());
     }
 
     private boolean hasSourceRule(List<ScopeRule> rules, Set<UUID> sourceIds) {

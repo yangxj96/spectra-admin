@@ -84,23 +84,31 @@ public class NotificationProviderTestServiceImpl implements NotificationProvider
      * 校验并确保数据满足当前约束（{@code validate}）。
      */
     private void validate(NotificationChannel channel, NotificationProviderTestFrom params) {
-        if (channel == null || channel == NotificationChannel.IN_APP) {
-            throw new DataSaveException("仅支持 SMS 或 EMAIL Provider 测试发送");
-        }
+        validateChannel(channel);
         if (params == null) {
             throw new DataSaveException("Provider 测试发送参数不能为空");
         }
+        validateConfirmation(params);
+        validateText(params.getRecipientAddress(), "测试收件地址不能为空");
+        validateText(params.getTitle(), "测试标题不能为空");
+        validateText(params.getContent(), "测试正文不能为空");
+    }
+
+    private void validateChannel(NotificationChannel channel) {
+        if (channel == null || channel == NotificationChannel.IN_APP) {
+            throw new DataSaveException("仅支持 SMS 或 EMAIL Provider 测试发送");
+        }
+    }
+
+    private void validateConfirmation(NotificationProviderTestFrom params) {
         if (!"SEND_TEST".equals(params.getConfirmation())) {
             throw new DataSaveException("Provider 测试发送必须输入确认词 SEND_TEST");
         }
-        if (params.getRecipientAddress() == null || params.getRecipientAddress().isBlank()) {
-            throw new DataSaveException("测试收件地址不能为空");
-        }
-        if (params.getTitle() == null || params.getTitle().isBlank()) {
-            throw new DataSaveException("测试标题不能为空");
-        }
-        if (params.getContent() == null || params.getContent().isBlank()) {
-            throw new DataSaveException("测试正文不能为空");
+    }
+
+    private void validateText(String value, String message) {
+        if (value == null || value.isBlank()) {
+            throw new DataSaveException(message);
         }
     }
 }

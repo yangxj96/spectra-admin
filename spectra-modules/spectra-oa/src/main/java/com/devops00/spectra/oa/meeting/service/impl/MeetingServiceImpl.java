@@ -106,6 +106,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         var receivers = new ArrayList<UUID>();
         addParticipant(entity, userId, "host", user.getDepartmentId(), MeetingParticipantStatus.ACCEPTED.getValue());
         receivers.add(userId);
+        addMeetingParticipants(from, entity, userId, receivers);
+        sendMeetingNotification(entity, receivers);
+    }
+
+    private void addMeetingParticipants(MeetingCreateFrom from, Meeting entity, UUID userId, List<UUID> receivers) {
         var participantIds = from.getParticipants() == null
                 ? List.<UUID>of()
                 : from.getParticipants()
@@ -137,6 +142,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                 receivers.add(participantId);
             }
         }
+    }
+
+    private void sendMeetingNotification(Meeting entity, List<UUID> receivers) {
         if (!receivers.isEmpty()) {
             notificationService.send(NotificationSendRequest.inApp("oa:meeting:" + entity.getId(),
                     NotificationPurpose.OA_REMINDER, receivers.stream().distinct().toList(),

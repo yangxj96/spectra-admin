@@ -59,24 +59,8 @@ public class SecurityUserAssembler {
      * 使用目标 authentication_identity/password_credential 模型构建安全主体。
      */
     public SecurityUser toSecurityUser(LoginType loginType, AuthenticationIdentity identity, PasswordCredential credential, Object user) {
-        if (loginType == null || identity == null || credential == null || !(user instanceof User u)) {
-            throw new LoginException("账号当前不可用");
-        }
-        if (!loginType.name().equals(identity.getMethodCode())
-                || !AuthenticationIdentityState.ACTIVE.name().equals(identity.getState())) {
-            throw new LoginException("账号当前不可用");
-        }
-        if (credential.getExpiresAt() != null && !credential.getExpiresAt().isAfter(Instant.now())) {
-            throw new LoginException("临时密码已过期，请联系管理员重置密码");
-        }
-        if (identity.getUserId() == null || !identity.getUserId().equals(u.getId())) {
-            throw new LoginException("账号当前不可用");
-        }
-        if (u.getDeleted() != null || !UserStatus.ACTIVE.equals(u.getStatus())) {
-            throw new LoginException("账号当前不可用");
-        }
-
-        var securityUser = authConverter.toSecurityUser(u);
+        var account = validUser(loginType, identity, credential, user);
+        var securityUser = authConverter.toSecurityUser(account);
         securityUser.setEnabled(true);
         securityUser.setAccountNonExpired(true);
         securityUser.setAccountNonLocked(true);
@@ -84,6 +68,41 @@ public class SecurityUserAssembler {
         securityUser.setPasswordChangeRequired(Boolean.TRUE.equals(credential.getMustChange()));
         securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
         return securityUser;
+    }
+
+    private User validUser(LoginType loginType, AuthenticationIdentity identity, PasswordCredential credential,
+                           Object user) {
+        if (!(user instanceof User account))
+            throw new LoginException("账号当前不可用");
+        validateIdentity(loginType, identity, account);
+        validateCredential(credential);
+        validateUser(account);
+        return account;
+    }
+
+    private void validateIdentity(LoginType loginType, AuthenticationIdentity identity, User user) {
+        if (loginType == null
+                || identity == null
+                || !loginType.name().equals(identity.getMethodCode())
+                || !AuthenticationIdentityState.ACTIVE.name().equals(identity.getState())
+                || identity.getUserId() == null
+                || !identity.getUserId().equals(user.getId())) {
+            throw new LoginException("账号当前不可用");
+        }
+    }
+
+    private void validateCredential(PasswordCredential credential) {
+        if (credential == null)
+            throw new LoginException("账号当前不可用");
+        if (credential.getExpiresAt() != null && !credential.getExpiresAt().isAfter(Instant.now())) {
+            throw new LoginException("临时密码已过期，请联系管理员重置密码");
+        }
+    }
+
+    private void validateUser(User user) {
+        if (user.getDeleted() != null || !UserStatus.ACTIVE.equals(user.getStatus())) {
+            throw new LoginException("账号当前不可用");
+        }
     }
 
     /**

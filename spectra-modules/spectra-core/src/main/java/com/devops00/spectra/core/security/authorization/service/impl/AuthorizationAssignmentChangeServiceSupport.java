@@ -144,8 +144,8 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
         result.setAffectedAssignmentCount(1);
         result.setAffectedUserCount(1);
-        appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), targetUserId,
-                Map.of("assignmentId", String.valueOf(prepared.assignmentId())), Map.of(), "Assignment 授权变更预览");
+        appendAudit(new AuditInput("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), targetUserId,
+                Map.of("assignmentId", String.valueOf(prepared.assignmentId())), Map.of(), "Assignment 授权变更预览"));
         return result;
     }
 
@@ -185,36 +185,9 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     @Override
     @Transactional
     public void revoke(UUID targetUserId, AuthorizationAssignmentRemovalFrom from) {
-        if (targetUserId == null
-                || from == null
-                || from.getAssignmentId() == null
-                || from.getExpectedVersion() == null) {
-            throw new DataException("角色授权移除参数不能为空");
-        }
-        var target = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getId, targetUserId)
-                .last("FOR UPDATE"));
-        if (target == null) {
-            throw new DataNotExistException("目标用户不存在");
-        }
-        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
-            throw new DataException("只有 ACTIVE 用户可以移除授权 Assignment");
-        }
-        var assignment = roleAssignmentMapper.selectById(from.getAssignmentId());
-        if (assignment == null || !targetUserId.equals(assignment.getUserId())) {
-            throw new DataNotExistException("待移除的角色授权不存在");
-        }
-        if (!SecurityAuthorizationState.ACTIVE.name().equals(assignment.getState())) {
-            throw new DataException("待移除的角色授权已经不是生效状态");
-        }
-        var assignedRole = securityRoleMapper.selectById(assignment.getRoleId());
-        if (assignedRole != null && SecurityRoleCodes.DEFAULT_USER.equals(assignedRole.getCode())) {
-            throw new DataException("普通用户基础角色由系统自动维护，不能移除");
-        }
-        long assignmentVersion = assignment.getVersion() == null ? 0L : assignment.getVersion();
-        if (assignmentVersion != from.getExpectedVersion()) {
-            throw new DataException("角色授权版本已变化，请刷新后重试");
-        }
+        validateRevokeInput(targetUserId, from);
+        var target = loadRevokeTarget(targetUserId);
+        var assignment = loadRevokeAssignment(targetUserId, from);
         long targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
         epochGuard.assertCurrent(targetUserId, targetSecurityVersion);
         var operatorId = currentOperatorId();
@@ -242,13 +215,49 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
             if (roleAssignmentMapper.update(null, update) != 1) {
                 throw new DataException("移除角色授权失败，授权版本可能已变化");
             }
-            appendAudit("ROLE_ASSIGNMENT_REVOKED", operatorId, targetUserId,
+            appendAudit(new AuditInput("ROLE_ASSIGNMENT_REVOKED", operatorId, targetUserId,
                     Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
-                    Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权");
+                    Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权"));
             epochGuard.advance(targetUserId, targetSecurityVersion);
             sessionRevocationPort.revokeUserSessions(targetUserId);
             return Boolean.TRUE;
         });
+    }
+
+    private void validateRevokeInput(UUID targetUserId, AuthorizationAssignmentRemovalFrom from) {
+        if (targetUserId == null || from == null || from.getAssignmentId() == null || from.getExpectedVersion() == null) {
+            throw new DataException("角色授权移除参数不能为空");
+        }
+    }
+
+    private User loadRevokeTarget(UUID targetUserId) {
+        var target = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, targetUserId).last("FOR UPDATE"));
+        if (target == null) {
+            throw new DataNotExistException("目标用户不存在");
+        }
+        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
+            throw new DataException("只有 ACTIVE 用户可以移除授权 Assignment");
+        }
+        return target;
+    }
+
+    private RoleAssignment loadRevokeAssignment(UUID targetUserId, AuthorizationAssignmentRemovalFrom from) {
+        var assignment = roleAssignmentMapper.selectById(from.getAssignmentId());
+        if (assignment == null || !targetUserId.equals(assignment.getUserId())) {
+            throw new DataNotExistException("待移除的角色授权不存在");
+        }
+        if (!SecurityAuthorizationState.ACTIVE.name().equals(assignment.getState())) {
+            throw new DataException("待移除的角色授权已经不是生效状态");
+        }
+        var assignedRole = securityRoleMapper.selectById(assignment.getRoleId());
+        if (assignedRole != null && SecurityRoleCodes.DEFAULT_USER.equals(assignedRole.getCode())) {
+            throw new DataException("普通用户基础角色由系统自动维护，不能移除");
+        }
+        long assignmentVersion = assignment.getVersion() == null ? 0L : assignment.getVersion();
+        if (assignmentVersion != from.getExpectedVersion()) {
+            throw new DataException("角色授权版本已变化，请刷新后重试");
+        }
+        return assignment;
     }
 
     @Override
@@ -303,10 +312,10 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         var prepared = new PreparedChange(securityContextAccessor.currentUserId(), role, null, null, requests, 0L,
                 targetSecurityVersion, "SYSTEM_DEFAULT_USER_ROLE");
         var assignmentId = persist(prepared, targetUserId);
-        appendAudit("DEFAULT_USER_ROLE_ASSIGNED", prepared.operatorId(), targetUserId,
+        appendAudit(new AuditInput("DEFAULT_USER_ROLE_ASSIGNED", prepared.operatorId(), targetUserId,
                 Map.of("assignmentId", assignmentId.toString()),
                 Map.of("roleCode", SecurityRoleCodes.DEFAULT_USER, "permissionCount", requests.size()),
-                "系统自动补齐普通用户基础角色");
+                "系统自动补齐普通用户基础角色"));
         epochGuard.advance(targetUserId, targetSecurityVersion);
         sessionRevocationPort.revokeUserSessions(targetUserId);
     }
@@ -315,21 +324,10 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
      * 创建或构建目标数据（{@code prepare}）。
      */
     private PreparedChange prepare(UUID targetUserId, AuthorizationAssignmentChangeFrom from, UUID assignmentId) {
-        if (targetUserId == null || from == null || from.getExpectedVersion() == null) {
-            throw new DataException("授权变更参数不能为空");
-        }
+        validateInput(targetUserId, from);
         var operatorId = currentOperatorId();
-        var target = userMapper.selectById(targetUserId);
-        if (target == null) {
-            throw new DataNotExistException("目标用户不存在");
-        }
-        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
-            throw new DataException("只有 ACTIVE 用户可以建立授权 Assignment");
-        }
-        var assignment = assignmentId == null ? null : roleAssignmentMapper.selectById(assignmentId);
-        if (assignment != null && !targetUserId.equals(assignment.getUserId())) {
-            throw new DataException("Assignment 不属于目标用户");
-        }
+        var target = loadTarget(targetUserId);
+        var assignment = loadAssignment(targetUserId, assignmentId);
         long assignmentVersion = assignment == null || assignment.getVersion() == null ? 0L : assignment.getVersion();
         if (assignmentVersion != from.getExpectedVersion()) {
             throw new DataException("Assignment version 已变化，请重新生成授权变更预览");
@@ -353,6 +351,31 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         }
         return new PreparedChange(operatorId, role, assignment, assignmentId, requests,
                 from.getExpectedVersion(), targetSecurityVersion, requestHash);
+    }
+
+    private void validateInput(UUID targetUserId, AuthorizationAssignmentChangeFrom from) {
+        if (targetUserId == null || from == null || from.getExpectedVersion() == null) {
+            throw new DataException("授权变更参数不能为空");
+        }
+    }
+
+    private User loadTarget(UUID targetUserId) {
+        var target = userMapper.selectById(targetUserId);
+        if (target == null) {
+            throw new DataNotExistException("目标用户不存在");
+        }
+        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
+            throw new DataException("只有 ACTIVE 用户可以建立授权 Assignment");
+        }
+        return target;
+    }
+
+    private RoleAssignment loadAssignment(UUID targetUserId, UUID assignmentId) {
+        var assignment = assignmentId == null ? null : roleAssignmentMapper.selectById(assignmentId);
+        if (assignment != null && !targetUserId.equals(assignment.getUserId())) {
+            throw new DataException("Assignment 不属于目标用户");
+        }
+        return assignment;
     }
 
     /**
@@ -397,24 +420,33 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
                 .collect(Collectors.toSet());
         var seen = new HashSet<String>();
         var result = new ArrayList<AuthorizationGrantRequest>();
+        var context = new GrantRequestContext(role, permissions, rolePermissionIds, grantableIds, seen);
         for (var boundary : boundaries) {
-            if (!seen.add(boundary.getPermission())) {
-                throw new DataException("同一 Permission 不能重复提交 Boundary");
-            }
-            var permission = permissions.get(boundary.getPermission());
-            if (permission == null || !SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())) {
-                throw new DataNotExistException("Permission 不存在或已停用: " + boundary.getPermission());
-            }
-            if (!rolePermissionIds.contains(permission.getId())) {
-                throw new DataException("目标 Role 未声明 Permission: " + boundary.getPermission());
-            }
-            if (boundary.getGrant() != null && !grantableIds.contains(permission.getId())) {
-                throw new DataException("目标 Role 未声明 GrantablePermission: " + boundary.getPermission());
-            }
-            result.add(new AuthorizationGrantRequest(boundary.getPermission(), toDomainScope(boundary.getAccess()),
-                    boundary.getGrant() == null ? null : toDomainScope(boundary.getGrant()), role.getAuthorityLevel()));
+            result.add(toGrantRequest(boundary, context));
         }
         return List.copyOf(result);
+    }
+
+    private AuthorizationGrantRequest toGrantRequest(AuthorizationBoundaryFrom boundary, GrantRequestContext context) {
+        if (!context.seen().add(boundary.getPermission())) {
+            throw new DataException("同一 Permission 不能重复提交 Boundary");
+        }
+        var permission = context.permissions().get(boundary.getPermission());
+        if (permission == null || !SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())) {
+            throw new DataNotExistException("Permission 不存在或已停用: " + boundary.getPermission());
+        }
+        if (!context.rolePermissionIds().contains(permission.getId())) {
+            throw new DataException("目标 Role 未声明 Permission: " + boundary.getPermission());
+        }
+        if (boundary.getGrant() != null && !context.grantableIds().contains(permission.getId())) {
+            throw new DataException("目标 Role 未声明 GrantablePermission: " + boundary.getPermission());
+        }
+        return new AuthorizationGrantRequest(boundary.getPermission(), toDomainScope(boundary.getAccess()),
+                boundary.getGrant() == null ? null : toDomainScope(boundary.getGrant()), context.role().getAuthorityLevel());
+    }
+
+    private record GrantRequestContext(SecurityRole role, Map<String, Permission> permissions,
+                                       Set<UUID> rolePermissionIds, Set<UUID> grantableIds, Set<String> seen) {
     }
 
     /**
@@ -536,34 +568,37 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
      * 更新或推进目标状态（{@code recordAssignmentEvents}）。
      */
     private void recordAssignmentEvents(PreparedChange prepared, UUID targetUserId, UUID assignmentId) {
-        appendAudit(prepared.assignment() == null ? "ROLE_ASSIGNMENT_CREATED" : "ROLE_ASSIGNMENT_UPDATED",
+        appendAudit(new AuditInput(prepared.assignment() == null ? "ROLE_ASSIGNMENT_CREATED" : "ROLE_ASSIGNMENT_UPDATED",
                 prepared.operatorId(), targetUserId, Map.of("assignmentId", assignmentId.toString()),
-                Map.of("roleId", prepared.role().getId().toString(), "state", SecurityAuthorizationState.ACTIVE.name()), null);
+                Map.of("roleId", prepared.role().getId().toString(), "state", SecurityAuthorizationState.ACTIVE.name()), null));
         if (!prepared.requests().isEmpty()) {
-            appendAudit("ASSIGNMENT_PERMISSION_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
+            appendAudit(new AuditInput("ASSIGNMENT_PERMISSION_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
                     Map.of("assignmentId", assignmentId.toString()),
-                    Map.of("permissionCount", prepared.requests().size()), null);
+                    Map.of("permissionCount", prepared.requests().size()), null));
         }
         if (prepared.requests().stream().anyMatch(request -> request.grantScope() != null)) {
-            appendAudit("ASSIGNMENT_GRANT_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
+            appendAudit(new AuditInput("ASSIGNMENT_GRANT_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
                     Map.of("assignmentId", assignmentId.toString()),
                     Map.of("grantablePermissionCount", prepared.requests()
                             .stream()
                             .filter(request -> request.grantScope() != null)
                             .count()),
-                    null);
+                    null));
         }
     }
 
     /**
      * 更新或推进目标状态（{@code appendAudit}）。
      */
-    private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
-                             Map<String, Object> after, String reason) {
-        var event = auditRecordFactory.create(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditRecord.Result.SUCCEEDED,
+    private void appendAudit(AuditInput input) {
+        var event = auditRecordFactory.create(null, input.eventType(), input.operatorId(), input.targetId(), null, null, null,
+                input.before(), input.after(), input.reason(), null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         auditService.record(event);
+    }
+
+    private record AuditInput(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                              Map<String, Object> after, String reason) {
     }
 
     /**

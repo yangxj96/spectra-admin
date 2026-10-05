@@ -104,13 +104,6 @@ public class NotificationModuleProperties {
     }
 
     /**
-     * 转换、解析或规范化数据（{@code normalize}）。
-     */
-    private static String normalize(String value) {
-        return value == null ? "" : value.trim();
-    }
-
-    /**
      * 转换、解析或规范化数据（{@code normalizePrefixes}）。
      */
     private static List<String> normalizePrefixes(List<String> values) {

@@ -93,10 +93,10 @@ public final class AuthenticationWebUtils {
         if (!isWebClient(clientType) || StrUtils.isBlank(refreshToken)) {
             return;
         }
-        addCookie(response, securityProperties, securityProperties.getRefreshCookieName(), refreshToken, true,
-                securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire());
-        addCookie(response, securityProperties, securityProperties.getCsrfCookieName(), TokenDigestService.generateToken(),
-                false, securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire());
+        addCookie(new CookieInput(response, securityProperties, securityProperties.getRefreshCookieName(), refreshToken, true,
+                securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire()));
+        addCookie(new CookieInput(response, securityProperties, securityProperties.getCsrfCookieName(), TokenDigestService.generateToken(),
+                false, securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire()));
     }
 
     /**
@@ -106,10 +106,10 @@ public final class AuthenticationWebUtils {
      * @param securityProperties 用于确定要清除的刷新令牌和 CSRF Cookie 名称及属性的安全配置。
      */
     public static void clearWebCookies(HttpServletResponse response, SecurityProperties securityProperties) {
-        addCookie(response, securityProperties, securityProperties.getRefreshCookieName(), "", true,
-                securityProperties.getRefreshCookieSameSite(), 0);
-        addCookie(response, securityProperties, securityProperties.getCsrfCookieName(), "", false,
-                securityProperties.getRefreshCookieSameSite(), 0);
+        addCookie(new CookieInput(response, securityProperties, securityProperties.getRefreshCookieName(), "", true,
+                securityProperties.getRefreshCookieSameSite(), 0));
+        addCookie(new CookieInput(response, securityProperties, securityProperties.getCsrfCookieName(), "", false,
+                securityProperties.getRefreshCookieSameSite(), 0));
     }
 
     /**
@@ -152,15 +152,18 @@ public final class AuthenticationWebUtils {
     /**
      * 处理身份认证对象Web相关数据。
      */
-    private static void addCookie(HttpServletResponse response, SecurityProperties securityProperties, String name,
-                                  String value, boolean httpOnly, String sameSite, long maxAgeSeconds) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
-                .httpOnly(httpOnly)
-                .secure(securityProperties.isRefreshCookieSecure())
-                .path(securityProperties.getRefreshCookiePath())
-                .sameSite(sameSite)
-                .maxAge(Duration.ofSeconds(maxAgeSeconds))
+    private static void addCookie(CookieInput input) {
+        ResponseCookie cookie = ResponseCookie.from(input.name(), input.value())
+                .httpOnly(input.httpOnly())
+                .secure(input.securityProperties().isRefreshCookieSecure())
+                .path(input.securityProperties().getRefreshCookiePath())
+                .sameSite(input.sameSite())
+                .maxAge(Duration.ofSeconds(input.maxAgeSeconds()))
                 .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        input.response().addHeader("Set-Cookie", cookie.toString());
+    }
+
+    private record CookieInput(HttpServletResponse response, SecurityProperties securityProperties, String name,
+                               String value, boolean httpOnly, String sameSite, long maxAgeSeconds) {
     }
 }

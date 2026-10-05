@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 系统配置Service层默认实现
@@ -75,41 +76,63 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     @Override
     @Transactional
     public void modifyBatch(ConfiguredBatchFrom params) {
+        validateBatch(params);
+        var settings = loadBatchSettings(params);
+        saveBatchSettings(params, settings);
+    }
+
+    private void validateBatch(ConfiguredBatchFrom params) {
         if (params == null || params.getCategory() == null || params.getItems() == null || params.getItems().isEmpty()) {
             throw new DataException("系统配置表单不能为空");
         }
+    }
 
+    private List<Configured> loadBatchSettings(ConfiguredBatchFrom params) {
         var ids = new HashSet<java.util.UUID>();
         var settings = new ArrayList<Configured>();
         for (ConfiguredBatchItemFrom item : params.getItems()) {
-            if (item == null || item.getId() == null || item.getValue() == null || !ids.add(item.getId())) {
-                throw new DataException("系统配置表单项无效或重复");
-            }
+            validateBatchItem(item, ids);
             var setting = this.getById(item.getId());
-            if (setting == null) {
-                throw new DataNotExistException("系统配置不存在");
-            }
-            if (ConfiguredCategory.fromKey(setting.getKey()) != params.getCategory()
-                    || ConfiguredCategory.isSystemManagedKey(setting.getKey())) {
-                throw new DataException("配置项不属于当前分类或不允许修改");
-            }
-            if (setting.getType() == ConfiguredValueType.SECRET && StrUtils.isNotBlank(item.getValue())) {
-                try {
-                    securityPasswordPolicyProvider.current().assertAccepts(item.getValue());
-                } catch (IllegalArgumentException exception) {
-                    throw new DataException("秘密配置不符合当前密码策略", exception);
-                }
-            }
+            validateSetting(setting, params.getCategory());
+            validateSecret(item, setting);
             settings.add(setting);
         }
+        return settings;
+    }
 
+    private void validateBatchItem(ConfiguredBatchItemFrom item, Set<java.util.UUID> ids) {
+        if (item == null || item.getId() == null || item.getValue() == null || !ids.add(item.getId())) {
+            throw new DataException("系统配置表单项无效或重复");
+        }
+    }
+
+    private void validateSetting(Configured setting, ConfiguredCategory category) {
+        if (setting == null) {
+            throw new DataNotExistException("系统配置不存在");
+        }
+        if (ConfiguredCategory.fromKey(setting.getKey()) != category || ConfiguredCategory.isSystemManagedKey(setting.getKey())) {
+            throw new DataException("配置项不属于当前分类或不允许修改");
+        }
+    }
+
+    private void validateSecret(ConfiguredBatchItemFrom item, Configured setting) {
+        if (setting.getType() != ConfiguredValueType.SECRET || StrUtils.isBlank(item.getValue())) {
+            return;
+        }
+        try {
+            securityPasswordPolicyProvider.current().assertAccepts(item.getValue());
+        } catch (IllegalArgumentException exception) {
+            throw new DataException("秘密配置不符合当前密码策略", exception);
+        }
+    }
+
+    private void saveBatchSettings(ConfiguredBatchFrom params, List<Configured> settings) {
         for (int index = 0; index < settings.size(); index++) {
             var setting = settings.get(index);
             var item = params.getItems().get(index);
             if (setting.getType() != ConfiguredValueType.SECRET || StrUtils.isNotBlank(item.getValue())) {
                 setting.setValue(setting.getType() == ConfiguredValueType.SECRET
-                        ? passwordEncoder.encode(item.getValue())
-                        : item.getValue());
+                        ? passwordEncoder.encode(item.getValue()) : item.getValue());
             }
             setting.setRemarks(item.getRemarks());
             if (!this.updateById(setting)) {
@@ -121,7 +144,7 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     @Override
     @Transactional
     public void upsert(String key, String value, ConfiguredValueType type, String remarks) {
-        upsertInternal(key, value, type, null, remarks, false);
+        upsertInternal(new UpsertRequest(key, value, type, null, remarks, false));
     }
 
     @Override
@@ -130,31 +153,34 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
         if (type != ConfiguredValueType.SELECT || StrUtils.isBlank(dictCode)) {
             throw new DataException("SELECT 配置必须指定字典编码");
         }
-        upsertInternal(key, value, type, dictCode, remarks, true);
+        upsertInternal(new UpsertRequest(key, value, type, dictCode, remarks, true));
     }
 
-    private void upsertInternal(String key, String value, ConfiguredValueType type, String dictCode, String remarks,
-                                boolean updateDictCode) {
-        var existing = this.getOne(new LambdaQueryWrapper<Configured>().eq(Configured::getKey, key));
+    private void upsertInternal(UpsertRequest request) {
+        var existing = this.getOne(new LambdaQueryWrapper<Configured>().eq(Configured::getKey, request.key()));
         if (existing != null) {
-            existing.setValue(value);
-            existing.setType(type);
-            existing.setRemarks(remarks);
-            if (updateDictCode) {
-                existing.setDictCode(dictCode);
+            existing.setValue(request.value());
+            existing.setType(request.type());
+            existing.setRemarks(request.remarks());
+            if (request.updateDictCode()) {
+                existing.setDictCode(request.dictCode());
             }
             this.updateById(existing);
         } else {
             var entity = new Configured();
-            entity.setKey(key);
-            entity.setValue(value);
-            entity.setType(type);
-            if (updateDictCode) {
-                entity.setDictCode(dictCode);
+            entity.setKey(request.key());
+            entity.setValue(request.value());
+            entity.setType(request.type());
+            if (request.updateDictCode()) {
+                entity.setDictCode(request.dictCode());
             }
-            entity.setRemarks(remarks);
+            entity.setRemarks(request.remarks());
             this.save(entity);
         }
+    }
+
+    private record UpsertRequest(String key, String value, ConfiguredValueType type, String dictCode,
+                                 String remarks, boolean updateDictCode) {
     }
 
     @Override

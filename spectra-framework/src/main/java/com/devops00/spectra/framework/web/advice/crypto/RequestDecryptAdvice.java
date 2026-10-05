@@ -206,14 +206,16 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
         log.debug("{}检测到加密请求（X-Encrypted={}），开始解密", LogPrefix.WEB.p(), hasEncryptedHeader);
 
+        return decryptMessage(inputMessage, parameter, node);
+    }
+
+    private HttpInputMessage decryptMessage(HttpInputMessage inputMessage, MethodParameter parameter, JsonNode node) {
         try {
             long start = System.currentTimeMillis();
             String decryptedJson = decrypt(node, requiresSignature(parameter));
             log.debug("{}请求解密完成, 耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
             return new DecryptedHttpInputMessage(inputMessage, decryptedJson.getBytes(StandardCharsets.UTF_8));
-        } catch (EncryptException exception) {
-            throw exception;
-        } catch (SecurityRedisUnavailableException exception) {
+        } catch (EncryptException | SecurityRedisUnavailableException exception) {
             throw exception;
         } catch (Exception exception) {
             log.warn("请求解密失败，correlationId={}", correlationId());

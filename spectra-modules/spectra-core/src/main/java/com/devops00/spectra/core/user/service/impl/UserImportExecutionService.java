@@ -162,8 +162,8 @@ public class UserImportExecutionService {
             var failed = task.getErrorRows();
             for (int start = 0; start < validRows.size(); start += UserImportExecutionWorker.CHUNK_SIZE) {
                 var end = Math.min(start + UserImportExecutionWorker.CHUNK_SIZE, validRows.size());
-                var chunk = executionWorker.processChunk(taskId, operatorId, validRows.subList(start, end),
-                        task.isSkipExisting(), referenceData, encodedDefaultPasswordHash);
+                var chunk = executionWorker.processChunk(new UserImportExecutionWorker.ChunkRequest(taskId, operatorId,
+                        validRows.subList(start, end), task.isSkipExisting(), referenceData, encodedDefaultPasswordHash));
                 processed += chunk.processedRows();
                 applied = chunk.appliedRows();
                 skipped = chunk.skippedRows();

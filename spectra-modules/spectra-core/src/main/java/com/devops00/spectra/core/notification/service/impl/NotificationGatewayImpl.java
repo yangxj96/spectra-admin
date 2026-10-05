@@ -178,25 +178,13 @@ public class NotificationGatewayImpl implements NotificationGateway {
     @Transactional
     public NotificationReceipt enqueue(NotificationRequest request,
                                        Map<NotificationChannel, UUID> templateVersionIds) {
-        if (!properties.enabled()) {
-            throw new DataSaveException("通知模块未启用");
-        }
-        validate(request);
+        validateEnqueue(request);
         var channels = policy.resolve(request.purpose(), request.channels());
-        var lockedTemplateVersions = templateVersionIds == null
-                ? Map.<NotificationChannel, UUID>of()
-                : Map.copyOf(templateVersionIds);
-        if (!lockedTemplateVersions.isEmpty()
-                && channels.stream().anyMatch(channel -> !lockedTemplateVersions.containsKey(channel))) {
-            throw new DataSaveException("受控发送模板版本未覆盖全部渠道");
-        }
+        var lockedTemplateVersions = lockedTemplateVersions(templateVersionIds, channels);
         var recipients = recipientDirectory.resolve(request.recipientUserIds());
-        var existing = requestMapper.selectOne(new LambdaQueryWrapper<NotificationRequestEntity>()
-                .eq(NotificationRequestEntity::getIdempotencyKey, request.idempotencyKey()));
-        if (existing != null) {
-            var count = taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
-                    .eq(NotificationTaskEntity::getNotificationRequestId, existing.getId()));
-            return new NotificationReceipt(existing.getId(), existing.getStatus(), Math.toIntExact(count), true);
+        var existingReceipt = existingReceipt(request);
+        if (existingReceipt != null) {
+            return existingReceipt;
         }
 
         var externalRequestId = request.requestId() == null ? UUID.randomUUID() : request.requestId();
@@ -219,11 +207,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         entity.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
         entity.setExpiresAt(request.expiresAt());
         entity.setPriority(normalizePriority(request.priority()));
-        var correlationId = RequestCorrelationContext.current().correlationId();
-        if (correlationId == null) {
-            correlationId = RequestCorrelationContext.forTask(null).correlationId();
-        }
-        entity.setTraceId(correlationId);
+        entity.setTraceId(correlationId());
         entity.setId(UuidCreator.getTimeOrderedEpoch());
         if (requestMapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知请求失败");
@@ -239,7 +223,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var templateSnapshot = new LinkedHashMap<String, Object>();
         var targets = collectTargets(request, channels, recipients);
         var renderedTemplates = renderTemplates(request, targets, lockedTemplateVersions, templateSnapshot);
-        var drafts = taskPlanner.plan(request, requestId, now, entity.getCreatedBy(), targets, renderedTemplates);
+        var drafts = taskPlanner.plan(new NotificationTaskBatchPlanner.PlanRequest(request, requestId, now,
+                entity.getCreatedBy(), targets, renderedTemplates));
         var taskCount = persistTasks(request, requestId, drafts);
         requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getId, requestId)
@@ -249,6 +234,38 @@ public class NotificationGatewayImpl implements NotificationGateway {
                         templateSnapshot,
                         "typeHandler=com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"));
         return new NotificationReceipt(requestId, NotificationRequestStatus.ACCEPTED.name(), taskCount, false);
+    }
+
+    private void validateEnqueue(NotificationRequest request) {
+        if (!properties.enabled()) {
+            throw new DataSaveException("通知模块未启用");
+        }
+        validate(request);
+    }
+
+    private Map<NotificationChannel, UUID> lockedTemplateVersions(Map<NotificationChannel, UUID> input,
+                                                                   List<NotificationChannel> channels) {
+        var locked = input == null ? Map.<NotificationChannel, UUID>of() : Map.copyOf(input);
+        if (!locked.isEmpty() && channels.stream().anyMatch(channel -> !locked.containsKey(channel))) {
+            throw new DataSaveException("受控发送模板版本未覆盖全部渠道");
+        }
+        return locked;
+    }
+
+    private NotificationReceipt existingReceipt(NotificationRequest request) {
+        var existing = requestMapper.selectOne(new LambdaQueryWrapper<NotificationRequestEntity>()
+                .eq(NotificationRequestEntity::getIdempotencyKey, request.idempotencyKey()));
+        if (existing == null) {
+            return null;
+        }
+        var count = taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
+                .eq(NotificationTaskEntity::getNotificationRequestId, existing.getId()));
+        return new NotificationReceipt(existing.getId(), existing.getStatus(), Math.toIntExact(count), true);
+    }
+
+    private String correlationId() {
+        var correlationId = RequestCorrelationContext.current().correlationId();
+        return correlationId == null ? RequestCorrelationContext.forTask(null).correlationId() : correlationId;
     }
 
     /**
@@ -442,9 +459,19 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 || !StringUtils.hasText(request.templateGroupCode())) {
             throw new DataSaveException("通知请求参数不完整");
         }
+        validateRecipients(request);
+        validateDirectAddresses(request);
+        validateParameters(request);
+        validateLink(request);
+    }
+
+    private void validateRecipients(NotificationRequest request) {
         if (request.recipientUserIds().stream().anyMatch(Objects::isNull)) {
             throw new DataSaveException("通知收件人无效");
         }
+    }
+
+    private void validateDirectAddresses(NotificationRequest request) {
         for (var directAddress : request.directAddresses()) {
             if (directAddress == null
                     || directAddress.channel() == null
@@ -454,6 +481,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 throw new DataSaveException("通知直接收件地址不合法");
             }
         }
+    }
+
+    private void validateParameters(NotificationRequest request) {
         if (request.parameters()
                 .keySet()
                 .stream()
@@ -461,6 +491,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 .anyMatch(key -> SENSITIVE_KEYS.stream().anyMatch(key::contains))) {
             throw new DataSaveException("通知普通参数不能包含敏感字段");
         }
+    }
+
+    private void validateLink(NotificationRequest request) {
         if (StringUtils.hasText(request.link())
                 && (!request.link().startsWith("/")
                         || request.link().startsWith("//")

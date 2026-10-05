@@ -48,7 +48,7 @@ public interface NotificationPreferenceService {
      * @param enabled      是否启用该功能或通知渠道。
      * @param doNotDisturb 是否开启免打扰策略。
      */
-    void save(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb);
+    void save(PreferenceInput input);
 
     /**
      * 保存带每日免打扰窗口的用途与渠道偏好。
@@ -61,7 +61,9 @@ public interface NotificationPreferenceService {
      * @param doNotDisturbStart 免打扰开始时间。
      * @param doNotDisturbEnd   免打扰结束时间。
      */
-    void save(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
-              Instant doNotDisturbStart, Instant doNotDisturbEnd);
+    /** 保存通知偏好输入。 */
+    record PreferenceInput(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
+                           Instant doNotDisturbStart, Instant doNotDisturbEnd) {
+    }
 
 }

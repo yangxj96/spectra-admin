@@ -78,10 +78,10 @@ public class LocalFileStorageProvider implements FileStorageProvider {
     }
 
     @Override
-    public PartTarget createPartTarget(StorageMultipart multipart, int partNumber, long partSize, String partSha256,
-                                       Instant expiresAt, int attempt) {
-        return new PartTarget("PUT", "/file/uploads/" + multipart.providerUploadId() + "/parts/" + partNumber + "/content",
-                java.util.Map.of("Content-Type", "application/octet-stream", "Content-Length", Long.toString(partSize)), expiresAt, attempt);
+    public PartTarget createPartTarget(FileStorageProvider.PartTargetInput input) {
+        return new PartTarget("PUT", "/file/uploads/" + input.multipart().providerUploadId() + "/parts/" + input.partNumber() + "/content",
+                java.util.Map.of("Content-Type", "application/octet-stream", "Content-Length", Long.toString(input.partSize())),
+                input.expiresAt(), input.attempt());
     }
 
     @Override

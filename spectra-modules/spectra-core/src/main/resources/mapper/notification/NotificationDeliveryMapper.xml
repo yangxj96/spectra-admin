@@ -128,24 +128,24 @@
           JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id
          WHERE d.deleted IS NULL
            AND t.deleted IS NULL
-        <if test="from != null">
-           AND d.created_at &gt;= #{from}
-           AND d.created_at &lt; #{to}
+        <if test="query.from != null">
+           AND d.created_at &gt;= #{query.from}
+           AND d.created_at &lt; #{query.to}
         </if>
-        <if test="requestId != null">
-           AND t.notification_request_id = #{requestId}
+        <if test="query.requestId != null">
+           AND t.notification_request_id = #{query.requestId}
         </if>
-        <if test="taskId != null">
-           AND d.notification_task_id = #{taskId}
+        <if test="query.taskId != null">
+           AND d.notification_task_id = #{query.taskId}
         </if>
-        <if test="recipientUserId != null">
-           AND t.receiver_user_id = #{recipientUserId}
+        <if test="query.recipientUserId != null">
+           AND t.receiver_user_id = #{query.recipientUserId}
         </if>
-        <if test="status != null and status != ''">
-           AND d.result_status = #{status}
+        <if test="query.status != null and query.status != ''">
+           AND d.result_status = #{query.status}
         </if>
-        <if test="channel != null and channel != ''">
-           AND t.channel = #{channel}
+        <if test="query.channel != null and query.channel != ''">
+           AND t.channel = #{query.channel}
         </if>
          ORDER BY d.created_at DESC
     </select>

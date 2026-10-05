@@ -64,6 +64,7 @@ public final class AuditRecordFactory {
         }
         return new AuditRecord(eventId, AuditCategory.SECURITY, eventType, targetId, result, occurredAt,
                 new AuditContext(operatorId, null, correlationId, client, ip, userAgent),
-                auditSanitizer.sanitize(before), auditSanitizer.sanitize(after), sanitizedReason);
+                auditSanitizer.sanitize(before), auditSanitizer.sanitize(after), sanitizedReason,
+                AuditRecord.HttpSummary.empty(), null);
     }
 }

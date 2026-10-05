@@ -88,54 +88,15 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
      */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // 流式响应无法作为单个对象加密，必须交给流式写出链路处理。
-        if (Flux.class.isAssignableFrom(returnType.getParameterType())) {
-            log.debug(LogPrefix.WEB.f("跳过响应加密: 流式返回类型"));
+        if (unsupportedResponse(returnType, converterType))
             return false;
-        }
-
-        // 统一响应和 ResponseEntity 已经表达了完整响应语义，尤其不能加密错误响应。
-        if (R.class.isAssignableFrom(returnType.getParameterType())
-                || ResponseEntity.class.isAssignableFrom(returnType.getParameterType())) {
-            return false;
-        }
-
-        // 二进制响应保持原始字节，否则文件下载内容会被序列化或加密破坏。
-        if (ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)) {
-            log.debug(LogPrefix.WEB.f("跳过响应加密: 字节数组转换器"));
-            return false;
-        }
-
-        // Resource 响应由资源转换器直接写出，不进入 JSON 加密协议。
-        if (ResourceHttpMessageConverter.class.isAssignableFrom(converterType)) {
-            log.debug(LogPrefix.WEB.f("跳过响应加密: Resource 转换器"));
-            return false;
-        }
-
-        if (Resource.class.isAssignableFrom(returnType.getParameterType())) {
-            return false;
-        }
 
         // 方法级注解优先于类级注解；显式关闭时不能被包名兜底规则重新打开。
         Method method = returnType.getMethod();
         if (method != null) {
-            Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
-            if (methodAnno != null) {
-                if (!methodAnno.value() || !methodAnno.response()) {
-                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), methodAnno.value(), methodAnno.response(),
-                            method.getName());
-                }
-                return methodAnno.value() && methodAnno.response() && encryptionConfigured();
-            }
-
-            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
-            if (classAnno != null) {
-                if (!classAnno.value() || !classAnno.response()) {
-                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), classAnno.value(), classAnno.response(),
-                            method.getDeclaringClass().getSimpleName());
-                }
-                return classAnno.value() && classAnno.response() && encryptionConfigured();
-            }
+            var annotated = annotationDecision(method);
+            if (annotated != null)
+                return annotated;
         }
 
         if (!encryptionConfigured()) {
@@ -150,6 +111,26 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             log.debug("{}跳过响应加密: 包名不匹配 {}", LogPrefix.WEB.p(), declaringClass.getPackageName());
         }
         return matched;
+    }
+
+    private boolean unsupportedResponse(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        var type = returnType.getParameterType();
+        if (Flux.class.isAssignableFrom(type)
+                || R.class.isAssignableFrom(type)
+                || ResponseEntity.class.isAssignableFrom(type)
+                || Resource.class.isAssignableFrom(type))
+            return true;
+        return ByteArrayHttpMessageConverter.class.isAssignableFrom(converterType)
+                || ResourceHttpMessageConverter.class.isAssignableFrom(converterType);
+    }
+
+    private Boolean annotationDecision(Method method) {
+        var annotation = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
+        if (annotation == null)
+            annotation = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
+        if (annotation == null)
+            return null;
+        return annotation.value() && annotation.response() && encryptionConfigured();
     }
 
     /**

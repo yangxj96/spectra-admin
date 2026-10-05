@@ -34,5 +34,10 @@ public interface UserOnlineConverter {
     /**
      * Redis 会话数据转在线用户视图对象。
      */
-    UserOnlineVO toVO(String userId, String username, String clientType, String ip, String sessionId, Long loginTime);
+    UserOnlineVO toVO(UserOnlineInput input);
+
+    /** 在线用户转换输入。 */
+    record UserOnlineInput(String userId, String username, String clientType, String ip,
+                           String sessionId, Long loginTime) {
+    }
 }

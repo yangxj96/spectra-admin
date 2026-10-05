@@ -56,6 +56,7 @@ public class JdbcAuditEventWriter {
      *
      * @param record 脱敏后的统一审计记录
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public void append(AuditRecord record) {
         if (record == null) {
             throw new AuditService.AuditRecordingException("统一审计记录不能为空");
@@ -102,6 +103,7 @@ public class JdbcAuditEventWriter {
     /**
      * 检查统一表可查询且当前数据库角色拥有 INSERT 权限。
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public void assertAvailable() {
         try {
             jdbcTemplate.queryForObject("SELECT EXISTS (SELECT 1 FROM " + TABLE + " WHERE false)", Boolean.class);

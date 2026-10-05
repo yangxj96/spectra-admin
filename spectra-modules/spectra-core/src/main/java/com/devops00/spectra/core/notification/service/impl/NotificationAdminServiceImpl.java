@@ -305,20 +305,34 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
      * 解析管理分页时间范围；未传条件时默认查询最近 31 天。
      */
     private QueryRange resolveQueryRange(NotificationAdminQueryFrom params) {
-        if (params != null
-                && (params.getRequestId() != null || params.getTaskId() != null)
-                && !StringUtils.hasText(params.getStartTime())
-                && !StringUtils.hasText(params.getEndTime())) {
+        if (isDirectLookup(params)) {
             return new QueryRange(null, null);
         }
-        var parsedTo = params != null && StringUtils.hasText(params.getEndTime()) ? timeMapper.toInstant(params.getEndTime()) : null;
-        var to = parsedTo == null ? Instant.now() : parsedTo;
-        var parsedFrom = params != null && StringUtils.hasText(params.getStartTime()) ? timeMapper.toInstant(params.getStartTime()) : null;
-        var from = parsedFrom == null ? to.minus(MAX_QUERY_RANGE) : parsedFrom;
+        var to = parseEnd(params);
+        var from = parseStart(params, to);
         if (!from.isBefore(to) || Duration.between(from, to).compareTo(MAX_QUERY_RANGE) > 0) {
             throw new DataSaveException("通知管理查询时间范围必须在 31 天以内");
         }
         return new QueryRange(from, to);
+    }
+
+    private boolean isDirectLookup(NotificationAdminQueryFrom params) {
+        return params != null
+                && (params.getRequestId() != null || params.getTaskId() != null)
+                && !StringUtils.hasText(params.getStartTime())
+                && !StringUtils.hasText(params.getEndTime());
+    }
+
+    private Instant parseEnd(NotificationAdminQueryFrom params) {
+        return params != null && StringUtils.hasText(params.getEndTime())
+                ? timeMapper.toInstant(params.getEndTime())
+                : Instant.now();
+    }
+
+    private Instant parseStart(NotificationAdminQueryFrom params, Instant to) {
+        return params != null && StringUtils.hasText(params.getStartTime())
+                ? timeMapper.toInstant(params.getStartTime())
+                : to.minus(MAX_QUERY_RANGE);
     }
 
     /**
@@ -407,10 +421,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
         var range = resolveQueryRange(params);
-        return converter.toDeliveryPage(deliveryMapper.selectAdminPage(page.toPage(), range.from(), range.to(),
-                params == null ? null : params.getRequestId(), params == null ? null : params.getTaskId(),
-                params == null ? null : params.getRecipientUserId(), params == null ? null : params.getStatus(),
-                params == null ? null : params.getChannel()));
+        return converter.toDeliveryPage(deliveryMapper.selectAdminPage(page.toPage(),
+                new NotificationDeliveryMapper.DeliveryAdminPageQuery(range.from(), range.to(),
+                        params == null ? null : params.getRequestId(), params == null ? null : params.getTaskId(),
+                        params == null ? null : params.getRecipientUserId(), params == null ? null : params.getStatus(),
+                        params == null ? null : params.getChannel())));
     }
 
     /**

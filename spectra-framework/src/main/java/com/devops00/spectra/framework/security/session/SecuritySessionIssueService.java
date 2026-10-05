@@ -301,27 +301,25 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         if (userAgent == null || userAgent.isBlank()) {
             return ClientType.WEB;
         }
+        return classifyUserAgent(userAgent);
+    }
+
+    private ClientType classifyUserAgent(String userAgent) {
         String lower = userAgent.toLowerCase();
-        if (lower.contains("miniprogram")
-                || lower.contains("wechat")
-                || lower.contains("alipay")
-                || lower.contains("bytedance")
-                || lower.contains("toutiao")) {
+        if (containsAny(lower, "miniprogram", "wechat", "alipay", "bytedance", "toutiao"))
             return ClientType.MINI;
-        }
-        if (lower.contains("uni-app")
-                || lower.contains("uniapp")
-                || lower.contains("html5plus")
-                || lower.contains("uts")
-                || lower.contains("okhttp")
-                || lower.contains("retrofit")
-                || lower.contains("af-android-sdk")
-                || lower.contains("alibc")
-                || lower.contains("flutter")
-                || lower.contains("reactnative")) {
+        if (containsAny(lower, "uni-app", "uniapp", "html5plus", "uts", "okhttp", "retrofit", "af-android-sdk",
+                "alibc", "flutter", "reactnative"))
             return ClientType.APP;
-        }
         return ClientType.WEB;
+    }
+
+    private boolean containsAny(String value, String... fragments) {
+        for (String fragment : fragments) {
+            if (value.contains(fragment))
+                return true;
+        }
+        return false;
     }
 
     /**

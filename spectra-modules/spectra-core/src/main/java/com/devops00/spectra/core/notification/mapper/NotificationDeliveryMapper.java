@@ -52,13 +52,12 @@ public interface NotificationDeliveryMapper extends BaseMapper<NotificationDeliv
      */
     @InterceptorIgnore(dataPermission = "true")
     Page<NotificationDeliveryEntity> selectAdminPage(Page<NotificationDeliveryEntity> page,
-                                                     @Param("from") Instant from,
-                                                     @Param("to") Instant to,
-                                                     @Param("requestId") UUID requestId,
-                                                     @Param("taskId") UUID taskId,
-                                                     @Param("recipientUserId") UUID recipientUserId,
-                                                     @Param("status") String status,
-                                                     @Param("channel") String channel);
+                                                     @Param("query") DeliveryAdminPageQuery query);
+
+    /** 投递记录管理分页筛选条件。 */
+    record DeliveryAdminPageQuery(Instant from, Instant to, UUID requestId, UUID taskId,
+                                  UUID recipientUserId, String status, String channel) {
+    }
 
     /**
      * 查询时间窗口内按小时聚合的投递趋势；聚合 SQL 不返回正文、地址或供应商响应。

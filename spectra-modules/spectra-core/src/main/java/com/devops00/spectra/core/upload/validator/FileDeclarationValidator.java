@@ -37,18 +37,30 @@ import java.util.Locale;
 public class FileDeclarationValidator {
 
     public void validate(CreateUploadRequest request, FileType type) {
+        validateType(type);
+        validateSize(request, type);
+        validateFormats(request, type);
+    }
+
+    private void validateType(FileType type) {
         if (type == null || !Boolean.TRUE.equals(type.getEnabled()) || !Boolean.TRUE.equals(type.getUploadEnabled())) {
             throw invalid("file type is not enabled");
         }
         if (Boolean.TRUE.equals(type.getDangerous())) {
             throw invalid("dangerous file type is not allowed");
         }
+    }
+
+    private void validateSize(CreateUploadRequest request, FileType type) {
         if (type.getMaxSize() != null && request.getSize() > type.getMaxSize()) {
             throw invalid("file exceeds the configured type limit");
         }
         if (request.getSize() < 0) {
             throw invalid("file size cannot be negative");
         }
+    }
+
+    private void validateFormats(CreateUploadRequest request, FileType type) {
         String extension = extension(request.getOriginalName());
         if (!containsText(type.getAllowedExtensions(), extension)) {
             throw invalid("file extension is not allowed");

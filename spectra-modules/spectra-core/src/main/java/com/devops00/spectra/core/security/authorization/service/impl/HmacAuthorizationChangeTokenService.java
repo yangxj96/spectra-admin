@@ -79,6 +79,11 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
     @Override
     public AuthorizationChangeToken verify(String encodedToken) {
         requireSecret();
+        String payload = verifyParts(encodedToken);
+        return parseToken(payload);
+    }
+
+    private String verifyParts(String encodedToken) {
         if (encodedToken == null || encodedToken.isBlank()) {
             throw new IllegalArgumentException("授权变更 token 不能为空");
         }
@@ -91,6 +96,10 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
         if (!MessageDigest.isEqual(sign(payload), actualSignature)) {
             throw new IllegalArgumentException("授权变更 token 签名无效");
         }
+        return payload;
+    }
+
+    private AuthorizationChangeToken parseToken(String payload) {
         try {
             String[] values = payload.split("\\|", -1);
             if (values.length != 9 || !"1".equals(values[0])) {

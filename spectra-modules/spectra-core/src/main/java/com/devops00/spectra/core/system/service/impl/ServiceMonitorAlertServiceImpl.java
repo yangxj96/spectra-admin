@@ -148,27 +148,37 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
             return null;
         }
         if (metric.isNumeric()) {
-            if ((metric == ServiceMonitorAlertMetric.ERROR_RATE || metric == ServiceMonitorAlertMetric.P95_RESPONSE_MS)
-                    && !sample.isRequestMetricsAvailable()) {
-                return null;
-            }
-            var value = switch (metric) {
-                case CPU_USAGE -> sample.getCpuUsage();
-                case SYSTEM_MEMORY_USAGE -> sample.getSystemMemoryUsage();
-                case JVM_HEAP_USAGE -> sample.getJvmHeapUsage();
-                case ERROR_RATE -> sample.getErrorRate();
-                case P95_RESPONSE_MS -> sample.getP95ResponseMs();
-                default -> 0D;
-            };
-            var violated = compare(value, rule.getThresholdValue(), rule.getOperatorCode());
-            var current = String.format("%.2f", value);
-            var threshold = rule.getThresholdValue() == null ? "未设置" : String.format("%.2f", rule.getThresholdValue());
-            var unit = metricUnit(metric);
-            var thresholdDisplay = "未设置".equals(threshold) ? threshold : threshold + unit;
-            return new Observation(violated, current + unit, thresholdDisplay, null,
-                    metric.getLabel() + (violated ? "超过阈值" : "已恢复") + "：当前 " + current + unit + "，阈值 "
-                            + thresholdDisplay);
+            return numericObservation(rule, sample, metric);
         }
+        return dependencyObservation(rule, sample, metric);
+    }
+
+    private Observation numericObservation(ServiceMonitorAlertRule rule, ServiceMonitorSample sample,
+                                           ServiceMonitorAlertMetric metric) {
+        if ((metric == ServiceMonitorAlertMetric.ERROR_RATE || metric == ServiceMonitorAlertMetric.P95_RESPONSE_MS)
+                && !sample.isRequestMetricsAvailable()) {
+            return null;
+        }
+        var value = switch (metric) {
+            case CPU_USAGE -> sample.getCpuUsage();
+            case SYSTEM_MEMORY_USAGE -> sample.getSystemMemoryUsage();
+            case JVM_HEAP_USAGE -> sample.getJvmHeapUsage();
+            case ERROR_RATE -> sample.getErrorRate();
+            case P95_RESPONSE_MS -> sample.getP95ResponseMs();
+            default -> 0D;
+        };
+        var violated = compare(value, rule.getThresholdValue(), rule.getOperatorCode());
+        var current = String.format("%.2f", value);
+        var threshold = rule.getThresholdValue() == null ? "未设置" : String.format("%.2f", rule.getThresholdValue());
+        var unit = metricUnit(metric);
+        var thresholdDisplay = "未设置".equals(threshold) ? threshold : threshold + unit;
+        return new Observation(violated, current + unit, thresholdDisplay, null,
+                metric.getLabel() + (violated ? "超过阈值" : "已恢复") + "：当前 " + current + unit + "，阈值 "
+                        + thresholdDisplay);
+    }
+
+    private Observation dependencyObservation(ServiceMonitorAlertRule rule, ServiceMonitorSample sample,
+                                              ServiceMonitorAlertMetric metric) {
         var current = dependencyStatus(sample, metric);
         if (current == null) {
             return null;
@@ -401,6 +411,16 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         }
         validateRule(from, rule.getMetricCode());
         var wasEnabled = Boolean.TRUE.equals(rule.getEnabled());
+        applyRuleChanges(rule, from);
+        if (ruleMapper.updateById(rule) != 1) {
+            throw new DataException("服务监控告警规则保存失败，请刷新后重试");
+        }
+        if (wasEnabled && !Boolean.TRUE.equals(rule.getEnabled())) {
+            recoverActiveEventWhenRuleDisabled(rule.getId());
+        }
+    }
+
+    private static void applyRuleChanges(ServiceMonitorAlertRule rule, ServiceMonitorAlertRuleFrom from) {
         rule.setVersion(from.getExpectedVersion());
         if (from.getName() != null)
             rule.setName(from.getName().trim());
@@ -417,12 +437,6 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (from.getCooldownSeconds() != null)
             rule.setCooldownSeconds(from.getCooldownSeconds());
         rule.setRemark(from.getRemark());
-        if (ruleMapper.updateById(rule) != 1) {
-            throw new DataException("服务监控告警规则保存失败，请刷新后重试");
-        }
-        if (wasEnabled && !Boolean.TRUE.equals(rule.getEnabled())) {
-            recoverActiveEventWhenRuleDisabled(rule.getId());
-        }
     }
 
     /**
@@ -444,8 +458,15 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
      */
     private static void validateRule(ServiceMonitorAlertRuleFrom from, String metricCode) {
         var metric = ServiceMonitorAlertMetric.fromCode(metricCode);
-        if (metric == null)
+        if (metric == null) {
             throw new DataException("告警指标无效");
+        }
+        var operator = validateCommon(from);
+        validateMetric(from, metric, operator);
+        validateLimits(from);
+    }
+
+    private static String validateCommon(ServiceMonitorAlertRuleFrom from) {
         if (from.getSeverity() != null
                 && !Set.of(ServiceMonitorAlertSeverity.WARNING.name(), ServiceMonitorAlertSeverity.CRITICAL.name())
                         .contains(from.getSeverity().trim().toUpperCase())) {
@@ -455,6 +476,11 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (!ServiceMonitorAlertOperator.contains(operator)) {
             throw new DataException("告警比较方式无效");
         }
+        return operator;
+    }
+
+    private static void validateMetric(ServiceMonitorAlertRuleFrom from, ServiceMonitorAlertMetric metric,
+                                       String operator) {
         if (metric.isNumeric() && from.getThresholdValue() == null) {
             throw new DataException("数值告警必须设置阈值");
         }
@@ -466,6 +492,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 throw new DataException("状态告警只支持等于或不等于");
             }
         }
+    }
+
+    private static void validateLimits(ServiceMonitorAlertRuleFrom from) {
         if (from.getConsecutiveFailures() != null && (from.getConsecutiveFailures() < 1 || from.getConsecutiveFailures() > 10)) {
             throw new DataException("连续触发次数必须在 1 到 10 之间");
         }

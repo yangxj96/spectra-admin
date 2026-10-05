@@ -46,6 +46,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -115,7 +116,7 @@ public class AuditAspect {
                     throw new AuditedInvocationException(failure);
                 }
                 if (descriptor != null) {
-                    submit(point, method, descriptor, result, null, startedAt);
+                    submit(new AuditRecordInput(point, method, descriptor, result, null, startedAt));
                 }
                 return result;
             }));
@@ -136,7 +137,7 @@ public class AuditAspect {
                                             AuditDescriptor descriptor,
                                             Throwable failure,
                                             long startedAt) {
-        AuditRecord record = createRecord(point, method, descriptor, null, failure, startedAt);
+        AuditRecord record = createRecord(new AuditRecordInput(point, method, descriptor, null, failure, startedAt));
         if (TransactionSynchronizationManager.isSynchronizationActive()
                 && TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -157,7 +158,7 @@ public class AuditAspect {
         try {
             failureRecorder.record(record);
         } catch (RuntimeException recordingFailure) {
-            if (recordingFailure != failure) {
+            if (!Objects.equals(recordingFailure, failure)) {
                 failure.addSuppressed(recordingFailure);
             }
             log.error("{}失败审计写入失败: category={}, eventType={}, cause={}",
@@ -238,18 +239,13 @@ public class AuditAspect {
     /**
      * 处理审计相关数据。
      */
-    private void submit(ProceedingJoinPoint point,
-                        Method method,
-                        AuditDescriptor descriptor,
-                        Object result,
-                        Throwable failure,
-                        long startedAt) {
-        AuditRecord record = createRecord(point, method, descriptor, result, failure, startedAt);
+    private void submit(AuditRecordInput input) {
+        AuditRecord record = createRecord(input);
         try {
             auditService.record(record);
         } catch (AuditService.AuditRecordingException exception) {
             log.error("{}审计记录提交失败，业务事务将回滚: category={}, eventType={}",
-                    LogPrefix.LOG.p(), descriptor.category(), descriptor.eventType(), exception);
+                    LogPrefix.LOG.p(), input.descriptor().category(), input.descriptor().eventType(), exception);
             throw exception;
         }
     }
@@ -257,12 +253,12 @@ public class AuditAspect {
     /**
      * 构建记录。
      */
-    private AuditRecord createRecord(ProceedingJoinPoint point,
-                                     Method method,
-                                     AuditDescriptor descriptor,
-                                     Object result,
-                                     Throwable failure,
-                                     long startedAt) {
+    private AuditRecord createRecord(AuditRecordInput input) {
+        var point = input.point();
+        var descriptor = input.descriptor();
+        var result = input.result();
+        var failure = input.failure();
+        var startedAt = input.startedAt();
         RequestMetadata request = requestMetadata();
         Map<String, Object> before = new LinkedHashMap<>();
         if (descriptor.captureArguments()) {
@@ -306,6 +302,10 @@ public class AuditAspect {
                 descriptor.reason(),
                 new AuditRecord.HttpSummary(request.method(), request.url(), request.status(), durationMs),
                 failureDetails);
+    }
+
+    private record AuditRecordInput(ProceedingJoinPoint point, Method method, AuditDescriptor descriptor,
+                                    Object result, Throwable failure, long startedAt) {
     }
 
     /**

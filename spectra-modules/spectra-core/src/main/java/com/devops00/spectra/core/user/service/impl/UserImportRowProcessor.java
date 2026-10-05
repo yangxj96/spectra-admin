@@ -96,12 +96,9 @@ public class UserImportRowProcessor {
      * @return 当前导入行创建或跳过后的结果。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ProcessResult process(UserImportRow row, UUID operatorId, boolean skipExisting,
-                                 Map<String, UUID> departmentIds, Map<String, AuthorizationProfileVO> profiles,
-                                 List<Department> departments,
-                                 String encodedDefaultPasswordHash) {
-        var result = processInternal(row, operatorId, skipExisting, departmentIds, profiles, departments,
-                encodedDefaultPasswordHash);
+    public ProcessResult process(ProcessRequest request) {
+        var result = processInternal(request);
+        var row = request.row();
         row.setUserId(result.userId());
         row.setState(result.skipped() ? UserImportRowState.SKIPPED.name() : UserImportRowState.APPLIED.name());
         if (rowMapper.updateById(row) != 1) {
@@ -121,11 +118,12 @@ public class UserImportRowProcessor {
      * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希；空值时由用户服务读取当前设置。
      * @return 当前导入行创建或跳过后的结果。
      */
-    private ProcessResult processInternal(UserImportRow row, UUID operatorId, boolean skipExisting,
-                                          Map<String, UUID> departmentIds,
-                                          Map<String, AuthorizationProfileVO> profiles,
-                                          List<Department> departments,
-                                          String encodedDefaultPasswordHash) {
+    private ProcessResult processInternal(ProcessRequest request) {
+        var row = request.row();
+        var operatorId = request.operatorId();
+        var departmentIds = request.departmentIds();
+        var profiles = request.profiles();
+        var departments = request.departments();
         var source = toSource(row.getNormalizedData());
         var departmentId = departmentIds.get(source.getDepartmentCode());
         if (departmentId == null) {
@@ -144,7 +142,7 @@ public class UserImportRowProcessor {
         }
         var existing = findExisting(source);
         if (existing != null) {
-            if (skipExisting) {
+            if (request.skipExisting()) {
                 return new ProcessResult(existing.getId(), true);
             }
             throw new DataException("用户已存在: " + source.getEmployeeNo());
@@ -164,12 +162,17 @@ public class UserImportRowProcessor {
         user.setPrimaryDepartmentId(departmentId);
         user.setAssociatedDepartmentIds(associatedDepartmentIds);
         user.setStatus(UserStatus.ACTIVE);
-        UserCreatedVO created = encodedDefaultPasswordHash == null
+        UserCreatedVO created = request.encodedDefaultPasswordHash() == null
                 ? userService.create(user)
-                : userService.createWithDefaultPasswordHash(user, encodedDefaultPasswordHash);
+                : userService.createWithDefaultPasswordHash(user, request.encodedDefaultPasswordHash());
         membershipService.replace(created.getId(), departmentId, associatedDepartmentIds, operatorId);
         applyProfile(created.getId(), profile, departmentIds);
         return new ProcessResult(created.getId(), false);
+    }
+
+    public record ProcessRequest(UserImportRow row, UUID operatorId, boolean skipExisting,
+                                 Map<String, UUID> departmentIds, Map<String, AuthorizationProfileVO> profiles,
+                                 List<Department> departments, String encodedDefaultPasswordHash) {
     }
 
     /**

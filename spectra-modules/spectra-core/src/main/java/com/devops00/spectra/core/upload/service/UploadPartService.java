@@ -98,8 +98,8 @@ public class UploadPartService {
             throw conflict("分片上传目标已被并发修改");
         }
         FileStorageProvider provider = providerRegistry.require(session.getStorageProvider());
-        PartTarget target = provider.createPartTarget(toMultipart(session), partNumber, request.getPartSize(), request.getPartSha256(),
-                Instant.now().plus(properties.getPresignTtl()), attempt);
+        PartTarget target = provider.createPartTarget(new FileStorageProvider.PartTargetInput(toMultipart(session), partNumber,
+                request.getPartSize(), request.getPartSha256(), Instant.now().plus(properties.getPresignTtl()), attempt));
         return fileUploadConverter.toPartTargetVO(target);
     }
 

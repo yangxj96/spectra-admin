@@ -71,7 +71,8 @@ public class NotificationPreferenceController {
     @PreAuthorize("isAuthenticated()")
     public void save(@RequestParam String purpose, @RequestParam String channel, @RequestParam boolean enabled,
                      @RequestParam(defaultValue = "false") boolean doNotDisturb) {
-        service.save(currentUserId(), purpose, channel, enabled, doNotDisturb);
+        service.save(new NotificationPreferenceService.PreferenceInput(currentUserId(), purpose, channel, enabled,
+                doNotDisturb, null, null));
     }
 
     /**

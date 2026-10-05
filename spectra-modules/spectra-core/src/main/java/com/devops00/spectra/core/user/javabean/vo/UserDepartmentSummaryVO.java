@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.javabean.vo;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -27,5 +28,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2026/09/27
  */
-public record UserDepartmentSummaryVO(UUID id, String name) {
+public record UserDepartmentSummaryVO(UUID id, String name) implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 }

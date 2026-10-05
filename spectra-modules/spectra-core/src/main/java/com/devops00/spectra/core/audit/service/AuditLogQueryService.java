@@ -141,6 +141,12 @@ public class AuditLogQueryService {
         criteria.setCanViewAllNonHighRisk(visibilityPolicy.canViewAllNonHighRisk(viewer));
         criteria.setViewerId(visibilityPolicy.viewerId(viewer));
         AuditLogQueryFrom filters = query == null ? new AuditLogQueryFrom() : query;
+        applyIdentityFilters(criteria, filters);
+        applyResultAndTimeFilters(criteria, filters);
+        return criteria;
+    }
+
+    private void applyIdentityFilters(AuditLogQueryCriteria criteria, AuditLogQueryFrom filters) {
         if (filters.getCategory() != null) {
             criteria.setCategory(filters.getCategory().name());
         }
@@ -153,6 +159,9 @@ public class AuditLogQueryService {
             criteria.setOperatorPattern("%" + operator + "%");
         }
         criteria.setTargetId(filters.getTargetId());
+    }
+
+    private void applyResultAndTimeFilters(AuditLogQueryCriteria criteria, AuditLogQueryFrom filters) {
         if (filters.getResult() != null) {
             criteria.setResult(filters.getResult().name());
         }
@@ -162,7 +171,6 @@ public class AuditLogQueryService {
         if (filters.getTo() != null && !filters.getTo().isBlank()) {
             criteria.setTo(timeMapper.toInstant(filters.getTo()));
         }
-        return criteria;
     }
 
     /**

@@ -182,30 +182,45 @@ public class FileTypeManagementService extends BaseServiceImpl<FileTypeMapper, F
             throw invalid("魔数规则必须是数组");
         }
         for (JsonNode rule : node) {
-            if (rule == null || !rule.isObject()) {
-                throw invalid("魔数规则只能是对象数组");
+            validateMagicRule(rule);
+        }
+    }
+
+    private void validateMagicRule(JsonNode rule) {
+        if (rule == null || !rule.isObject()) {
+            throw invalid("魔数规则只能是对象数组");
+        }
+        validateMagicFields(rule);
+        validateMagicBytes(rule.get("bytes"));
+        validateMagicOffset(rule.get("offset"));
+        validateMagicDescription(rule.get("description"));
+    }
+
+    private void validateMagicFields(JsonNode rule) {
+        for (Map.Entry<String, JsonNode> field : rule.properties()) {
+            String name = field.getKey();
+            if (!name.equals("bytes") && !name.equals("offset") && !name.equals("description")) {
+                throw invalid("魔数规则包含不支持的字段");
             }
-            for (Map.Entry<String, JsonNode> field : rule.properties()) {
-                String name = field.getKey();
-                if (!name.equals("bytes") && !name.equals("offset") && !name.equals("description")) {
-                    throw invalid("魔数规则包含不支持的字段");
-                }
-            }
-            JsonNode bytes = rule.get("bytes");
-            if (bytes == null
-                    || !bytes.isTextual()
-                    || !bytes.asText().matches("(?i)^[0-9a-f]+$")
-                    || (bytes.asText().length() % 2 != 0)) {
-                throw invalid("魔数规则 bytes 必须是偶数位十六进制文本");
-            }
-            JsonNode offset = rule.get("offset");
-            if (offset != null && (!offset.isIntegralNumber() || offset.asInt() < 0)) {
-                throw invalid("魔数规则 offset 必须是非负整数");
-            }
-            JsonNode description = rule.get("description");
-            if (description != null && !description.isTextual()) {
-                throw invalid("魔数规则 description 必须是文本");
-            }
+        }
+    }
+
+    private void validateMagicBytes(JsonNode bytes) {
+        if (bytes == null || !bytes.isTextual() || !bytes.asText().matches("(?i)^[0-9a-f]+$")
+                || bytes.asText().length() % 2 != 0) {
+            throw invalid("魔数规则 bytes 必须是偶数位十六进制文本");
+        }
+    }
+
+    private void validateMagicOffset(JsonNode offset) {
+        if (offset != null && (!offset.isIntegralNumber() || offset.asInt() < 0)) {
+            throw invalid("魔数规则 offset 必须是非负整数");
+        }
+    }
+
+    private void validateMagicDescription(JsonNode description) {
+        if (description != null && !description.isTextual()) {
+            throw invalid("魔数规则 description 必须是文本");
         }
     }
 

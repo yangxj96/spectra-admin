@@ -158,26 +158,12 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
             throw new DataNotExistException("通知发送 Preview 不存在");
         }
         verifyToken(entity, params);
-        if (NotificationPreviewStatus.APPLIED.name().equals(entity.getStatus())
-                && entity.getAppliedRequestId() != null) {
-            var taskCount = Math.toIntExact(
-                    taskMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity>()
-                            .eq(com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity::getNotificationRequestId,
-                                    entity.getAppliedRequestId())));
-            return new NotificationControlledSendApplyVO(
-                    entity.getAppliedRequestId(), NotificationPreviewStatus.APPLIED.name(), taskCount, true);
+        var replay = replayReceipt(entity);
+        if (replay != null) {
+            return replay;
         }
         var now = Instant.now();
-        if (!NotificationPreviewStatus.PREVIEWED.name().equals(entity.getStatus())
-                || entity.getExpiresAt() == null
-                || !now.isBefore(entity.getExpiresAt())) {
-            markExpired(entity);
-            throw new DataException("通知发送 Preview 已过期或已消费");
-        }
-        if (!MessageDigest.isEqual(entity.getRequestHash().getBytes(StandardCharsets.US_ASCII),
-                params.getRequestHash().getBytes(StandardCharsets.US_ASCII))) {
-            throw new DataException("通知发送请求摘要不一致，请重新 Preview");
-        }
+        validateApplyWindow(entity, params, now);
         var request = readSnapshot(entity.getRequestSnapshot());
         var prepared = prepare(request);
         var evaluation = evaluate(prepared);
@@ -215,6 +201,30 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
         return new NotificationControlledSendApplyVO(receipt.requestId(), receipt.status(), receipt.taskCount(),
                 receipt.idempotentReplay());
+    }
+
+    private NotificationControlledSendApplyVO replayReceipt(NotificationControlledSendPreviewEntity entity) {
+        if (!NotificationPreviewStatus.APPLIED.name().equals(entity.getStatus()) || entity.getAppliedRequestId() == null) {
+            return null;
+        }
+        var taskCount = Math.toIntExact(taskMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity>()
+                .eq(com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity::getNotificationRequestId,
+                        entity.getAppliedRequestId())));
+        return new NotificationControlledSendApplyVO(entity.getAppliedRequestId(), NotificationPreviewStatus.APPLIED.name(),
+                taskCount, true);
+    }
+
+    private void validateApplyWindow(NotificationControlledSendPreviewEntity entity,
+                                     NotificationControlledSendApplyFrom params, Instant now) {
+        if (!NotificationPreviewStatus.PREVIEWED.name().equals(entity.getStatus())
+                || entity.getExpiresAt() == null || !now.isBefore(entity.getExpiresAt())) {
+            markExpired(entity);
+            throw new DataException("通知发送 Preview 已过期或已消费");
+        }
+        if (!MessageDigest.isEqual(entity.getRequestHash().getBytes(StandardCharsets.US_ASCII),
+                params.getRequestHash().getBytes(StandardCharsets.US_ASCII))) {
+            throw new DataException("通知发送请求摘要不一致，请重新 Preview");
+        }
     }
 
     /**
@@ -355,18 +365,23 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
      * 校验并确保数据满足当前约束（{@code validate}）。
      */
     private void validate(NotificationControlledSendFrom params) {
-        if (params == null
-                || params.getPurpose() == null
-                || params.getChannels() == null
-                || params.getChannels().isEmpty()
-                || params.getTemplateVersionIds() == null
-                || params.getAudience() == null
-                || params.getParameters() == null) {
+        if (params == null || params.getPurpose() == null || params.getChannels() == null
+                || params.getChannels().isEmpty() || params.getTemplateVersionIds() == null
+                || params.getAudience() == null || params.getParameters() == null) {
             throw new DataException("受控发送参数不完整");
         }
+        validateIdempotency(params);
+        validateChannels(params);
+        validateAudience(params);
+    }
+
+    private void validateIdempotency(NotificationControlledSendFrom params) {
         if (!StringUtils.hasText(params.getIdempotencyKey()) || params.getIdempotencyKey().length() > 200) {
             throw new DataException("受控发送幂等键不合法");
         }
+    }
+
+    private void validateChannels(NotificationControlledSendFrom params) {
         var channels = policy.resolve(params.getPurpose(), params.getChannels());
         if (channels.size() != params.getChannels().stream().distinct().count()
                 || !channels.containsAll(params.getChannels())
@@ -374,6 +389,9 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 || !params.getTemplateVersionIds().keySet().equals(Set.copyOf(channels))) {
             throw new DataException("受控发送渠道或模板版本不合法");
         }
+    }
+
+    private void validateAudience(NotificationControlledSendFrom params) {
         var audience = params.getAudience();
         var selected = size(audience.getUserIds()) + size(audience.getDepartmentIds()) + size(audience.getRoleIds());
         if (selected == 0 || selected > MAX_CANDIDATE_USERS) {

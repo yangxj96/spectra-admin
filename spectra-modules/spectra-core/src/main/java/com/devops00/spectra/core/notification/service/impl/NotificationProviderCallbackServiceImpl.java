@@ -111,20 +111,36 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
             throw new DataNotExistException("Provider 回执对应的投递不存在");
         }
 
-        var eventDigest = digest(body);
         var summary = new LinkedHashMap<String, Object>();
         if (delivery.getResponseSummary() != null) {
             summary.putAll(delivery.getResponseSummary());
         }
-        var previousDigest = summary.get("callback_event_digest");
-        if (previousDigest != null
-                && MessageDigest.isEqual(eventDigest.getBytes(StandardCharsets.US_ASCII),
-                        String.valueOf(previousDigest).getBytes(StandardCharsets.US_ASCII))) {
+        var eventDigest = digest(body);
+        if (isDuplicate(summary, eventDigest)) {
             return new NotificationProviderCallbackVO(
                     NotificationCallbackStatus.DUPLICATE.name(), delivery.getResultStatus());
         }
 
         var receivedAt = Instant.now();
+        applyCallback(delivery, summary, callback, eventDigest, receivedAt);
+        if (deliveryMapper.updateById(delivery) != 1) {
+            throw new DataSaveException("更新 Provider 回执失败");
+        }
+
+        updateTask(delivery, resultStatus, errorCode);
+        return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(), resultStatus.name());
+    }
+
+    private boolean isDuplicate(Map<String, Object> summary, String eventDigest) {
+        var previousDigest = summary.get("callback_event_digest");
+        return previousDigest != null
+                && MessageDigest.isEqual(eventDigest.getBytes(StandardCharsets.US_ASCII),
+                        String.valueOf(previousDigest).getBytes(StandardCharsets.US_ASCII));
+    }
+
+    private void applyCallback(NotificationDeliveryEntity delivery, Map<String, Object> summary,
+                               NotificationProviderCallbackFrom callback, String eventDigest, Instant receivedAt) {
+        var resultStatus = normalizeStatus(callback.getStatus());
         var errorCode = safeErrorCode(callback.getErrorCode());
         summary.put("callback_event_digest", eventDigest);
         summary.put("callback_status", resultStatus.name());
@@ -139,12 +155,6 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         delivery.setErrorCode(resultStatus == ChannelSendStatus.FAILED ? errorCode : null);
         delivery.setErrorMessageSanitized(resultStatus == ChannelSendStatus.FAILED ? errorCode : null);
         delivery.setResponseSummary(summary);
-        if (deliveryMapper.updateById(delivery) != 1) {
-            throw new DataSaveException("更新 Provider 回执失败");
-        }
-
-        updateTask(delivery, resultStatus, errorCode);
-        return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(), resultStatus.name());
     }
 
     /**
@@ -171,12 +181,20 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
      * 处理内部业务逻辑（{@code verifySignature}）。
      */
     private void verifySignature(String signature, String body, NotificationProviderConfiguration configuration) {
-        if (configuration == null
-                || !configuration.enabled()
+        validateSignatureConfiguration(configuration);
+        var expected = normalizeSignature(signature);
+        verifyMac(expected, body, configuration.secret());
+    }
+
+    private static void validateSignatureConfiguration(NotificationProviderConfiguration configuration) {
+        if (configuration == null || !configuration.enabled()
                 || !StringUtils.hasText(configuration.providerType())
                 || !StringUtils.hasText(configuration.secret())) {
             throw new DataSaveException("Provider 回执验签配置不可用");
         }
+    }
+
+    private static String normalizeSignature(String signature) {
         if (!StringUtils.hasText(signature)) {
             throw new DataSaveException("Provider 回执签名不能为空");
         }
@@ -187,9 +205,13 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         if (!expected.matches("[0-9a-f]{64}")) {
             throw new DataSaveException("Provider 回执签名格式不合法");
         }
+        return expected;
+    }
+
+    private static void verifyMac(String expected, String body, String secret) {
         try {
             var mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(configuration.secret().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
             var actual = HexFormat.of().formatHex(mac.doFinal(body.getBytes(StandardCharsets.UTF_8)));
             if (!MessageDigest.isEqual(actual.getBytes(StandardCharsets.US_ASCII),
                     expected.getBytes(StandardCharsets.US_ASCII))) {

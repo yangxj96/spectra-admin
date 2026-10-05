@@ -76,23 +76,6 @@ public record AuditRecord(UUID eventId,
     }
 
     /**
-     * 创建没有 HTTP 摘要和失败详情的审计事件。
-     */
-    public AuditRecord(UUID eventId,
-                       AuditCategory category,
-                       String eventType,
-                       UUID targetId,
-                       Result result,
-                       Instant occurredAt,
-                       AuditContext context,
-                       Map<String, Object> before,
-                       Map<String, Object> after,
-                       String reason) {
-        this(eventId, category, eventType, targetId, result, occurredAt, context, before, after, reason,
-                HttpSummary.empty(), null);
-    }
-
-    /**
      * 返回审计前快照的防御性副本。
      *
      * @return 不受记录内部状态影响的快照

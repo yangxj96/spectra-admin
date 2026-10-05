@@ -62,8 +62,8 @@ public interface UserDepartmentMembershipMapper {
 
     /** 锁定指定用户在源部门中的活动关联关系，部门重组 Apply 调用方必须处于事务中。 */
     List<UserDepartmentMembership> selectActiveByUsersAndDepartmentsForUpdate(
-            @Param("userIds") List<UUID> userIds,
-            @Param("departmentIds") List<UUID> departmentIds);
+                                                                              @Param("userIds") List<UUID> userIds,
+                                                                              @Param("departmentIds") List<UUID> departmentIds);
 
     /**
      * 软删除用户当前全部关联部门。

@@ -238,56 +238,8 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         if (params == null) {
             throw new DataSaveException("Provider 配置不能为空");
         }
-        var providerType = normalize(params.getProviderType()).toUpperCase();
-        if (!SUPPORTED_PROVIDER_TYPES.contains(providerType)) {
-            throw new DataSaveException("不支持的 Provider 类型");
-        }
-        var endpoint = normalize(params.getEndpoint());
-        if ("ALIYUN_SMS".equals(providerType) && !StringUtils.hasText(endpoint)) {
-            endpoint = ALIYUN_SMS_ENDPOINT;
-        } else if ("TENCENT_SMS".equals(providerType) && !StringUtils.hasText(endpoint)) {
-            endpoint = TENCENT_SMS_ENDPOINT;
-        }
-        var port = normalizePort(providerType, params.getPort(), params.isSslEnabled());
-        var region = normalize(params.getRegion());
-        if ("ALIYUN_SMS".equals(providerType) && !StringUtils.hasText(region)) {
-            region = ALIYUN_SMS_REGION;
-        } else if ("TENCENT_SMS".equals(providerType) && !StringUtils.hasText(region)) {
-            region = TENCENT_SMS_REGION;
-        }
-        var credentialId = normalize(params.getCredentialId());
-        var appId = normalize(params.getAppId());
-        var signName = normalize(params.getSignName());
-        var senderAddress = normalize(params.getSenderAddress());
-        var senderName = normalize(params.getSenderName());
-        var templateCode = normalize(params.getTemplateCode());
-        var templateParameterOrder = normalize(params.getTemplateParameterOrder());
-        var sslEnabled = params.isSslEnabled();
-        var starttlsEnabled = params.isStarttlsEnabled();
-        var timeoutMs = params.getTimeoutMs();
-        var rateLimitPerSecond = params.getRateLimitPerSecond();
-        var maxAttempts = params.getMaxAttempts();
-        if ("SMTP".equals(providerType) && params.isSslEnabled() && params.isStarttlsEnabled()) {
-            throw new DataSaveException("SMTP 不能同时启用隐式 SSL 和 STARTTLS");
-        }
-        normalizeProviderFields(providerType, endpoint, credentialId, appId, signName, senderAddress, templateCode);
-        if ("MOCK".equals(providerType)) {
-            endpoint = "";
-            port = 0;
-            region = null;
-            credentialId = null;
-            appId = null;
-            signName = null;
-            senderAddress = null;
-            senderName = null;
-            sslEnabled = false;
-            starttlsEnabled = false;
-            timeoutMs = 0;
-            rateLimitPerSecond = 0;
-            maxAttempts = 1;
-            templateCode = null;
-            templateParameterOrder = null;
-        }
+        var fields = normalizeProviderInput(params);
+        var providerType = fields.providerType();
         var current = readDocument(channel);
         var secretKeyId = current.secretKeyId();
         var providerTypeChanged = !providerType.equals(current.providerType());
@@ -299,9 +251,10 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             secretKeyId = secretKey(channel);
             secretManagementService.createPending(secretKeyId, params.getSecret().trim(), "MANUAL");
         }
-        var document = new NotificationProviderConfigDocument(providerType, params.isEnabled(), endpoint,
-                port, region, credentialId, appId, signName, senderAddress, senderName, sslEnabled, starttlsEnabled,
-                timeoutMs, rateLimitPerSecond, maxAttempts, templateCode, templateParameterOrder, secretKeyId,
+        var document = new NotificationProviderConfigDocument(providerType, params.isEnabled(), fields.endpoint(),
+                fields.port(), fields.region(), fields.credentialId(), fields.appId(), fields.signName(), fields.senderAddress(),
+                fields.senderName(), fields.sslEnabled(), fields.starttlsEnabled(), fields.timeoutMs(), fields.rateLimitPerSecond(),
+                fields.maxAttempts(), fields.templateCode(), fields.templateParameterOrder(), secretKeyId,
                 Instant.now());
         try {
             write(configKey(channel), objectMapper.writeValueAsString(document), "通知" + channel.name() + " Provider 配置");
@@ -309,6 +262,59 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             throw new DataSaveException("Provider 配置序列化失败", exception);
         }
         return get(channel);
+    }
+
+    private ProviderFields normalizeProviderInput(NotificationProviderSaveFrom params) {
+        var providerType = normalize(params.getProviderType()).toUpperCase();
+        if (!SUPPORTED_PROVIDER_TYPES.contains(providerType)) {
+            throw new DataSaveException("不支持的 Provider 类型");
+        }
+        if ("SMTP".equals(providerType) && params.isSslEnabled() && params.isStarttlsEnabled()) {
+            throw new DataSaveException("SMTP 不能同时启用隐式 SSL 和 STARTTLS");
+        }
+        var endpoint = defaultEndpoint(providerType, normalize(params.getEndpoint()));
+        var port = normalizePort(providerType, params.getPort(), params.isSslEnabled());
+        var region = defaultRegion(providerType, normalize(params.getRegion()));
+        var fields = new ProviderFields(providerType, endpoint, port, region, normalize(params.getCredentialId()),
+                normalize(params.getAppId()), normalize(params.getSignName()), normalize(params.getSenderAddress()),
+                normalize(params.getSenderName()), params.isSslEnabled(), params.isStarttlsEnabled(), params.getTimeoutMs(),
+                params.getRateLimitPerSecond(), params.getMaxAttempts(), normalize(params.getTemplateCode()),
+                normalize(params.getTemplateParameterOrder()));
+        normalizeProviderFields(fields);
+        return "MOCK".equals(providerType) ? ProviderFields.mock() : fields;
+    }
+
+    private record ProviderFields(String providerType, String endpoint, int port, String region, String credentialId,
+                                  String appId, String signName, String senderAddress, String senderName,
+                                  boolean sslEnabled, boolean starttlsEnabled, Integer timeoutMs,
+                                  Integer rateLimitPerSecond, Integer maxAttempts, String templateCode,
+                                  String templateParameterOrder) {
+        private static ProviderFields mock() {
+            return new ProviderFields("MOCK", "", 0, null, null, null, null, null, null,
+                    false, false, 0, 0, 1, null, null);
+        }
+    }
+
+    private static String defaultEndpoint(String providerType, String endpoint) {
+        if (StringUtils.hasText(endpoint)) {
+            return endpoint;
+        }
+        return switch (providerType) {
+            case "ALIYUN_SMS" -> ALIYUN_SMS_ENDPOINT;
+            case "TENCENT_SMS" -> TENCENT_SMS_ENDPOINT;
+            default -> endpoint;
+        };
+    }
+
+    private static String defaultRegion(String providerType, String region) {
+        if (StringUtils.hasText(region)) {
+            return region;
+        }
+        return switch (providerType) {
+            case "ALIYUN_SMS" -> ALIYUN_SMS_REGION;
+            case "TENCENT_SMS" -> TENCENT_SMS_REGION;
+            default -> region;
+        };
     }
 
     /**
@@ -512,40 +518,41 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     /**
      * 转换、解析或规范化数据（{@code normalizeProviderFields}）。
      */
-    private void normalizeProviderFields(String providerType, String endpoint, String credentialId, String appId,
-                                         String signName, String senderAddress, String templateCode) {
-        switch (providerType) {
-            case "ALIYUN_SMS" -> {
-                if (!StringUtils.hasText(credentialId)
-                        || !StringUtils.hasText(signName)
-                        || !StringUtils.hasText(templateCode)) {
-                    throw new DataSaveException("阿里云短信必须配置 AccessKey ID、短信签名和模板编码");
-                }
-            }
-            case "TENCENT_SMS" -> {
-                if (!StringUtils.hasText(credentialId)
-                        || !StringUtils.hasText(appId)
-                        || !StringUtils.hasText(signName)
-                        || !StringUtils.hasText(templateCode)) {
-                    throw new DataSaveException("腾讯云短信必须配置 SecretId、SDK AppID、短信签名和模板 ID");
-                }
-            }
-            case "SMTP" -> {
-                if (!StringUtils.hasText(endpoint)
-                        || !StringUtils.hasText(credentialId)
-                        || !StringUtils.hasText(senderAddress)) {
-                    throw new DataSaveException("SMTP 必须配置主机、用户名和发件地址");
-                }
-            }
-            case "HTTP_JSON" -> {
-                if (!isHttpEndpoint(endpoint)) {
-                    throw new DataSaveException("HTTP_JSON Provider 必须配置合法的 HTTP 或 HTTPS 端点");
-                }
-            }
+    private void normalizeProviderFields(ProviderFields fields) {
+        switch (fields.providerType()) {
+            case "ALIYUN_SMS" -> requireAliyun(fields.credentialId(), fields.signName(), fields.templateCode());
+            case "TENCENT_SMS" -> requireTencent(fields.credentialId(), fields.appId(), fields.signName(), fields.templateCode());
+            case "SMTP" -> requireSmtp(fields.endpoint(), fields.credentialId(), fields.senderAddress());
+            case "HTTP_JSON" -> requireHttp(fields.endpoint());
             case "MOCK" -> {
                 // 内置模拟服务不需要任何第三方配置。
             }
             default -> throw new DataSaveException("不支持的 Provider 类型");
+        }
+    }
+
+    private void requireAliyun(String credentialId, String signName, String templateCode) {
+        if (!StringUtils.hasText(credentialId) || !StringUtils.hasText(signName) || !StringUtils.hasText(templateCode)) {
+            throw new DataSaveException("阿里云短信必须配置 AccessKey ID、短信签名和模板编码");
+        }
+    }
+
+    private void requireTencent(String credentialId, String appId, String signName, String templateCode) {
+        if (!StringUtils.hasText(credentialId) || !StringUtils.hasText(appId)
+                || !StringUtils.hasText(signName) || !StringUtils.hasText(templateCode)) {
+            throw new DataSaveException("腾讯云短信必须配置 SecretId、SDK AppID、短信签名和模板 ID");
+        }
+    }
+
+    private void requireSmtp(String endpoint, String credentialId, String senderAddress) {
+        if (!StringUtils.hasText(endpoint) || !StringUtils.hasText(credentialId) || !StringUtils.hasText(senderAddress)) {
+            throw new DataSaveException("SMTP 必须配置主机、用户名和发件地址");
+        }
+    }
+
+    private void requireHttp(String endpoint) {
+        if (!isHttpEndpoint(endpoint)) {
+            throw new DataSaveException("HTTP_JSON Provider 必须配置合法的 HTTP 或 HTTPS 端点");
         }
     }
 

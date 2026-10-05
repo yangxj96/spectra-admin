@@ -208,7 +208,7 @@ public class UserController {
     @GetMapping(value = "/department-members", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'department:read') and hasPermission(null, 'user:read')")
     public IPage<DepartmentMemberCandidateVO> departmentMembers(
-            @Validated @ModelAttribute DepartmentMemberPageFrom params) {
+                                                                @Validated @ModelAttribute DepartmentMemberPageFrom params) {
         return departmentMemberQueryService.page(params);
     }
 

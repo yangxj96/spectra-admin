@@ -61,8 +61,12 @@ public interface FileStorageProvider {
      * @param attempt    尝试参数。
      * @return 分片目标数据。
      */
-    PartTarget createPartTarget(StorageMultipart multipart, int partNumber, long partSize, String partSha256,
-                                Instant expiresAt, int attempt);
+    PartTarget createPartTarget(PartTargetInput input);
+
+    /** 分片上传目标输入。 */
+    record PartTargetInput(StorageMultipart multipart, int partNumber, long partSize, String partSha256,
+                           Instant expiresAt, int attempt) {
+    }
 
     /**
      * 处理本地分片相关数据。

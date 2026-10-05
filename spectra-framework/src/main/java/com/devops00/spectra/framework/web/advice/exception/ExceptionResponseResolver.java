@@ -62,9 +62,9 @@ public class ExceptionResponseResolver {
     /**
      * 解析异常后的统一结果。
      *
-     * @param status          对外 HTTP 状态
-     * @param message         对外安全消息
-     * @param logStackTrace   是否需要在边界层记录完整堆栈
+     * @param status        对外 HTTP 状态
+     * @param message       对外安全消息
+     * @param logStackTrace 是否需要在边界层记录完整堆栈
      */
     public record ExceptionResolution(HttpStatus status, String message, boolean logStackTrace) {
     }
@@ -76,7 +76,18 @@ public class ExceptionResponseResolver {
      * @return 状态、消息和日志策略；永远不会返回 null
      */
     public ExceptionResolution resolve(Throwable exception) {
-        // 按“业务语义优先、基础设施次之、未知异常兜底”的顺序匹配，避免父类异常抢先覆盖更具体的异常。
+        ExceptionResolution business = resolveBusiness(exception);
+        if (business != null) {
+            return business;
+        }
+        ExceptionResolution infrastructure = resolveInfrastructure(exception);
+        if (infrastructure != null) {
+            return infrastructure;
+        }
+        return resolveStandard(exception);
+    }
+
+    private static ExceptionResolution resolveBusiness(Throwable exception) {
         var dataNotExist = findCause(exception, DataNotExistException.class);
         if (dataNotExist != null) {
             return known(HttpStatus.NOT_FOUND, messageOr(dataNotExist.getMessage(), "数据不存在"));
@@ -116,7 +127,10 @@ public class ExceptionResponseResolver {
         if (kaptchaExpires != null) {
             return known(HttpStatus.BAD_REQUEST, "验证码过期");
         }
+        return null;
+    }
 
+    private static ExceptionResolution resolveInfrastructure(Throwable exception) {
         var scheduler = findCause(exception, SchedulerDatabaseUnavailableException.class);
         if (scheduler != null) {
             return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "调度服务暂不可用");
@@ -146,7 +160,10 @@ public class ExceptionResponseResolver {
         if (cryptoConfiguration != null) {
             return infrastructure(HttpStatus.INTERNAL_SERVER_ERROR, "加密配置不可用");
         }
+        return null;
+    }
 
+    private static ExceptionResolution resolveStandard(Throwable exception) {
         var accessDenied = findCause(exception, AccessDeniedException.class);
         if (accessDenied != null) {
             return known(HttpStatus.FORBIDDEN, "权限不足");
@@ -217,9 +234,9 @@ public class ExceptionResponseResolver {
      *
      * <p>使用对象身份集合而不是 {@code equals}，并防止异常链异常地形成环，避免错误处理再次阻塞请求线程。</p>
      *
-     * @param source    原始异常
+     * @param source     原始异常
      * @param targetType 要查找的异常类型
-     * @param <T>       异常类型
+     * @param <T>        异常类型
      * @return 找到的异常；未找到或输入为空时返回 null
      */
     private static <T extends Throwable> T findCause(Throwable source, Class<T> targetType) {

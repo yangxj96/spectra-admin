@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.security.change.service.impl;
 
+import java.util.Objects;
+
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.core.audit.AuditFailureRecorder;
@@ -93,7 +95,7 @@ public class DefaultSecurityChangeExecutor implements SecurityChangeExecutor {
         try {
             failureRecorder.record(failed);
         } catch (RuntimeException auditException) {
-            if (auditException != original) {
+            if (!Objects.equals(auditException, original)) {
                 original.addSuppressed(auditException);
             }
         }

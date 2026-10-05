@@ -40,7 +40,7 @@ public class FileUploadExceptionAdvice {
      * 处理文件上传异常。
      *
      * @param exception 异常参数。
-     * @param response 当前 HTTP 响应，用于同步写入异常对应的 HTTP 状态。
+     * @param response  当前 HTTP 响应，用于同步写入异常对应的 HTTP 状态。
      * @return 处理后的结果。
      */
     @ExceptionHandler(FileUploadException.class)

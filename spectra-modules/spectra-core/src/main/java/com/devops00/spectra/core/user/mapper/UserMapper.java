@@ -46,9 +46,9 @@ public interface UserMapper extends BaseMapper<User> {
      * @return 部门直属成员页
      */
     IPage<DepartmentMemberCandidateVO> selectDepartmentMemberCandidates(
-            Page<DepartmentMemberCandidateVO> page,
-            @Param("departmentId") UUID departmentId,
-            @Param("keyword") String keyword);
+                                                                        Page<DepartmentMemberCandidateVO> page,
+                                                                        @Param("departmentId") UUID departmentId,
+                                                                        @Param("keyword") String keyword);
 
     /**
      * 批量将用户主部门从源部门替换为目标部门。
@@ -65,7 +65,7 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 将选定用户仍指向指定源部门的主部门关系替换为目标部门。
      *
-     * @param userIds             用户 ID
+     * @param userIds            用户 ID
      * @param sourceDepartmentId 源部门 ID
      * @param targetDepartmentId 新部门 ID
      * @param operatorId         操作者 ID

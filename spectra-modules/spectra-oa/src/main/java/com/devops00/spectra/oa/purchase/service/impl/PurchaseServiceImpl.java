@@ -238,20 +238,18 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (PurchaseExecutionStatus.RECEIVED.getValue().equals(entity.getExecutionStatus())) {
             throw new DataSaveException("采购申请已完成收货");
         }
-        var currentUserId = securityContextAccessor.currentUserId();
-        var purchaserId = from == null || from.getPurchaserId() == null ? currentUserId : from.getPurchaserId();
-        if (purchaserId == null) {
-            throw new DataSaveException("采购执行人不能为空");
+        applyExecution(entity, from);
+        if (!this.updateById(entity)) {
+            throw new DataSaveException("登记采购执行失败");
         }
-        var status = from == null || !StringUtils.hasText(from.getExecutionStatus())
-                ? PurchaseExecutionStatus.ORDERED.getValue()
-                : from.getExecutionStatus();
-        if (!PurchaseExecutionStatus.ORDERED.getValue().equals(status)
-                && !PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue().equals(status)) {
-            throw new DataSaveException("采购执行状态不合法");
-        }
+        workflowSupport.sendNotification(application, "purchase", "采购申请已进入执行", "采购申请已审批通过并进入采购执行环节");
+    }
+
+    private void applyExecution(Purchase entity, PurchaseExecuteFrom from) {
+        var purchaserId = resolvePurchaser(from);
+        var status = resolveExecutionStatus(from);
         entity.setPurchaserId(purchaserId);
-        if (StringUtils.hasText(from == null ? null : from.getOrderNo())) {
+        if (from != null && StringUtils.hasText(from.getOrderNo())) {
             entity.setOrderNo(from.getOrderNo());
         }
         entity.setExecutionStatus(PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue().equals(entity.getExecutionStatus())
@@ -259,10 +257,31 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 : status);
         entity.setOrderedAt(entity.getOrderedAt() == null ? Instant.now() : entity.getOrderedAt());
         entity.setExecutionRemark(from == null ? null : from.getExecutionRemark());
-        if (!this.updateById(entity)) {
-            throw new DataSaveException("登记采购执行失败");
+    }
+
+    private UUID resolvePurchaser(PurchaseExecuteFrom from) {
+        var purchaserId = from == null || from.getPurchaserId() == null
+                ? securityContextAccessor.currentUserId()
+                : from.getPurchaserId();
+        if (purchaserId == null) {
+            throw new DataSaveException("采购执行人不能为空");
         }
-        workflowSupport.sendNotification(application, "purchase", "采购申请已进入执行", "采购申请已审批通过并进入采购执行环节");
+        return purchaserId;
+    }
+
+    private String resolveExecutionStatus(PurchaseExecuteFrom from) {
+        var status = from == null || !StringUtils.hasText(from.getExecutionStatus())
+                ? PurchaseExecutionStatus.ORDERED.getValue()
+                : from.getExecutionStatus();
+        validateExecutionStatus(status);
+        return status;
+    }
+
+    private void validateExecutionStatus(String status) {
+        if (!PurchaseExecutionStatus.ORDERED.getValue().equals(status)
+                && !PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue().equals(status)) {
+            throw new DataSaveException("采购执行状态不合法");
+        }
     }
 
     @Override

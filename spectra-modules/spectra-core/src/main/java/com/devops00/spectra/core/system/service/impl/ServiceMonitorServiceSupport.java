@@ -207,8 +207,8 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         var requestMetrics = collectRequestMetrics();
         var health = collectHealth();
         var dependencies = toDependencies(health.results());
-        var status = resolveStatus(cpuUsage, systemMemoryUsage, heapUsage.usage(), requestMetrics, dependencies,
-                health.status());
+        var status = resolveStatus(new StatusInput(cpuUsage, systemMemoryUsage, heapUsage.usage(), requestMetrics,
+                dependencies, health.status()));
         var runtime = ManagementFactory.getRuntimeMXBean();
 
         var databaseStatus = dependencies.stream()
@@ -333,33 +333,35 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
     /**
      * 转换、解析或规范化数据（{@code resolveStatus}）。
      */
-    private static ServiceMonitorHealthStatus resolveStatus(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
-                                                            RequestMetrics requestMetrics,
-                                                            List<ServiceMonitorOverviewVO.Dependency> dependencies,
-                                                            DependencyHealthStatus healthStatus) {
-        var downCount = dependencies.stream()
+    private static ServiceMonitorHealthStatus resolveStatus(StatusInput input) {
+        var downCount = input.dependencies().stream()
                 .filter(item -> DependencyHealthStatus.DOWN.name().equals(item.getStatus()))
                 .count();
-        if (!dependencies.isEmpty() && downCount == dependencies.size()) {
+        if (!input.dependencies().isEmpty() && downCount == input.dependencies().size()) {
             return ServiceMonitorHealthStatus.DOWN;
         }
         if (downCount > 0L) {
             return ServiceMonitorHealthStatus.DEGRADED;
         }
-        if (healthStatus == DependencyHealthStatus.DOWN || healthStatus == DependencyHealthStatus.DEGRADED) {
+        if (input.healthStatus() == DependencyHealthStatus.DOWN || input.healthStatus() == DependencyHealthStatus.DEGRADED) {
             return ServiceMonitorHealthStatus.DEGRADED;
         }
-        if (healthStatus == DependencyHealthStatus.UNKNOWN) {
+        if (input.healthStatus() == DependencyHealthStatus.UNKNOWN) {
             return ServiceMonitorHealthStatus.WARNING;
         }
-        if (cpuUsage >= WARNING_CPU_USAGE
-                || systemMemoryUsage >= WARNING_MEMORY_USAGE
-                || jvmHeapUsage >= WARNING_JVM_HEAP_USAGE
-                || requestMetrics.errorRate() >= WARNING_ERROR_RATE
-                || requestMetrics.p95ResponseMs() >= WARNING_P95_RESPONSE_MS) {
+        if (input.cpuUsage() >= WARNING_CPU_USAGE || input.systemMemoryUsage() >= WARNING_MEMORY_USAGE
+                || input.jvmHeapUsage() >= WARNING_JVM_HEAP_USAGE
+                || input.requestMetrics().errorRate() >= WARNING_ERROR_RATE
+                || input.requestMetrics().p95ResponseMs() >= WARNING_P95_RESPONSE_MS) {
             return ServiceMonitorHealthStatus.WARNING;
         }
         return ServiceMonitorHealthStatus.HEALTHY;
+    }
+
+    private record StatusInput(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
+                               RequestMetrics requestMetrics,
+                               List<ServiceMonitorOverviewVO.Dependency> dependencies,
+                               DependencyHealthStatus healthStatus) {
     }
 
     /**

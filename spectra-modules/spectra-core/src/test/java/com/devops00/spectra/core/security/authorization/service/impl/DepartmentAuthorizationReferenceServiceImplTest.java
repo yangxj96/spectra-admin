@@ -168,8 +168,9 @@ class DepartmentAuthorizationReferenceServiceImplTest {
     @Test
     void previewDoesNotFlagExpansionWhenEverySourceDepartmentIsAlreadyCovered() {
         scopeRules.getFirst().setIncludeDescendants(false);
-        profileBoundaries.getFirst().setAccessScope(scopeMap(
-                "RULES", List.of("dept-a", "dept-b"), false, "active-extra"));
+        profileBoundaries.getFirst()
+                .setAccessScope(scopeMap(
+                        "RULES", List.of("dept-a", "dept-b"), false, "active-extra"));
 
         var impact = service.previewMerge(List.of(SOURCE_A, SOURCE_B),
                 List.of("dept-a", "dept-b"), TARGET, "dept-target");
@@ -183,12 +184,18 @@ class DepartmentAuthorizationReferenceServiceImplTest {
                 List.of("dept-a", "dept-b"), TARGET, "dept-target", OPERATOR_ID);
 
         assertEquals(1, impact.assignmentCount());
-        assertEquals(1, scopeRules.stream().filter(rule -> ACCESS_SCOPE_ID.equals(rule.getScopeId())
-                && TARGET.equals(rule.getDepartmentId())).count());
-        assertEquals(1, scopeRules.stream().filter(rule -> GRANT_SCOPE_ID.equals(rule.getScopeId())
-                && TARGET.equals(rule.getDepartmentId())).count());
-        assertEquals(1, scopeRules.stream().filter(rule -> REVOKED_SCOPE_ID.equals(rule.getScopeId())
-                && SOURCE_A.equals(rule.getDepartmentId())).count());
+        assertEquals(1, scopeRules.stream()
+                .filter(rule -> ACCESS_SCOPE_ID.equals(rule.getScopeId())
+                        && TARGET.equals(rule.getDepartmentId()))
+                .count());
+        assertEquals(1, scopeRules.stream()
+                .filter(rule -> GRANT_SCOPE_ID.equals(rule.getScopeId())
+                        && TARGET.equals(rule.getDepartmentId()))
+                .count());
+        assertEquals(1, scopeRules.stream()
+                .filter(rule -> REVOKED_SCOPE_ID.equals(rule.getScopeId())
+                        && SOURCE_A.equals(rule.getDepartmentId()))
+                .count());
         verify(scopeRuleMapper, times(2)).update(any(), any());
         verify(scopeRuleMapper).deleteDuplicateDepartmentRule(scopeRules.get(2).getId(), 0L);
     }
@@ -271,8 +278,8 @@ class DepartmentAuthorizationReferenceServiceImplTest {
     }
 
     private static AuthorizationProfileBoundary profileBoundary(UUID assignmentId,
-                                                                 Map<String, Object> access,
-                                                                 Map<String, Object> grant) {
+                                                                Map<String, Object> access,
+                                                                Map<String, Object> grant) {
         var boundary = new AuthorizationProfileBoundary();
         boundary.setProfileAssignmentId(assignmentId);
         boundary.setAccessScope(access);
@@ -281,7 +288,7 @@ class DepartmentAuthorizationReferenceServiceImplTest {
     }
 
     private static Map<String, Object> scopeMap(String mode, List<String> codes,
-                                                 boolean includeDescendants, String extra) {
+                                                boolean includeDescendants, String extra) {
         var map = new LinkedHashMap<String, Object>();
         map.put("mode", mode);
         map.put("department_codes", new ArrayList<>(codes));

@@ -289,9 +289,10 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         QuartzHistoryQueryFrom query = from == null ? new QuartzHistoryQueryFrom() : from;
         long current = page == null || page.getPageNum() == null ? 1L : page.getPageNum();
         long size = page == null || page.getPageSize() == null ? 15L : page.getPageSize();
-        IPage<QuartzJobExecutionHistoryEntity> source = historyService.page(current, size,
-                normalize(query.getJobKey()), normalize(query.getTriggerKey()), query.getStatus(),
-                parseTime(query.getFrom(), "历史开始时间"), parseTime(query.getTo(), "历史结束时间"));
+        IPage<QuartzJobExecutionHistoryEntity> source = historyService.page(
+                new QuartzJobExecutionHistoryService.HistoryPageRequest(current, size,
+                        normalize(query.getJobKey()), normalize(query.getTriggerKey()), query.getStatus(),
+                        parseTime(query.getFrom(), "历史开始时间"), parseTime(query.getTo(), "历史结束时间")));
         Page<QuartzExecutionHistoryVO> result = new Page<>(source.getCurrent(), source.getSize(), source.getTotal());
         return result.setRecords(source.getRecords().stream().map(this::toHistory).toList());
     }
@@ -365,30 +366,42 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
      * 处理触发器相关数据。
      */
     private Trigger trigger(QuartzTriggerFrom from, TriggerKey triggerKey, JobKey jobKey) {
+        validateTrigger(from);
+        return switch (from.getTriggerType()) {
+            case CRON -> cronTrigger(from, triggerKey, jobKey);
+            case SIMPLE -> simpleTrigger(from, triggerKey, jobKey);
+        };
+    }
+
+    private void validateTrigger(QuartzTriggerFrom from) {
         if (from == null || from.getTriggerType() == null) {
             throw new DataSaveException("Quartz Trigger 类型不能为空");
         }
-        QuartzTriggerTemplate.MisfirePolicy misfire = from.getMisfireInstruction();
-        if (from.getTriggerType() == QuartzTriggerTemplate.TriggerType.CRON) {
-            if (normalize(from.getCronExpression()) == null || normalize(from.getTimeZone()) == null) {
-                throw new DataSaveException("Cron Trigger 必须提供表达式和 IANA 时区");
-            }
-            try {
-                return QuartzTriggerTemplate.cron(from.getCronExpression().trim(), ZoneId.of(from.getTimeZone().trim()),
-                        misfire).build(triggerKey, jobKey, from.getStartAt());
-            } catch (DateTimeException exception) {
-                throw new DataSaveException("Cron Trigger 时区无效", exception);
-            } catch (IllegalArgumentException exception) {
-                throw new DataSaveException("Cron Trigger 表达式无效", exception);
-            }
+    }
+
+    private Trigger cronTrigger(QuartzTriggerFrom from, TriggerKey triggerKey, JobKey jobKey) {
+        if (normalize(from.getCronExpression()) == null || normalize(from.getTimeZone()) == null) {
+            throw new DataSaveException("Cron Trigger 必须提供表达式和 IANA 时区");
         }
+        try {
+            return QuartzTriggerTemplate.cron(from.getCronExpression().trim(), ZoneId.of(from.getTimeZone().trim()),
+                    from.getMisfireInstruction()).build(triggerKey, jobKey, from.getStartAt());
+        } catch (DateTimeException exception) {
+            throw new DataSaveException("Cron Trigger 时区无效", exception);
+        } catch (IllegalArgumentException exception) {
+            throw new DataSaveException("Cron Trigger 表达式无效", exception);
+        }
+    }
+
+    private Trigger simpleTrigger(QuartzTriggerFrom from, TriggerKey triggerKey, JobKey jobKey) {
         if (from.isOneShot()) {
-            return QuartzTriggerTemplate.oneShot(misfire).build(triggerKey, jobKey, from.getStartAt());
+            return QuartzTriggerTemplate.oneShot(from.getMisfireInstruction())
+                    .build(triggerKey, jobKey, from.getStartAt());
         }
         if (from.getIntervalMs() == null || from.getIntervalMs() <= 0L) {
             throw new DataSaveException("Simple Trigger 间隔必须大于 0");
         }
-        return QuartzTriggerTemplate.fixedInterval(Duration.ofMillis(from.getIntervalMs()), misfire)
+        return QuartzTriggerTemplate.fixedInterval(Duration.ofMillis(from.getIntervalMs()), from.getMisfireInstruction())
                 .build(triggerKey, jobKey, from.getStartAt());
     }
 

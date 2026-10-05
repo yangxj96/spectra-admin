@@ -104,7 +104,8 @@ public class SecurityOnlineUserQueryService implements SecuritySessionQuery {
             String ip = SecurityRedisValueParser.requiredText(summary.get("ip"), "SessionSummary.ip");
             long loginTime = SecurityRedisValueParser.requiredLong(summary.get("loginTime"), "SessionSummary.loginTime");
             String sessionId = resolveSessionId(summary, accessDigest, summaryKeys.get(index));
-            result.add(userOnlineConverter.toVO(userId, username, clientType, ip, sessionId, loginTime));
+            result.add(userOnlineConverter.toVO(new UserOnlineConverter.UserOnlineInput(
+                    userId, username, clientType, ip, sessionId, loginTime)));
         }
         return result;
     }

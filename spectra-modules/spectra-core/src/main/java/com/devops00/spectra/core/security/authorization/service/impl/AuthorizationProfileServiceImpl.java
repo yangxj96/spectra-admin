@@ -240,27 +240,30 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         }
         var roleCodes = new HashSet<String>();
         for (var assignment : params.getAssignments()) {
-            var roleCode = assignment.getRoleCode() == null ? "" : assignment.getRoleCode().trim();
-            if (!roleCodes.add(roleCode)) {
-                throw new DataException("授权方案不能重复配置同一个 Role");
-            }
-            var role = roleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
-                    .eq(SecurityRole::getCode, roleCode));
-            if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
-                throw new DataNotExistException("Role 不存在或已停用: " + roleCode);
-            }
-            var currentRoleVersion = role.getVersion() == null ? 0L : role.getVersion();
-            if (!Long.valueOf(currentRoleVersion).equals(assignment.getRoleVersion())) {
-                throw new DataException("Role version 已变化，请刷新角色授权后重试: " + roleCode);
-            }
-            if ("DEV_OPS".equals(role.getRoleKind())) {
-                throw new DataException("DEV_OPS Role 不能通过普通授权方案配置");
-            }
-            if (Boolean.TRUE.equals(role.getSystemManaged())) {
-                throw new DataException("系统内置 Role 不能通过普通授权方案配置: " + roleCode);
-            }
-            validateBoundaries(role, assignment.getBoundaries());
+            validateAssignment(assignment, roleCodes);
         }
+    }
+
+    private void validateAssignment(AuthorizationProfileAssignmentFrom assignment, Set<String> roleCodes) {
+        var roleCode = assignment.getRoleCode() == null ? "" : assignment.getRoleCode().trim();
+        if (!roleCodes.add(roleCode)) {
+            throw new DataException("授权方案不能重复配置同一个 Role");
+        }
+        var role = roleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getCode, roleCode));
+        if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
+            throw new DataNotExistException("Role 不存在或已停用: " + roleCode);
+        }
+        var currentRoleVersion = role.getVersion() == null ? 0L : role.getVersion();
+        if (!Long.valueOf(currentRoleVersion).equals(assignment.getRoleVersion())) {
+            throw new DataException("Role version 已变化，请刷新角色授权后重试: " + roleCode);
+        }
+        if ("DEV_OPS".equals(role.getRoleKind())) {
+            throw new DataException("DEV_OPS Role 不能通过普通授权方案配置");
+        }
+        if (Boolean.TRUE.equals(role.getSystemManaged())) {
+            throw new DataException("系统内置 Role 不能通过普通授权方案配置: " + roleCode);
+        }
+        validateBoundaries(role, assignment.getBoundaries());
     }
 
     /**
@@ -290,24 +293,30 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
                 .collect(Collectors.toMap(Permission::getCode, item -> item));
         var seen = new HashSet<String>();
         for (var boundary : boundaries) {
-            var permissionCode = boundary.getPermission().trim();
-            if (!seen.add(permissionCode)) {
-                throw new DataException("授权方案不能重复配置 Permission: " + permissionCode);
+            validateBoundary(boundary, seen, permissions, rolePermissionIds, grantablePermissionIds);
+        }
+    }
+
+    private void validateBoundary(AuthorizationProfileBoundaryFrom boundary, Set<String> seen,
+                                  Map<String, Permission> permissions, Set<UUID> rolePermissionIds,
+                                  Set<UUID> grantablePermissionIds) {
+        var permissionCode = boundary.getPermission().trim();
+        if (!seen.add(permissionCode)) {
+            throw new DataException("授权方案不能重复配置 Permission: " + permissionCode);
+        }
+        var permission = permissions.get(permissionCode);
+        if (permission == null || !SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())) {
+            throw new DataNotExistException("Permission 不存在或已停用: " + permissionCode);
+        }
+        if (!rolePermissionIds.contains(permission.getId())) {
+            throw new DataException("Role 未声明 Permission: " + permissionCode);
+        }
+        validateScope(boundary.getAccess(), permission, "Access Boundary");
+        if (boundary.getGrant() != null) {
+            if (!grantablePermissionIds.contains(permission.getId())) {
+                throw new DataException("Role 未声明 GrantablePermission: " + permissionCode);
             }
-            var permission = permissions.get(permissionCode);
-            if (permission == null || !SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())) {
-                throw new DataNotExistException("Permission 不存在或已停用: " + permissionCode);
-            }
-            if (!rolePermissionIds.contains(permission.getId())) {
-                throw new DataException("Role 未声明 Permission: " + permissionCode);
-            }
-            validateScope(boundary.getAccess(), permission, "Access Boundary");
-            if (boundary.getGrant() != null) {
-                if (!grantablePermissionIds.contains(permission.getId())) {
-                    throw new DataException("Role 未声明 GrantablePermission: " + permissionCode);
-                }
-                validateScope(boundary.getGrant(), permission, "Grant Boundary");
-            }
+            validateScope(boundary.getGrant(), permission, "Grant Boundary");
         }
     }
 

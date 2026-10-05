@@ -26,17 +26,17 @@ import java.util.UUID;
  * @param primaryDepartmentCount      被替换的主部门关系数
  * @param associatedDepartmentCount   被替换的关联部门关系数
  * @param deduplicatedAssociatedCount 合并或主关联冲突中被去重的关系数
- * @param stateFingerprint           成员关系快照摘要，用于 Apply 检查 Preview 后的变化
+ * @param stateFingerprint            成员关系快照摘要，用于 Apply 检查 Preview 后的变化
  * @author yangxj96
  * @version 1.0
  * @since 2026/09/28
  */
 public record DepartmentMembershipRestructureImpact(
-        Set<UUID> affectedUserIds,
-        int primaryDepartmentCount,
-        int associatedDepartmentCount,
-        int deduplicatedAssociatedCount,
-        String stateFingerprint) {
+                                                    Set<UUID> affectedUserIds,
+                                                    int primaryDepartmentCount,
+                                                    int associatedDepartmentCount,
+                                                    int deduplicatedAssociatedCount,
+                                                    String stateFingerprint) {
 
     public DepartmentMembershipRestructureImpact {
         affectedUserIds = Set.copyOf(affectedUserIds);

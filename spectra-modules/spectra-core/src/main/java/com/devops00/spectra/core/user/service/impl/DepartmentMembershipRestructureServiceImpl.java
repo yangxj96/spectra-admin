@@ -112,7 +112,9 @@ public class DepartmentMembershipRestructureServiceImpl implements DepartmentMem
     @Override
     public Set<UUID> applySplit(UUID sourceDepartmentId, Collection<UUID> userIds,
                                 UUID targetDepartmentId, UUID operatorId) {
-        if (sourceDepartmentId == null || targetDepartmentId == null || operatorId == null
+        if (sourceDepartmentId == null
+                || targetDepartmentId == null
+                || operatorId == null
                 || sourceDepartmentId.equals(targetDepartmentId)) {
             throw new DataException("部门重组参数无效");
         }
@@ -203,9 +205,12 @@ public class DepartmentMembershipRestructureServiceImpl implements DepartmentMem
                 .filter(userId -> !primaryDepartmentUserIds.contains(userId))
                 .count();
         var fingerprintParts = new ArrayList<String>();
-        snapshot.users().stream().sorted(java.util.Comparator.comparing(User::getId))
+        snapshot.users()
+                .stream()
+                .sorted(java.util.Comparator.comparing(User::getId))
                 .forEach(user -> fingerprintParts.add("P:" + user.getId() + ":" + user.getPrimaryDepartmentId()));
-        snapshot.memberships().stream()
+        snapshot.memberships()
+                .stream()
                 .filter(item -> snapshot.sourceDepartmentIds().contains(item.getDepartmentId()))
                 .sorted(java.util.Comparator.comparing(UserDepartmentMembership::getUserId)
                         .thenComparing(UserDepartmentMembership::getDepartmentId))
@@ -216,8 +221,9 @@ public class DepartmentMembershipRestructureServiceImpl implements DepartmentMem
 
     private String fingerprint(List<String> parts) {
         try {
-            var digest = MessageDigest.getInstance("SHA-256").digest(
-                    String.join("|", parts).getBytes(StandardCharsets.UTF_8));
+            var digest = MessageDigest.getInstance("SHA-256")
+                    .digest(
+                            String.join("|", parts).getBytes(StandardCharsets.UTF_8));
             var result = new StringBuilder(digest.length * 2);
             for (byte value : digest) {
                 result.append(String.format("%02x", value));
@@ -229,8 +235,9 @@ public class DepartmentMembershipRestructureServiceImpl implements DepartmentMem
     }
 
     private List<UserDepartmentMembership> sourceMemberships(MembershipSnapshot snapshot,
-                                                              Set<UUID> sourceDepartmentIds) {
-        return snapshot.memberships().stream()
+                                                             Set<UUID> sourceDepartmentIds) {
+        return snapshot.memberships()
+                .stream()
                 .filter(item -> sourceDepartmentIds.contains(item.getDepartmentId()))
                 .toList();
     }

@@ -284,14 +284,14 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     @Override
     public NotificationTemplatePreviewVO preview(NotificationTemplatePreviewFrom params) {
         var template = params.getTemplateId() == null ? null : getTemplate(params.getTemplateId());
-        var groupCode = template == null ? null : template.getTemplateGroupCode();
-        var channel = template == null ? params.getChannel() : parseChannel(template.getChannel());
-        var purpose = template == null ? normalize(params.getPurpose()) : template.getPurpose();
-        var title = template == null ? params.getTitleTemplate() : template.getTitleTemplate();
-        var content = template == null ? params.getContentTemplate() : template.getContentTemplate();
-        var html = template == null ? params.getHtmlTemplate() : template.getHtmlTemplate();
-        var providerTemplateCode = template == null ? null : template.getProviderTemplateCode();
-        var schema = template == null ? params.getParameterSchema() : template.getParameterSchema();
+        var input = previewInput(params, template);
+        var channel = input.channel();
+        var purpose = input.purpose();
+        var title = input.title();
+        var content = input.content();
+        var html = input.html();
+        var providerTemplateCode = input.providerTemplateCode();
+        var schema = input.schema();
         if (!StringUtils.hasText(content)) {
             throw new DataSaveException("正文模板不能为空");
         }
@@ -300,6 +300,33 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         policy.validateTemplateFields(channel, title, html, providerTemplateCode);
         renderer.validateDefinition(schema, title, content, html);
         renderer.validateParameterSecurity(schema, params.getParameters(), params.getSensitiveParameters());
+        var parameters = mergeParameters(params);
+        renderer.validateAll(parameters, title, content, html);
+
+        var result = new NotificationTemplatePreviewVO();
+        result.setTemplateId(template == null ? null : template.getId());
+        result.setTemplateGroupCode(input.groupCode());
+        result.setChannel(channel.name());
+        result.setPurpose(purposeValue.name());
+        result.setVersionNo(input.versionNo());
+        result.setTitle(renderer.render(title, parameters));
+        result.setContent(renderer.render(content, parameters));
+        result.setHtml(renderer.render(html, parameters));
+        result.setPreviewedAt(timeMapper.toLocalDateTime(Instant.now()));
+        return result;
+    }
+
+    private PreviewInput previewInput(NotificationTemplatePreviewFrom params, NotificationTemplateEntity template) {
+        if (template == null) {
+            return new PreviewInput(null, params.getChannel(), normalize(params.getPurpose()), params.getTitleTemplate(),
+                    params.getContentTemplate(), params.getHtmlTemplate(), null, params.getParameterSchema(), null);
+        }
+        return new PreviewInput(template.getTemplateGroupCode(), parseChannel(template.getChannel()), template.getPurpose(),
+                template.getTitleTemplate(), template.getContentTemplate(), template.getHtmlTemplate(),
+                template.getProviderTemplateCode(), template.getParameterSchema(), template.getVersionNo());
+    }
+
+    private Map<String, Object> mergeParameters(NotificationTemplatePreviewFrom params) {
         var parameters = new HashMap<String, Object>();
         if (params.getParameters() != null) {
             parameters.putAll(params.getParameters());
@@ -307,19 +334,12 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         if (params.getSensitiveParameters() != null) {
             parameters.putAll(params.getSensitiveParameters());
         }
-        renderer.validateAll(parameters, title, content, html);
+        return parameters;
+    }
 
-        var result = new NotificationTemplatePreviewVO();
-        result.setTemplateId(template == null ? null : template.getId());
-        result.setTemplateGroupCode(groupCode);
-        result.setChannel(channel.name());
-        result.setPurpose(purposeValue.name());
-        result.setVersionNo(template == null ? null : template.getVersionNo());
-        result.setTitle(renderer.render(title, parameters));
-        result.setContent(renderer.render(content, parameters));
-        result.setHtml(renderer.render(html, parameters));
-        result.setPreviewedAt(timeMapper.toLocalDateTime(Instant.now()));
-        return result;
+    private record PreviewInput(String groupCode, NotificationChannel channel, String purpose, String title,
+                                String content, String html, String providerTemplateCode, Map<String, Object> schema,
+                                Integer versionNo) {
     }
 
     /**

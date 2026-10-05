@@ -168,6 +168,9 @@ public class SecurityReplayNonceAdminService implements SecurityReplayNonceAdmin
     private long scanAndDelete(RedisConnection connection, long cutoff) {
         RedisSerializer<?> keySerializer = redis.getKeySerializer();
         RedisSerializer<?> valueSerializer = redis.getValueSerializer();
+        if (keySerializer == null || valueSerializer == null) {
+            throw new SecurityRedisUnavailableException("安全 Redis nonce 序列化器不可用", null);
+        }
         byte[] pattern = serialize(keySerializer, NONCE_PATTERN);
         byte[] cutoffKey = serialize(keySerializer, SecurityRedisKey.CRYPTO_NONCE_CUTOFF.getPattern());
         long deleted = 0L;

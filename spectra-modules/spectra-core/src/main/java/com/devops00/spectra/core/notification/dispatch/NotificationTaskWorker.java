@@ -213,9 +213,19 @@ public class NotificationTaskWorker {
      * 记录渠道结果；只有明确的限流结果允许按任务最大尝试次数退避重试。
      */
     private void finish(NotificationTaskEntity task, ChannelSendResult result) {
-        var delivery = new NotificationDeliveryEntity();
         var completedAt = Instant.now();
         var attemptCount = (task.getAttemptCount() == null ? 0 : task.getAttemptCount()) + 1;
+        var safeSummary = sanitizeProviderSummary(result.summary());
+        var delivery = buildDelivery(task, result, completedAt, attemptCount, safeSummary);
+        if (deliveryMapper.insert(delivery) != 1) {
+            throw new DataSaveException("记录通知投递结果失败");
+        }
+        updateTask(task, result, attemptCount, safeSummary);
+    }
+
+    private NotificationDeliveryEntity buildDelivery(NotificationTaskEntity task, ChannelSendResult result,
+                                                     Instant completedAt, int attemptCount, String safeSummary) {
+        var delivery = new NotificationDeliveryEntity();
         delivery.setNotificationTaskId(task.getId());
         delivery.setTemplateId(task.getTemplateId());
         delivery.setTemplateVersionNo(task.getTemplateVersionNo());
@@ -228,13 +238,14 @@ public class NotificationTaskWorker {
         delivery.setStartedAt(completedAt);
         delivery.setCompletedAt(completedAt);
         delivery.setResultStatus(result.status().name());
-        var safeSummary = sanitizeProviderSummary(result.summary());
         delivery.setErrorCode(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
         delivery.setErrorMessageSanitized(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
         delivery.setResponseSummary(safeSummary == null ? Map.of() : Map.of("summary", safeSummary));
-        if (deliveryMapper.insert(delivery) != 1) {
-            throw new DataSaveException("记录通知投递结果失败");
-        }
+        return delivery;
+    }
+
+    private void updateTask(NotificationTaskEntity task, ChannelSendResult result, int attemptCount,
+                            String safeSummary) {
         var retryable = isRetryable(result, attemptCount, task.getMaxAttempts());
         var nextAttempt = Instant.now().plusSeconds(retryDelaySeconds(attemptCount));
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()

@@ -113,20 +113,20 @@
         SELECT <include refid="HistoryColumns"/>
         FROM spectra_core.quartz_job_execution_history
         WHERE 1 = 1
-        <if test="jobKey != null and jobKey != ''">
-            AND job_key = #{jobKey}
+        <if test="query.jobKey != null and query.jobKey != ''">
+            AND job_key = #{query.jobKey}
         </if>
-        <if test="triggerKey != null and triggerKey != ''">
-            AND trigger_key = #{triggerKey}
+        <if test="query.triggerKey != null and query.triggerKey != ''">
+            AND trigger_key = #{query.triggerKey}
         </if>
-        <if test="status != null">
-            AND status = #{status}
+        <if test="query.status != null">
+            AND status = #{query.status}
         </if>
-        <if test="startedAtFrom != null">
-            AND started_at &gt;= #{startedAtFrom}
+        <if test="query.startedAtFrom != null">
+            AND started_at &gt;= #{query.startedAtFrom}
         </if>
-        <if test="startedAtTo != null">
-            AND started_at &lt; #{startedAtTo}
+        <if test="query.startedAtTo != null">
+            AND started_at &lt; #{query.startedAtTo}
         </if>
         ORDER BY created_at DESC, id DESC
     </select>
@@ -139,15 +139,15 @@
 
     <update id="finish">
         UPDATE spectra_core.quartz_job_execution_history
-           SET status = #{status},
-               finished_at = #{finishedAt},
-               duration_ms = #{durationMs},
-               result_summary = #{resultSummary},
-               error_code = #{errorCode},
-               error_message = #{errorMessage},
+           SET status = #{result.status},
+               finished_at = #{result.finishedAt},
+               duration_ms = #{result.durationMs},
+               result_summary = #{result.resultSummary},
+               error_code = #{result.errorCode},
+               error_message = #{result.errorMessage},
                updated_at = CURRENT_TIMESTAMP,
                version = version + 1
-         WHERE id = #{id}
+         WHERE id = #{result.id}
            AND status = 'RUNNING'
     </update>
 

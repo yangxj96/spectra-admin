@@ -60,20 +60,19 @@ public class NotificationTaskBatchPlanner {
      * @param templateSnapshots 各渠道渲染模板快照
      * @return 带有稳定幂等键的任务草稿
      */
-    public List<TaskDraft> plan(NotificationRequest request, UUID requestId, Instant now, UUID auditUserId,
-                                Collection<TaskTarget> targets,
-                                Map<NotificationChannel, TemplateSnapshot> templateSnapshots) {
+    public List<TaskDraft> plan(PlanRequest planRequest) {
+        var request = planRequest.request();
         var hasSensitivePayload = !request.sensitiveParameters().isEmpty();
-        return targets.stream().map(target -> {
-            var rendered = templateSnapshots.get(target.channel());
+        return planRequest.targets().stream().map(target -> {
+            var rendered = planRequest.templateSnapshots().get(target.channel());
             var task = new NotificationTaskEntity();
             var recipientKeyHash = recipientKeyHash(target.recipientUserId(), target.channel(), target.address());
             task.setId(UuidCreator.getTimeOrderedEpoch());
-            task.setCreatedBy(auditUserId);
-            task.setCreatedAt(now);
-            task.setUpdatedBy(auditUserId);
-            task.setUpdatedAt(now);
-            task.setNotificationRequestId(requestId);
+            task.setCreatedBy(planRequest.auditUserId());
+            task.setCreatedAt(planRequest.now());
+            task.setUpdatedBy(planRequest.auditUserId());
+            task.setUpdatedAt(planRequest.now());
+            task.setNotificationRequestId(planRequest.requestId());
             task.setReceiverUserId(target.recipientUserId());
             task.setRecipientKeyHash(recipientKeyHash);
             task.setRecipientMasked(NotificationAddressMasker.maskAddress(target.address()));
@@ -101,12 +100,17 @@ public class NotificationTaskBatchPlanner {
             task.setPriority(normalizePriority(request.priority()));
             task.setAttemptCount(0);
             task.setMaxAttempts(3);
-            task.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
+            task.setScheduledAt(request.scheduledAt() == null ? planRequest.now() : request.scheduledAt());
             task.setNextRetryAt(task.getScheduledAt());
             task.setExpiresAt(request.expiresAt());
             task.setStatus(NotificationTaskStatus.PENDING.name());
             return new TaskDraft(task, recipientKeyHash, target.channel().name());
         }).toList();
+    }
+
+    public record PlanRequest(NotificationRequest request, UUID requestId, Instant now, UUID auditUserId,
+                              Collection<TaskTarget> targets,
+                              Map<NotificationChannel, TemplateSnapshot> templateSnapshots) {
     }
 
     /**

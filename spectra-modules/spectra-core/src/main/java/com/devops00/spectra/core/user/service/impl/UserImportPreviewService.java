@@ -149,9 +149,26 @@ public class UserImportPreviewService {
             throw new DataException("创建用户导入任务失败");
         }
 
-        var usernames = new HashSet<String>();
-        var emails = new HashSet<String>();
-        var phones = new HashSet<String>();
+        var rowContext = new PreviewRowContext(params, referenceData, allowedDepartmentIds,
+                new HashSet<>(), new HashSet<>(), new HashSet<>());
+        var stats = processRows(task, rows, rowContext);
+        task.setStatus(STATUS_PREVIEWED);
+        task.setValidRows(stats.validRows());
+        task.setErrorRows(stats.errorRows());
+        task.setSkippedRows(stats.skippedRows());
+        task.setAssignmentCount(stats.assignmentCount());
+        task.setAccessBoundaryCount(stats.accessBoundaryCount());
+        task.setGrantBoundaryCount(stats.grantBoundaryCount());
+        var token = issuePreviewToken();
+        task.setPreviewTokenHash(PreviewTokenDigest.hash(token));
+        task.setPreviewExpiresAt(Instant.now().plusSeconds(10 * 60));
+        if (taskMapper.updateById(task) != 1) {
+            throw new DataException("更新用户导入 Preview 状态失败");
+        }
+        return resultService.toVO(task, token);
+    }
+
+    private RowStats processRows(UserImportTask task, List<NormalizedRow> rows, PreviewRowContext context) {
         var validRows = 0;
         var errorRows = 0;
         var skippedRows = 0;
@@ -166,20 +183,21 @@ public class UserImportPreviewService {
             row.setRowKey((index + 1) + ":" + normalized.source().getEmployeeNo());
             row.setRawData(normalized.rawData());
             row.setNormalizedData(normalized.normalizedData());
-            boolean departmentReferencesValid = rowDepartmentReferencesValid(normalized.source(), referenceData);
-            var errors = rowDepartmentsInScope(normalized.source(), referenceData, allowedDepartmentIds)
-                    ? validate(normalized.source(), referenceData, params.isSkipExisting(), usernames, emails, phones,
-                            departmentReferencesValid)
+            boolean departmentReferencesValid = rowDepartmentReferencesValid(normalized.source(), context.referenceData());
+            var errors = rowDepartmentsInScope(normalized.source(), context.referenceData(), context.allowedDepartmentIds())
+                    ? validate(new ValidationInput(normalized.source(), context.referenceData(),
+                            context.params().isSkipExisting(), context.usernames(), context.emails(), context.phones(),
+                            departmentReferencesValid))
                     : List.of("用户创建部门超出当前数据范围");
             if (errors.isEmpty()) {
                 row.setState(STATE_VALID);
                 validRows++;
                 var existingUser = findExisting(normalized.source());
-                if (existingUser != null && params.isSkipExisting()) {
+                if (existingUser != null && context.params().isSkipExisting()) {
                     row.setUserId(existingUser.getId());
                     skippedRows++;
                 } else {
-                    var profile = referenceData.profiles().get(normalized.source().getAuthorizationProfileCode());
+                    var profile = context.referenceData().profiles().get(normalized.source().getAuthorizationProfileCode());
                     if (profile != null) {
                         assignmentCount += profile.getAssignments().size();
                         accessBoundaryCount += profile.getAssignments()
@@ -203,20 +221,16 @@ public class UserImportPreviewService {
                 throw new DataException("保存用户导入暂存行失败: " + row.getRowNumber());
             }
         }
-        task.setStatus(STATUS_PREVIEWED);
-        task.setValidRows(validRows);
-        task.setErrorRows(errorRows);
-        task.setSkippedRows(skippedRows);
-        task.setAssignmentCount(assignmentCount);
-        task.setAccessBoundaryCount(accessBoundaryCount);
-        task.setGrantBoundaryCount(grantBoundaryCount);
-        var token = issuePreviewToken();
-        task.setPreviewTokenHash(PreviewTokenDigest.hash(token));
-        task.setPreviewExpiresAt(Instant.now().plusSeconds(10 * 60));
-        if (taskMapper.updateById(task) != 1) {
-            throw new DataException("更新用户导入 Preview 状态失败");
-        }
-        return resultService.toVO(task, token);
+        return new RowStats(validRows, errorRows, skippedRows, assignmentCount, accessBoundaryCount, grantBoundaryCount);
+    }
+
+    private record PreviewRowContext(UserImportPreviewFrom params, ReferenceData referenceData,
+                                     Set<UUID> allowedDepartmentIds, Set<String> usernames, Set<String> emails,
+                                     Set<String> phones) {
+    }
+
+    private record RowStats(int validRows, int errorRows, int skippedRows, int assignmentCount,
+                            int accessBoundaryCount, int grantBoundaryCount) {
     }
 
     /** 在 Apply 前重新校验 Preview token、引用数据版本和请求摘要。 */
@@ -289,7 +303,8 @@ public class UserImportPreviewService {
         if (!associatedCodes.errors().isEmpty()) {
             return true;
         }
-        associatedCodes.codes().stream()
+        associatedCodes.codes()
+                .stream()
                 .map(referenceData.departmentIds()::get)
                 .filter(java.util.Objects::nonNull)
                 .forEach(requestedDepartmentIds::add);
@@ -332,32 +347,49 @@ public class UserImportPreviewService {
     /**
      * 校验用户。
      */
-    private List<String> validate(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
-                                  Set<String> usernames, Set<String> emails, Set<String> phones,
-                                  boolean checkExisting) {
+    private List<String> validate(ValidationInput input) {
         var errors = new ArrayList<String>();
-        if (blank(source.getRealName())) {
+        validateIdentity(input.source(), input.usernames(), input.emails(), input.phones(), errors);
+        validateReferences(input.source(), input.referenceData(), errors);
+        validateExisting(input.source(), input.skipExisting(), input.checkExisting(), errors);
+        return errors;
+    }
+
+    private record ValidationInput(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
+                                   Set<String> usernames, Set<String> emails, Set<String> phones,
+                                   boolean checkExisting) {
+    }
+
+    private void validateIdentity(UserImportRowFrom source, Set<String> usernames, Set<String> emails,
+                                  Set<String> phones, List<String> errors) {
+        if (blank(source.getRealName()))
             errors.add("姓名不能为空");
+        validateUnique(source.getUsername(), usernames, "登录用户名", "登录用户名不能为空", errors);
+        validatePattern(source.getPhone(), PHONE_PATTERN, phones, "手机号码", errors);
+        validatePattern(source.getEmail(), EMAIL_PATTERN, emails, "邮箱", errors);
+    }
+
+    private void validateUnique(String value, Set<String> values, String label, String emptyMessage,
+                                List<String> errors) {
+        if (blank(value)) {
+            errors.add(emptyMessage);
+        } else if (!values.add(value.toLowerCase(Locale.ROOT))) {
+            errors.add(label + "在导入文件中重复");
         }
-        if (blank(source.getUsername())) {
-            errors.add("登录用户名不能为空");
-        } else if (!usernames.add(source.getUsername().toLowerCase(Locale.ROOT))) {
-            errors.add("登录用户名在导入文件中重复");
+    }
+
+    private void validatePattern(String value, Pattern pattern, Set<String> values, String label,
+                                 List<String> errors) {
+        if (blank(value)) {
+            errors.add(label + "不能为空");
+        } else if (!pattern.matcher(value).matches()) {
+            errors.add(label + "格式不正确");
+        } else if (!values.add(value.toLowerCase(Locale.ROOT))) {
+            errors.add(label + "在导入文件中重复");
         }
-        if (blank(source.getPhone())) {
-            errors.add("手机号码不能为空");
-        } else if (!PHONE_PATTERN.matcher(source.getPhone()).matches()) {
-            errors.add("手机号码格式不正确");
-        } else if (!phones.add(source.getPhone())) {
-            errors.add("手机号码在导入文件中重复");
-        }
-        if (blank(source.getEmail())) {
-            errors.add("邮箱不能为空");
-        } else if (!EMAIL_PATTERN.matcher(source.getEmail()).matches()) {
-            errors.add("邮箱格式不正确");
-        } else if (!emails.add(source.getEmail().toLowerCase(Locale.ROOT))) {
-            errors.add("邮箱在导入文件中重复");
-        }
+    }
+
+    private void validateReferences(UserImportRowFrom source, ReferenceData referenceData, List<String> errors) {
         if (!referenceData.departmentIds().containsKey(source.getDepartmentCode())) {
             errors.add("部门编码不存在");
         }
@@ -373,6 +405,10 @@ public class UserImportPreviewService {
         if (profile == null || !SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             errors.add("授权方案不存在或已停用");
         }
+    }
+
+    private void validateExisting(UserImportRowFrom source, boolean skipExisting, boolean checkExisting,
+                                  List<String> errors) {
         if (checkExisting) {
             var existing = findExisting(source);
             if (existing != null && !skipExisting) {

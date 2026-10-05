@@ -145,8 +145,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());
-        appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), roleId,
-                Map.of("affectedUserCount", prepared.impact().affectedUserCount()), Map.of(), "Role 授权变更预览");
+        appendAudit(new AuditInput("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), roleId,
+                Map.of("affectedUserCount", prepared.impact().affectedUserCount()), Map.of(), "Role 授权变更预览"));
         return result;
     }
 
@@ -184,29 +184,10 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
      * 创建或构建目标数据（{@code prepare}）。
      */
     private PreparedChange prepare(UUID roleId, RoleAuthorizationChangeFrom from) {
-        if (roleId == null
-                || from == null
-                || from.getExpectedVersion() == null
-                || from.getAuthorityLevel() == null
-                || from.getPermissionCodes() == null
-                || from.getGrantablePermissionCodes() == null) {
-            throw new DataException("Role 授权变更参数不能为空");
-        }
+        validateInput(roleId, from);
         var operatorId = currentOperatorId();
-        var role = roleMapper.selectById(roleId);
-        if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
-            throw new DataNotExistException("目标 Role 不存在或已停用");
-        }
-        if (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind())) {
-            throw new BuiltinDataException("内置角色不可修改授权");
-        }
-        if (from.getAuthorityLevel() > 999) {
-            throw new DataException("普通角色授权管理等级必须在 1 到 999 之间");
-        }
-        long expectedVersion = role.getVersion() == null ? 0L : role.getVersion();
-        if (expectedVersion != from.getExpectedVersion()) {
-            throw new DataException("Role version 已变化，请重新生成授权变更预览");
-        }
+        var role = loadRole(roleId);
+        long expectedVersion = validateRoleVersion(role, from);
         var before = currentState(roleId, role);
         var after = requestedState(from);
         if (!after.grantablePermissions().stream().allMatch(after.permissions()::contains)) {
@@ -225,6 +206,35 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
             approvalGate.assertAllowed("ROLE_AUTHORIZATION_CHANGE", requestHash);
         }
         return new PreparedChange(operatorId, role, expectedVersion, before, after, impact, requestHash);
+    }
+
+    private void validateInput(UUID roleId, RoleAuthorizationChangeFrom from) {
+        if (roleId == null || from == null || from.getExpectedVersion() == null || from.getAuthorityLevel() == null
+                || from.getPermissionCodes() == null || from.getGrantablePermissionCodes() == null) {
+            throw new DataException("Role 授权变更参数不能为空");
+        }
+    }
+
+    private SecurityRole loadRole(UUID roleId) {
+        var role = roleMapper.selectById(roleId);
+        if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
+            throw new DataNotExistException("目标 Role 不存在或已停用");
+        }
+        if (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind())) {
+            throw new BuiltinDataException("内置角色不可修改授权");
+        }
+        return role;
+    }
+
+    private long validateRoleVersion(SecurityRole role, RoleAuthorizationChangeFrom from) {
+        if (from.getAuthorityLevel() > 999) {
+            throw new DataException("普通角色授权管理等级必须在 1 到 999 之间");
+        }
+        long expectedVersion = role.getVersion() == null ? 0L : role.getVersion();
+        if (expectedVersion != from.getExpectedVersion()) {
+            throw new DataException("Role version 已变化，请重新生成授权变更预览");
+        }
+        return expectedVersion;
     }
 
     /**
@@ -420,31 +430,34 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
      */
     private void recordRoleAuthorizationEvents(PreparedChange prepared, UUID roleId) {
         if (!prepared.before().permissions().equals(prepared.after().permissions())) {
-            appendAudit("ROLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
+            appendAudit(new AuditInput("ROLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
                     Map.of("permissions", prepared.before().permissions()),
-                    Map.of("permissions", prepared.after().permissions()), null);
+                    Map.of("permissions", prepared.after().permissions()), null));
         }
         if (!prepared.before().grantablePermissions().equals(prepared.after().grantablePermissions())) {
-            appendAudit("ROLE_GRANTABLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
+            appendAudit(new AuditInput("ROLE_GRANTABLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
                     Map.of("grantablePermissions", prepared.before().grantablePermissions()),
-                    Map.of("grantablePermissions", prepared.after().grantablePermissions()), null);
+                    Map.of("grantablePermissions", prepared.after().grantablePermissions()), null));
         }
         if (prepared.before().authorityLevel() != prepared.after().authorityLevel()) {
-            appendAudit("ROLE_AUTHORITY_LEVEL_CHANGED", prepared.operatorId(), roleId,
+            appendAudit(new AuditInput("ROLE_AUTHORITY_LEVEL_CHANGED", prepared.operatorId(), roleId,
                     Map.of("authorityLevel", prepared.before().authorityLevel()),
-                    Map.of("authorityLevel", prepared.after().authorityLevel()), null);
+                    Map.of("authorityLevel", prepared.after().authorityLevel()), null));
         }
     }
 
     /**
      * 更新或推进目标状态（{@code appendAudit}）。
      */
-    private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
-                             Map<String, Object> after, String reason) {
-        var event = auditRecordFactory.create(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditRecord.Result.SUCCEEDED,
+    private void appendAudit(AuditInput input) {
+        var event = auditRecordFactory.create(null, input.eventType(), input.operatorId(), input.targetId(), null, null, null,
+                input.before(), input.after(), input.reason(), null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         auditService.record(event);
+    }
+
+    private record AuditInput(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                              Map<String, Object> after, String reason) {
     }
 
     /**

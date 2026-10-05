@@ -51,31 +51,34 @@ public class UserDepartmentMembershipServiceImpl implements UserDepartmentMember
         }
 
         List<UUID> requested = associatedDepartmentIds == null ? List.of() : associatedDepartmentIds;
-        var uniqueIds = new HashSet<UUID>();
-        for (var departmentId : requested) {
-            if (departmentId == null) {
-                throw new DataException("关联部门不能为空");
-            }
-            if (!uniqueIds.add(departmentId)) {
-                throw new DataException("关联部门不能重复");
-            }
-            if (primaryDepartmentId.equals(departmentId)) {
-                throw new DataException("主部门不能重复添加为关联部门");
-            }
-        }
-
-        var allDepartmentIds = new ArrayList<UUID>(requested.size() + 1);
-        allDepartmentIds.add(primaryDepartmentId);
-        allDepartmentIds.addAll(requested);
-        var activeDepartmentIds = departmentMapper.selectActiveIdsByIds(allDepartmentIds);
-        if (activeDepartmentIds.size() != allDepartmentIds.size()) {
-            throw new DataException("主部门或关联部门不存在或已删除");
-        }
+        validateRequested(primaryDepartmentId, requested);
+        validateDepartmentsExist(primaryDepartmentId, requested);
 
         membershipMapper.softDeleteActiveByUserId(userId, operatorId);
         if (!requested.isEmpty()
                 && membershipMapper.batchInsertAssociated(userId, requested, operatorId) != requested.size()) {
             throw new DataException("替换用户关联部门失败");
+        }
+    }
+
+    private void validateRequested(UUID primaryDepartmentId, List<UUID> requested) {
+        var uniqueIds = new HashSet<UUID>();
+        for (var departmentId : requested) {
+            if (departmentId == null)
+                throw new DataException("关联部门不能为空");
+            if (!uniqueIds.add(departmentId))
+                throw new DataException("关联部门不能重复");
+            if (primaryDepartmentId.equals(departmentId))
+                throw new DataException("主部门不能重复添加为关联部门");
+        }
+    }
+
+    private void validateDepartmentsExist(UUID primaryDepartmentId, List<UUID> requested) {
+        var allDepartmentIds = new ArrayList<UUID>(requested.size() + 1);
+        allDepartmentIds.add(primaryDepartmentId);
+        allDepartmentIds.addAll(requested);
+        if (departmentMapper.selectActiveIdsByIds(allDepartmentIds).size() != allDepartmentIds.size()) {
+            throw new DataException("主部门或关联部门不存在或已删除");
         }
     }
 

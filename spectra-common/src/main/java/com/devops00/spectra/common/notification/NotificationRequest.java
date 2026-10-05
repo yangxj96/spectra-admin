@@ -80,14 +80,18 @@ public record NotificationRequest(UUID requestId, String idempotencyKey, Notific
      * @param link              客户端站内跳转路径
      * @return 仅包含 {@link NotificationChannel#IN_APP} 渠道的不可变通知请求
      */
-    public static NotificationRequest inApp(String idempotencyKey, NotificationPurpose purpose,
-                                            List<UUID> recipientUserIds, String templateGroupCode, String title, String content,
-                                            String businessType, String businessId, String sourceModule, String link) {
+    public static NotificationRequest inApp(InAppInput input) {
         var parameters = new HashMap<String, Object>();
-        parameters.put("title", title == null ? "通知" : title);
-        parameters.put("content", content == null ? "" : content);
-        return new NotificationRequest(null, idempotencyKey, purpose, List.of(NotificationChannel.IN_APP),
-                recipientUserIds, List.of(), templateGroupCode, parameters, Map.of(), businessType, businessId,
-                sourceModule, null, null, null, 0, link);
+        parameters.put("title", input.title() == null ? "通知" : input.title());
+        parameters.put("content", input.content() == null ? "" : input.content());
+        return new NotificationRequest(null, input.idempotencyKey(), input.purpose(), List.of(NotificationChannel.IN_APP),
+                input.recipientUserIds(), List.of(), input.templateGroupCode(), parameters, Map.of(), input.businessType(),
+                input.businessId(), input.sourceModule(), null, null, null, 0, input.link());
+    }
+
+    /** 站内信请求的构造输入。 */
+    public record InAppInput(String idempotencyKey, NotificationPurpose purpose, List<UUID> recipientUserIds,
+                             String templateGroupCode, String title, String content, String businessType,
+                             String businessId, String sourceModule, String link) {
     }
 }

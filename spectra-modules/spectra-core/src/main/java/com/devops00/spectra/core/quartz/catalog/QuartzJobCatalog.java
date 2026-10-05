@@ -62,6 +62,13 @@ public class QuartzJobCatalog {
 
     /** 校验单个 Job 定义的受信任边界。 */
     private void validateDefinition(QuartzJobDefinition definition) {
+        validateRequiredFields(definition);
+        validateBuiltInKey(definition);
+        validateTrigger(definition);
+        log.debug("加载 Quartz Job 定义: typeKey={}, builtIn={}", definition.typeKey(), definition.builtIn());
+    }
+
+    private void validateRequiredFields(QuartzJobDefinition definition) {
         if (definition == null || definition.typeKey() == null || definition.typeKey().isBlank()) {
             throw new IllegalArgumentException("Quartz Job 类型键不能为空");
         }
@@ -74,14 +81,19 @@ public class QuartzJobCatalog {
         if (definition.parameterSchema() == null) {
             throw new IllegalArgumentException("Quartz Job 参数 schema 不能为空: " + definition.typeKey());
         }
+    }
+
+    private void validateBuiltInKey(QuartzJobDefinition definition) {
         if (definition.builtIn() && definition.builtInJobKey().isEmpty()) {
             throw new IllegalArgumentException("内置 Quartz Job 必须声明固定 JobKey: " + definition.typeKey());
         }
+    }
+
+    private void validateTrigger(QuartzJobDefinition definition) {
         definition.defaultTrigger().ifPresent(trigger -> {
             if (trigger.triggerType() == null) {
                 throw new IllegalArgumentException("Quartz Trigger 类型不能为空: " + definition.typeKey());
             }
         });
-        log.debug("加载 Quartz Job 定义: typeKey={}, builtIn={}", definition.typeKey(), definition.builtIn());
     }
 }

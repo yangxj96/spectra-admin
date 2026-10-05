@@ -103,7 +103,8 @@ class DepartmentRestructureServiceImplTest {
         var second = department(secondId, secondParentId);
         var sourceIds = List.of(firstId, secondId).stream().sorted().toList();
         when(departmentMapper.selectActiveByIds(sourceIds)).thenReturn(sourceIds.stream()
-                .map(id -> id.equals(firstId) ? first : second).toList());
+                .map(id -> id.equals(firstId) ? first : second)
+                .toList());
         var from = new DepartmentMergePreviewFrom();
         from.setSourceDepartmentIds(sourceIds);
         from.setExpectedOrganizationVersion(3L);
@@ -196,16 +197,16 @@ class DepartmentRestructureServiceImplTest {
     }
 
     private DepartmentRestructureServiceImpl service(DepartmentMapper departmentMapper,
-                                                      OrganizationVersionMapper organizationVersionMapper,
-                                                      SecurityContextAccessor securityContextAccessor) {
+                                                     OrganizationVersionMapper organizationVersionMapper,
+                                                     SecurityContextAccessor securityContextAccessor) {
         return service(departmentMapper, organizationVersionMapper, securityContextAccessor,
                 mock(AuthorizationChangeTokenService.class));
     }
 
     private DepartmentRestructureServiceImpl service(DepartmentMapper departmentMapper,
-                                                      OrganizationVersionMapper organizationVersionMapper,
-                                                      SecurityContextAccessor securityContextAccessor,
-                                                      AuthorizationChangeTokenService tokenService) {
+                                                     OrganizationVersionMapper organizationVersionMapper,
+                                                     SecurityContextAccessor securityContextAccessor,
+                                                     AuthorizationChangeTokenService tokenService) {
         return new DepartmentRestructureServiceImpl(
                 departmentMapper, mock(DepartmentClosureMapper.class), organizationVersionMapper,
                 mock(DepartmentService.class), mock(DepartmentMembershipRestructureService.class),

@@ -309,29 +309,13 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
 
     @Override
     public ServiceMonitorDiagnosticTaskVO createTask(ServiceMonitorDiagnosticFrom from) {
-        if (!enabled)
-            throw new DataException("服务监控诊断功能已关闭");
-        var type = ServiceMonitorDiagnosticType.fromCode(from.getTaskType());
-        if (type == null)
-            throw new DataException("诊断类型无效");
-        if (type == ServiceMonitorDiagnosticType.HEAP_DUMP && (!heapDumpEnabled || !Boolean.TRUE.equals(from.getConfirm()))) {
-            throw new DataException("堆转储默认关闭，启用后必须显式确认风险");
-        }
+        var type = validateTaskRequest(from);
         var running = taskMapper.selectCount(new LambdaQueryWrapper<ServiceMonitorDiagnosticTask>()
                 .in(ServiceMonitorDiagnosticTask::getStatus, PENDING, RUNNING)
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted));
         if (running > 0)
             throw new DataException("当前已有诊断任务执行中，请稍后再试");
-        try {
-            Files.createDirectories(diagnosticDirectory);
-            if (Files.getFileStore(diagnosticDirectory).getUsableSpace() < (type == ServiceMonitorDiagnosticType.HEAP_DUMP
-                    ? heapDumpMaxBytes
-                    : threadDumpMaxBytes)) {
-                throw new DataException("诊断目录可用空间不足");
-            }
-        } catch (IOException exception) {
-            throw new DataException("诊断目录不可用", exception);
-        }
+        validateStorage(type);
         var now = Instant.now();
         var task = new ServiceMonitorDiagnosticTask();
         task.setTaskType(type.getCode());
@@ -351,6 +335,33 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
             throw new DataException("诊断任务未能启动", exception);
         }
         return toVO(task);
+    }
+
+    private ServiceMonitorDiagnosticType validateTaskRequest(ServiceMonitorDiagnosticFrom from) {
+        if (!enabled) {
+            throw new DataException("服务监控诊断功能已关闭");
+        }
+        var type = ServiceMonitorDiagnosticType.fromCode(from.getTaskType());
+        if (type == null) {
+            throw new DataException("诊断类型无效");
+        }
+        if (type == ServiceMonitorDiagnosticType.HEAP_DUMP
+                && (!heapDumpEnabled || !Boolean.TRUE.equals(from.getConfirm()))) {
+            throw new DataException("堆转储默认关闭，启用后必须显式确认风险");
+        }
+        return type;
+    }
+
+    private void validateStorage(ServiceMonitorDiagnosticType type) {
+        try {
+            Files.createDirectories(diagnosticDirectory);
+            long required = type == ServiceMonitorDiagnosticType.HEAP_DUMP ? heapDumpMaxBytes : threadDumpMaxBytes;
+            if (Files.getFileStore(diagnosticDirectory).getUsableSpace() < required) {
+                throw new DataException("诊断目录可用空间不足");
+            }
+        } catch (IOException exception) {
+            throw new DataException("诊断目录不可用", exception);
+        }
     }
 
     /**

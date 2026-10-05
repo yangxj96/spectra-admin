@@ -67,34 +67,11 @@ public final class UserAuthorizationStatusCalculator {
             return UserAuthorizationStatus.UNCONFIGURED;
         }
 
-        var effectiveCount = 0;
-        var completeCount = 0;
-        var incompleteCount = 0;
-        var invalidCount = 0;
-        for (var assignment : currentAssignments) {
-            var assignmentEffective = SecurityAuthorizationState.ACTIVE.name().equals(assignment.state())
-                    && (assignment.validFrom() == null || !assignment.validFrom().isAfter(now))
-                    && (assignment.validUntil() == null || assignment.validUntil().isAfter(now));
-            var roleEffective = SecurityAuthorizationState.ACTIVE.name().equals(assignment.roleState());
-            if (!assignmentEffective || !roleEffective) {
-                invalidCount++;
-                continue;
-            }
-
-            effectiveCount++;
-            var requiredPermissionCount = assignment.rolePermissionCount() == null
-                    ? 0L
-                    : assignment.rolePermissionCount();
-            var configuredBoundaryCount = assignment.accessBoundaries() == null
-                    ? 0
-                    : assignment.accessBoundaries().size();
-            var rootRole = RootAuthorizationPolicy.ROOT_ROLE.equals(assignment.roleCode());
-            if (rootRole || requiredPermissionCount == 0 || configuredBoundaryCount >= requiredPermissionCount) {
-                completeCount++;
-            } else {
-                incompleteCount++;
-            }
-        }
+        var counts = countAssignments(currentAssignments, now);
+        var effectiveCount = counts.effective();
+        var completeCount = counts.complete();
+        var incompleteCount = counts.incomplete();
+        var invalidCount = counts.invalid();
 
         if (effectiveCount == 0) {
             return UserAuthorizationStatus.PARTIAL;
@@ -109,5 +86,61 @@ public final class UserAuthorizationStatusCalculator {
             return UserAuthorizationStatus.BASIC_ONLY;
         }
         return UserAuthorizationStatus.ACTIVE;
+    }
+
+    private static AssignmentCounts countAssignments(List<AuthorizationAssignmentView> assignments,
+                                                     LocalDateTime now) {
+        var counts = new AssignmentCounts();
+        for (var assignment : assignments) {
+            if (!isEffective(assignment, now)) {
+                counts.invalid++;
+                continue;
+            }
+            counts.effective++;
+            if (isComplete(assignment)) {
+                counts.complete++;
+            } else {
+                counts.incomplete++;
+            }
+        }
+        return counts;
+    }
+
+    private static boolean isEffective(AuthorizationAssignmentView assignment, LocalDateTime now) {
+        var assignmentEffective = SecurityAuthorizationState.ACTIVE.name().equals(assignment.state())
+                && (assignment.validFrom() == null || !assignment.validFrom().isAfter(now))
+                && (assignment.validUntil() == null || assignment.validUntil().isAfter(now));
+        return assignmentEffective && SecurityAuthorizationState.ACTIVE.name().equals(assignment.roleState());
+    }
+
+    private static boolean isComplete(AuthorizationAssignmentView assignment) {
+        var required = assignment.rolePermissionCount() == null ? 0L : assignment.rolePermissionCount();
+        var configured = assignment.accessBoundaries() == null ? 0 : assignment.accessBoundaries().size();
+        return RootAuthorizationPolicy.ROOT_ROLE.equals(assignment.roleCode())
+                || required == 0
+                || configured >= required;
+    }
+
+    private static final class AssignmentCounts {
+        private int effective;
+        private int complete;
+        private int incomplete;
+        private int invalid;
+
+        private int effective() {
+            return effective;
+        }
+
+        private int complete() {
+            return complete;
+        }
+
+        private int incomplete() {
+            return incomplete;
+        }
+
+        private int invalid() {
+            return invalid;
+        }
     }
 }

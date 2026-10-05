@@ -145,9 +145,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());
-        appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), departmentId,
+        appendAudit(new AuditInput("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), departmentId,
                 Map.of("organizationVersion", prepared.impact().beforeVersion(), "operation", changeType.name()),
-                Map.of(), "组织变更预览");
+                Map.of(), "组织变更预览"));
         return result;
     }
 
@@ -210,12 +210,12 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
             String eventType = prepared.changeType() == ChangeType.CREATE
                     ? "ORGANIZATION_NODE_CREATED"
                     : "ORGANIZATION_NODE_UPDATED";
-            appendAudit(eventType, operatorId, persistedDepartmentId,
+            appendAudit(new AuditInput(eventType, operatorId, persistedDepartmentId,
                     Map.of("organizationVersion", prepared.impact().beforeVersion()),
                     Map.of("organizationVersion", prepared.impact().afterVersion(), "parentId",
                             String.valueOf(prepared.requestedDepartment().getPid()), "name",
                             prepared.requestedDepartment().getName()),
-                    null);
+                    null));
             return Boolean.TRUE;
         });
     }
@@ -224,15 +224,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
      * 创建或构建目标数据（{@code prepare}）。
      */
     private PreparedChange prepare(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
-        if ((changeType == ChangeType.UPDATE && departmentId == null)
-                || from == null
-                || from.getExpectedOrganizationVersion() == null
-                || from.getName() == null
-                || from.getName().isBlank()
-                || from.getType() == null
-                || from.getRegionId() == null) {
-            throw new DataException("组织变更参数不能为空");
-        }
+        validateInput(departmentId, from, changeType);
         var existing = departmentId == null ? null : departmentMapper.selectById(departmentId);
         if (changeType == ChangeType.UPDATE && existing == null) {
             throw new DataNotExistException("目标部门不存在");
@@ -250,21 +242,36 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         var userIds = assignments.stream().map(RoleAssignment::getUserId).collect(Collectors.toSet());
         var impact = impactAnalyzer.analyze(currentVersion, assignments.size(), userIds.size(), true);
         var operatorId = currentOperatorId();
+        evaluatePermission(operatorId, changeType);
+        var requestHash = requestHash(departmentId, changeType, requestedDepartment, currentVersion);
+        assertApproval(changeType, requestHash);
+        return new PreparedChange(operatorId, departmentId, changeType, requestedDepartment, impact, requestHash,
+                userIds);
+    }
+
+    private void validateInput(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
+        if ((changeType == ChangeType.UPDATE && departmentId == null) || from == null
+                || from.getExpectedOrganizationVersion() == null || from.getName() == null || from.getName().isBlank()
+                || from.getType() == null || from.getRegionId() == null) {
+            throw new DataException("组织变更参数不能为空");
+        }
+    }
+
+    private void evaluatePermission(UUID operatorId, ChangeType changeType) {
         var rootPolicy = rootPolicyProvider.getIfAvailable();
         boolean root = rootPolicy != null && rootPolicy.isRoot(securityContextAccessor.currentUser());
         String permission = changeType == ChangeType.CREATE ? "department:create" : "department:update";
         grantBoundaryService.evaluate(snapshotLoader.load(operatorId), operatorId, null,
                 List.of(new AuthorizationGrantRequest(permission, AuthorizationScope.of(ScopeMode.NONE),
-                        AuthorizationScope.of(ScopeMode.NONE), 1)),
-                root);
-        var requestHash = requestHash(departmentId, changeType, requestedDepartment, currentVersion);
+                        AuthorizationScope.of(ScopeMode.NONE), 1)), root);
+    }
+
+    private void assertApproval(ChangeType changeType, String requestHash) {
         var approvalGate = approvalGateProvider.getIfAvailable();
         if (approvalGate != null) {
             approvalGate.assertAllowed(changeType == ChangeType.CREATE ? "ORGANIZATION_CREATE" : "ORGANIZATION_CHANGE",
                     requestHash);
         }
-        return new PreparedChange(operatorId, departmentId, changeType, requestedDepartment, impact, requestHash,
-                userIds);
     }
 
     /**
@@ -409,12 +416,15 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     /**
      * 更新或推进目标状态（{@code appendAudit}）。
      */
-    private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
-                             Map<String, Object> after, String reason) {
-        var event = auditRecordFactory.create(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditRecord.Result.SUCCEEDED,
+    private void appendAudit(AuditInput input) {
+        var event = auditRecordFactory.create(null, input.eventType(), input.operatorId(), input.targetId(), null, null, null,
+                input.before(), input.after(), input.reason(), null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         auditService.record(event);
+    }
+
+    private record AuditInput(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                              Map<String, Object> after, String reason) {
     }
 
     /**

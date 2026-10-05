@@ -22,9 +22,11 @@ public final class AuthorizationDepartmentScope {
 
     /** Whether this permission has an ALL boundary (or the user has root ownership). */
     public static boolean isUnrestricted(AuthorizationSnapshot snapshot, String permission) {
-        return snapshot != null && (snapshot.isRoot()
-                || snapshot.accessBoundaries(permission).stream()
-                        .anyMatch(boundary -> boundary.scope().mode() == ScopeMode.ALL));
+        return snapshot != null
+                && (snapshot.isRoot()
+                        || snapshot.accessBoundaries(permission)
+                                .stream()
+                                .anyMatch(boundary -> boundary.scope().mode() == ScopeMode.ALL));
     }
 
     /**
@@ -33,7 +35,7 @@ public final class AuthorizationDepartmentScope {
      * and the subject's own department memberships remain intersected.
      */
     public static Set<UUID> visibleDepartmentIds(AuthorizationSnapshot snapshot, String permission,
-                                                  List<Department> departments) {
+                                                 List<Department> departments) {
         if (snapshot == null || departments == null || departments.isEmpty()) {
             return Set.of();
         }
@@ -50,7 +52,7 @@ public final class AuthorizationDepartmentScope {
 
     /** Adds ancestors only as structural context for the authorized department tree. */
     public static Set<UUID> treeDepartmentIds(AuthorizationSnapshot snapshot, String permission,
-                                               List<Department> departments) {
+                                              List<Department> departments) {
         if (snapshot == null || departments == null || departments.isEmpty()) {
             return Set.of();
         }
@@ -71,20 +73,24 @@ public final class AuthorizationDepartmentScope {
     }
 
     /** Checks whether a user row belongs to the permission's SELF or department scope. */
-    public static boolean canAccessUser(AuthorizationSnapshot snapshot, String permission,
-                                        UUID viewerUserId, UUID targetUserId,
-                                        Set<UUID> targetDepartmentIds, List<Department> departments) {
-        if (isUnrestricted(snapshot, permission)) {
+    public static boolean canAccessUser(UserAccessQuery query) {
+        if (isUnrestricted(query.snapshot(), query.permission())) {
             return true;
         }
-        if (allowsOwnUser(snapshot, permission, viewerUserId, targetUserId)) {
+        if (allowsOwnUser(query.snapshot(), query.permission(), query.viewerUserId(), query.targetUserId())) {
             return true;
         }
-        if (snapshot == null || targetDepartmentIds == null || targetDepartmentIds.isEmpty()) {
+        if (query.snapshot() == null || query.targetDepartmentIds() == null || query.targetDepartmentIds().isEmpty()) {
             return false;
         }
-        Set<UUID> visibleDepartments = visibleDepartmentIds(snapshot, permission, departments);
-        return targetDepartmentIds.stream().anyMatch(visibleDepartments::contains);
+        Set<UUID> visibleDepartments = visibleDepartmentIds(query.snapshot(), query.permission(), query.departments());
+        return query.targetDepartmentIds().stream().anyMatch(visibleDepartments::contains);
+    }
+
+    /** 用户访问范围判断所需的不可变查询上下文。 */
+    public record UserAccessQuery(AuthorizationSnapshot snapshot, String permission, UUID viewerUserId,
+                                  UUID targetUserId, Set<UUID> targetDepartmentIds,
+                                  List<Department> departments) {
     }
 
     /** Checks whether the requested department itself is in the permission scope. */
@@ -97,7 +103,9 @@ public final class AuthorizationDepartmentScope {
     /** Whether the permission's SELF or ALL boundary allows the current user's own user row. */
     public static boolean allowsOwnUser(AuthorizationSnapshot snapshot, String permission,
                                         UUID viewerUserId, UUID targetUserId) {
-        return viewerUserId != null && targetUserId != null && snapshot != null
+        return viewerUserId != null
+                && targetUserId != null
+                && snapshot != null
                 && snapshot.canAccess(permission, new ScopeQuery(targetUserId, viewerUserId, null, Set.of()));
     }
 

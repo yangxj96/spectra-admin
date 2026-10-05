@@ -37,8 +37,8 @@ public interface AuthConverter {
      * 用户信息转换为UserDTO,用于认证
      *
      * @param source 用户信息
-    * @return 转换结果
-    */
+     * @return 转换结果
+     */
     @Mapping(source = "primaryDepartmentId", target = "departmentId")
     SecurityUser toSecurityUser(User source);
 }

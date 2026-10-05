@@ -42,19 +42,24 @@ public class CacheRegionRegistry {
             new CacheRegionDescriptor("core:dept", "部门名称缓存", "RedisCacheManager", "REMOTE",
                     3_600L, false, true));
 
-    private final CacheManager cacheManager;
-    private final Map<String, CacheRegionDescriptor> descriptors;
-
-    public CacheRegionRegistry(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-        var entries = new LinkedHashMap<String, CacheRegionDescriptor>();
+    static {
         for (CacheRegionDescriptor descriptor : REGISTERED) {
             if (descriptor.code().startsWith("sec:")) {
                 throw new IllegalStateException("安全缓存不得注册为普通缓存区域");
             }
+        }
+    }
+
+    private final CacheManager cacheManager;
+    private final Map<String, CacheRegionDescriptor> descriptors;
+
+    public CacheRegionRegistry(CacheManager cacheManager) {
+        var entries = new LinkedHashMap<String, CacheRegionDescriptor>();
+        for (CacheRegionDescriptor descriptor : REGISTERED) {
             entries.put(descriptor.code(), descriptor);
         }
         this.descriptors = Map.copyOf(entries);
+        this.cacheManager = cacheManager;
     }
 
     /** 返回普通缓存区域白名单的稳定快照。 */

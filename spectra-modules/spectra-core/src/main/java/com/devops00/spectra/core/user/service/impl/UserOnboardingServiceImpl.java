@@ -102,8 +102,9 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         UUID operatorId = securityContextAccessor.currentUserId();
         membershipService.replace(user.getId(), userParams.getPrimaryDepartmentId(),
                 userParams.getAssociatedDepartmentIds(), operatorId);
-        recordDepartmentMembershipChange(user.getId(), operatorId, previousPrimaryDepartmentId,
-                previousAssociatedIds, userParams.getPrimaryDepartmentId(), userParams.getAssociatedDepartmentIds());
+        recordDepartmentMembershipChange(new DepartmentMembershipChangeInput(user.getId(), operatorId,
+                previousPrimaryDepartmentId, previousAssociatedIds, userParams.getPrimaryDepartmentId(),
+                userParams.getAssociatedDepartmentIds()));
         submitAuthorization(user.getId(), params.getAuthorization());
         return user;
     }
@@ -158,18 +159,21 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
     /**
      * 记录主部门和关联部门列表的变更前后快照。
      */
-    private void recordDepartmentMembershipChange(UUID userId, UUID operatorId, UUID previousPrimaryDepartmentId,
-                                                  List<UUID> previousAssociatedIds, UUID primaryDepartmentId,
-                                                  List<UUID> associatedDepartmentIds) {
-        Map<String, Object> before = departmentSnapshot(previousPrimaryDepartmentId, previousAssociatedIds);
-        Map<String, Object> after = departmentSnapshot(primaryDepartmentId, associatedDepartmentIds);
+    private void recordDepartmentMembershipChange(DepartmentMembershipChangeInput input) {
+        Map<String, Object> before = departmentSnapshot(input.previousPrimaryDepartmentId(), input.previousAssociatedIds());
+        Map<String, Object> after = departmentSnapshot(input.primaryDepartmentId(), input.associatedDepartmentIds());
         if (before.equals(after)) {
             return;
         }
-        var event = auditRecordFactory.create(null, "USER_DEPARTMENT_MEMBERSHIP_CHANGED", operatorId, userId,
+        var event = auditRecordFactory.create(null, "USER_DEPARTMENT_MEMBERSHIP_CHANGED", input.operatorId(), input.userId(),
                 null, null, null, before, after, "更新用户部门成员关系", null, AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         auditService.record(event);
+    }
+
+    private record DepartmentMembershipChangeInput(UUID userId, UUID operatorId, UUID previousPrimaryDepartmentId,
+                                                   List<UUID> previousAssociatedIds, UUID primaryDepartmentId,
+                                                   List<UUID> associatedDepartmentIds) {
     }
 
     /**
@@ -237,7 +241,15 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         var requestedAssignments = params.getAssignments() == null
                 ? List.<AuthorizationAssignmentChangeFrom>of()
                 : params.getAssignments();
-        for (var assignment : requestedAssignments) {
+        validateRequestedAssignments(requestedAssignments, requestedAssignmentIds, requestedRoleIds);
+        var removedIds = new HashSet<UUID>();
+        validateRemovedAssignments(params.getRemovedAssignments(), activeAssignmentIds, removedIds);
+        validateReconciledAssignments(activeAssignmentIds, requestedAssignmentIds, removedIds);
+    }
+
+    private void validateRequestedAssignments(List<AuthorizationAssignmentChangeFrom> assignments,
+                                              Set<UUID> requestedAssignmentIds, Set<UUID> requestedRoleIds) {
+        for (var assignment : assignments) {
             if (assignment.getAssignmentId() != null && !requestedAssignmentIds.add(assignment.getAssignmentId())) {
                 throw new com.devops00.spectra.common.exception.DataException("同一角色授权不能重复提交");
             }
@@ -245,17 +257,25 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 throw new com.devops00.spectra.common.exception.DataException("同一角色不能重复授权");
             }
         }
-        var removedIds = new HashSet<UUID>();
-        if (params.getRemovedAssignments() != null) {
-            for (var removal : params.getRemovedAssignments()) {
-                if (!removedIds.add(removal.getAssignmentId())) {
-                    throw new com.devops00.spectra.common.exception.DataException("同一角色授权不能重复移除");
-                }
-                if (!activeAssignmentIds.contains(removal.getAssignmentId())) {
-                    throw new com.devops00.spectra.common.exception.DataException("待移除的角色授权已不存在或已失效");
-                }
+    }
+
+    private void validateRemovedAssignments(List<AuthorizationAssignmentRemovalFrom> removals,
+                                            Set<UUID> activeAssignmentIds, Set<UUID> removedIds) {
+        if (removals == null) {
+            return;
+        }
+        for (var removal : removals) {
+            if (!removedIds.add(removal.getAssignmentId())) {
+                throw new com.devops00.spectra.common.exception.DataException("同一角色授权不能重复移除");
+            }
+            if (!activeAssignmentIds.contains(removal.getAssignmentId())) {
+                throw new com.devops00.spectra.common.exception.DataException("待移除的角色授权已不存在或已失效");
             }
         }
+    }
+
+    private void validateReconciledAssignments(Set<UUID> activeAssignmentIds, Set<UUID> requestedAssignmentIds,
+                                               Set<UUID> removedIds) {
         if (!Collections.disjoint(requestedAssignmentIds, removedIds)) {
             throw new com.devops00.spectra.common.exception.DataException("角色授权不能同时保留和移除");
         }

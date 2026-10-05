@@ -63,41 +63,13 @@ public class OnlineUserPageAssembler {
      * @param matchingDepartmentIds 目标部门及其可匹配的下级部门 ID。
      * @return 返回 total 按用户数量计算的 MyBatis-Plus 分页结果；没有匹配在线用户时 records 为空、total 为 0。
      */
-    public Page<OnlineUserPageVO> page(PageFrom page, OnlineUserPageFrom filter,
-                                       List<UserOnlineVO> onlineSessions, List<User> onlineUsers,
-                                       Set<UUID> matchingDepartmentIds,
-                                       Map<UUID, Set<UUID>> departmentIdsByUser) {
-        long pageNum = page.getPageNum() == null ? 1L : page.getPageNum();
-        long pageSize = page.getPageSize() == null ? 15L : page.getPageSize();
-        if (pageNum < 1 || pageSize < 1) {
-            throw new IllegalArgumentException("在线用户分页页码和页大小必须大于零");
-        }
-
-        Map<UUID, User> usersById = new HashMap<>();
-        for (User user : onlineUsers) {
-            usersById.put(user.getId(), user);
-        }
-        Map<UUID, List<UserOnlineVO>> sessionsByUser = new HashMap<>();
-        for (UserOnlineVO session : onlineSessions) {
-            UUID userId = UUID.fromString(session.getUserId());
-            sessionsByUser.computeIfAbsent(userId, ignored -> new ArrayList<>()).add(session);
-        }
-
-        List<OnlineUserPageVO> records = new ArrayList<>();
-        for (Map.Entry<UUID, List<UserOnlineVO>> entry : sessionsByUser.entrySet()) {
-            User user = usersById.get(entry.getKey());
-            if (user == null || !matches(user, filter, matchingDepartmentIds, departmentIdsByUser)) {
-                continue;
-            }
-            List<UserOnlineVO> sortedSessions = entry.getValue().stream().sorted(SESSION_ORDER).toList();
-            UserOnlineVO latestSession = sortedSessions.getFirst();
-            List<OnlineSessionVO> sessionViews = sortedSessions.stream()
-                    .map(session -> new OnlineSessionVO(session.getSessionId(), session.getClientType(), session.getIp(),
-                            session.getLoginTime()))
-                    .toList();
-            records.add(new OnlineUserPageVO(user.getId(), user.getUsername(), user.getRealName(),
-                    user.getPrimaryDepartmentId(), null, null, sessionViews.size(), latestSession.getLoginTime(), sessionViews));
-        }
+    public Page<OnlineUserPageVO> page(PageRequest request) {
+        long pageNum = pageNum(request.page());
+        long pageSize = pageSize(request.page());
+        var usersById = usersById(request.onlineUsers());
+        var sessionsByUser = sessionsByUser(request.onlineSessions());
+        var records = records(sessionsByUser, usersById, request.filter(), request.matchingDepartmentIds(),
+                request.departmentIdsByUser());
         records.sort(USER_ORDER);
 
         long pageOffset = pageNum - 1;
@@ -108,6 +80,60 @@ public class OnlineUserPageAssembler {
         Page<OnlineUserPageVO> result = new Page<>(pageNum, pageSize, records.size());
         result.setRecords(records.subList(fromIndex, toIndex));
         return result;
+    }
+
+    public record PageRequest(PageFrom page, OnlineUserPageFrom filter, List<UserOnlineVO> onlineSessions,
+                              List<User> onlineUsers, Set<UUID> matchingDepartmentIds,
+                              Map<UUID, Set<UUID>> departmentIdsByUser) {
+    }
+
+    private static long pageNum(PageFrom page) {
+        var value = page.getPageNum() == null ? 1L : page.getPageNum();
+        if (value < 1) {
+            throw new IllegalArgumentException("在线用户分页页码必须大于零");
+        }
+        return value;
+    }
+
+    private static long pageSize(PageFrom page) {
+        var value = page.getPageSize() == null ? 15L : page.getPageSize();
+        if (value < 1) {
+            throw new IllegalArgumentException("在线用户分页页大小必须大于零");
+        }
+        return value;
+    }
+
+    private static Map<UUID, User> usersById(List<User> users) {
+        var result = new HashMap<UUID, User>();
+        users.forEach(user -> result.put(user.getId(), user));
+        return result;
+    }
+
+    private static Map<UUID, List<UserOnlineVO>> sessionsByUser(List<UserOnlineVO> sessions) {
+        var result = new HashMap<UUID, List<UserOnlineVO>>();
+        sessions.forEach(session -> result.computeIfAbsent(UUID.fromString(session.getUserId()), ignored -> new ArrayList<>())
+                .add(session));
+        return result;
+    }
+
+    private static List<OnlineUserPageVO> records(Map<UUID, List<UserOnlineVO>> sessionsByUser,
+                                                  Map<UUID, User> usersById, OnlineUserPageFrom filter,
+                                                  Set<UUID> matchingDepartmentIds,
+                                                  Map<UUID, Set<UUID>> departmentIdsByUser) {
+        var records = new ArrayList<OnlineUserPageVO>();
+        sessionsByUser.forEach((userId, sessions) -> {
+            var user = usersById.get(userId);
+            if (user != null && matches(user, filter, matchingDepartmentIds, departmentIdsByUser)) {
+                var sorted = sessions.stream().sorted(SESSION_ORDER).toList();
+                var views = sorted.stream()
+                        .map(session -> new OnlineSessionVO(session.getSessionId(), session.getClientType(),
+                                session.getIp(), session.getLoginTime()))
+                        .toList();
+                records.add(new OnlineUserPageVO(user.getId(), user.getUsername(), user.getRealName(),
+                        user.getPrimaryDepartmentId(), null, null, views.size(), sorted.getFirst().getLoginTime(), views));
+            }
+        });
+        return records;
     }
 
     private static boolean matches(User user, OnlineUserPageFrom filter, Set<UUID> matchingDepartmentIds,

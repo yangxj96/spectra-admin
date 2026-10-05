@@ -140,58 +140,74 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     public void complete(SystemInitializationCompleteFrom from) {
         lockInitialization();
         SystemState state = loadState(true);
-        UUID initializationId = parseInitializationId(from.getInitializationId());
+        validateInitialization(state, parseInitializationId(from.getInitializationId()));
+        User user = findLockedDevOpsUser();
+        SecurityRole role = findDevOpsRole();
+        activateUser(user);
+        ensureRoleAssignment(user, role);
+        authorizationAssignmentChangeService.ensureDefaultUserRole(user.getId());
+        systemSecretInitializer.initialize();
+        markInitialized(state, user.getId());
+        initializationTokenManager.clear();
+    }
+
+    private void validateInitialization(SystemState state, UUID initializationId) {
         if (!SystemStateKeys.INITIALIZING.equals(state.getState())
                 || !initializationId.equals(state.getInitializationId())) {
             throw new IllegalStateException("初始化状态已变化，请重新开始初始化");
         }
+    }
 
+    private User findLockedDevOpsUser() {
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getEmployeeNo, "DEV_OPS")
-                .eq(User::getStatus, UserStatus.LOCKED)
-                .last("LIMIT 1"));
+                .eq(User::getEmployeeNo, "DEV_OPS").eq(User::getStatus, UserStatus.LOCKED).last("LIMIT 1"));
         if (user == null || !UserStatus.LOCKED.equals(user.getStatus())) {
             throw new IllegalStateException("初始化用户状态无效");
         }
+        return user;
+    }
+
+    private SecurityRole findDevOpsRole() {
         SecurityRole role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, DEV_OPS_ROLE)
-                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name())
-                .last("LIMIT 1"));
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()).last("LIMIT 1"));
         if (role == null) {
             throw new IllegalStateException("ROLE_DEV_OPS 种子不存在");
         }
+        return role;
+    }
 
+    private void activateUser(User user) {
         user.setStatus(UserStatus.ACTIVE);
         if (userMapper.updateById(user) != 1) {
             throw new IllegalStateException("激活初始化用户失败");
         }
+    }
+
+    private void ensureRoleAssignment(User user, SecurityRole role) {
         RoleAssignment assignment = roleAssignmentMapper.selectOne(new LambdaQueryWrapper<RoleAssignment>()
-                .eq(RoleAssignment::getUserId, user.getId())
-                .eq(RoleAssignment::getRoleId, role.getId())
-                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())
-                .last("LIMIT 1"));
-        if (assignment == null) {
-            assignment = new RoleAssignment();
-            assignment.setUserId(user.getId());
-            assignment.setRoleId(role.getId());
-            assignment.setState(SecurityAuthorizationState.ACTIVE.name());
-            assignment.setVersion(0L);
-            if (roleAssignmentMapper.insert(assignment) != 1) {
-                throw new IllegalStateException("创建 DEV_OPS 角色分配失败");
-            }
+                .eq(RoleAssignment::getUserId, user.getId()).eq(RoleAssignment::getRoleId, role.getId())
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()).last("LIMIT 1"));
+        if (assignment != null) {
+            return;
         }
-        authorizationAssignmentChangeService.ensureDefaultUserRole(user.getId());
+        assignment = new RoleAssignment();
+        assignment.setUserId(user.getId());
+        assignment.setRoleId(role.getId());
+        assignment.setState(SecurityAuthorizationState.ACTIVE.name());
+        assignment.setVersion(0L);
+        if (roleAssignmentMapper.insert(assignment) != 1) {
+            throw new IllegalStateException("创建 DEV_OPS 角色分配失败");
+        }
+    }
 
-        systemSecretInitializer.initialize();
-
+    private void markInitialized(SystemState state, UUID userId) {
         state.setState(SystemStateKeys.INITIALIZED);
         state.setInitializedAt(Instant.now());
-        state.setInitializedBy(user.getId());
+        state.setInitializedBy(userId);
         if (stateMapper.updateById(state) != 1) {
             throw new IllegalStateException("完成系统初始化失败");
         }
-
-        initializationTokenManager.clear();
     }
 
     /**

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
+    <!-- These are private Spring-managed collaborators retained by the replay administration service. -->
+    <Match>
+        <Class name="com.devops00.spectra.framework.security.replay.SecurityReplayNonceAdminService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
     <!--
         These are Spring dependency-injection collaborators. They are stored in private final fields
         and are never returned or exposed; EI_EXPOSE_REP2 is a false positive for constructor
@@ -49,10 +54,6 @@
     </Match>
     <Match>
         <Class name="com.devops00.spectra.core.common.service.impl.KaptchaServiceImpl"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.audit.observability.SecurityAuditMetrics"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -122,16 +123,6 @@
         <Class name="com.devops00.spectra.core.common.runner.FolderCheckRunner"/>
         <Bug pattern="PATH_TRAVERSAL_IN"/>
     </Match>
-    <!-- Spring collaborators are intentionally retained by the local storage service. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceLocalImpl"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <!-- Upload roots are trusted deployment configuration, not request-controlled paths. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceLocalImpl"/>
-        <Bug pattern="PATH_TRAVERSAL_IN"/>
-    </Match>
     <Match>
         <Class name="com.devops00.spectra.core.upload.service.FileUploadCleanupService"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
@@ -152,11 +143,6 @@
     <Match>
         <Class name="com.devops00.spectra.workflow.health.FlowableHealthContributor"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <!-- S3 presigner creates the redirect URL from trusted deployment credentials and endpoint. -->
-    <Match>
-        <Class name="com.devops00.spectra.core.upload.service.impl.FileUploadServiceS3Impl"/>
-        <Bug pattern="UNVALIDATED_REDIRECT"/>
     </Match>
     <!-- ObjectMapper/RedisTemplate/configuration/Converter are private Spring collaborators. -->
     <Match>
@@ -279,4 +265,18 @@
         <Class name="com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle"/>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
+    <Match><Class name="com.devops00.spectra.core.security.secret.javabean.vo.SecretImportPreviewVO"/><Bug pattern="EI_EXPOSE_REP"/></Match>
+    <Match><Class name="com.devops00.spectra.core.security.secret.javabean.vo.SecretImportPreviewVO"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.javabean.from.CacheBusinessClearFrom"/><Bug pattern="EI_EXPOSE_REP"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.javabean.from.CacheBusinessClearFrom"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.javabean.from.CacheBusinessPreviewFrom"/><Bug pattern="EI_EXPOSE_REP"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.javabean.from.CacheBusinessPreviewFrom"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.audit.observability.AuditLogMetrics"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.security.authorization.service.impl.DepartmentAuthorizationReferenceServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.security.authorization.service.impl.DepartmentRestructureServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.security.secret.service.SecretTransferService"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.cache.CacheInvalidationCoordinator"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.controller.ConfiguredController"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <Match><Class name="com.devops00.spectra.core.system.service.impl.CacheManagementServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
 </FindBugsFilter>

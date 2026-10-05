@@ -51,28 +51,31 @@ public class FileReferenceAdminService {
     /** 查询当前有效的业务引用；该服务不提供绕过业务权限的删除能力。 */
     @Transactional(readOnly = true)
     public IPage<FileReferenceAdminVO> page(Page<FileReference> page, FileReferencePageRequest request) {
-        var query = new LambdaQueryWrapper<FileReference>()
-                .eq(request != null && request.getFileAssetId() != null,
-                        FileReference::getFileAssetId, request == null ? null : request.getFileAssetId())
-                .eq(request != null && request.getReferenceId() != null,
-                        FileReference::getReferenceId, request == null ? null : request.getReferenceId())
-                .like(request != null && StringUtils.hasText(request.getReferenceType()),
-                        FileReference::getReferenceType, request == null ? null : request.getReferenceType())
-                .like(request != null && StringUtils.hasText(request.getPurpose()),
-                        FileReference::getPurpose, request == null ? null : request.getPurpose())
-                .like(request != null && StringUtils.hasText(request.getDisplayName()),
-                        FileReference::getDisplayName, request == null ? null : request.getDisplayName())
-                .orderByDesc(FileReference::getCreatedAt);
-        return referenceMapper.selectPage(page, query).convert(reference -> {
-            var vo = fileUploadConverter.toReferenceAdminVO(reference);
-            FileAsset asset = assetMapper.selectById(reference.getFileAssetId());
-            if (asset != null && asset.getDeleted() == null) {
-                vo.setAssetOriginalName(asset.getOriginalName());
-                vo.setAssetContentSha256(asset.getContentSha256());
-                vo.setAssetSize(asset.getSize());
-                vo.setAssetContentType(asset.getContentType());
-            }
-            return vo;
-        });
+        return referenceMapper.selectPage(page, buildQuery(request)).convert(this::toVO);
+    }
+
+    private LambdaQueryWrapper<FileReference> buildQuery(FileReferencePageRequest request) {
+        var query = new LambdaQueryWrapper<FileReference>().orderByDesc(FileReference::getCreatedAt);
+        if (request == null) {
+            return query;
+        }
+        query.eq(request.getFileAssetId() != null, FileReference::getFileAssetId, request.getFileAssetId())
+                .eq(request.getReferenceId() != null, FileReference::getReferenceId, request.getReferenceId())
+                .like(StringUtils.hasText(request.getReferenceType()), FileReference::getReferenceType, request.getReferenceType())
+                .like(StringUtils.hasText(request.getPurpose()), FileReference::getPurpose, request.getPurpose())
+                .like(StringUtils.hasText(request.getDisplayName()), FileReference::getDisplayName, request.getDisplayName());
+        return query;
+    }
+
+    private FileReferenceAdminVO toVO(FileReference reference) {
+        var vo = fileUploadConverter.toReferenceAdminVO(reference);
+        var asset = assetMapper.selectById(reference.getFileAssetId());
+        if (asset != null && asset.getDeleted() == null) {
+            vo.setAssetOriginalName(asset.getOriginalName());
+            vo.setAssetContentSha256(asset.getContentSha256());
+            vo.setAssetSize(asset.getSize());
+            vo.setAssetContentType(asset.getContentType());
+        }
+        return vo;
     }
 }

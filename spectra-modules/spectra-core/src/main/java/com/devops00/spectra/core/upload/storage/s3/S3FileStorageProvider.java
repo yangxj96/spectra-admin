@@ -92,8 +92,13 @@ public class S3FileStorageProvider implements FileStorageProvider {
     }
 
     @Override
-    public PartTarget createPartTarget(StorageMultipart multipart, int partNumber, long partSize, String partSha256,
-                                       Instant expiresAt, int attempt) {
+    public PartTarget createPartTarget(FileStorageProvider.PartTargetInput input) {
+        var multipart = input.multipart();
+        var partNumber = input.partNumber();
+        var partSize = input.partSize();
+        var partSha256 = input.partSha256();
+        var expiresAt = input.expiresAt();
+        var attempt = input.attempt();
         try {
             var uploadRequest = UploadPartRequest.builder()
                     .bucket(multipart.container())

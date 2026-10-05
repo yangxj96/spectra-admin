@@ -19,6 +19,7 @@ package com.devops00.spectra.framework.security.session;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.security.SecurityToken;
 import com.devops00.spectra.common.port.security.SecurityUserLoader;
+import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
@@ -78,6 +79,40 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
      * 刷新内部。
      */
     private SecurityToken refreshInternal(String refreshToken) {
+        RefreshContext context = loadContext(refreshToken);
+        String refreshDigest = context.refreshDigest();
+        String refreshKey = context.refreshKey();
+        SecurityPrincipal currentUser = context.currentUser();
+        var parsedClientType = context.clientType();
+        SessionPolicy policy = context.policy();
+        Duration refreshTtl = context.refreshTtl();
+        String replayFenceKey = context.replayFenceKey();
+
+        RefreshTokenRotationStore.ClaimResult claimResult = RefreshTokenRotationStore.claim(store.redis(), refreshKey,
+                SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest), policy.refreshTtlSeconds());
+        if (claimResult != RefreshTokenRotationStore.ClaimResult.CLAIMED) {
+            if (claimResult == RefreshTokenRotationStore.ClaimResult.REPLAY) {
+                store.redis().opsForValue().set(replayFenceKey, "REVOKED", refreshTtl);
+                revocationService.revokeFamilyForRefreshReplay(context.familyId());
+                throw new BadCredentialsException("刷新token重放，所属 Token Family 已撤销");
+            }
+            throw new BadCredentialsException("刷新token无效或已过期");
+        }
+
+        try {
+            removeRotatedAccessSession(context.accessDigest(), refreshDigest, context.userId().toString(),
+                    context.clientTypeName(), context.familyId());
+            if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
+                throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
+            }
+            return issueService.createToken(currentUser, parsedClientType, context.familyId());
+        } catch (RuntimeException exception) {
+            revocationService.revokeFamilyForRefreshReplay(context.familyId());
+            throw exception;
+        }
+    }
+
+    private RefreshContext loadContext(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new BadCredentialsException("刷新token不能为空");
         }
@@ -87,7 +122,6 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         if (refreshData.isEmpty()) {
             throw new BadCredentialsException("刷新token无效或已过期");
         }
-
         String accessDigest = SecurityRedisValueParser.requiredText(refreshData.get("accessToken"), "Refresh.accessToken");
         UUID userId = SecurityRedisValueParser.requiredUuid(refreshData.get("userId"), "Refresh.userId");
         String familyId = SecurityRedisValueParser.requiredText(refreshData.get("familyId"), "Refresh.familyId");
@@ -96,40 +130,24 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         if (currentUser == null) {
             throw new BadCredentialsException("刷新token所属账号当前不可用");
         }
-
         Map<Object, Object> session = store.hash("读取安全会话", SecurityRedisKey.SESSION.format(accessDigest));
-        String clientType = session.isEmpty()
-                ? refreshClientType
+        String clientTypeName = session.isEmpty() ? refreshClientType
                 : SecurityRedisValueParser.requiredText(session.get("clientType"), "Session.clientType");
-        var parsedClientType = SecurityRedisValueParser.requiredClientType(clientType, "Refresh.clientType");
-        SessionPolicy policy = store.sessionPolicy(parsedClientType.getName());
-        Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
+        var clientType = SecurityRedisValueParser.requiredClientType(clientTypeName, "Refresh.clientType");
+        SessionPolicy policy = store.sessionPolicy(clientType.getName());
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
             throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
         }
+        return new RefreshContext(refreshDigest, refreshKey, accessDigest, userId, familyId, clientTypeName,
+                clientType, policy, Duration.ofSeconds(policy.refreshTtlSeconds()), replayFenceKey, currentUser);
+    }
 
-        RefreshTokenRotationStore.ClaimResult claimResult = RefreshTokenRotationStore.claim(store.redis(), refreshKey,
-                SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest), policy.refreshTtlSeconds());
-        if (claimResult != RefreshTokenRotationStore.ClaimResult.CLAIMED) {
-            if (claimResult == RefreshTokenRotationStore.ClaimResult.REPLAY) {
-                store.redis().opsForValue().set(replayFenceKey, "REVOKED", refreshTtl);
-                revocationService.revokeFamilyForRefreshReplay(familyId);
-                throw new BadCredentialsException("刷新token重放，所属 Token Family 已撤销");
-            }
-            throw new BadCredentialsException("刷新token无效或已过期");
-        }
-
-        try {
-            removeRotatedAccessSession(accessDigest, refreshDigest, userId.toString(), clientType, familyId);
-            if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
-                throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
-            }
-            return issueService.createToken(currentUser, parsedClientType, familyId);
-        } catch (RuntimeException exception) {
-            revocationService.revokeFamilyForRefreshReplay(familyId);
-            throw exception;
-        }
+    private record RefreshContext(String refreshDigest, String refreshKey, String accessDigest, UUID userId,
+                                  String familyId, String clientTypeName,
+                                  ClientType clientType,
+                                  SessionPolicy policy, Duration refreshTtl, String replayFenceKey,
+                                  SecurityPrincipal currentUser) {
     }
 
     /**

@@ -59,9 +59,9 @@ public class DepartmentMemberQueryServiceImpl implements DepartmentMemberQuerySe
         var authorization = viewerId == null ? null : authorizationSnapshotProvider.load(viewerId);
         var departments = departmentMapper.selectList(new QueryWrapper<Department>().select("id", "pid"));
         if (!AuthorizationDepartmentScope.canAccessDepartment(
-                    authorization, "department:read", from.getDepartmentId(), departments)
+                authorization, "department:read", from.getDepartmentId(), departments)
                 || !AuthorizationDepartmentScope.canAccessDepartment(
-                    authorization, "user:read", from.getDepartmentId(), departments)) {
+                        authorization, "user:read", from.getDepartmentId(), departments)) {
             throw new DataNotExistException("部门不存在或无权访问");
         }
         var keyword = from.getKeyword() == null || from.getKeyword().isBlank()

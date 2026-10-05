@@ -70,22 +70,16 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      */
     @Override
     @Transactional
-    public void save(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb) {
-        save(userId, purpose, channel, enabled, doNotDisturb, null, null);
-    }
-
-    /**
-     * 保存带每日免打扰窗口的用途与渠道偏好，并强制保护安全用途。
-     */
-    @Override
-    @Transactional
-    public void save(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
-                     Instant doNotDisturbStart, Instant doNotDisturbEnd) {
-        if (userId == null || !StringUtils.hasText(purpose) || !StringUtils.hasText(channel)) {
+    public void save(NotificationPreferenceService.PreferenceInput input) {
+        if (input.userId() == null || !StringUtils.hasText(input.purpose()) || !StringUtils.hasText(input.channel())) {
             throw new DataSaveException("通知偏好参数不完整");
         }
-        var normalizedPurpose = purpose.toUpperCase();
-        var normalizedChannel = channel.toUpperCase();
+        var normalizedPurpose = input.purpose().toUpperCase();
+        var normalizedChannel = input.channel().toUpperCase();
+        var enabled = input.enabled();
+        var doNotDisturb = input.doNotDisturb();
+        var doNotDisturbStart = input.doNotDisturbStart();
+        var doNotDisturbEnd = input.doNotDisturbEnd();
         try {
             NotificationPurpose.valueOf(normalizedPurpose);
             NotificationChannel.valueOf(normalizedChannel);
@@ -103,14 +97,14 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
             doNotDisturbEnd = null;
         }
         var query = new LambdaQueryWrapper<NotificationUserPreferenceEntity>()
-                .eq(NotificationUserPreferenceEntity::getUserId, userId)
+                .eq(NotificationUserPreferenceEntity::getUserId, input.userId())
                 .eq(NotificationUserPreferenceEntity::getPurpose, normalizedPurpose)
                 .eq(NotificationUserPreferenceEntity::getChannel, normalizedChannel);
         var entity = mapper.selectOne(query);
         var existing = entity != null;
         if (!existing) {
             entity = new NotificationUserPreferenceEntity();
-            entity.setUserId(userId);
+            entity.setUserId(input.userId());
             entity.setPurpose(normalizedPurpose);
             entity.setChannel(normalizedChannel);
             entity.setCreatedAt(Instant.now());

@@ -148,9 +148,9 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         var expiresAt = Instant.now().plusSeconds(PREVIEW_TTL_SECONDS);
         var result = toPreview(prepared, issueToken(Operation.MERGE, prepared.operatorId(),
                 prepared.organizationVersion(), prepared.tokenHash(), expiresAt));
-        appendPreviewAudit(Operation.MERGE, prepared.operatorId(), prepared.sourceIds(),
+        appendPreviewAudit(new PreviewAuditInput(Operation.MERGE, prepared.operatorId(), prepared.sourceIds(),
                 prepared.organizationVersion(), prepared.memberImpact().affectedUserCount(),
-                prepared.authorizationImpact().assignmentCount());
+                prepared.authorizationImpact().assignmentCount()));
         return result;
     }
 
@@ -177,8 +177,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         var expiresAt = Instant.now().plusSeconds(PREVIEW_TTL_SECONDS);
         var result = toPreview(prepared, issueToken(Operation.SPLIT, prepared.operatorId(),
                 prepared.organizationVersion(), prepared.tokenHash(), expiresAt));
-        appendPreviewAudit(Operation.SPLIT, prepared.operatorId(), List.of(prepared.source().getId()),
-                prepared.organizationVersion(), prepared.memberImpact().affectedUserCount(), 0);
+        appendPreviewAudit(new PreviewAuditInput(Operation.SPLIT, prepared.operatorId(), List.of(prepared.source().getId()),
+                prepared.organizationVersion(), prepared.memberImpact().affectedUserCount(), 0));
         return result;
     }
 
@@ -256,7 +256,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         var sourceRows = lock
                 ? departmentMapper.selectActiveByIdsForUpdate(List.of(from.getSourceDepartmentId()))
                 : departmentMapper.selectActiveByIds(List.of(from.getSourceDepartmentId()));
-        var source = activeDepartments(sourceRows).stream().findFirst()
+        var source = activeDepartments(sourceRows).stream()
+                .findFirst()
                 .orElseThrow(() -> new DataNotExistException("源部门不存在或已删除"));
         validateActiveParent(source.getPid());
         var requestedDepartment = departmentFrom(from.getDepartment(), source.getPid());
@@ -291,8 +292,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
     }
 
     private DepartmentMembershipRestructureImpact lockSplitMemberSnapshot(UUID sourceId,
-                                                                           List<UUID> selectedUserIds,
-                                                                           boolean lock) {
+                                                                          List<UUID> selectedUserIds,
+                                                                          boolean lock) {
         var beforeLock = membershipService.previewSplit(sourceId, selectedUserIds);
         if (!lock) {
             return beforeLock;
@@ -340,9 +341,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         rebuildOrganization(prepared.organizationVersion(), prepared.operatorId());
         var affectedUserIds = union(movedUsers, appliedAuthorizationImpact.affectedUserIds());
         revokeAffectedUsers(affectedUserIds, prepared.operatorId());
-        var response = toApply(Operation.MERGE, target.getId(), prepared.organizationVersion() + 1,
-                prepared.movedDepartmentCount(), prepared.memberImpact(), appliedAuthorizationImpact,
-                affectedUserIds.size());
+        var response = toApply(new ApplyData(Operation.MERGE, target.getId(), prepared.organizationVersion() + 1,
+                prepared.movedDepartmentCount(), prepared.memberImpact(), appliedAuthorizationImpact, affectedUserIds.size()));
         appendApplyAudit(Operation.MERGE, prepared.operatorId(), target.getId(), prepared.sourceIds(), response);
         return response;
     }
@@ -364,8 +364,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         }
         rebuildOrganization(prepared.organizationVersion(), prepared.operatorId());
         revokeAffectedUsers(movedUsers, prepared.operatorId());
-        var response = toApply(Operation.SPLIT, target.getId(), prepared.organizationVersion() + 1,
-                0, prepared.memberImpact(), null, movedUsers.size());
+        var response = toApply(new ApplyData(Operation.SPLIT, target.getId(), prepared.organizationVersion() + 1,
+                0, prepared.memberImpact(), null, movedUsers.size()));
         appendApplyAudit(Operation.SPLIT, prepared.operatorId(), target.getId(),
                 List.of(prepared.source().getId()), response);
         return response;
@@ -380,7 +380,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
             throw new DataException("重建活动部门路径失败");
         }
         var row = organizationVersionMapper.selectSystemForUpdate();
-        if (row == null || row.getOrganizationVersion() == null
+        if (row == null
+                || row.getOrganizationVersion() == null
                 || row.getOrganizationVersion() != expectedVersion) {
             throw new DataException("organizationVersion 已变化，请重新生成预览");
         }
@@ -439,7 +440,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         result.setProfileAccessScopeCount(authorizationImpact.profileAccessScopeCount());
         result.setProfileGrantScopeCount(authorizationImpact.profileGrantScopeCount());
         result.setAuthorizationBoundariesChanged(authorizationImpact.accessRuleCount() > 0
-                || authorizationImpact.grantRuleCount() > 0 || authorizationImpact.profileAccessScopeCount() > 0
+                || authorizationImpact.grantRuleCount() > 0
+                || authorizationImpact.profileAccessScopeCount() > 0
                 || authorizationImpact.profileGrantScopeCount() > 0);
         result.setExpandsEffectiveAuthority(authorizationImpact.expandsEffectiveAuthority());
         result.setEffectiveScopeChangeSummary(authorizationImpact.expandsEffectiveAuthority()
@@ -477,30 +479,34 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         return result;
     }
 
-    private DepartmentRestructureApplyVO toApply(Operation operation, UUID departmentId, long organizationVersion,
-                                                 int movedDepartmentCount,
-                                                 DepartmentMembershipRestructureImpact memberImpact,
-                                                 DepartmentAuthorizationReferenceImpact authorizationImpact,
-                                                 int affectedUserCount) {
+    private DepartmentRestructureApplyVO toApply(ApplyData data) {
         var result = new DepartmentRestructureApplyVO();
-        result.setOperation(operation.name());
-        result.setDepartmentId(departmentId);
-        result.setOrganizationVersion(organizationVersion);
-        result.setMovedDepartmentCount(movedDepartmentCount);
-        result.setAffectedUserCount(affectedUserCount);
-        result.setPrimaryDepartmentCount(memberImpact.primaryDepartmentCount());
-        result.setAssociatedDepartmentCount(memberImpact.associatedDepartmentCount());
-        result.setDeduplicatedAssociatedCount(memberImpact.deduplicatedAssociatedCount());
-        if (authorizationImpact != null) {
-            result.setAffectedAssignmentCount(authorizationImpact.assignmentCount());
-            result.setAffectedProfileCount(authorizationImpact.profileCount());
+        result.setOperation(data.operation().name());
+        result.setDepartmentId(data.departmentId());
+        result.setOrganizationVersion(data.organizationVersion());
+        result.setMovedDepartmentCount(data.movedDepartmentCount());
+        result.setAffectedUserCount(data.affectedUserCount());
+        result.setPrimaryDepartmentCount(data.memberImpact().primaryDepartmentCount());
+        result.setAssociatedDepartmentCount(data.memberImpact().associatedDepartmentCount());
+        result.setDeduplicatedAssociatedCount(data.memberImpact().deduplicatedAssociatedCount());
+        if (data.authorizationImpact() != null) {
+            result.setAffectedAssignmentCount(data.authorizationImpact().assignmentCount());
+            result.setAffectedProfileCount(data.authorizationImpact().profileCount());
         }
         return result;
     }
 
+    private record ApplyData(Operation operation, UUID departmentId, long organizationVersion,
+                             int movedDepartmentCount, DepartmentMembershipRestructureImpact memberImpact,
+                             DepartmentAuthorizationReferenceImpact authorizationImpact, int affectedUserCount) {
+    }
+
     private Department departmentFrom(DepartmentRestructureDepartmentFrom from, UUID parentId) {
-        if (from == null || from.getName() == null || from.getName().isBlank()
-                || from.getType() == null || from.getRegionId() == null) {
+        if (from == null
+                || from.getName() == null
+                || from.getName().isBlank()
+                || from.getType() == null
+                || from.getRegionId() == null) {
             throw new DataException("新部门名称、类型和行政区划不能为空");
         }
         var department = new Department();
@@ -514,8 +520,11 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
     }
 
     private List<Department> activeDepartments(List<Department> departments) {
-        return departments == null ? List.of() : departments.stream()
-                .filter(department -> department != null && department.getDeleted() == null).toList();
+        return departments == null
+                ? List.of()
+                : departments.stream()
+                        .filter(department -> department != null && department.getDeleted() == null)
+                        .toList();
     }
 
     private int countMovedDepartments(List<Department> children) {
@@ -592,14 +601,15 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
     }
 
     private AuthorizationChangeToken verifyTokenEnvelope(String encoded,
-                                                          Operation operation,
-                                                          UUID operatorId,
-                                                          Long expectedVersion) {
+                                                         Operation operation,
+                                                         UUID operatorId,
+                                                         Long expectedVersion) {
         if (expectedVersion == null) {
             throw new DataException("组织版本不能为空");
         }
         var token = tokenService.verify(encoded);
-        if (!operatorId.equals(token.operatorId()) || !operatorId.equals(token.targetUserId())
+        if (!operatorId.equals(token.operatorId())
+                || !operatorId.equals(token.targetUserId())
                 || !operation.marker().equals(token.roleId())
                 || !requestMarker(operation, token.requestHash()).equals(token.assignmentId())) {
             throw new DataException("部门重组 token 与操作者或操作类型不匹配");
@@ -689,16 +699,19 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
                 RequestCorrelationContext.current().correlationId());
     }
 
-    private void appendPreviewAudit(Operation operation, UUID operatorId, List<UUID> sourceIds,
-                                    long version, int memberCount, int assignmentCount) {
+    private void appendPreviewAudit(PreviewAuditInput input) {
         var details = new LinkedHashMap<String, Object>();
-        details.put("operation", operation.name());
-        details.put("sourceDepartmentIds", sourceIds.stream().map(UUID::toString).toList());
-        details.put("organizationVersion", version);
-        details.put("memberCount", memberCount);
-        details.put("assignmentCount", assignmentCount);
-        appendAudit("DEPARTMENT_RESTRUCTURE_PREVIEWED", operatorId, sourceIds.getFirst(), Map.of(), details,
-                "预览部门重组");
+        details.put("operation", input.operation().name());
+        details.put("sourceDepartmentIds", input.sourceIds().stream().map(UUID::toString).toList());
+        details.put("organizationVersion", input.version());
+        details.put("memberCount", input.memberCount());
+        details.put("assignmentCount", input.assignmentCount());
+        appendAudit(new AuditInput("DEPARTMENT_RESTRUCTURE_PREVIEWED", input.operatorId(), input.sourceIds().getFirst(), Map.of(),
+                details, "预览部门重组"));
+    }
+
+    private record PreviewAuditInput(Operation operation, UUID operatorId, List<UUID> sourceIds,
+                                     long version, int memberCount, int assignmentCount) {
     }
 
     private void appendApplyAudit(Operation operation, UUID operatorId, UUID targetId,
@@ -712,16 +725,19 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         after.put("affectedUserCount", result.getAffectedUserCount());
         after.put("affectedAssignmentCount", result.getAffectedAssignmentCount());
         after.put("affectedProfileCount", result.getAffectedProfileCount());
-        appendAudit("DEPARTMENT_RESTRUCTURE_APPLIED", operatorId, targetId, Map.of(), after,
-                "提交部门重组");
+        appendAudit(new AuditInput("DEPARTMENT_RESTRUCTURE_APPLIED", operatorId, targetId, Map.of(), after,
+                "提交部门重组"));
     }
 
-    private void appendAudit(String eventType, UUID operatorId, UUID targetId,
-                             Map<String, Object> before, Map<String, Object> after, String reason) {
-        var event = auditRecordFactory.create(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, Instant.now(), AuditRecord.Result.SUCCEEDED,
+    private void appendAudit(AuditInput input) {
+        var event = auditRecordFactory.create(null, input.eventType(), input.operatorId(), input.targetId(), null, null, null,
+                input.before(), input.after(), input.reason(), Instant.now(), AuditRecord.Result.SUCCEEDED,
                 RequestCorrelationContext.current().correlationId());
         auditService.record(event);
+    }
+
+    private record AuditInput(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                              Map<String, Object> after, String reason) {
     }
 
     private Set<UUID> union(Collection<UUID> first, Collection<UUID> second) {

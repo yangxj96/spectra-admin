@@ -43,17 +43,14 @@ public interface NotificationService {
      * @param parameters        用于渲染标题、正文和链接的普通模板参数，不应放入密码、验证码等敏感值。
      * @return 返回包含幂等键和请求标识的通知入队回执；已存在相同幂等键时返回原有回执，校验或入队失败时抛出异常，不返回 null。
      */
-    default NotificationReceipt sendToUsers(String idempotencyKey, NotificationPurpose purpose,
-                                            Collection<UUID> recipientUserIds,
-                                            Collection<NotificationChannel> channels, String templateGroupCode,
-                                            Map<String, ?> parameters) {
+    default NotificationReceipt sendToUsers(UserNotificationRequest request) {
         return send(NotificationSendRequest.builder()
-                .idempotencyKey(idempotencyKey)
-                .purpose(purpose)
-                .recipientUserIds(recipientUserIds)
-                .channels(channels)
-                .templateGroupCode(templateGroupCode)
-                .parameters(parameters)
+                .idempotencyKey(request.idempotencyKey())
+                .purpose(request.purpose())
+                .recipientUserIds(request.recipientUserIds())
+                .channels(request.channels())
+                .templateGroupCode(request.templateGroupCode())
+                .parameters(request.parameters())
                 .build());
     }
 
@@ -70,8 +67,8 @@ public interface NotificationService {
     default NotificationReceipt sendInApp(String idempotencyKey, NotificationPurpose purpose,
                                           Collection<UUID> recipientUserIds, String templateGroupCode,
                                           Map<String, ?> parameters) {
-        return sendToUsers(idempotencyKey, purpose, recipientUserIds, List.of(NotificationChannel.IN_APP),
-                templateGroupCode, parameters);
+        return sendToUsers(new UserNotificationRequest(idempotencyKey, purpose, recipientUserIds,
+                List.of(NotificationChannel.IN_APP), templateGroupCode, parameters));
     }
 
     /**
@@ -87,8 +84,8 @@ public interface NotificationService {
     default NotificationReceipt sendSms(String idempotencyKey, NotificationPurpose purpose,
                                         Collection<UUID> recipientUserIds, String templateGroupCode,
                                         Map<String, ?> parameters) {
-        return sendToUsers(idempotencyKey, purpose, recipientUserIds, List.of(NotificationChannel.SMS),
-                templateGroupCode, parameters);
+        return sendToUsers(new UserNotificationRequest(idempotencyKey, purpose, recipientUserIds,
+                List.of(NotificationChannel.SMS), templateGroupCode, parameters));
     }
 
     /**
@@ -104,8 +101,8 @@ public interface NotificationService {
     default NotificationReceipt sendEmail(String idempotencyKey, NotificationPurpose purpose,
                                           Collection<UUID> recipientUserIds, String templateGroupCode,
                                           Map<String, ?> parameters) {
-        return sendToUsers(idempotencyKey, purpose, recipientUserIds, List.of(NotificationChannel.EMAIL),
-                templateGroupCode, parameters);
+        return sendToUsers(new UserNotificationRequest(idempotencyKey, purpose, recipientUserIds,
+                List.of(NotificationChannel.EMAIL), templateGroupCode, parameters));
     }
 
     /**
@@ -119,13 +116,11 @@ public interface NotificationService {
      * @param sensitiveParameters 仅供受控模板渲染使用的敏感参数；不会作为普通通知字段记录或写入日志。
      * @return 返回按直接地址生成的通知入队回执；地址或模板校验失败时抛出异常，不返回 null。
      */
-    default NotificationReceipt sendDirect(String idempotencyKey, NotificationPurpose purpose,
-                                           Collection<NotificationDirectAddress> directAddresses,
-                                           String templateGroupCode, Map<String, ?> parameters,
-                                           Map<String, ?> sensitiveParameters) {
-        return send(NotificationSendRequest.direct(idempotencyKey, purpose, directAddresses, templateGroupCode)
-                .parameters(parameters)
-                .sensitiveParameters(sensitiveParameters)
+    default NotificationReceipt sendDirect(DirectNotificationRequest request) {
+        return send(NotificationSendRequest.direct(request.idempotencyKey(), request.purpose(),
+                request.directAddresses(), request.templateGroupCode())
+                .parameters(request.parameters())
+                .sensitiveParameters(request.sensitiveParameters())
                 .build());
     }
 
@@ -136,4 +131,18 @@ public interface NotificationService {
      * @return 返回统一通知网关生成的入队回执，包含请求标识和幂等处理结果；请求校验或入队失败时抛出异常，不返回 null。
      */
     NotificationReceipt send(NotificationSendRequest request);
+
+    /** 用户通知快捷入口的参数对象。 */
+    record UserNotificationRequest(String idempotencyKey, NotificationPurpose purpose,
+                                   Collection<UUID> recipientUserIds,
+                                   Collection<NotificationChannel> channels, String templateGroupCode,
+                                   Map<String, ?> parameters) {
+    }
+
+    /** 直接地址通知快捷入口的参数对象。 */
+    record DirectNotificationRequest(String idempotencyKey, NotificationPurpose purpose,
+                                     Collection<NotificationDirectAddress> directAddresses,
+                                     String templateGroupCode, Map<String, ?> parameters,
+                                     Map<String, ?> sensitiveParameters) {
+    }
 }

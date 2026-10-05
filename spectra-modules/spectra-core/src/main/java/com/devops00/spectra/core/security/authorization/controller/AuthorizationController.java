@@ -115,7 +115,7 @@ public class AuthorizationController {
     @PostMapping(value = "/departments/merge/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
     public DepartmentRestructurePreviewVO departmentMergePreview(
-            @Validated @RequestBody DepartmentMergePreviewFrom from) {
+                                                                 @Validated @RequestBody DepartmentMergePreviewFrom from) {
         return departmentRestructureService.previewMerge(from);
     }
 
@@ -124,7 +124,7 @@ public class AuthorizationController {
     @PostMapping(value = "/departments/merge/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
     public DepartmentRestructureApplyVO departmentMergeApply(
-            @Validated @RequestBody DepartmentMergeApplyFrom from) {
+                                                             @Validated @RequestBody DepartmentMergeApplyFrom from) {
         return departmentRestructureService.applyMerge(from);
     }
 
@@ -133,7 +133,7 @@ public class AuthorizationController {
     @PostMapping(value = "/departments/split/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
     public DepartmentRestructurePreviewVO departmentSplitPreview(
-            @Validated @RequestBody DepartmentSplitPreviewFrom from) {
+                                                                 @Validated @RequestBody DepartmentSplitPreviewFrom from) {
         return departmentRestructureService.previewSplit(from);
     }
 
@@ -142,7 +142,7 @@ public class AuthorizationController {
     @PostMapping(value = "/departments/split/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create') and hasPermission(null ,'department:update')")
     public DepartmentRestructureApplyVO departmentSplitApply(
-            @Validated @RequestBody DepartmentSplitApplyFrom from) {
+                                                             @Validated @RequestBody DepartmentSplitApplyFrom from) {
         return departmentRestructureService.applySplit(from);
     }
 

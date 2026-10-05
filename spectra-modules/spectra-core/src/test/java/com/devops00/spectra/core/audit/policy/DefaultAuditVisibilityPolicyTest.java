@@ -63,6 +63,6 @@ class DefaultAuditVisibilityPolicyTest {
                 AuditContext.empty(),
                 Map.of(),
                 Map.of(),
-                null);
+                null, AuditRecord.HttpSummary.empty(), null);
     }
 }

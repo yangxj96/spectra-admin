@@ -76,9 +76,11 @@ public interface QuartzJobExecutionHistoryService {
      * @param startedAtTo   可选开始时间上界，包含该时刻
      * @return 执行历史分页结果；没有匹配记录时返回空记录列表而不是 null
      */
-    IPage<QuartzJobExecutionHistoryEntity> page(long current, long size, String jobKey,
-                                                String triggerKey, QuartzExecutionHistoryStatus status,
-                                                Instant startedAtFrom, Instant startedAtTo);
+    IPage<QuartzJobExecutionHistoryEntity> page(HistoryPageRequest request);
+
+    record HistoryPageRequest(long current, long size, String jobKey, String triggerKey,
+                              QuartzExecutionHistoryStatus status, Instant startedAtFrom, Instant startedAtTo) {
+    }
 
     /**
      * 按历史记录 ID 查询单次执行详情。
