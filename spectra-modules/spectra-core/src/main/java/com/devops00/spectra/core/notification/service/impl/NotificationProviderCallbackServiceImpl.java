@@ -49,6 +49,7 @@ import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Provider 回执处理实现；只更新已存在的 Delivery，并以回调正文摘要实现重复回执幂等。
@@ -127,7 +128,7 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
             throw new DataSaveException("更新 Provider 回执失败");
         }
 
-        updateTask(delivery, resultStatus, errorCode);
+        updateTask(delivery, resultStatus, safeErrorCode(callback.getErrorCode()));
         return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(), resultStatus.name());
     }
 

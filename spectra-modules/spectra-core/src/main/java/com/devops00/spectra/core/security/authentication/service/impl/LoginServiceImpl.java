@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
+import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
@@ -70,8 +71,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public SecurityToken login(LoginFrom params, ClientType clientType) {
-        String username = params.getUsername() != null ? params.getUsername() : "";
-        if (securityAuthenticationPort.isLockedOut(username)) {
+        String identityBucket = AuthenticationIdentifierHash.digest(params.getUsername());
+        if (securityAuthenticationPort.isLockedOut(identityBucket)) {
             audit("AUTH_LOGIN_FAILED", null, clientType, "LOCKED_OUT");
             throw new LoginException("账号已锁定，请稍后再试");
         }
@@ -81,9 +82,9 @@ public class LoginServiceImpl implements LoginService {
             if (!(authentication.getPrincipal() instanceof SecurityUser user)) {
                 throw new UsernameNotFoundException("未找到用户");
             }
-            return issueAuthenticatedToken(user, clientType);
+            return issueAuthenticatedToken(user, clientType, identityBucket);
         } catch (BadCredentialsException exception) {
-            securityAuthenticationPort.recordLoginFail(username);
+            securityAuthenticationPort.recordLoginFail(identityBucket);
             audit("AUTH_LOGIN_FAILED", null, clientType, "BAD_CREDENTIALS");
             throw exception;
         }
@@ -119,12 +120,12 @@ public class LoginServiceImpl implements LoginService {
     /**
      * 判断条件是否满足（{@code issueAuthenticatedToken}）。
      */
-    private SecurityToken issueAuthenticatedToken(SecurityUser user, ClientType clientType) {
+    private SecurityToken issueAuthenticatedToken(SecurityUser user, ClientType clientType, String identityBucket) {
+        securityAuthenticationPort.clearLoginFail(identityBucket);
         SecurityContextHolder.getContext()
                 .setAuthentication(
                         new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                                 user, null, user.getAuthorities()));
-        securityAuthenticationPort.clearLoginFail(user.getUsername());
         audit("AUTH_LOGIN_SUCCEEDED", user.getId(), clientType, null);
         return securityAuthenticationPort.login(user);
     }

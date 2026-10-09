@@ -64,6 +64,9 @@ public class OnlineUserPageAssembler {
      * @return 返回 total 按用户数量计算的 MyBatis-Plus 分页结果；没有匹配在线用户时 records 为空、total 为 0。
      */
     public Page<OnlineUserPageVO> page(PageRequest request) {
+        if (request.page() != null) {
+            request.page().requireUnsorted();
+        }
         long pageNum = pageNum(request.page());
         long pageSize = pageSize(request.page());
         var usersById = usersById(request.onlineUsers());

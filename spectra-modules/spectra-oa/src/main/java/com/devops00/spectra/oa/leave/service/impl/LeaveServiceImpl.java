@@ -142,6 +142,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
 
     @Override
     public IPage<LeaveVO> page(PageFrom page, LeavePageFrom params) {
+        var queryPage = page.<LeaveApplication>toPage(Map.of("id", "id", "created_at", "created_at"));
         var wrapper = new LambdaQueryWrapper<LeaveApplication>();
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null) {
@@ -167,7 +168,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             wrapper.eq(LeaveApplication::getLeaveTypeCode, params.getLeaveTypeCode());
         }
         wrapper.orderByDesc(LeaveApplication::getCreatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<LeaveVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(
                 result.getRecords().stream().map(detail -> assembleView(detail, applicationService.require(detail.getApplicationId()))).toList());

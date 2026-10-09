@@ -99,6 +99,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
 
     @Override
     public IPage<PurchaseVO> page(PageFrom page, PurchasePageFrom params) {
+        var queryPage = page.<Purchase>toPage(Map.of("id", "id", "created_at", "created_at"));
         var wrapper = new LambdaQueryWrapper<Purchase>();
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null) {
@@ -131,7 +132,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                     .like(Purchase::getOrderNo, params.getKeyword()));
         }
         wrapper.orderByDesc(Purchase::getCreatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<PurchaseVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;

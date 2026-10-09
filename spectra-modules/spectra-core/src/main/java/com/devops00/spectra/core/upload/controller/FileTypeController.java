@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * 文件类型策略管理接口。
@@ -63,7 +64,7 @@ public class FileTypeController {
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileTypePolicyVO> page(PageFrom page) {
-        return managementService.page(page.toPage());
+        return managementService.page(page.toPage(Map.of("id", "id", "created_at", "created_at")));
     }
 
     /**

@@ -203,7 +203,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 receipt.idempotentReplay());
     }
 
-    private NotificationControlledSendApplyVO replayReceipt(NotificationControlledSendPreviewEntity entity) {
+    private NotificationControlledSendApplyVO replayReceipt(NotificationSendPreviewEntity entity) {
         if (!NotificationPreviewStatus.APPLIED.name().equals(entity.getStatus()) || entity.getAppliedRequestId() == null) {
             return null;
         }
@@ -214,7 +214,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 taskCount, true);
     }
 
-    private void validateApplyWindow(NotificationControlledSendPreviewEntity entity,
+    private void validateApplyWindow(NotificationSendPreviewEntity entity,
                                      NotificationControlledSendApplyFrom params, Instant now) {
         if (!NotificationPreviewStatus.PREVIEWED.name().equals(entity.getStatus())
                 || entity.getExpiresAt() == null || !now.isBefore(entity.getExpiresAt())) {

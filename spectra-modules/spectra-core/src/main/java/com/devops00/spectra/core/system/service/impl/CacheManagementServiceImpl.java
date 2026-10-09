@@ -211,7 +211,8 @@ public class CacheManagementServiceImpl implements CacheManagementService {
     public CacheOperationVO clearLoginFailure(SecurityLoginFailureClearFrom from) {
         requireSecurityConfirmation(from.reason(), from.confirmed());
         String username = normalizeTarget(from.username());
-        loginFailureTracker.clearLoginFail(username);
+        loginFailureTracker.clearLoginFail(
+                com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash.digest(username));
         return completed("LOGIN_FAILURE", 1L, "已清理登录失败计数；未改变用户生命周期状态");
     }
 

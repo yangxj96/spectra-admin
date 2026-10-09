@@ -18,7 +18,7 @@ package com.devops00.spectra.core.audit;
 
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
-import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
+import tools.jackson.databind.ObjectMapper;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -38,8 +38,8 @@ public class AuditConfiguration {
 
     /** 默认统一审计脱敏器。 */
     @Bean
-    public AuditSanitizer auditSanitizer() {
-        return new DefaultAuditSanitizer();
+    public AuditSanitizer auditSanitizer(ObjectMapper objectMapper) {
+        return new JacksonAuditSanitizer(objectMapper);
     }
 
     /** Core 必选的 Audit 切面；没有统一审计服务时不装配技术入口。 */

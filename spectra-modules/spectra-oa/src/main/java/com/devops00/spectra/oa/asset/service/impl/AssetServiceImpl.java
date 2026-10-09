@@ -58,6 +58,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -86,6 +87,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
 
     @Override
     public IPage<AssetVO> page(PageFrom page, AssetPageFrom params) {
+        var queryPage = page.<Asset>toPage(Map.of("id", "id", "created_at", "created_at"));
         var wrapper = new LambdaQueryWrapper<Asset>();
         if (params != null) {
             if (StringUtils.hasText(params.getKeyword())) {
@@ -109,7 +111,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
             }
         }
         wrapper.orderByDesc(Asset::getCreatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<AssetVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;

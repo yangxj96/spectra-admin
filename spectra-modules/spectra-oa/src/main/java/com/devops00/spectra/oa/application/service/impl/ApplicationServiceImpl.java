@@ -48,6 +48,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -73,6 +74,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
 
     @Override
     public IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params) {
+        var queryPage = page.<Application>toPage(Map.of("id", "id", "created_at", "created_at"));
         var wrapper = new LambdaQueryWrapper<Application>();
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null) {
@@ -96,7 +98,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
                     query -> query.like(Application::getTitle, params.getKeyword()).or().like(Application::getApplicationNo, params.getKeyword()));
         }
         wrapper.orderByDesc(Application::getCreatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<ApplicationVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(applicationConverter.toVOList(result.getRecords()));
         return voPage;

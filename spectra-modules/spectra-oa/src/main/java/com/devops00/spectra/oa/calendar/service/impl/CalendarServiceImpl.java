@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,6 +61,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
 
     @Override
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
+        var queryPage = page.<Calendar>toPage(Map.of("id", "id", "start_time", "start_time", "end_time", "end_time"));
         var user = securityContextAccessor.currentUser();
         var userId = securityContextAccessor.currentUserId();
         if (user == null || userId == null) {
@@ -83,7 +85,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         if (params != null && StringUtils.hasText(params.getEndTime())) {
             wrapper.le(Calendar::getStartTime, parseTime(params.getEndTime()));
         }
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<CalendarVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(calendarConverter::toVO).toList());
         return voPage;

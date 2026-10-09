@@ -352,6 +352,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
      */
     @Override
     public IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params) {
+        var queryPage = page.<NotificationRequestEntity>toPage(Map.of("id", "id", "created_at", "created_at", "status", "status"));
         var range = resolveQueryRange(params);
         var wrapper = new LambdaQueryWrapper<NotificationRequestEntity>().orderByDesc(NotificationRequestEntity::getCreatedAt);
         if (range.from() != null) {
@@ -378,7 +379,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                 wrapper.eq(NotificationRequestEntity::getId, params.getRequestId());
             }
         }
-        return converter.toRequestPage(requestMapper.selectPage(page.toPage(), wrapper));
+        return converter.toRequestPage(requestMapper.selectPage(queryPage, wrapper));
     }
 
     /**
@@ -386,6 +387,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
      */
     @Override
     public IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params) {
+        var queryPage = page.<NotificationTaskEntity>toPage(Map.of("id", "id", "created_at", "created_at", "status", "status", "channel", "channel"));
         var range = resolveQueryRange(params);
         var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>().orderByDesc(NotificationTaskEntity::getCreatedAt);
         if (range.from() != null) {
@@ -412,7 +414,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                 wrapper.eq(NotificationTaskEntity::getPurpose, params.getPurpose());
             }
         }
-        return converter.toTaskPage(taskMapper.selectPage(page.toPage(), wrapper));
+        return converter.toTaskPage(taskMapper.selectPage(queryPage, wrapper));
     }
 
     /**
@@ -420,8 +422,10 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
      */
     @Override
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
+        var queryPage = page.<NotificationDeliveryEntity>toPage(
+                Map.of("id", "d.id", "created_at", "d.created_at", "result_status", "d.result_status", "channel", "t.channel"));
         var range = resolveQueryRange(params);
-        return converter.toDeliveryPage(deliveryMapper.selectAdminPage(page.toPage(),
+        return converter.toDeliveryPage(deliveryMapper.selectAdminPage(queryPage,
                 new NotificationDeliveryMapper.DeliveryAdminPageQuery(range.from(), range.to(),
                         params == null ? null : params.getRequestId(), params == null ? null : params.getTaskId(),
                         params == null ? null : params.getRecipientUserId(), params == null ? null : params.getStatus(),

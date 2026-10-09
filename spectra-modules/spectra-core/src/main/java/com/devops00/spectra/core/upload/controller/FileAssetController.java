@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * 提供文件资产相关的 HTTP 接口。
@@ -59,7 +60,7 @@ public class FileAssetController {
     @Audit("'分页查询文件资产'")
     @GetMapping(value = "/page", version = "1.0.0")
     public IPage<FileAssetVO> page(PageFrom page, FileAssetPageRequest request) {
-        return assetService.page(page.toPage(), request);
+        return assetService.page(page.toPage(Map.of("id", "id", "created_at", "created_at")), request);
     }
 
     /**

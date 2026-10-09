@@ -92,6 +92,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     @Override
     public IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params) {
+        page.requireUnsorted();
         var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .isNull(NotificationTemplateEntity::getDeleted)
                 .orderByDesc(NotificationTemplateEntity::getUpdatedAt)
@@ -127,6 +128,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     @Override
     public IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params) {
+        page.requireUnsorted();
         var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .isNull(NotificationTemplateEntity::getDeleted)
                 .orderByDesc(NotificationTemplateEntity::getUpdatedAt)

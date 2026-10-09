@@ -59,6 +59,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -91,6 +92,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     @Override
     public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
+        var queryPage = page.<Document>toPage(Map.of("id", "id", "updated_at", "updated_at"));
         var wrapper = new LambdaQueryWrapper<Document>();
         var user = securityContextAccessor.currentUser();
         var userId = securityContextAccessor.currentUserId();
@@ -114,7 +116,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             wrapper.eq(Document::getFolderId, params.getFolderId());
         }
         wrapper.orderByDesc(Document::getUpdatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<DocumentVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(document -> documentConverter.toVO(document, currentVersion(document.getId()))).toList());
         return voPage;

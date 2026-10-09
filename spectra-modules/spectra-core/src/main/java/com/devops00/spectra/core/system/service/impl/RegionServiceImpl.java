@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -73,10 +74,11 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
 
     @Override
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
+        var queryPage = page.<Region>toPage(Map.of("id", "id", "code", "code", "name", "name", "sort", "sort"));
         // 条件构建
         var wrapper = new LambdaQueryWrapper<Region>().orderByAsc(Region::getCode);
         // 查询并转换相关内容
-        var db = this.page(page.toPage(), wrapper);
+        var db = this.page(queryPage, wrapper);
         return converter.toVOPage(db);
     }
 

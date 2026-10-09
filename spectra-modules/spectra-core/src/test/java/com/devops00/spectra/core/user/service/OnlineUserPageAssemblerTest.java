@@ -28,8 +28,9 @@ class OnlineUserPageAssemblerTest {
         filter.setDepartmentId(associatedDepartmentId);
         var sessions = List.of(session("session-1", userId), session("session-2", userId));
 
-        var result = new OnlineUserPageAssembler().page(new PageFrom(), filter, sessions, List.of(user),
-                Set.of(associatedDepartmentId), Map.of(userId, Set.of(primaryDepartmentId, associatedDepartmentId)));
+        var result = new OnlineUserPageAssembler().page(new OnlineUserPageAssembler.PageRequest(
+                new PageFrom(), filter, sessions, List.of(user), Set.of(associatedDepartmentId),
+                Map.of(userId, Set.of(primaryDepartmentId, associatedDepartmentId))));
 
         assertEquals(1, result.getTotal());
         assertEquals(1, result.getRecords().size());

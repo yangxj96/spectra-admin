@@ -160,6 +160,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
 
     @Override
     public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
+        var queryPage = page.<Meeting>toPage(Map.of("id", "id", "start_time", "start_time"));
         var wrapper = new LambdaQueryWrapper<Meeting>();
         if (StringUtils.hasText(params.getTitle())) {
             wrapper.like(Meeting::getTitle, params.getTitle());
@@ -168,7 +169,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             wrapper.eq(Meeting::getStatus, params.getStatus());
         }
         wrapper.orderByAsc(Meeting::getStartTime);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<MeetingVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(meetingConverter.toVOList(result.getRecords()));
         return voPage;

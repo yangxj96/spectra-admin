@@ -58,6 +58,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public IPage<ContactVO> page(PageFrom page, String keyword) {
+        page.requireUnsorted();
         var users = directoryQueryPort.listUsers()
                 .stream()
                 .filter(user -> ENABLED.equals(user.status()))

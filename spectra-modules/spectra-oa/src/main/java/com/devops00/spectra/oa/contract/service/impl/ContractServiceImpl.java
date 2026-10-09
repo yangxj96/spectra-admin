@@ -67,6 +67,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -99,6 +100,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
+        var queryPage = page.<Contract>toPage(Map.of("id", "id", "updated_at", "updated_at"));
         var wrapper = new LambdaQueryWrapper<Contract>();
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null) {
@@ -128,7 +130,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             wrapper.eq(Contract::getSigningStatus, params.getSigningStatus());
         }
         wrapper.orderByDesc(Contract::getUpdatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<ContractVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(contractConverter::toVO).toList());
         return voPage;

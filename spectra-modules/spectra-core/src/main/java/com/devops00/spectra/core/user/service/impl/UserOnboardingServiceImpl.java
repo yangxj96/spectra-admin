@@ -123,8 +123,8 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
             if (previous.getPrimaryDepartmentId() != null) {
                 previousDepartmentIds.add(previous.getPrimaryDepartmentId());
             }
-            if (!AuthorizationDepartmentScope.canAccessUser(authorization, permission, viewerId,
-                    previous.getId(), previousDepartmentIds, departments)) {
+            if (!AuthorizationDepartmentScope.canAccessUser(new AuthorizationDepartmentScope.UserAccessQuery(
+                    authorization, permission, viewerId, previous.getId(), previousDepartmentIds, departments))) {
                 throw new com.devops00.spectra.common.exception.DataNotExistException("用户不存在");
             }
         }

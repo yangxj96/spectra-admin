@@ -41,12 +41,12 @@ class AuthorizationDepartmentScopeTest {
                 Set.of(D09, D10));
         var departments = departments();
 
-        assertTrue(AuthorizationDepartmentScope.canAccessUser(snapshot, "user:read", VIEWER,
-                id(101), Set.of(D10), departments));
-        assertFalse(AuthorizationDepartmentScope.canAccessUser(snapshot, "user:read", VIEWER,
-                id(102), Set.of(D11), departments));
-        assertFalse(AuthorizationDepartmentScope.canAccessUser(snapshot, "user:read", VIEWER,
-                id(103), Set.of(), departments));
+        assertTrue(AuthorizationDepartmentScope.canAccessUser(new AuthorizationDepartmentScope.UserAccessQuery(
+                snapshot, "user:read", VIEWER, id(101), Set.of(D10), departments)));
+        assertFalse(AuthorizationDepartmentScope.canAccessUser(new AuthorizationDepartmentScope.UserAccessQuery(
+                snapshot, "user:read", VIEWER, id(102), Set.of(D11), departments)));
+        assertFalse(AuthorizationDepartmentScope.canAccessUser(new AuthorizationDepartmentScope.UserAccessQuery(
+                snapshot, "user:read", VIEWER, id(103), Set.of(), departments)));
     }
 
     @Test
@@ -79,8 +79,8 @@ class AuthorizationDepartmentScopeTest {
         assertFalse(AuthorizationDepartmentScope.isUnrestricted(self, "user:read"));
         assertTrue(AuthorizationDepartmentScope.allowsOwnUser(self, "user:read", VIEWER, VIEWER));
         assertFalse(AuthorizationDepartmentScope.allowsOwnUser(self, "user:read", VIEWER, id(91)));
-        assertFalse(AuthorizationDepartmentScope.canAccessUser(self, "user:read", VIEWER,
-                id(91), Set.of(D09), departments()));
+        assertFalse(AuthorizationDepartmentScope.canAccessUser(new AuthorizationDepartmentScope.UserAccessQuery(
+                self, "user:read", VIEWER, id(91), Set.of(D09), departments())));
         assertEquals(Set.of(), AuthorizationDepartmentScope.visibleDepartmentIds(self, "user:read", departments()));
     }
 

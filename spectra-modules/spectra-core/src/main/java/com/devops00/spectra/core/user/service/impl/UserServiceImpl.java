@@ -287,6 +287,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
+        var queryPage = page.<User>toPage(
+                Map.of("id", "id", "username", "username", "real_name", "real_name", "employee_no", "employee_no", "created_at", "created_at"));
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>().like(StrUtils.isNotBlank(params.getRealName()), User::getRealName, params.getRealName())
                 .like(StrUtils.isNotBlank(params.getEmployeeNo()), User::getEmployeeNo, params.getEmployeeNo())
@@ -323,7 +325,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             appendUserReadScope(wrapper, viewerId, includeSelf, visibleDepartmentIds);
         }
 
-        var db = this.page(page.toPage(), wrapper);
+        var db = this.page(queryPage, wrapper);
         var result = userConverter.toVOPage(db);
 
         // 字段填充
@@ -365,8 +367,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         targetDepartmentIds.addAll(membershipMapper.selectActiveDepartmentIdsByUserId(target.getId()));
         var departments = departmentMapper.selectList(new QueryWrapper<Department>().select("id", "pid"));
-        if (!AuthorizationDepartmentScope.canAccessUser(
-                authorization, permission, viewerId, target.getId(), targetDepartmentIds, departments)) {
+        if (!AuthorizationDepartmentScope.canAccessUser(new AuthorizationDepartmentScope.UserAccessQuery(
+                authorization, permission, viewerId, target.getId(), targetDepartmentIds, departments))) {
             throw new DataNotExistException("用户不存在");
         }
     }
@@ -403,6 +405,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public IPage<OnlineUserPageVO> online(PageFrom page, OnlineUserPageFrom filter) throws IllegalAccessException {
+        page.requireUnsorted();
         var onlineSessions = securitySessionQueryPort.listOnlineUsers();
         Set<UUID> onlineUserIds = onlineSessions.stream()
                 .map(session -> UUID.fromString(session.getUserId()))

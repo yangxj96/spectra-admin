@@ -48,6 +48,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -73,6 +74,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     @Override
     @Transactional
     public IPage<NoticeVO> page(PageFrom page, NoticePageFrom params) {
+        var queryPage = page.<Notice>toPage(Map.of("id", "id", "publish_at", "publish_at", "created_at", "created_at"));
         var currentUser = securityContextAccessor.currentUser();
         var userId = securityContextAccessor.currentUserId();
         if (currentUser == null || userId == null) {
@@ -98,7 +100,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
             wrapper.eq(Notice::getStatus, params.getStatus());
         }
         wrapper.orderByDesc(Notice::getPublishAt).orderByDesc(Notice::getCreatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         activateDueNotices(result.getRecords());
         var voPage = new Page<NoticeVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());

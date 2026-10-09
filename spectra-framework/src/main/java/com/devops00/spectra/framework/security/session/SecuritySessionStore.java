@@ -113,15 +113,14 @@ public final class SecuritySessionStore {
     }
 
     /**
-     * 读取安全 Set；不存在的索引按空集合处理。
+     * 读取安全 Set；正常空集合表示索引不存在，null 表示无法确认并拒绝。
      *
      * @param operation 安全 Redis 操作标识，用于诊断并统一处理存储失败。
      * @param key       已按安全命名空间生成的 Redis 键。
      * @return 返回指定安全 Set 的成员；Set 不存在时返回空 Set，不返回 null，Redis 命令失败时抛出异常。
      */
     public Set<Object> members(String operation, String key) {
-        Set<Object> members = SecurityRedisExecutor.execute(operation, () -> redis.opsForSet().members(key));
-        return members == null ? Set.of() : members;
+        return SecurityRedisExecutor.require(operation, () -> redis.opsForSet().members(key));
     }
 
     /**

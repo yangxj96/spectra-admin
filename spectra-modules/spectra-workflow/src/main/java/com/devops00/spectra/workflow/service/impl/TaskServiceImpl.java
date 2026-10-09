@@ -74,6 +74,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
 
     @Override
     public IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey) {
+        page.requireUnsorted();
         var taskQuery = flowableTaskService.createTaskQuery().taskAssignee(assignee).orderByTaskCreateTime().desc();
         if (StringUtils.hasText(processDefinitionKey)) {
             taskQuery.processDefinitionKey(processDefinitionKey);
@@ -92,6 +93,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
 
     @Override
     public IPage<TaskVO> done(PageFrom page, String assignee, String processDefinitionKey) {
+        page.requireUnsorted();
         var historicTaskQuery = historyService.createHistoricTaskInstanceQuery()
                 .taskAssignee(assignee)
                 .finished()

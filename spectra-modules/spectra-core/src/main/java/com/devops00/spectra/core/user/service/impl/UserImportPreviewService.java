@@ -415,7 +415,6 @@ public class UserImportPreviewService {
                 errors.add("登录用户名、邮箱或手机号码已存在");
             }
         }
-        return errors;
     }
 
     /**

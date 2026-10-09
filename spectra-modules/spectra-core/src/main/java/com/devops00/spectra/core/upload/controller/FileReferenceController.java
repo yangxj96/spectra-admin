@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * 提供文件引用相关的 HTTP 接口。
@@ -95,6 +96,6 @@ public class FileReferenceController {
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileReferenceAdminVO> page(PageFrom page, FileReferencePageRequest request) {
-        return adminService.page(page.toPage(), request);
+        return adminService.page(page.toPage(Map.of("id", "id", "created_at", "created_at")), request);
     }
 }

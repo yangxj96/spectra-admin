@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -69,6 +70,7 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      */
     @Override
     public IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom params) {
+        var queryPage = page.<NotificationInboxEntity>toPage(Map.of("id", "id", "created_at", "created_at"));
         var query = new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .orderByDesc(NotificationInboxEntity::getCreatedAt);
@@ -93,7 +95,7 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
                 query.le(NotificationInboxEntity::getCreatedAt, parseTime(params.getEndTime()));
             }
         }
-        return converter.toVOPage(mapper.selectPage(page.toPage(), query));
+        return converter.toVOPage(mapper.selectPage(queryPage, query));
     }
 
     /**

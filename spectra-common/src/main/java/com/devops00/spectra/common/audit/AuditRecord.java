@@ -240,7 +240,7 @@ public record AuditRecord(UUID eventId,
             return Map.of();
         }
         Map<String, Object> copied = new LinkedHashMap<>();
-        source.forEach((key, value) -> {
+        new DefaultAuditSanitizer().sanitize(source).forEach((key, value) -> {
             if (key == null) {
                 throw new IllegalArgumentException("审计快照字段名不能为空");
             }

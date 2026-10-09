@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+import java.util.Map;
 
 /**
  * 文件上传任务管理接口。
@@ -65,7 +66,7 @@ public class FileUploadAdminController {
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileUploadAdminVO> page(PageFrom page, FileUploadAdminPageRequest request) {
-        return adminService.page(page.toPage(), request);
+        return adminService.page(page.toPage(Map.of("id", "id", "created_at", "created_at")), request);
     }
 
     /**

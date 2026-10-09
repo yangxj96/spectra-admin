@@ -134,6 +134,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
     /** {@inheritDoc} */
     @Override
     public IPage<QuartzJobVO> jobs(PageFrom page) {
+        if (page != null) {
+            page.requireUnsorted();
+        }
         return withScheduler(scheduler -> {
             long current = page == null || page.getPageNum() == null
                     ? 1L
@@ -286,6 +289,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
     /** {@inheritDoc} */
     @Override
     public IPage<QuartzExecutionHistoryVO> executionHistory(PageFrom page, QuartzHistoryQueryFrom from) {
+        if (page != null) {
+            page.requireUnsorted();
+        }
         QuartzHistoryQueryFrom query = from == null ? new QuartzHistoryQueryFrom() : from;
         long current = page == null || page.getPageNum() == null ? 1L : page.getPageNum();
         long size = page == null || page.getPageSize() == null ? 15L : page.getPageSize();

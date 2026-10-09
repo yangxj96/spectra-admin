@@ -101,6 +101,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
 
     @Override
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
+        var queryPage = page.<Reimbursement>toPage(Map.of("id", "id", "created_at", "created_at"));
         var wrapper = new LambdaQueryWrapper<Reimbursement>();
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null) {
@@ -136,7 +137,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             wrapper.in(Reimbursement::getApplicationId, statusApplicationIds);
         }
         wrapper.orderByDesc(Reimbursement::getCreatedAt);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<ReimbursementVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;

@@ -23,6 +23,8 @@ import com.devops00.spectra.core.security.authentication.javabean.entity.Passwor
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
+import com.devops00.spectra.common.security.policy.SecurityPolicyUnavailableException;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.core.security.authentication.exception.LoginException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
@@ -30,7 +32,8 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
+import java.time.Clock;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -50,9 +53,16 @@ public class SecurityUserAssembler {
 
     private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
-    public SecurityUserAssembler(AuthConverter authConverter, AuthorizationSnapshotProvider authorizationSnapshotProvider) {
+    private final SecurityPasswordPolicyProvider passwordPolicyProvider;
+
+    private final Clock clock;
+
+    public SecurityUserAssembler(AuthConverter authConverter, AuthorizationSnapshotProvider authorizationSnapshotProvider,
+                                 SecurityPasswordPolicyProvider passwordPolicyProvider, Clock clock) {
         this.authConverter = authConverter;
         this.authorizationSnapshotProvider = authorizationSnapshotProvider;
+        this.passwordPolicyProvider = passwordPolicyProvider;
+        this.clock = clock;
     }
 
     /**
@@ -94,8 +104,20 @@ public class SecurityUserAssembler {
     private void validateCredential(PasswordCredential credential) {
         if (credential == null)
             throw new LoginException("账号当前不可用");
-        if (credential.getExpiresAt() != null && !credential.getExpiresAt().isAfter(Instant.now())) {
-            throw new LoginException("临时密码已过期，请联系管理员重置密码");
+        var now = clock.instant();
+        var policy = passwordPolicyProvider.current();
+        if (policy == null) {
+            throw new SecurityPolicyUnavailableException("密码策略不可用，拒绝认证", null);
+        }
+        if (credential.getExpiresAt() != null && !credential.getExpiresAt().isAfter(now)) {
+            throw new LoginException("密码已过期，请联系管理员重置密码");
+        }
+        if (policy.maxAgeDays() != null) {
+            var changedAt = credential.getChangedAt();
+            if (changedAt == null || changedAt.isAfter(now)
+                    || !changedAt.isAfter(now.minus(policy.maxAgeDays(), ChronoUnit.DAYS))) {
+                throw new LoginException("密码已过期，请联系管理员重置密码");
+            }
         }
     }
 

@@ -67,6 +67,7 @@ public class AuditLogQueryService {
     public AuditLogPageVO page(Authentication viewer, PageFrom page, AuditLogQueryFrom query) {
         requireAuthenticated(viewer);
         PageFrom safePage = page == null ? new PageFrom() : page;
+        safePage.requireUnsorted();
         long pageNum = safePage.getPageNum() == null ? 1L : Math.max(1L, safePage.getPageNum());
         long pageSize = safePage.getPageSize() == null
                 ? 15L

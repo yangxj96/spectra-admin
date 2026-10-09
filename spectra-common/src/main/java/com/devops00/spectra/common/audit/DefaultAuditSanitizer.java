@@ -19,6 +19,7 @@ package com.devops00.spectra.common.audit;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +38,12 @@ import java.util.regex.Pattern;
  * @since 2026/8/31
  */
 public final class DefaultAuditSanitizer implements AuditSanitizer {
+
+    private static final Set<Class<?>> SCALAR_TYPES = Set.of(Boolean.class, Character.class, Byte.class,
+            Short.class, Integer.class, Long.class, Float.class, Double.class,
+            java.math.BigInteger.class, java.math.BigDecimal.class, java.util.UUID.class,
+            java.time.Instant.class, java.time.LocalDate.class, java.time.LocalTime.class,
+            java.time.LocalDateTime.class, java.time.OffsetDateTime.class, java.time.ZonedDateTime.class);
 
     private static final Set<String> SENSITIVE_KEYS = Set.of(
             "password",
@@ -71,17 +78,22 @@ public final class DefaultAuditSanitizer implements AuditSanitizer {
         if (snapshot == null || snapshot.isEmpty()) {
             return Map.of();
         }
-        return sanitizeMap(snapshot);
+        var path = new IdentityHashMap<Object, Boolean>();
+        path.put(snapshot, Boolean.TRUE);
+        return sanitizeMap(snapshot, path);
     }
 
     /**
      * 递归清洗 Map，并保留原有字段顺序。
      */
-    private Map<String, Object> sanitizeMap(Map<?, ?> source) {
+    private Map<String, Object> sanitizeMap(Map<?, ?> source, IdentityHashMap<Object, Boolean> path) {
         Map<String, Object> sanitized = new LinkedHashMap<>();
         source.forEach((key, value) -> {
+            if (key == null) {
+                throw new IllegalArgumentException("审计快照字段名不能为空");
+            }
             String field = String.valueOf(key);
-            sanitized.put(field, isSensitiveKey(field) ? REDACTED_VALUE : sanitizeValue(value));
+            sanitized.put(field, isSensitiveKey(field) ? REDACTED_VALUE : sanitizeValue(value, path));
         });
         return sanitized;
     }
@@ -89,30 +101,49 @@ public final class DefaultAuditSanitizer implements AuditSanitizer {
     /**
      * 递归清洗任意审计快照值。
      */
-    private Object sanitizeValue(Object value) {
+    private Object sanitizeValue(Object value, IdentityHashMap<Object, Boolean> path) {
         if (value == null) {
             return null;
         }
+        if (value instanceof String text) {
+            return sanitizeText(text);
+        }
+        if (SCALAR_TYPES.contains(value.getClass())) {
+            return value;
+        }
+        if (value instanceof Enum<?> enumeration) {
+            return enumeration.name();
+        }
+        if (path.size() >= 64 || path.containsKey(value)) {
+            return REDACTED_VALUE;
+        }
+        path.put(value, Boolean.TRUE);
+        try {
+            return sanitizeStructure(value, path);
+        } finally {
+            path.remove(value);
+        }
+    }
+
+    /** 只保留结构化副本；任意对象须先在序列化边界转换，不能延迟展开。 */
+    private Object sanitizeStructure(Object value, IdentityHashMap<Object, Boolean> path) {
         if (value instanceof Map<?, ?> map) {
-            return sanitizeMap(map);
+            return sanitizeMap(map, path);
         }
         if (value instanceof Iterable<?> iterable) {
             List<Object> sanitized = new ArrayList<>();
-            iterable.forEach(element -> sanitized.add(sanitizeValue(element)));
+            iterable.forEach(element -> sanitized.add(sanitizeValue(element, path)));
             return sanitized;
         }
         if (value.getClass().isArray()) {
             int length = Array.getLength(value);
             List<Object> sanitized = new ArrayList<>(length);
             for (int index = 0; index < length; index++) {
-                sanitized.add(sanitizeValue(Array.get(value, index)));
+                sanitized.add(sanitizeValue(Array.get(value, index), path));
             }
             return sanitized;
         }
-        if (value instanceof String text) {
-            return sanitizeText(text);
-        }
-        return value;
+        return REDACTED_VALUE;
     }
 
     /**

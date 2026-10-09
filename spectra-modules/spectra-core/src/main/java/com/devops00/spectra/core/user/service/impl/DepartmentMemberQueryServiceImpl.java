@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 部门直属成员查询服务实现。
@@ -51,6 +52,8 @@ public class DepartmentMemberQueryServiceImpl implements DepartmentMemberQuerySe
 
     @Override
     public IPage<DepartmentMemberCandidateVO> page(DepartmentMemberPageFrom from) {
+        var queryPage = from.<DepartmentMemberCandidateVO>toPage(Map.of("id", "user_record.id", "username", "user_record.username", "real_name",
+                "user_record.real_name", "status", "user_record.status"));
         var activeIds = departmentMapper.selectActiveIdsByIds(List.of(from.getDepartmentId()));
         if (activeIds.size() != 1 || !activeIds.contains(from.getDepartmentId())) {
             throw new DataNotExistException("部门不存在或已删除");
@@ -67,6 +70,6 @@ public class DepartmentMemberQueryServiceImpl implements DepartmentMemberQuerySe
         var keyword = from.getKeyword() == null || from.getKeyword().isBlank()
                 ? null
                 : from.getKeyword().trim();
-        return userMapper.selectDepartmentMemberCandidates(from.toPage(), from.getDepartmentId(), keyword);
+        return userMapper.selectDepartmentMemberCandidates(queryPage, from.getDepartmentId(), keyword);
     }
 }

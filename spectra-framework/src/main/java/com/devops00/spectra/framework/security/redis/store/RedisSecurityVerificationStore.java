@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 安全验证码及其失败尝试计数的 Redis 适配器。
@@ -117,13 +116,7 @@ public class RedisSecurityVerificationStore implements SecurityVerificationCodeS
      */
     @Override
     public long increment(String key, Duration ttl) {
-        Long attempts = SecurityRedisExecutor.require("记录验证码失败次数",
-                () -> redis.opsForValue().increment(key));
-        if (attempts == 1L) {
-            SecurityRedisExecutor.run("设置验证码失败次数 TTL",
-                    () -> redis.expire(key, ttl.toSeconds(), TimeUnit.SECONDS));
-        }
-        return attempts;
+        return SecurityRedisCounter.increment(redis, key, ttl);
     }
 
 }

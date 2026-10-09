@@ -16,10 +16,9 @@
 
 package com.devops00.spectra.framework.security.session;
 
-import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
-import com.devops00.spectra.framework.security.redis.value.SecurityRedisValueParser;
+import com.devops00.spectra.framework.security.redis.store.SecurityRedisCounter;
 import com.devops00.spectra.framework.security.session.lifecycle.SecurityLoginFailureTracker;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
@@ -50,14 +49,11 @@ public class SecurityLoginFailureStore implements SecurityLoginFailureTracker {
      */
     @Override
     public void recordLoginFail(String username) {
-        SecurityRedisExecutor.run("记录登录失败次数", () -> {
-            String key = SecurityRedisKey.LOGIN_FAIL.format(username);
-            Long count = SecurityRedisExecutor.require("记录登录失败次数",
-                    () -> store.redis().opsForValue().increment(key));
-            if (count == 1L && store.properties().getLockoutSeconds() > 0) {
-                store.redis().expire(key, Duration.ofSeconds(store.properties().getLockoutSeconds()));
-            }
-        });
+        if (store.properties().getLockoutSeconds() <= 0) {
+            return;
+        }
+        SecurityRedisCounter.increment(store.redis(), SecurityRedisKey.LOGIN_FAIL.format(username),
+                Duration.ofSeconds(store.properties().getLockoutSeconds()));
     }
 
     /**
@@ -68,20 +64,11 @@ public class SecurityLoginFailureStore implements SecurityLoginFailureTracker {
      */
     @Override
     public boolean isLockedOut(String username) {
-        return SecurityRedisExecutor.execute("读取登录失败锁定状态", () -> {
-            if (store.properties().getLockoutSeconds() <= 0) {
-                return false;
-            }
-            Object value = store.value("读取登录失败次数", SecurityRedisKey.LOGIN_FAIL.format(username));
-            if (value == null) {
-                return false;
-            }
-            long count = SecurityRedisValueParser.requiredLong(value, "LoginFailure.count");
-            if (count < 0) {
-                throw new SecurityRedisUnavailableException("安全 Redis 登录失败次数无效", null);
-            }
-            return count >= store.properties().getLockoutMaxAttempts();
-        });
+        if (store.properties().getLockoutSeconds() <= 0) {
+            return false;
+        }
+        long count = SecurityRedisCounter.current(store.redis(), SecurityRedisKey.LOGIN_FAIL.format(username));
+        return count >= store.properties().getLockoutMaxAttempts();
     }
 
     /**
@@ -91,7 +78,7 @@ public class SecurityLoginFailureStore implements SecurityLoginFailureTracker {
      */
     @Override
     public void clearLoginFail(String username) {
-        SecurityRedisExecutor.run("清理登录失败次数",
+        SecurityRedisExecutor.require("清理登录失败次数",
                 () -> store.redis().delete(SecurityRedisKey.LOGIN_FAIL.format(username)));
     }
 }

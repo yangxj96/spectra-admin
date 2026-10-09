@@ -146,6 +146,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
 
     @Override
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
+        page.requireUnsorted();
         var wrapper = new LambdaQueryWrapper<SecurityRole>()
                 .like(StringUtils.hasText(params.getName()), SecurityRole::getName, params.getName())
                 .eq(params.getState() != null, SecurityRole::getState,

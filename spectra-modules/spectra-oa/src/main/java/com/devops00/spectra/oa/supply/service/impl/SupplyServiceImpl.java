@@ -46,6 +46,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -65,6 +66,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
 
     @Override
     public IPage<SupplyItemVO> page(PageFrom page, SupplyPageFrom params) {
+        var queryPage = page.<SupplyItem>toPage(Map.of("id", "id", "name", "name", "sku", "sku"));
         var wrapper = new LambdaQueryWrapper<SupplyItem>();
         if (params != null) {
             if (StringUtils.hasText(params.getKeyword())) {
@@ -85,7 +87,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
             }
         }
         wrapper.orderByAsc(SupplyItem::getName).orderByAsc(SupplyItem::getSku);
-        var result = this.page(page.toPage(), wrapper);
+        var result = this.page(queryPage, wrapper);
         var voPage = new Page<SupplyItemVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(item -> assembleView(item, false)).toList());
         return voPage;
