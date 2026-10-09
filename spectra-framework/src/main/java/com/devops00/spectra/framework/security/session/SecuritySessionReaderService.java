@@ -34,6 +34,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,7 +61,8 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
     public @Nullable SecurityPrincipal getCurrentUser() {
         SecurityPrincipal user = getUserFromSecurityContext();
         if (user != null) {
-            return user;
+            String contextToken = getTokenFromSecurityContext();
+            return contextToken == null || contextToken.isBlank() ? user : getCurrentUser(contextToken);
         }
         String token = getTokenFromHttpRequest();
         return token == null ? null : getCurrentUser(token);
@@ -77,12 +79,15 @@ public class SecuritySessionReaderService implements SecuritySessionReader, Secu
     private @Nullable SecurityPrincipal getCurrentUserInternal(String token) {
         String tokenDigest = TokenDigestService.digest(token);
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
-        Object userIdValue = SecurityRedisExecutor.execute("读取 Session 用户标识",
-                () -> store.redis().opsForHash().get(sessionKey, "userId"));
-        if (userIdValue == null) {
+        Map<Object, Object> session = store.hash("读取待认证安全会话", sessionKey);
+        if (session.isEmpty()) {
             return null;
         }
-        UUID userId = SecurityRedisValueParser.requiredUuid(userIdValue, "Session.userId");
+        UUID userId = SecurityRedisValueParser.requiredUuid(session.get("userId"), "Session.userId");
+        String familyId = SecurityRedisValueParser.requiredText(session.get("familyId"), "Session.familyId");
+        if (store.hasKey("检查 Token Family 撤销围栏", SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId))) {
+            return null;
+        }
         return securityUserLoader.load(userId);
     }
 

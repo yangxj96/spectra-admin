@@ -353,13 +353,15 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         store.redis().delete(refreshFamilyKey);
     }
 
-    /** Refresh Rotation 重放或部分写入失败时撤销整个 Access Token Family。 */
-    void revokeFamilyForRefreshReplay(String familyId) {
+    /** Refresh 重放或部分写入失败时，先立围栏，再清理整个 Token Family。 */
+    void revokeFamilyForRefreshReplay(String familyId, long minimumTtlSeconds) {
+        RefreshTokenRotationStore.markFamilyRevoked(store.redis(), familyId, minimumTtlSeconds);
         Set<Object> familyTokens = store.members("读取 Session Family", SecurityRedisKey.SESSION_FAMILY.format(familyId));
         for (Object familyToken : familyTokens) {
             deleteAccessDigest(SecurityRedisValueParser.requiredText(familyToken, "SessionFamily.accessDigest"));
         }
         store.redis().delete(SecurityRedisKey.SESSION_FAMILY.format(familyId));
+        deleteRefreshFamily(familyId);
     }
 
 }

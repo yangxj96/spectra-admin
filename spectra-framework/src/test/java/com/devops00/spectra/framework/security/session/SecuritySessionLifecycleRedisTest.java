@@ -13,6 +13,7 @@ import com.devops00.spectra.common.constant.ClientType;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.security.SecurityToken;
+import com.devops00.spectra.common.port.security.SecurityUserLoader;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
@@ -20,6 +21,7 @@ import com.devops00.spectra.framework.security.configuration.redis.SecJacksonCon
 import com.devops00.spectra.framework.security.configuration.redis.SecRedisConfiguration;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
+import com.devops00.spectra.framework.security.redis.store.RefreshTokenRotationStore;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import com.devops00.spectra.framework.security.session.concurrency.AllowSessionConcurrencyStrategy;
 import com.devops00.spectra.framework.security.session.concurrency.KickOldSessionConcurrencyStrategy;
@@ -39,10 +41,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,6 +65,7 @@ import static org.mockito.Mockito.when;
 class SecuritySessionLifecycleRedisTest {
     private LettuceConnectionFactory factory;
     private RedisTemplate<String, Object> redis;
+    private SecuritySessionStore store;
     private SecuritySessionIssueService issuer;
     private SecuritySessionRefreshService refresher;
     private SecuritySessionRevocationService revoker;
@@ -76,7 +86,7 @@ class SecuritySessionLifecycleRedisTest {
         policy = SessionPolicy.defaults(30, 300);
         var beans = new StaticListableBeanFactory();
         beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
-        var store = new SecuritySessionStore(redis, new SecurityProperties(),
+        store = new SecuritySessionStore(redis, new SecurityProperties(),
                 beans.getBeanProvider(SecuritySessionPolicyProvider.class));
         user = mock(SecurityPrincipal.class);
         when(user.getId()).thenReturn(UUID.randomUUID());
@@ -269,6 +279,132 @@ class SecuritySessionLifecycleRedisTest {
         revoker.deleteBySessionId(handle);
         assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(target.getRefreshToken()));
         assertNotNull(reader.getCurrentUser(operatorToken));
+    }
+
+    @Test
+    void replayOfRotatedRefreshRevokesReplacementFamily() {
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        SecurityToken replacement = refresher.refreshByRefreshToken(first.getRefreshToken());
+        assertNotNull(reader.getCurrentUser(replacement.getAccessToken()));
+
+        assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(first.getRefreshToken()));
+        assertNull(reader.getCurrentUser(replacement.getAccessToken()));
+        assertThrows(BadCredentialsException.class,
+                () -> refresher.refreshByRefreshToken(replacement.getRefreshToken()));
+    }
+
+    @Test
+    void readerRejectsLiveAccessFromFencedFamily() {
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        assertNotNull(reader.getCurrentUser(first.getAccessToken()));
+        String digest = TokenDigestService.digest(first.getAccessToken());
+        Object familyId = redis.opsForHash().get(SecurityRedisKey.SESSION.format(digest), "familyId");
+        assertNotNull(familyId);
+        redis.opsForValue().set(SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId), "REVOKED");
+
+        assertNull(reader.getCurrentUser(first.getAccessToken()));
+        assertNull(reader.getCurrentUser());
+        assertNotNull(reader.getCurrentUser(issuer.createToken(user, ClientType.APP).getAccessToken()));
+    }
+
+    @Test
+    void replayBetweenClaimAndReplacementIssueCannotRestoreFamily() throws Exception {
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        String familyId = (String) redis.opsForHash()
+                .get(SecurityRedisKey.SESSION.format(
+                        TokenDigestService.digest(first.getAccessToken())), "familyId");
+        assertNotNull(familyId);
+        var configuration = new RedisStandaloneConfiguration("127.0.0.1", 26379);
+        configuration.setDatabase(14);
+        var otherFactory = new LettuceConnectionFactory(configuration);
+        otherFactory.afterPropertiesSet();
+        otherFactory.start();
+        var executor = Executors.newFixedThreadPool(2);
+        var replayLoaded = new CountDownLatch(1);
+        var releaseReplay = new CountDownLatch(1);
+        var firstAtIssue = new CountDownLatch(1);
+        var releaseIssue = new CountDownLatch(1);
+        try {
+            RedisTemplate<String, Object> otherRedis = new SecRedisConfiguration().redisTemplate(otherFactory,
+                    new SecJacksonConfiguration().redisObjectMapper(), new SecurityProperties());
+            var beans = new StaticListableBeanFactory();
+            beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
+            var otherStore = new SecuritySessionStore(otherRedis, new SecurityProperties(),
+                    beans.getBeanProvider(SecuritySessionPolicyProvider.class));
+            var otherRevoker = new SecuritySessionRevocationService(otherStore, () -> null);
+            SecurityUserLoader replayLoader = id -> {
+                replayLoaded.countDown();
+                awaitLatch(releaseReplay);
+                return user;
+            };
+            var replaying = new SecuritySessionRefreshService(otherStore, issuer, otherRevoker, replayLoader);
+            var pausedIssuer = spy(issuer);
+            doAnswer(invocation -> {
+                firstAtIssue.countDown();
+                awaitLatch(releaseIssue);
+                return invocation.callRealMethod();
+            }).when(pausedIssuer).createToken(any(SecurityPrincipal.class), any(ClientType.class), anyString());
+            var rotating = new SecuritySessionRefreshService(store, pausedIssuer, revoker, id -> user);
+
+            var replayFuture = executor.submit(() -> replaying.refreshByRefreshToken(first.getRefreshToken()));
+            awaitLatch(replayLoaded);
+            var rotateFuture = executor.submit(() -> rotating.refreshByRefreshToken(first.getRefreshToken()));
+            awaitLatch(firstAtIssue);
+            releaseReplay.countDown();
+            assertInstanceOf(BadCredentialsException.class,
+                    assertThrows(ExecutionException.class, () -> replayFuture.get(5, TimeUnit.SECONDS)).getCause());
+            releaseIssue.countDown();
+            assertInstanceOf(BadCredentialsException.class,
+                    assertThrows(ExecutionException.class, () -> rotateFuture.get(5, TimeUnit.SECONDS)).getCause());
+
+            assertNull(reader.getCurrentUser(first.getAccessToken()));
+            assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(first.getRefreshToken()));
+            assertTrue(Boolean.TRUE.equals(redis.hasKey(SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId))));
+        } finally {
+            releaseReplay.countDown();
+            releaseIssue.countDown();
+            executor.shutdownNow();
+            otherFactory.destroy();
+        }
+    }
+
+    @Test
+    void replayFenceTtlNeverShortensOnRepeatedRevocation() {
+        String familyId = UUID.randomUUID().toString();
+        RefreshTokenRotationStore.markFamilyRevoked(redis, familyId, 300);
+        String fenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
+        Long firstTtl = redis.getExpire(fenceKey, TimeUnit.SECONDS);
+        assertNotNull(firstTtl);
+        RefreshTokenRotationStore.markFamilyRevoked(redis, familyId, 5);
+        Long secondTtl = redis.getExpire(fenceKey, TimeUnit.SECONDS);
+        assertNotNull(secondTtl);
+        assertTrue(secondTtl >= firstTtl - 1);
+    }
+
+    @Test
+    void replayFenceOutlivesAccessWhenPolicyShrinks() {
+        policy = SessionPolicy.defaults(300, 30);
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        SecurityToken replacement = refresher.refreshByRefreshToken(first.getRefreshToken());
+        String replacementDigest = TokenDigestService.digest(replacement.getAccessToken());
+        String familyId = (String) redis.opsForHash().get(SecurityRedisKey.SESSION.format(replacementDigest), "familyId");
+        assertNotNull(familyId);
+
+        policy = SessionPolicy.defaults(5, 5);
+        assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(first.getRefreshToken()));
+        Long fenceTtl = redis.getExpire(SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId), TimeUnit.SECONDS);
+        assertNotNull(fenceTtl);
+        assertTrue(fenceTtl > 100, "围栏必须覆盖此前签发的较长 Access 生命周期");
+        assertNull(reader.getCurrentUser(replacement.getAccessToken()));
+    }
+
+    private static void awaitLatch(CountDownLatch latch) {
+        try {
+            assertTrue(latch.await(5, TimeUnit.SECONDS), "预期的 Redis 交错点未到达");
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("等待 Redis 交错点被中断", exception);
+        }
     }
 
     @Test

@@ -33,6 +33,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.core.ExpireChanges;
 import org.springframework.data.redis.connection.ExpirationOptions;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -109,6 +110,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         Objects.requireNonNull(user, "user");
         Objects.requireNonNull(clientType, "clientType");
         Objects.requireNonNull(familyId, "familyId");
+        ensureFamilyNotRevoked(familyId);
 
         String userId = user.getId().toString();
         String clientCode = clientType.getName();
@@ -120,6 +122,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
 
         Duration accessTtl = Duration.ofSeconds(policy.accessTtlSeconds());
         Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
+        Duration familyTtl = Duration.ofSeconds(Math.max(policy.accessTtlSeconds(), policy.refreshTtlSeconds()));
         String token = TokenDigestService.generateToken();
         String refreshToken = TokenDigestService.generateToken();
         String tokenDigest = TokenDigestService.digest(token);
@@ -163,7 +166,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             extendUserTokensTtl(userTokensKey, refreshTtl);
             redis.opsForValue().set(accessRefreshKey, refreshDigest, refreshTtl);
             redis.opsForSet().add(sessionFamilyKey, tokenDigest);
-            redis.expire(sessionFamilyKey, refreshTtl);
+            redis.expire(sessionFamilyKey, familyTtl);
             redis.opsForHash().putAll(refreshKey, refreshData);
             redis.expire(refreshKey, refreshTtl);
             redis.opsForSet().add(refreshFamilyKey, refreshDigest);
@@ -171,6 +174,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             redis.opsForSet().add(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
             redis.opsForValue().set(summaryKey, summary, accessTtl);
             redis.opsForSet().add(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), tokenDigest);
+            ensureFamilyNotRevoked(familyId);
 
             var authorities = user.getAuthorityNames()
                     .stream()
@@ -182,6 +186,13 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         } catch (RuntimeException exception) {
             cleanupPartialSession(redis, keys, identity);
             throw exception;
+        }
+    }
+
+    /** 重放围栏优先于任何新签发；写入后再次检查以缩小交错窗口。 */
+    private void ensureFamilyNotRevoked(String familyId) {
+        if (store.hasKey("检查 Token Family 撤销围栏", SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId))) {
+            throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
         }
     }
 

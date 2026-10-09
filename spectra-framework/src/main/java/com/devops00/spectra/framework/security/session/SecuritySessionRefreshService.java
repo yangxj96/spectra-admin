@@ -31,7 +31,6 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
@@ -81,25 +80,31 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
     private SecurityToken refreshInternal(String refreshToken) {
         RefreshContext context = loadContext(refreshToken);
         String refreshDigest = context.refreshDigest();
-        String refreshKey = context.refreshKey();
         SecurityPrincipal currentUser = context.currentUser();
         var parsedClientType = context.clientType();
         SessionPolicy policy = context.policy();
-        Duration refreshTtl = context.refreshTtl();
         String replayFenceKey = context.replayFenceKey();
+        long fenceTtlSeconds = Math.max(policy.accessTtlSeconds(), policy.refreshTtlSeconds());
 
-        RefreshTokenRotationStore.ClaimResult claimResult = RefreshTokenRotationStore.claim(store.redis(), refreshKey,
-                SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest), policy.refreshTtlSeconds());
+        var identity = new RefreshTokenRotationStore.ClaimIdentity(refreshDigest, context.accessDigest(),
+                context.userId().toString(), context.familyId());
+        RefreshTokenRotationStore.ClaimResult claimResult = RefreshTokenRotationStore.claim(store.redis(), identity,
+                fenceTtlSeconds);
         if (claimResult != RefreshTokenRotationStore.ClaimResult.CLAIMED) {
             if (claimResult == RefreshTokenRotationStore.ClaimResult.REPLAY) {
-                store.redis().opsForValue().set(replayFenceKey, "REVOKED", refreshTtl);
-                revocationService.revokeFamilyForRefreshReplay(context.familyId());
+                revocationService.revokeFamilyForRefreshReplay(context.familyId(), fenceTtlSeconds);
                 throw new BadCredentialsException("刷新token重放，所属 Token Family 已撤销");
             }
             throw new BadCredentialsException("刷新token无效或已过期");
         }
 
         try {
+            Boolean indexed = SecurityRedisExecutor.require("校验 Refresh 用户会话索引", () -> store.redis()
+                    .opsForSet()
+                    .isMember(SecurityRedisKey.USER_TOKENS.format(context.userId()), context.accessDigest()));
+            if (!indexed) {
+                throw new BadCredentialsException("刷新token所属会话已失效");
+            }
             removeRotatedAccessSession(context.accessDigest(), refreshDigest, context.userId().toString(),
                     context.clientTypeName(), context.familyId());
             if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
@@ -107,7 +112,7 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
             }
             return issueService.createToken(currentUser, parsedClientType, context.familyId());
         } catch (RuntimeException exception) {
-            revocationService.revokeFamilyForRefreshReplay(context.familyId());
+            revocationService.revokeFamilyForRefreshReplay(context.familyId(), fenceTtlSeconds);
             throw exception;
         }
     }
@@ -126,12 +131,6 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         UUID userId = SecurityRedisValueParser.requiredUuid(refreshData.get("userId"), "Refresh.userId");
         String familyId = SecurityRedisValueParser.requiredText(refreshData.get("familyId"), "Refresh.familyId");
         String refreshClientType = SecurityRedisValueParser.requiredText(refreshData.get("clientType"), "Refresh.clientType");
-        Boolean indexed = SecurityRedisExecutor.require("校验 Refresh 用户会话索引", () -> store.redis()
-                .opsForSet()
-                .isMember(SecurityRedisKey.USER_TOKENS.format(userId), accessDigest));
-        if (!indexed) {
-            throw new BadCredentialsException("刷新token所属会话已失效");
-        }
         SecurityPrincipal currentUser = securityUserLoader.load(userId);
         if (currentUser == null) {
             throw new BadCredentialsException("刷新token所属账号当前不可用");
@@ -146,14 +145,14 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
             throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
         }
-        return new RefreshContext(refreshDigest, refreshKey, accessDigest, userId, familyId, clientTypeName,
-                clientType, policy, Duration.ofSeconds(policy.refreshTtlSeconds()), replayFenceKey, currentUser);
+        return new RefreshContext(refreshDigest, accessDigest, userId, familyId, clientTypeName,
+                clientType, policy, replayFenceKey, currentUser);
     }
 
-    private record RefreshContext(String refreshDigest, String refreshKey, String accessDigest, UUID userId,
+    private record RefreshContext(String refreshDigest, String accessDigest, UUID userId,
                                   String familyId, String clientTypeName,
                                   ClientType clientType,
-                                  SessionPolicy policy, Duration refreshTtl, String replayFenceKey,
+                                  SessionPolicy policy, String replayFenceKey,
                                   SecurityPrincipal currentUser) {
     }
 

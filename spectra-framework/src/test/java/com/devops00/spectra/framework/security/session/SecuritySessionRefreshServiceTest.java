@@ -17,10 +17,13 @@
 package com.devops00.spectra.framework.security.session;
 
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.port.security.SecurityUserLoader;
+import com.devops00.spectra.common.security.policy.SessionPolicy;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Map;
@@ -29,6 +32,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -69,13 +74,17 @@ class SecuritySessionRefreshServiceTest {
                 "clientType", "web",
                 "familyId", "family-id"));
         when(store.redis()).thenReturn(redis);
+        when(store.sessionPolicy("web")).thenReturn(SessionPolicy.defaults(30, 300));
         when(redis.opsForSet()).thenReturn(sets);
+        when(redis.execute(any(RedisScript.class), anyList(), any(), any())).thenReturn(1L);
         when(sets.isMember(anyString(), eq("access-digest"))).thenReturn(null);
+        var loader = mock(SecurityUserLoader.class);
+        when(loader.load(any(UUID.class))).thenReturn(mock(SecurityPrincipal.class));
         var service = new SecuritySessionRefreshService(
                 store,
                 mock(SecuritySessionIssueService.class),
                 mock(SecuritySessionRevocationService.class),
-                mock(SecurityUserLoader.class));
+                loader);
 
         assertThrows(SecurityRedisUnavailableException.class,
                 () -> service.refreshByRefreshToken("synthetic-refresh-token"));
