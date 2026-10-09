@@ -10,6 +10,7 @@
  */
 package com.devops00.spectra.framework.security.redis.store;
 
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -59,8 +60,12 @@ public final class SecurityRedisCounter {
 
     /** 同时确认计数与窗口；健康未命中返回零，缺少有效期时拒绝。 */
     public static long current(RedisTemplate<String, Object> redis, String key) {
-        return SecurityRedisExecutor.require("读取安全失败计数窗口",
+        long count = SecurityRedisExecutor.require("读取安全失败计数窗口",
                 () -> redis.execute(READ, List.of(key)));
+        if (count < 0) {
+            throw new SecurityRedisUnavailableException("安全 Redis 返回无效的失败计数", null);
+        }
+        return count;
     }
 
     /** 原子累加；首写即带有效期，后续递增保持原来的窗口。 */
@@ -68,7 +73,11 @@ public final class SecurityRedisCounter {
         if (ttl == null || ttl.isNegative() || ttl.isZero() || ttl.toMillis() < 1) {
             throw new IllegalArgumentException("安全计数有效期必须为正毫秒数");
         }
-        return SecurityRedisExecutor.require("原子记录安全失败次数",
+        long count = SecurityRedisExecutor.require("原子记录安全失败次数",
                 () -> redis.execute(INCREMENT, List.of(key), ttl.toMillis()));
+        if (count < 1) {
+            throw new SecurityRedisUnavailableException("安全 Redis 返回无效的失败计数", null);
+        }
+        return count;
     }
 }
