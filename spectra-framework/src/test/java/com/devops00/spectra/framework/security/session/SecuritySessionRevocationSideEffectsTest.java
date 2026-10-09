@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.RedisScript;
 
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -63,8 +66,10 @@ class SecuritySessionRevocationSideEffectsTest {
         RedisTemplate<String, Object> redis = mock();
         HashOperations<String, Object, Object> hashes = mock();
         SetOperations<String, Object> sets = mock();
+        ValueOperations<String, Object> values = mock();
         when(redis.opsForHash()).thenReturn(hashes);
         when(redis.opsForSet()).thenReturn(sets);
+        when(redis.opsForValue()).thenReturn(values);
         when(hashes.entries(eq(refreshKey))).thenReturn(Map.of(
                 "accessToken", accessDigest,
                 "userId", "user-id",
@@ -141,8 +146,13 @@ class SecuritySessionRevocationSideEffectsTest {
         when(sets.members(eq(SecurityRedisKey.REFRESH_FAMILY.format(familyId))))
                 .thenReturn(Set.of(refreshDigest));
         when(hashes.entries(eq(sessionKey))).thenReturn(Map.of());
-        when(hashes.entries(eq(refreshKey))).thenReturn(Map.of("familyId", familyId));
+        when(hashes.entries(eq(refreshKey))).thenReturn(Map.of(
+                "accessToken", expiredDigest,
+                "userId", userId.toString(),
+                "clientType", "web",
+                "familyId", familyId));
         when(values.get(eq(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest)))).thenReturn(refreshDigest);
+        when(redis.execute(any(RedisScript.class), anyList(), any())).thenReturn(1L);
         when(sets.size(eq(userTokensKey))).thenReturn(0L);
 
         var repository = new SecuritySessionRevocationService(store(redis, null), () -> null);
@@ -152,8 +162,8 @@ class SecuritySessionRevocationSideEffectsTest {
         verify(sets).remove(userTokensKey, expiredDigest);
         verify(redis).delete(userTokensKey);
         verify(sets).remove(SecurityRedisKey.ONLINE_USERS.getPattern(), userId.toString());
-        verify(redis).delete(refreshKey);
-        verify(redis).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
+        verify(redis, atLeastOnce()).delete(refreshKey);
+        verify(redis, atLeastOnce()).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
         verify(redis).delete(SecurityRedisKey.REFRESH_FAMILY.format(familyId));
         verify(redis).delete(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest));
     }

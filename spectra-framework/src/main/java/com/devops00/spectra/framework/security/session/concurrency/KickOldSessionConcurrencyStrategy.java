@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.security.session.concurrency;
 
 import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.value.SecurityRedisValueParser;
 import com.devops00.spectra.framework.security.session.SecuritySessionStore;
@@ -64,7 +65,7 @@ public final class KickOldSessionConcurrencyStrategy implements SessionConcurren
      *
      * @param policy             当前客户端会话策略；撤销旧会话模式下不使用容量值。
      * @param clientCode         新会话客户端编码，用于过滤其他客户端的活动 Session。
-     * @param activeTokenDigests 当前活动访问令牌摘要集合。
+     * @param activeTokenDigests Access 或关联 Refresh 仍有效的会话摘要集合。
      * @param revokeAccessDigest 按访问令牌摘要执行受控撤销的回调。
      */
     @Override
@@ -73,13 +74,34 @@ public final class KickOldSessionConcurrencyStrategy implements SessionConcurren
         Objects.requireNonNull(clientCode, "clientCode 不能为空");
         Objects.requireNonNull(revokeAccessDigest, "revokeAccessDigest 不能为空");
         for (String activeTokenDigest : activeTokenDigests) {
-            Map<Object, Object> activeSession = store.hash("读取活动安全会话",
-                    SecurityRedisKey.SESSION.format(activeTokenDigest));
-            if (!activeSession.isEmpty()
-                    && clientCode.equals(SecurityRedisValueParser.requiredText(activeSession.get("clientType"),
-                            "Session.clientType"))) {
+            String existingClient = clientTypeOf(activeTokenDigest);
+            if (clientCode.equals(existingClient)) {
                 revokeAccessDigest.accept(activeTokenDigest);
             }
         }
+    }
+
+    /** Access 过期后仍可通过有效 Refresh 辨认并撤销同端旧会话。 */
+    private String clientTypeOf(String accessDigest) {
+        Map<Object, Object> session = store.hash("读取活动安全会话", SecurityRedisKey.SESSION.format(accessDigest));
+        if (!session.isEmpty()) {
+            return SecurityRedisValueParser.requiredText(session.get("clientType"), "Session.clientType");
+        }
+        Object refreshValue = store.value("读取过期 Access 的 Refresh 映射",
+                SecurityRedisKey.REFRESH_TOKEN.format(accessDigest));
+        if (refreshValue == null) {
+            return "";
+        }
+        String refreshDigest = SecurityRedisValueParser.requiredText(refreshValue, "Access.refreshDigest");
+        Map<Object, Object> refresh = store.hash("读取过期 Access 的 Refresh 状态",
+                SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest));
+        if (refresh.isEmpty()) {
+            return "";
+        }
+        String mappedAccess = SecurityRedisValueParser.requiredText(refresh.get("accessToken"), "Refresh.accessToken");
+        if (!accessDigest.equals(mappedAccess)) {
+            throw new SecurityRedisUnavailableException("安全 Redis Access Refresh 映射不一致", null);
+        }
+        return SecurityRedisValueParser.requiredText(refresh.get("clientType"), "Refresh.clientType");
     }
 }

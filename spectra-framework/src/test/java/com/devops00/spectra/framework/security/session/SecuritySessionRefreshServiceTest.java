@@ -16,15 +16,20 @@
 
 package com.devops00.spectra.framework.security.session;
 
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.port.security.SecurityUserLoader;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,5 +56,28 @@ class SecuritySessionRefreshServiceTest {
                 () -> service.refreshByRefreshToken("invalid-refresh-token"));
 
         assertEquals("刷新token无效或已过期", exception.getMessage());
+    }
+
+    @Test
+    void unknownUserIndexMembershipRejectsRefresh() {
+        var store = mock(SecuritySessionStore.class);
+        RedisTemplate<String, Object> redis = mock();
+        SetOperations<String, Object> sets = mock();
+        when(store.hash(anyString(), anyString())).thenReturn(Map.of(
+                "accessToken", "access-digest",
+                "userId", UUID.randomUUID().toString(),
+                "clientType", "web",
+                "familyId", "family-id"));
+        when(store.redis()).thenReturn(redis);
+        when(redis.opsForSet()).thenReturn(sets);
+        when(sets.isMember(anyString(), eq("access-digest"))).thenReturn(null);
+        var service = new SecuritySessionRefreshService(
+                store,
+                mock(SecuritySessionIssueService.class),
+                mock(SecuritySessionRevocationService.class),
+                mock(SecurityUserLoader.class));
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> service.refreshByRefreshToken("synthetic-refresh-token"));
     }
 }

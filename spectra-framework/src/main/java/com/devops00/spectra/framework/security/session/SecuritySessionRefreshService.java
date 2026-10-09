@@ -126,12 +126,19 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
         UUID userId = SecurityRedisValueParser.requiredUuid(refreshData.get("userId"), "Refresh.userId");
         String familyId = SecurityRedisValueParser.requiredText(refreshData.get("familyId"), "Refresh.familyId");
         String refreshClientType = SecurityRedisValueParser.requiredText(refreshData.get("clientType"), "Refresh.clientType");
+        Boolean indexed = SecurityRedisExecutor.require("校验 Refresh 用户会话索引", () -> store.redis()
+                .opsForSet()
+                .isMember(SecurityRedisKey.USER_TOKENS.format(userId), accessDigest));
+        if (!indexed) {
+            throw new BadCredentialsException("刷新token所属会话已失效");
+        }
         SecurityPrincipal currentUser = securityUserLoader.load(userId);
         if (currentUser == null) {
             throw new BadCredentialsException("刷新token所属账号当前不可用");
         }
         Map<Object, Object> session = store.hash("读取安全会话", SecurityRedisKey.SESSION.format(accessDigest));
-        String clientTypeName = session.isEmpty() ? refreshClientType
+        String clientTypeName = session.isEmpty()
+                ? refreshClientType
                 : SecurityRedisValueParser.requiredText(session.get("clientType"), "Session.clientType");
         var clientType = SecurityRedisValueParser.requiredClientType(clientTypeName, "Refresh.clientType");
         SessionPolicy policy = store.sessionPolicy(clientType.getName());

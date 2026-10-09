@@ -30,6 +30,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
+import org.springframework.data.redis.core.ExpireChanges;
+import org.springframework.data.redis.connection.ExpirationOptions;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -157,7 +160,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             redis.expire(sessionKey, accessTtl);
             redis.opsForValue().set(ucKey, tokenDigest, accessTtl);
             redis.opsForSet().add(userTokensKey, tokenDigest);
-            redis.expire(userTokensKey, refreshTtl);
+            extendUserTokensTtl(userTokensKey, refreshTtl);
             redis.opsForValue().set(accessRefreshKey, refreshDigest, refreshTtl);
             redis.opsForSet().add(sessionFamilyKey, tokenDigest);
             redis.expire(sessionFamilyKey, refreshTtl);
@@ -252,17 +255,49 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
      * 处理活动状态令牌相关数据。
      */
     private Set<String> activeTokenDigests(String userId) {
-        Set<Object> tokens = store.members("读取用户会话索引", SecurityRedisKey.USER_TOKENS.format(userId));
+        String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
+        Set<Object> tokens = store.members("读取用户会话索引", userTokensKey);
         Set<String> active = new java.util.LinkedHashSet<>();
         for (Object token : tokens) {
             String digest = SecurityRedisValueParser.requiredText(token, "UserTokens.accessDigest");
             if (store.hasKey("检查活动安全会话", SecurityRedisKey.SESSION.format(digest))) {
                 active.add(digest);
             } else {
-                store.redis().opsForSet().remove(SecurityRedisKey.USER_TOKENS.format(userId), digest);
+                String accessRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(digest);
+                Object refreshValue = store.value("读取过期 Access 的 Refresh 映射", accessRefreshKey);
+                String refreshDigest = refreshValue == null
+                        ? null
+                        : SecurityRedisValueParser.requiredText(refreshValue, "Access.refreshDigest");
+                if (refreshDigest == null
+                        || !store.hasKey("检查过期 Access 的 Refresh 状态",
+                                SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest))) {
+                    store.redis().opsForSet().remove(userTokensKey, digest);
+                    if (refreshDigest != null) {
+                        store.redis().delete(accessRefreshKey);
+                    }
+                } else {
+                    active.add(digest);
+                }
             }
         }
         return active;
+    }
+
+    /** 用户索引至少存活到其中最长的 Refresh 生命周期结束；不同客户端策略不得缩短已有索引。 */
+    private void extendUserTokensTtl(String userTokensKey, Duration refreshTtl) {
+        var expiration = Expiration.from(refreshTtl);
+        var noExpiry = SecurityRedisExecutor.require("设置用户会话索引有效期", () -> store.redis()
+                .expire(
+                        userTokensKey, expiration, ExpirationOptions.builder().nx().build()));
+        if (ExpireChanges.ExpiryChangeState.DOES_NOT_EXIST.equals(noExpiry)) {
+            throw new com.devops00.spectra.common.exception.SecurityRedisUnavailableException("用户会话索引不存在", null);
+        }
+        var extended = SecurityRedisExecutor.require("延长用户会话索引有效期", () -> store.redis()
+                .expire(
+                        userTokensKey, expiration, ExpirationOptions.builder().gt().build()));
+        if (ExpireChanges.ExpiryChangeState.DOES_NOT_EXIST.equals(extended)) {
+            throw new com.devops00.spectra.common.exception.SecurityRedisUnavailableException("用户会话索引不存在", null);
+        }
     }
 
     /**
