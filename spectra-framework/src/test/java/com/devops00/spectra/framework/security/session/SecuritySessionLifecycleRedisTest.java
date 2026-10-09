@@ -40,6 +40,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -107,6 +108,16 @@ class SecuritySessionLifecycleRedisTest {
             connection.serverCommands().flushDb();
         }
         factory.destroy();
+    }
+
+    @Test
+    void missingUserIndexIsConfirmedEmptyInIsolatedRedis() {
+        UUID missingUserId = UUID.randomUUID();
+        String userIndexKey = SecurityRedisKey.USER_TOKENS.format(missingUserId);
+
+        assertEquals(Set.of(), store.members("读取不存在的用户会话索引", userIndexKey));
+        revoker.deleteByUserId(missingUserId);
+        assertFalse(Boolean.TRUE.equals(redis.hasKey(userIndexKey)));
     }
 
     @Test
