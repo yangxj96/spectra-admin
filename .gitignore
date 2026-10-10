@@ -100,6 +100,7 @@ document/jar/
 .env.properties
 .mise.local.toml
 .mise.test.toml
+.miserc.local.toml
 .agentscope
 .mimocode
 
