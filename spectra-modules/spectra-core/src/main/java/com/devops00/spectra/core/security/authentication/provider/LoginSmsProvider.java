@@ -66,6 +66,7 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
 
     private final SecretRuntimeService secretRuntimeService;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-007: 认证 Provider 协作者逐项注入。
     public LoginSmsProvider(SecurityVerificationCodeStore verificationCodeStore,
                             SecurityVerificationAttemptStore verificationAttemptStore,
                             UserService userService,

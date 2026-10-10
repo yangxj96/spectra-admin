@@ -91,6 +91,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     private final long threadDumpMaxBytes;
     private final long heapDumpMaxBytes;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-012: 诊断服务基础设施协作者逐项注入。
     public ServiceMonitorDiagnosticServiceImpl(MeterRegistry meterRegistry, DataSource dataSource,
                                                RedisConnectionFactory redisConnectionFactory, Environment environment,
                                                TimeMapper timeMapper, ServiceMonitorDiagnosticTaskMapper taskMapper,

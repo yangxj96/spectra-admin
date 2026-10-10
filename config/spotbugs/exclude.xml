@@ -279,4 +279,8 @@
     <Match><Class name="com.devops00.spectra.core.system.cache.CacheInvalidationCoordinator"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
     <Match><Class name="com.devops00.spectra.core.system.controller.ConfiguredController"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
     <Match><Class name="com.devops00.spectra.core.system.service.impl.CacheManagementServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <!-- EX-B02-SPOTBUGS-001: configured Spring Jackson mapper is the intentional audit serializer. -->
+    <Match><Class name="com.devops00.spectra.core.audit.JacksonAuditSanitizer"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <!-- EX-B02-SPOTBUGS-002: Quartz parameter validator is a Spring-owned collaborator. -->
+    <Match><Class name="com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
 </FindBugsFilter>

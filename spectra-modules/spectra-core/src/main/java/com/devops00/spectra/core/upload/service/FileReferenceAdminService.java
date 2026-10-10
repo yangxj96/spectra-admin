@@ -19,7 +19,6 @@ package com.devops00.spectra.core.upload.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.core.upload.javabean.entity.FileAsset;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
 import com.devops00.spectra.core.upload.javabean.converter.FileUploadConverter;
 import com.devops00.spectra.core.upload.javabean.from.FileReferencePageRequest;

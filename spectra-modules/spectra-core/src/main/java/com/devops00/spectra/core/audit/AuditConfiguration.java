@@ -45,6 +45,7 @@ public class AuditConfiguration {
     /** Core 必选的 Audit 切面；没有统一审计服务时不装配技术入口。 */
     @Bean
     @ConditionalOnBean(AuditService.class)
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-005: Bean 装配依赖逐项注入。
     public AuditAspect auditAspect(SecurityContextAccessor securityContextAccessor,
                                    AuditService auditService,
                                    AuditSanitizer auditSanitizer,

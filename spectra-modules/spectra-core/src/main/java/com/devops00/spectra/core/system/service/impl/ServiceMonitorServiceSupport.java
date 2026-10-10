@@ -93,6 +93,7 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
     private long previousRequestNanos = -1L;
     private volatile Instant lastHistoryCleanupAt;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-013: 监控采样协作者逐项注入。
     public ServiceMonitorServiceSupport(MeterRegistry meterRegistry, TimeMapper timeMapper, Environment environment,
                                         @Lazy CoreHealthAggregator healthAggregator,
                                         ServiceMonitorSampleMapper sampleMapper,
@@ -334,7 +335,8 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
      * 转换、解析或规范化数据（{@code resolveStatus}）。
      */
     private static ServiceMonitorHealthStatus resolveStatus(StatusInput input) {
-        var downCount = input.dependencies().stream()
+        var downCount = input.dependencies()
+                .stream()
                 .filter(item -> DependencyHealthStatus.DOWN.name().equals(item.getStatus()))
                 .count();
         if (!input.dependencies().isEmpty() && downCount == input.dependencies().size()) {
@@ -349,7 +351,8 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         if (input.healthStatus() == DependencyHealthStatus.UNKNOWN) {
             return ServiceMonitorHealthStatus.WARNING;
         }
-        if (input.cpuUsage() >= WARNING_CPU_USAGE || input.systemMemoryUsage() >= WARNING_MEMORY_USAGE
+        if (input.cpuUsage() >= WARNING_CPU_USAGE
+                || input.systemMemoryUsage() >= WARNING_MEMORY_USAGE
                 || input.jvmHeapUsage() >= WARNING_JVM_HEAP_USAGE
                 || input.requestMetrics().errorRate() >= WARNING_ERROR_RATE
                 || input.requestMetrics().p95ResponseMs() >= WARNING_P95_RESPONSE_MS) {

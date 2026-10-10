@@ -89,16 +89,13 @@ public class UserImportRowProcessor {
     /**
      * 在独立事务中处理单行用户数据。
      *
-     * @param row           待处理导入行。
-     * @param skipExisting  是否跳过已存在的用户。
-     * @param departmentIds 部门编码到部门标识的映射。
-     * @param profiles      授权方案编码到方案详情的映射。
+     * @param row     待处理并写回状态的导入行。
+     * @param request 本次导入的操作人、策略和参考数据快照。
      * @return 当前导入行创建或跳过后的结果。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ProcessResult process(ProcessRequest request) {
-        var result = processInternal(request);
-        var row = request.row();
+    public ProcessResult process(UserImportRow row, ProcessRequest request) {
+        var result = processInternal(row, request);
         row.setUserId(result.userId());
         row.setState(result.skipped() ? UserImportRowState.SKIPPED.name() : UserImportRowState.APPLIED.name());
         if (rowMapper.updateById(row) != 1) {
@@ -110,16 +107,11 @@ public class UserImportRowProcessor {
     /**
      * 校验导入行并创建用户、应用授权方案。
      *
-     * @param row                        待处理导入行。
-     * @param operatorId                 发起导入的操作人。
-     * @param skipExisting               是否跳过已存在的用户。
-     * @param departmentIds              部门编码到部门标识的映射。
-     * @param profiles                   授权方案编码到方案详情的映射。
-     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希；空值时由用户服务读取当前设置。
+     * @param row     待处理导入行。
+     * @param request 操作人、跳过策略、部门和授权方案映射、默认密码哈希快照。
      * @return 当前导入行创建或跳过后的结果。
      */
-    private ProcessResult processInternal(ProcessRequest request) {
-        var row = request.row();
+    private ProcessResult processInternal(UserImportRow row, ProcessRequest request) {
         var operatorId = request.operatorId();
         var departmentIds = request.departmentIds();
         var profiles = request.profiles();
@@ -170,9 +162,14 @@ public class UserImportRowProcessor {
         return new ProcessResult(created.getId(), false);
     }
 
-    public record ProcessRequest(UserImportRow row, UUID operatorId, boolean skipExisting,
+    public record ProcessRequest(UUID operatorId, boolean skipExisting,
                                  Map<String, UUID> departmentIds, Map<String, AuthorizationProfileVO> profiles,
                                  List<Department> departments, String encodedDefaultPasswordHash) {
+        public ProcessRequest {
+            departmentIds = Map.copyOf(departmentIds);
+            profiles = Map.copyOf(profiles);
+            departments = List.copyOf(departments);
+        }
     }
 
     /**

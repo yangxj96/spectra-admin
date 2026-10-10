@@ -11,7 +11,10 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** 验证实际序列化后的审计快照，不允许延迟展开的业务对象携带秘密。 */
 class AuditSanitizationTest {
@@ -69,9 +72,29 @@ class AuditSanitizationTest {
         assertTrue(json.contains(AuditSanitizer.REDACTED_VALUE));
     }
 
-    record Nested(String displayName, String accessToken, Map<String, String> settings) { }
-    record Alias(@com.fasterxml.jackson.annotation.JsonProperty("password") String value) { }
+    @Test
+    void inlineCredentialsAndAuditReasonAreSanitizedBeforeSerialization() {
+        String text = "visible password=synthetic-password token:'synthetic-token' "
+                + "{\"api_key\":\"synthetic-api-key\"} client_secret=synthetic-client-secret "
+                + "x_private_key=synthetic-private-key Bearer synthetic-bearer";
+        var snapshot = new DefaultAuditSanitizer().sanitize(Map.of("note", text));
+        var record = new AuditRecord(null, AuditCategory.OPERATION, "SYNTHETIC", null,
+                AuditRecord.Result.SUCCEEDED, null, null, snapshot, Map.of(), text, null, null);
+        String json = mapper.writeValueAsString(record);
+        assertTrue(json.contains("visible"));
+        assertTrue(json.contains(AuditSanitizer.REDACTED_VALUE));
+        assertFalse(json.contains("synthetic-"));
+    }
+
+    record Nested(String displayName, String accessToken, Map<String, String> settings) {
+    }
+
+    record Alias(@com.fasterxml.jackson.annotation.JsonProperty("password") String value) {
+    }
+
     public static class BrokenBean {
-        public String getValue() { throw new IllegalStateException("synthetic-getter-secret"); }
+        public String getValue() {
+            throw new IllegalStateException("synthetic-getter-secret");
+        }
     }
 }

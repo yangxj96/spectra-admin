@@ -6,6 +6,7 @@ import com.devops00.spectra.common.security.authorization.ScopeMode;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -91,6 +92,10 @@ public final class AuthorizationDepartmentScope {
     public record UserAccessQuery(AuthorizationSnapshot snapshot, String permission, UUID viewerUserId,
                                   UUID targetUserId, Set<UUID> targetDepartmentIds,
                                   List<Department> departments) {
+        public UserAccessQuery {
+            targetDepartmentIds = targetDepartmentIds == null ? null : Set.copyOf(targetDepartmentIds);
+            departments = departments == null ? null : Collections.unmodifiableList(new ArrayList<>(departments));
+        }
     }
 
     /** Checks whether the requested department itself is in the permission scope. */

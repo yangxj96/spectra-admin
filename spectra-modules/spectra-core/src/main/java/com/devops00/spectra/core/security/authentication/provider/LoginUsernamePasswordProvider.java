@@ -55,6 +55,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
 
     private final SecurityUserAssembler securityUserAssembler;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-008: 密码认证协作者逐项注入。
     public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService,
                                          AuthenticationIdentityService authenticationIdentityService,
                                          PasswordCredentialService passwordCredentialService,

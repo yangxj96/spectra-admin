@@ -46,10 +46,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 
 /**
@@ -79,6 +79,7 @@ public class AuditAspect {
 
     private final ExpressionParser parser = new SpelExpressionParser();
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-004: 审计切面协作者由 Spring 明确注入。
     public AuditAspect(SecurityContextAccessor securityContextAccessor,
                        AuditService auditService,
                        AuditSanitizer auditSanitizer,
@@ -159,11 +160,11 @@ public class AuditAspect {
             failureRecorder.record(record);
         } catch (RuntimeException recordingFailure) {
             if (!Objects.equals(recordingFailure, failure)) {
-                failure.addSuppressed(recordingFailure);
+                failure.addSuppressed(new AuditService.AuditRecordingException("失败审计记录未写入"));
             }
             log.error("{}失败审计写入失败: category={}, eventType={}, cause={}",
                     LogPrefix.LOG.p(), descriptor.category(), descriptor.eventType(),
-                    recordingFailure.getClass().getSimpleName(), recordingFailure);
+                    recordingFailure.getClass().getSimpleName());
         }
     }
 
@@ -244,8 +245,9 @@ public class AuditAspect {
         try {
             auditService.record(record);
         } catch (AuditService.AuditRecordingException exception) {
-            log.error("{}审计记录提交失败，业务事务将回滚: category={}, eventType={}",
-                    LogPrefix.LOG.p(), input.descriptor().category(), input.descriptor().eventType(), exception);
+            log.error("{}审计记录提交失败，业务事务将回滚: category={}, eventType={}, cause={}",
+                    LogPrefix.LOG.p(), input.descriptor().category(), input.descriptor().eventType(),
+                    exception.getClass().getSimpleName());
             throw exception;
         }
     }

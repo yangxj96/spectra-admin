@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 将 Redis 在线会话摘要与当前用户资料合并为按用户分页的页面结果。
@@ -56,22 +57,15 @@ public class OnlineUserPageAssembler {
     /**
      * 按当前有效会话构造经过过滤、排序和分页的用户分组。
      *
-     * @param page                  页码与页大小。
-     * @param filter                账号、姓名和部门筛选条件。
-     * @param onlineSessions        安全 Redis 返回的在线会话摘要。
-     * @param onlineUsers           当前存在的用户实体资料。
-     * @param matchingDepartmentIds 目标部门及其可匹配的下级部门 ID。
+     * @param request 固定分页、筛选条件、在线会话及部门关系的请求快照。
      * @return 返回 total 按用户数量计算的 MyBatis-Plus 分页结果；没有匹配在线用户时 records 为空、total 为 0。
      */
     public Page<OnlineUserPageVO> page(PageRequest request) {
-        if (request.page() != null) {
-            request.page().requireUnsorted();
-        }
-        long pageNum = pageNum(request.page());
-        long pageSize = pageSize(request.page());
+        long pageNum = request.options().pageNum();
+        long pageSize = request.options().pageSize();
         var usersById = usersById(request.onlineUsers());
         var sessionsByUser = sessionsByUser(request.onlineSessions());
-        var records = records(sessionsByUser, usersById, request.filter(), request.matchingDepartmentIds(),
+        var records = records(sessionsByUser, usersById, request.options(), request.matchingDepartmentIds(),
                 request.departmentIdsByUser());
         records.sort(USER_ORDER);
 
@@ -85,12 +79,29 @@ public class OnlineUserPageAssembler {
         return result;
     }
 
-    public record PageRequest(PageFrom page, OnlineUserPageFrom filter, List<UserOnlineVO> onlineSessions,
-                              List<User> onlineUsers, Set<UUID> matchingDepartmentIds,
+    public record PageRequest(PageOptions options, List<UserOnlineVO> onlineSessions, List<User> onlineUsers,
+                              Set<UUID> matchingDepartmentIds,
                               Map<UUID, Set<UUID>> departmentIdsByUser) {
+        public PageRequest {
+            onlineSessions = List.copyOf(onlineSessions);
+            onlineUsers = List.copyOf(onlineUsers);
+            matchingDepartmentIds = matchingDepartmentIds == null ? null : Set.copyOf(matchingDepartmentIds);
+            departmentIdsByUser = Map.copyOf(departmentIdsByUser.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> Set.copyOf(entry.getValue()))));
+        }
+    }
+
+    public record PageOptions(long pageNum, long pageSize, String username, String realName, UUID departmentId) {
+        public PageOptions(PageFrom page, OnlineUserPageFrom filter) {
+            this(OnlineUserPageAssembler.pageNum(page), OnlineUserPageAssembler.pageSize(page),
+                    filter == null ? null : filter.getUsername(),
+                    filter == null ? null : filter.getRealName(), filter == null ? null : filter.getDepartmentId());
+        }
     }
 
     private static long pageNum(PageFrom page) {
+        page.requireUnsorted();
         var value = page.getPageNum() == null ? 1L : page.getPageNum();
         if (value < 1) {
             throw new IllegalArgumentException("在线用户分页页码必须大于零");
@@ -120,7 +131,7 @@ public class OnlineUserPageAssembler {
     }
 
     private static List<OnlineUserPageVO> records(Map<UUID, List<UserOnlineVO>> sessionsByUser,
-                                                  Map<UUID, User> usersById, OnlineUserPageFrom filter,
+                                                  Map<UUID, User> usersById, PageOptions filter,
                                                   Set<UUID> matchingDepartmentIds,
                                                   Map<UUID, Set<UUID>> departmentIdsByUser) {
         var records = new ArrayList<OnlineUserPageVO>();
@@ -139,16 +150,13 @@ public class OnlineUserPageAssembler {
         return records;
     }
 
-    private static boolean matches(User user, OnlineUserPageFrom filter, Set<UUID> matchingDepartmentIds,
+    private static boolean matches(User user, PageOptions filter, Set<UUID> matchingDepartmentIds,
                                    Map<UUID, Set<UUID>> departmentIdsByUser) {
-        if (filter == null) {
-            return true;
-        }
-        if (!containsIgnoreCase(user.getUsername(), filter.getUsername())
-                || !containsIgnoreCase(user.getRealName(), filter.getRealName())) {
+        if (!containsIgnoreCase(user.getUsername(), filter.username())
+                || !containsIgnoreCase(user.getRealName(), filter.realName())) {
             return false;
         }
-        if (filter.getDepartmentId() == null) {
+        if (filter.departmentId() == null) {
             return true;
         }
         Set<UUID> userDepartmentIds = departmentIdsByUser.getOrDefault(user.getId(), Set.of());

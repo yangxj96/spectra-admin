@@ -159,7 +159,7 @@ public class ExceptionResponseResolver {
 
         var audit = findCause(exception, AuditService.AuditRecordingException.class);
         if (audit != null) {
-            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "审计服务暂不可用");
+            return known(HttpStatus.SERVICE_UNAVAILABLE, "审计服务暂不可用");
         }
 
         var cryptoConfiguration = findCause(exception, CryptoConfigurationException.class);

@@ -78,6 +78,7 @@ public class DepartmentAuthorizationReferenceServiceImpl implements DepartmentAu
     private final AuthorizationProfileAssignmentMapper profileAssignmentMapper;
     private final AuthorizationProfileBoundaryMapper profileBoundaryMapper;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-009: 授权引用服务的持久化协作者逐项注入。
     public DepartmentAuthorizationReferenceServiceImpl(RoleAssignmentMapper roleAssignmentMapper,
                                                        AssignmentPermissionBoundaryMapper permissionBoundaryMapper,
                                                        AssignmentGrantBoundaryMapper grantBoundaryMapper,

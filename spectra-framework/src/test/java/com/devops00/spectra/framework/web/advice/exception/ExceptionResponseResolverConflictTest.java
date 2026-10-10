@@ -16,12 +16,14 @@
 
 package com.devops00.spectra.framework.web.advice.exception;
 
+import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.SpectraException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ExceptionResponseResolverConflictTest {
 
@@ -38,5 +40,15 @@ class ExceptionResponseResolverConflictTest {
     void keepsUnknownProjectFailureAsServerError() {
         var result = resolver.resolve(new SpectraException("Root 策略不可用"));
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.status());
+    }
+
+    @Test
+    void auditStorageFailureKeepsSecretBearingCauseOutOfBoundaryLogs() {
+        var failure = new AuditService.AuditRecordingException("统一审计记录写入失败",
+                new IllegalStateException("synthetic-secret SQL parameter"));
+        var result = resolver.resolve(failure);
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, result.status());
+        assertEquals("审计服务暂不可用", result.message());
+        assertFalse(result.logStackTrace());
     }
 }

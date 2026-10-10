@@ -67,6 +67,11 @@ public final class DefaultAuditSanitizer implements AuditSanitizer {
 
     private static final Pattern BEARER_TOKEN = Pattern.compile("(?i)(\\bbearer\\s+)[A-Za-z0-9._~+/=-]+");
 
+    private static final Pattern INLINE_CREDENTIAL = Pattern.compile(
+            "(?i)(\\b[a-z0-9_.-]*(?:password|passwd|pwd|token|secret|api[_-]?key|private[_-]?key|"
+                    + "authorization|cookie|credential|captcha|verification[_-]?code|sms[_-]?code|"
+                    + "email[_-]?code|signature)[\\\"']?\\s*[:=]\\s*)(?:\\\"[^\\\"]*\\\"|'[^']*'|[^\\s,;&}]+)");
+
     /**
      * 创建无状态的默认审计脱敏器。
      */
@@ -164,6 +169,7 @@ public final class DefaultAuditSanitizer implements AuditSanitizer {
      */
     private String sanitizeText(String text) {
         String sanitized = URL_SECRET.matcher(text).replaceAll("$1" + REDACTED_VALUE);
-        return BEARER_TOKEN.matcher(sanitized).replaceAll("$1" + REDACTED_VALUE);
+        sanitized = BEARER_TOKEN.matcher(sanitized).replaceAll("$1" + REDACTED_VALUE);
+        return INLINE_CREDENTIAL.matcher(sanitized).replaceAll("$1" + REDACTED_VALUE);
     }
 }

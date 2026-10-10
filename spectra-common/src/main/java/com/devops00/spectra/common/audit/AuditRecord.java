@@ -72,6 +72,7 @@ public record AuditRecord(UUID eventId,
         context = context == null ? AuditContext.empty() : context;
         before = immutableSnapshot(before);
         after = immutableSnapshot(after);
+        reason = sanitizeReason(reason);
         httpSummary = httpSummary == null ? HttpSummary.empty() : httpSummary;
     }
 
@@ -230,6 +231,14 @@ public record AuditRecord(UUID eventId,
             throw new IllegalArgumentException(message);
         }
         return normalized;
+    }
+
+    /** 审计说明在创建记录时脱敏，避免原始文本流入后续持久化或查询边界。 */
+    private static String sanitizeReason(String reason) {
+        if (reason == null) {
+            return null;
+        }
+        return (String) new DefaultAuditSanitizer().sanitize(Map.of("reason", reason)).get("reason");
     }
 
     /**

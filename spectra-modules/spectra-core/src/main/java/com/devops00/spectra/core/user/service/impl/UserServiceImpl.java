@@ -457,7 +457,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                     .toList();
         }
         IPage<OnlineUserPageVO> result = onlineUserPageAssembler.page(new OnlineUserPageAssembler.PageRequest(
-                page, filter, onlineSessions, onlineUsers, matchingDepartmentIds, departmentIdsByUser));
+                new OnlineUserPageAssembler.PageOptions(page, filter), onlineSessions, onlineUsers,
+                matchingDepartmentIds, departmentIdsByUser));
         fillExecutor.fill(result.getRecords());
         var summariesByUser = associatedDepartmentSummaries(result.getRecords().stream().map(OnlineUserPageVO::getUserId).toList());
         result.getRecords()

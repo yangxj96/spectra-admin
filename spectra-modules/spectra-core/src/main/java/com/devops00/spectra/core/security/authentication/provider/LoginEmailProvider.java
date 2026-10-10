@@ -66,6 +66,7 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     private final SecretRuntimeService secretRuntimeService;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-006: 认证 Provider 协作者逐项注入。
     public LoginEmailProvider(SecurityVerificationCodeStore verificationCodeStore,
                               SecurityVerificationAttemptStore verificationAttemptStore,
                               UserService userService,

@@ -73,6 +73,7 @@ public class CacheManagementServiceImpl implements CacheManagementService {
     private final SecurityLoginFailureTracker loginFailureTracker;
     private final SecurityReplayNonceAdminPort nonceAdmin;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-011: 缓存管理协作者逐项注入。
     public CacheManagementServiceImpl(CacheRegionRegistry registry,
                                       CacheInvalidationCoordinator coordinator,
                                       SecuritySessionQueryPort sessionQuery,

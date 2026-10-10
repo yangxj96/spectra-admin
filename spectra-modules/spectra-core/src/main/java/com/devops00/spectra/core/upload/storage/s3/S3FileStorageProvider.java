@@ -96,7 +96,6 @@ public class S3FileStorageProvider implements FileStorageProvider {
         var multipart = input.multipart();
         var partNumber = input.partNumber();
         var partSize = input.partSize();
-        var partSha256 = input.partSha256();
         var expiresAt = input.expiresAt();
         var attempt = input.attempt();
         try {

@@ -62,12 +62,7 @@ public class UserImportExecutionWorker {
     /**
      * 在独立事务中处理导入分块，并使用本次 Apply 固定的默认密码哈希。
      *
-     * @param taskId                     导入任务标识。
-     * @param operatorId                 发起 Apply 的操作者标识。
-     * @param rows                       当前需要处理的导入行。
-     * @param skipExisting               是否跳过已存在的用户。
-     * @param referenceData              Preview 确认时的部门和授权方案数据。
-     * @param encodedDefaultPasswordHash 本批次统一使用的默认密码哈希。
+     * @param request 固定任务、操作人、导入行、参考数据和默认密码哈希的分块请求。
      * @return 当前分块的处理、成功、跳过和失败数量。
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -89,7 +84,7 @@ public class UserImportExecutionWorker {
                 continue;
             }
             try {
-                var result = rowProcessor.process(new UserImportRowProcessor.ProcessRequest(row, request.operatorId(),
+                var result = rowProcessor.process(row, new UserImportRowProcessor.ProcessRequest(request.operatorId(),
                         request.skipExisting(), request.referenceData().departmentIds(), request.referenceData().profiles(),
                         request.referenceData().departments(), request.encodedDefaultPasswordHash()));
                 if (result.skipped()) {
@@ -119,6 +114,9 @@ public class UserImportExecutionWorker {
     public record ChunkRequest(UUID taskId, UUID operatorId, List<UserImportRow> rows, boolean skipExisting,
                                UserImportPreviewService.ReferenceData referenceData,
                                String encodedDefaultPasswordHash) {
+        public ChunkRequest {
+            rows = List.copyOf(rows);
+        }
     }
 
     /**

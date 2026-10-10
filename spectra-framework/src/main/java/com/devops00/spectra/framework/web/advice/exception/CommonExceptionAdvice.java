@@ -131,7 +131,7 @@ public class CommonExceptionAdvice {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
-        log.error("{}参数验证异常,{} ", LogPrefix.WEB.p(), e.getMessage(), e);
+        log.warn("{}参数验证失败，correlationId={}", LogPrefix.WEB.p(), correlationId());
         response.setStatus(HttpStatus.BAD_REQUEST.value());
 
         var errors = e.getBindingResult().getAllErrors();

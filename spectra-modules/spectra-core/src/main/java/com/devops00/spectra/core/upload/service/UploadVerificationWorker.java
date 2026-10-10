@@ -62,6 +62,7 @@ public class UploadVerificationWorker {
     private final FileUploadPartMapper partMapper;
     private final FileStorageProviderRegistry providerRegistry;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-014: 上传校验协作者逐项注入。
     public UploadVerificationWorker(FileUploadProperties properties,
                                     FileTypeMapper fileTypeMapper,
                                     FileAssetMapper fileAssetMapper,

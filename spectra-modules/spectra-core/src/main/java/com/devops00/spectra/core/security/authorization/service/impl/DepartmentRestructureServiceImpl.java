@@ -63,7 +63,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -72,7 +71,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 统一编排部门合并和直属成员拆分，保证部门、关系、授权、闭包和版本在一个事务内完成。
@@ -105,6 +103,7 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
     private final AuditRecordFactory auditRecordFactory;
     private final TimeMapper timeMapper;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-010: 部门重构协作者逐项注入。
     public DepartmentRestructureServiceImpl(DepartmentMapper departmentMapper,
                                             DepartmentClosureMapper departmentClosureMapper,
                                             OrganizationVersionMapper organizationVersionMapper,

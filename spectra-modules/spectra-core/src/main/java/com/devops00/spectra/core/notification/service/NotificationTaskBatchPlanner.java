@@ -52,12 +52,7 @@ public class NotificationTaskBatchPlanner {
     /**
      * 按去重后的接收人和渠道集合规划任务，不执行数据库读写。
      *
-     * @param request           原始通知请求
-     * @param requestId         已持久化的通知请求 ID
-     * @param now               当前时间快照
-     * @param auditUserId       创建和更新审计人
-     * @param targets           去重后的接收人和渠道目标
-     * @param templateSnapshots 各渠道渲染模板快照
+     * @param planRequest 原始请求、持久化请求 ID、去重目标和模板的快照
      * @return 带有稳定幂等键的任务草稿
      */
     public List<TaskDraft> plan(PlanRequest planRequest) {
@@ -111,6 +106,10 @@ public class NotificationTaskBatchPlanner {
     public record PlanRequest(NotificationRequest request, UUID requestId, Instant now, UUID auditUserId,
                               Collection<TaskTarget> targets,
                               Map<NotificationChannel, TemplateSnapshot> templateSnapshots) {
+        public PlanRequest {
+            targets = List.copyOf(targets);
+            templateSnapshots = Map.copyOf(templateSnapshots);
+        }
     }
 
     /**
