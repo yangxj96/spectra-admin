@@ -24,6 +24,7 @@ import com.devops00.spectra.core.security.authentication.javabean.enums.Authenti
 import com.devops00.spectra.core.security.authentication.mapper.AuthenticationIdentityMapper;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -56,6 +57,8 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
 
     private final AuthenticationIdentityMapper mapper;
 
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
+
     @Override
     public @Nullable AuthenticationIdentity findPasswordIdentity(String identifier) {
         return findIdentity(METHOD_PASSWORD, identifier);
@@ -81,6 +84,7 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
     @Override
     @Transactional
     public AuthenticationIdentity createIdentity(UUID userId, String methodCode, String identifier) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var identifierHash = AuthenticationIdentifierHash.digest(identifier);
         var existing = mapper.selectOne(new LambdaQueryWrapper<AuthenticationIdentity>()
                 .eq(AuthenticationIdentity::getMethodCode, methodCode)
@@ -96,6 +100,7 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
             if (mapper.updateById(existing) != 1) {
                 throw new EntityUpdateException("恢复认证身份失败");
             }
+            lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             return existing;
         }
         var identity = new AuthenticationIdentity();
@@ -108,15 +113,18 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         if (mapper.insert(identity) != 1) {
             throw new DataSaveException("创建认证身份失败");
         }
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
         return identity;
     }
 
     @Override
     @Transactional
     public void updatePasswordIdentifier(UUID userId, String identifier) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var identity = findByUserId(userId);
         if (identity == null) {
             createPasswordIdentity(userId, identifier);
+            lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             return;
         }
         identity.setIdentifierHash(AuthenticationIdentifierHash.digest(identifier));
@@ -125,31 +133,40 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         if (mapper.updateById(identity) != 1) {
             throw new EntityUpdateException("更新密码认证身份失败");
         }
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
     }
 
     @Override
     @Transactional
     public void revokeByUserId(UUID userId) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var identities = mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
                 .eq(AuthenticationIdentity::getUserId, userId)
                 .eq(AuthenticationIdentity::getState, STATE_ACTIVE));
         for (AuthenticationIdentity identity : identities) {
             identity.setState(STATE_REVOKED);
-            mapper.updateById(identity);
+            if (mapper.updateById(identity) != 1) {
+                throw new EntityUpdateException("撤销认证身份失败");
+            }
         }
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
     }
 
     @Override
     @Transactional
     public void revokeByUserIdAndMethod(UUID userId, String methodCode) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var identities = mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
                 .eq(AuthenticationIdentity::getUserId, userId)
                 .eq(AuthenticationIdentity::getMethodCode, methodCode)
                 .eq(AuthenticationIdentity::getState, STATE_ACTIVE));
         for (AuthenticationIdentity identity : identities) {
             identity.setState(STATE_REVOKED);
-            mapper.updateById(identity);
+            if (mapper.updateById(identity) != 1) {
+                throw new EntityUpdateException("撤销认证身份失败");
+            }
         }
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
     }
 
     @Override
@@ -164,6 +181,7 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
     @Override
     @Transactional
     public void revokeByUserIdAndId(UUID userId, UUID identityId) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var identity = mapper.selectOne(new LambdaQueryWrapper<AuthenticationIdentity>()
                 .eq(AuthenticationIdentity::getId, identityId)
                 .eq(AuthenticationIdentity::getUserId, userId)
@@ -176,6 +194,7 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         if (mapper.updateById(identity) != 1) {
             throw new EntityUpdateException("撤销认证身份失败");
         }
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
     }
 
     /**

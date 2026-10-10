@@ -18,12 +18,12 @@ package com.devops00.spectra.core.security.root.service.impl;
 
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
+import com.devops00.spectra.core.security.root.RootGovernanceConflictException;
 import com.devops00.spectra.core.security.root.RootGovernanceException;
-import com.devops00.spectra.core.security.root.RootPolicy;
 import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 在数据库行锁和审计可用性门禁下保护 DEV_OPS 生命周期。
@@ -40,24 +40,31 @@ public class JdbcLastEffectiveDevOpsGuard implements LastEffectiveDevOpsGuard {
     private final AuditService auditService;
 
     @Override
-    @Transactional
-    public void assertCanAddDevOps() {
+    public Snapshot lockForChange() {
+        requireTransaction();
         auditService.assertAvailable();
-        RootPolicy policy = rootPolicyRepository.lock();
-        long current = rootPolicyRepository.countEffectiveDevOpsUsers();
-        if (current >= policy.maxDevOpsUsers()) {
-            throw new RootGovernanceException("已达到 maxDevOpsUsers，拒绝新增 DEV_OPS");
-        }
+        var policy = rootPolicyRepository.lock();
+        return new Snapshot(policy, rootPolicyRepository.countEffectiveDevOpsUsers());
     }
 
     @Override
-    @Transactional
-    public void assertCanRemoveDevOps() {
-        auditService.assertAvailable();
-        RootPolicy policy = rootPolicyRepository.lock();
+    public void assertWithinLimits(Snapshot before) {
+        requireTransaction();
+        if (before == null) {
+            throw new RootGovernanceException("缺少 Root 策略锁定快照，拒绝变更");
+        }
         long current = rootPolicyRepository.countEffectiveDevOpsUsers();
-        if (current <= policy.minEffectiveDevOpsUsers()) {
-            throw new RootGovernanceException("拒绝移除最后一个有效 DEV_OPS");
+        if (current < before.effectiveCount() && current < before.policy().minEffectiveDevOpsUsers()) {
+            throw new RootGovernanceConflictException("拒绝移除最后一个有效 DEV_OPS");
+        }
+        if (current > before.effectiveCount() && current > before.policy().maxDevOpsUsers()) {
+            throw new RootGovernanceConflictException("已达到 maxDevOpsUsers，拒绝新增 DEV_OPS");
+        }
+    }
+
+    private void requireTransaction() {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            throw new RootGovernanceException("Root 人数变更必须在数据库事务内执行");
         }
     }
 }

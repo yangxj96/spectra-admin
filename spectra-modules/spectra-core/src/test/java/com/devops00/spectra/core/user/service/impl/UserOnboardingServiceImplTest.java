@@ -30,6 +30,7 @@ import com.devops00.spectra.common.security.authorization.ScopeMode;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentsChangeFrom;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
@@ -84,6 +85,7 @@ class UserOnboardingServiceImplTest {
     private SecurityContextAccessor securityContextAccessor;
     private AuthorizationSnapshotProvider authorizationSnapshotProvider;
     private DepartmentMapper departmentMapper;
+    private LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
     private UserOnboardingServiceImpl onboardingService;
 
     @BeforeEach
@@ -96,10 +98,11 @@ class UserOnboardingServiceImplTest {
         securityContextAccessor = mock(SecurityContextAccessor.class);
         authorizationSnapshotProvider = mock(AuthorizationSnapshotProvider.class);
         departmentMapper = mock(DepartmentMapper.class);
+        lastEffectiveDevOpsGuard = mock(LastEffectiveDevOpsGuard.class);
         AuditSanitizer sanitizer = snapshot -> new LinkedHashMap<>(snapshot);
         onboardingService = new UserOnboardingServiceImpl(userService, assignmentChangeService,
                 assignmentQueryService, membershipService, new AuditRecordFactory(sanitizer), auditService,
-                securityContextAccessor, authorizationSnapshotProvider, departmentMapper);
+                securityContextAccessor, authorizationSnapshotProvider, departmentMapper, lastEffectiveDevOpsGuard);
         when(securityContextAccessor.currentUserId()).thenReturn(OPERATOR_ID);
         when(authorizationSnapshotProvider.load(OPERATOR_ID)).thenReturn(rootSnapshot());
         when(departmentMapper.selectList(any())).thenReturn(List.of(

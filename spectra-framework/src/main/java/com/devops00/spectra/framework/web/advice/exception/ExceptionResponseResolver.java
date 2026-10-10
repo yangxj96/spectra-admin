@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.web.advice.exception;
 
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.exception.BusinessRuleViolationException;
+import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
@@ -96,6 +97,11 @@ public class ExceptionResponseResolver {
         var dataExist = findCause(exception, DataExistException.class);
         if (dataExist != null) {
             return known(HttpStatus.CONFLICT, messageOr(dataExist.getMessage(), "数据已存在"));
+        }
+
+        var businessConflict = findCause(exception, BusinessConflictException.class);
+        if (businessConflict != null) {
+            return known(HttpStatus.CONFLICT, messageOr(businessConflict.getMessage(), "当前状态不允许执行此操作"));
         }
 
         var businessRule = findCause(exception, BusinessRuleViolationException.class);

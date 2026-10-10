@@ -23,6 +23,7 @@ import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.security.authentication.mapper.PasswordCredentialMapper;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +46,8 @@ import java.util.UUID;
 public class PasswordCredentialServiceImpl implements PasswordCredentialService {
 
     private final PasswordCredentialMapper mapper;
+
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
 
     @Override
     public @Nullable PasswordCredential getByUserId(UUID userId) {
@@ -73,11 +76,13 @@ public class PasswordCredentialServiceImpl implements PasswordCredentialService 
     @Override
     @Transactional
     public void updatePassword(UUID userId, String passwordHash, boolean mustChange, Instant expiresAt) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var credential = getByUserId(userId);
         if (credential == null) {
             throw new DataNotExistException("密码凭证不存在");
         }
         update(credential, passwordHash, mustChange, expiresAt);
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
     }
 
     /**

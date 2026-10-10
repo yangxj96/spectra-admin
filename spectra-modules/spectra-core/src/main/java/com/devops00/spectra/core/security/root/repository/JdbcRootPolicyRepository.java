@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security.root.repository;
 
 import com.devops00.spectra.core.security.root.RootGovernanceException;
+import com.devops00.spectra.core.security.root.RootGovernanceConflictException;
 import com.devops00.spectra.core.security.root.RootPolicy;
 import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
         try {
             return jdbcTemplate.queryForObject(
                     "SELECT min_effective_dev_ops_users, max_dev_ops_users, version FROM " + TABLE
-                            + " WHERE policy_key = ? FOR UPDATE",
+                            + " WHERE policy_key = ? AND deleted IS NULL FOR UPDATE",
                     (resultSet, _) -> new RootPolicy(resultSet.getInt(1), resultSet.getInt(2), resultSet.getLong(3)),
                     SINGLETON_KEY);
         } catch (DataAccessException exception) {
@@ -61,7 +62,7 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
                             + " WHERE policy_key = ? AND version = ?",
                     policy.minEffectiveDevOpsUsers(), policy.maxDevOpsUsers(), SINGLETON_KEY, expectedVersion);
             if (updated != 1) {
-                throw new RootGovernanceException("Root 策略版本冲突，拒绝覆盖并发修改");
+                throw new RootGovernanceConflictException("Root 策略版本冲突，拒绝覆盖并发修改");
             }
         } catch (DataAccessException exception) {
             throw new RootGovernanceException("Root 策略更新失败", exception);
@@ -71,20 +72,49 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
     @Override
     public long countEffectiveDevOpsUsers() {
         try {
+            Long policyRows = jdbcTemplate.queryForObject("""
+                    SELECT COUNT(*) FROM spectra_security.sec_password_policy
+                    WHERE policy_key = 'SYSTEM' AND deleted IS NULL
+                    """, Long.class);
+            if (policyRows == null || policyRows != 1L) {
+                throw new RootGovernanceException("密码策略不可用，无法核验有效 DEV_OPS 数量");
+            }
             Long count = jdbcTemplate.queryForObject("""
                     SELECT COUNT(DISTINCT assignment.user_id)
                     FROM spectra_security.sec_role_assignment assignment
                     JOIN spectra_security.sec_role role ON role.id = assignment.role_id
                     JOIN spectra_core.sys_user user_account ON user_account.id = assignment.user_id
+                    JOIN spectra_security.sec_password_policy policy
+                      ON policy.policy_key = 'SYSTEM' AND policy.deleted IS NULL
                     WHERE role.code = 'ROLE_DEV_OPS'
                       AND role.state = 'ACTIVE'
+                      AND role.deleted IS NULL
                       AND assignment.state = 'ACTIVE'
+                      AND assignment.deleted IS NULL
+                      AND (assignment.valid_from IS NULL OR assignment.valid_from <= statement_timestamp())
+                      AND (assignment.valid_until IS NULL OR assignment.valid_until > statement_timestamp())
                       AND user_account.status = 'ACTIVE'
+                      AND user_account.deleted IS NULL
                       AND EXISTS (
                           SELECT 1
                           FROM spectra_security.sec_authentication_identity identity
                           WHERE identity.user_id = assignment.user_id
                             AND identity.state = 'ACTIVE'
+                            AND identity.deleted IS NULL
+                            AND identity.provider_code = 'LOCAL'
+                            AND identity.method_code IN ('PASSWORD', 'EMAIL', 'SMS')
+                      )
+                      AND EXISTS (
+                          SELECT 1
+                          FROM spectra_security.sec_password_credential credential
+                          WHERE credential.user_id = assignment.user_id
+                            AND credential.deleted IS NULL
+                            AND (credential.expires_at IS NULL
+                                 OR credential.expires_at > statement_timestamp())
+                            AND (policy.max_age_days IS NULL
+                                 OR (credential.changed_at <= statement_timestamp()
+                                     AND credential.changed_at > statement_timestamp()
+                                         - policy.max_age_days * INTERVAL '1 day'))
                       )
                     """, Long.class);
             return count == null ? 0L : count;

@@ -14,23 +14,18 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.security.root;
+package com.devops00.spectra.common.exception;
 
 /**
- * DEV_OPS 数量和最后有效 Root 保护端口。
+ * 当前业务状态与请求冲突，调用方可以调整目标后重试。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/14
+ * @since 2026/10/10
  */
-public interface LastEffectiveDevOpsGuard {
+public class BusinessConflictException extends SpectraException {
 
-    /** 在调用方事务内锁定 Root 策略行并记录变更前的有效人数。 */
-    Snapshot lockForChange();
-
-    /** 写入后、撤销会话前检查本次操作没有突破有效 Root 人数边界。 */
-    void assertWithinLimits(Snapshot before);
-
-    record Snapshot(RootPolicy policy, long effectiveCount) {
+    public BusinessConflictException(String message) {
+        super(message);
     }
 }

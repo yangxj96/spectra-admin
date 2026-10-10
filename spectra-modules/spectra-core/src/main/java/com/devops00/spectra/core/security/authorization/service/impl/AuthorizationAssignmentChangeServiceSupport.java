@@ -67,6 +67,7 @@ import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -130,6 +131,8 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
 
     private final TimeMapper timeMapper;
 
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
+
     @Override
     public AuthorizationChangePreviewVO preview(UUID targetUserId, AuthorizationAssignmentChangeFrom from) {
         var prepared = prepare(targetUserId, from, from.getAssignmentId());
@@ -164,6 +167,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         if (!Objects.equals(assignmentId, token.assignmentId())) {
             throw new DataException("授权变更 token 与 Assignment 不匹配");
         }
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var prepared = prepare(targetUserId, from, assignmentId);
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("授权变更请求已被修改，请重新生成预览");
@@ -175,6 +179,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
                 RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             UUID persistedAssignmentId = persist(prepared, targetUserId);
+            lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             recordAssignmentEvents(prepared, targetUserId, persistedAssignmentId);
             epochGuard.advance(targetUserId, prepared.targetSecurityVersion());
             sessionRevocationPort.revokeUserSessions(targetUserId);
@@ -186,6 +191,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     @Transactional
     public void revoke(UUID targetUserId, AuthorizationAssignmentRemovalFrom from) {
         validateRevokeInput(targetUserId, from);
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var target = loadRevokeTarget(targetUserId);
         var assignment = loadRevokeAssignment(targetUserId, from);
         long targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
@@ -215,6 +221,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
             if (roleAssignmentMapper.update(null, update) != 1) {
                 throw new DataException("移除角色授权失败，授权版本可能已变化");
             }
+            lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             appendAudit(new AuditInput("ROLE_ASSIGNMENT_REVOKED", operatorId, targetUserId,
                     Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
                     Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权"));

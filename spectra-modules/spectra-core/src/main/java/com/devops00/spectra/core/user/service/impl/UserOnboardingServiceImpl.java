@@ -33,6 +33,7 @@ import com.devops00.spectra.core.security.authorization.javabean.from.Authorizat
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationChangePreviewVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
@@ -86,9 +87,13 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
 
     private final DepartmentMapper departmentMapper;
 
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
+
     @Override
     @Transactional
     public UserOnboardingVO submit(UserOnboardingFrom params) {
+        // 后续 Assignment 变更会锁定 Root 策略；先统一锁顺序，再写用户及部门关系。
+        lastEffectiveDevOpsGuard.lockForChange();
         var userParams = params.getUser();
         User previous = userParams.getId() == null ? null : userService.getById(userParams.getId());
         var previousAssociatedIds = previous == null

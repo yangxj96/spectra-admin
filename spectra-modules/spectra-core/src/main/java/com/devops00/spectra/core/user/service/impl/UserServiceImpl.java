@@ -38,6 +38,7 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.Authorizatio
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.javabean.entity.Department;
@@ -168,6 +169,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     /** 提供当前生效的密码策略。 */
     private final SecurityPasswordPolicyProvider securityPasswordPolicyProvider;
 
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
+
     /** 提供新建、导入和重置用户使用的默认密码哈希。 */
     private final DefaultUserPasswordProvider defaultUserPasswordProvider;
 
@@ -243,6 +246,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Transactional
     public void modify(UserSaveFrom params) {
         params.setUsername(params.getUsername().trim());
+        // 修改登录名可能恢复密码认证身份；先锁 Root 策略，再写用户行。
+        lastEffectiveDevOpsGuard.lockForChange();
         var entity = this.getById(params.getId());
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
@@ -546,6 +551,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (target == null) {
             throw new DataException("目标用户状态不能为空");
         }
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var current = this.getById(userId);
         if (current == null) {
             throw new DataNotExistException("用户不存在");
@@ -587,6 +593,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             if (target == UserStatus.DEPARTED) {
                 revokeActiveAssignments(userId);
             }
+            lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             // Redis/Session 核心依赖不可用时撤销端口会 fail-closed，事务随之回滚。
             securitySessionRevocationPort.revokeUserSessions(userId);
             return Boolean.TRUE;

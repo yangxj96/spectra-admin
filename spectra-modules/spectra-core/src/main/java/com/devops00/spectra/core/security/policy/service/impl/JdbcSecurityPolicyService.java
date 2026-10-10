@@ -28,6 +28,7 @@ import com.devops00.spectra.core.security.policy.service.SecurityPolicyService;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.change.SecurityChangeExecutor;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.policy.PasswordPolicy;
 import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
@@ -69,6 +70,8 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     private final SecurityContextAccessor securityContextAccessor;
 
     private final AuditRecordFactory auditRecordFactory;
+
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
 
     @Override
     public List<SecuritySessionPolicyVO> sessionPolicies() {
@@ -136,6 +139,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         if (from == null) {
             throw new DataException("密码策略参数不能为空");
         }
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         SecurityPasswordPolicyVO before = loadPasswordPolicy(true);
         requireVersion(before.version(), from.getExpectedVersion());
         PasswordPolicy requested;
@@ -161,6 +165,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
             if (updated != 1) {
                 throw new EntityUpdateException("密码策略版本冲突，请刷新后重试");
             }
+            lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             log.info("系统密码策略已更新");
             return after;
         });
