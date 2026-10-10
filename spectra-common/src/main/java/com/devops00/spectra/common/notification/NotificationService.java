@@ -19,6 +19,7 @@ package com.devops00.spectra.common.notification;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -143,6 +144,13 @@ public interface NotificationService {
                                    Collection<UUID> recipientUserIds,
                                    Collection<NotificationChannel> channels, String templateGroupCode,
                                    Map<String, ?> parameters) {
+        public UserNotificationRequest {
+            recipientUserIds = recipientUserIds == null ? List.of() : List.copyOf(recipientUserIds);
+            channels = channels == null
+                    ? List.of()
+                    : List.copyOf(channels.stream().filter(Objects::nonNull).toList());
+            parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
+        }
     }
 
     /** 直接地址通知快捷入口的参数对象。 */
@@ -150,5 +158,12 @@ public interface NotificationService {
                                      Collection<NotificationDirectAddress> directAddresses,
                                      String templateGroupCode, Map<String, ?> parameters,
                                      Map<String, ?> sensitiveParameters) {
+        public DirectNotificationRequest {
+            directAddresses = directAddresses == null
+                    ? List.of()
+                    : List.copyOf(directAddresses.stream().filter(Objects::nonNull).toList());
+            parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
+            sensitiveParameters = sensitiveParameters == null ? Map.of() : Map.copyOf(sensitiveParameters);
+        }
     }
 }

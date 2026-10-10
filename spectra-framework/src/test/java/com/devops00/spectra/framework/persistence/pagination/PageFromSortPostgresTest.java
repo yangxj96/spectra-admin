@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version 1.0
  * @since 2026/10/08
  */
-@EnabledIfSystemProperty(named = "spectra.test.postgres.port", matches = "25432")
+@EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class PageFromSortPostgresTest {
     private JdbcTemplate jdbc;
     private final PaginationInnerInterceptor interceptor = new PaginationInnerInterceptor();
@@ -49,8 +49,15 @@ class PageFromSortPostgresTest {
 
     @BeforeEach
     void connect() {
-        jdbc = new JdbcTemplate(new DriverManagerDataSource(
-                "jdbc:postgresql://127.0.0.1:25432/b02_test", "b02_test", ""));
+        String url = System.getenv("DB_URL");
+        if (url == null || !url.matches("^jdbc:postgresql://[^/]+/devops00_spectra_db_test(?:\\?.*)?$")) {
+            throw new IllegalStateException("真实依赖测试只允许 devops00_spectra_db_test");
+        }
+        String username = System.getenv("DB_USERNAME");
+        if (username == null || username.isBlank()) {
+            throw new IllegalStateException("真实依赖测试缺少 DB_USERNAME");
+        }
+        jdbc = new JdbcTemplate(new DriverManagerDataSource(url, username, System.getenv("DB_PASSWORD")));
     }
 
     @Test

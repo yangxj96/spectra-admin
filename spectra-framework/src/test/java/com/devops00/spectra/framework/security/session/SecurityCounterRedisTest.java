@@ -2,8 +2,6 @@ package com.devops00.spectra.framework.security.session;
 
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
-import com.devops00.spectra.framework.security.configuration.redis.SecJacksonConfiguration;
-import com.devops00.spectra.framework.security.configuration.redis.SecRedisConfiguration;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.store.RedisSecurityVerificationStore;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -30,30 +27,30 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 只连接独立端口的合成 Redis，验证计数及 TTL 的原子边界。
+ * 使用 test 环境的 Redis DB 5 验证计数及 TTL 的原子边界。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/10/07
  */
-@EnabledIfSystemProperty(named = "spectra.test.redis.port", matches = "26379")
+@EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class SecurityCounterRedisTest {
     private LettuceConnectionFactory factory;
     private RedisTemplate<String, Object> redis;
     private RedisSecurityVerificationStore verification;
     private SecurityLoginFailureStore login;
     private SecurityProperties properties;
+    private String keyPrefix;
 
     @BeforeEach
     void setUp() {
-        var config = new RedisStandaloneConfiguration("127.0.0.1", 26379);
-        config.setDatabase(12);
+        var config = RealRedisTestEnvironment.configuration();
         factory = new LettuceConnectionFactory(config);
         factory.afterPropertiesSet();
         factory.start();
         properties = new SecurityProperties();
-        redis = new SecRedisConfiguration().redisTemplate(factory,
-                new SecJacksonConfiguration().redisObjectMapper(), properties);
+        keyPrefix = RealRedisTestEnvironment.newKeyPrefix();
+        redis = RealRedisTestEnvironment.template(factory, keyPrefix);
         verification = new RedisSecurityVerificationStore(redis);
         login = new SecurityLoginFailureStore(new SecuritySessionStore(redis, properties,
                 new StaticListableBeanFactory().getBeanProvider(SecuritySessionPolicyProvider.class)));
@@ -61,10 +58,16 @@ class SecurityCounterRedisTest {
 
     @AfterEach
     void close() {
-        try (var connection = factory.getConnection()) {
-            connection.serverCommands().flushDb();
+        if (factory == null) {
+            return;
         }
-        factory.destroy();
+        try {
+            if (keyPrefix != null) {
+                RealRedisTestEnvironment.clearOwnKeys(factory, keyPrefix);
+            }
+        } finally {
+            factory.destroy();
+        }
     }
 
     @Test

@@ -93,5 +93,8 @@ public record NotificationRequest(UUID requestId, String idempotencyKey, Notific
     public record InAppInput(String idempotencyKey, NotificationPurpose purpose, List<UUID> recipientUserIds,
                              String templateGroupCode, String title, String content, String businessType,
                              String businessId, String sourceModule, String link) {
+        public InAppInput {
+            recipientUserIds = recipientUserIds == null ? List.of() : List.copyOf(recipientUserIds);
+        }
     }
 }

@@ -17,8 +17,6 @@ import com.devops00.spectra.common.port.security.SecurityUserLoader;
 import com.devops00.spectra.common.security.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
-import com.devops00.spectra.framework.security.configuration.redis.SecJacksonConfiguration;
-import com.devops00.spectra.framework.security.configuration.redis.SecRedisConfiguration;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.store.RefreshTokenRotationStore;
@@ -32,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -56,13 +53,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /**
- * 隔离真实 Redis 验证会话生命周期；仅允许专用测试端口及数据库。
+ * 使用 test 环境的 Redis DB 5 验证会话生命周期，并隔离每个用例的键。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/10/07
  */
-@EnabledIfSystemProperty(named = "spectra.test.redis.port", matches = "26379")
+@EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class SecuritySessionLifecycleRedisTest {
     private LettuceConnectionFactory factory;
     private RedisTemplate<String, Object> redis;
@@ -74,16 +71,16 @@ class SecuritySessionLifecycleRedisTest {
     private SecurityPrincipal user;
     private SessionPolicy policy;
     private String operatorToken;
+    private String keyPrefix;
 
     @BeforeEach
     void setUp() {
-        var configuration = new RedisStandaloneConfiguration("127.0.0.1", 26379);
-        configuration.setDatabase(14);
+        var configuration = RealRedisTestEnvironment.configuration();
         factory = new LettuceConnectionFactory(configuration);
         factory.afterPropertiesSet();
         factory.start();
-        redis = new SecRedisConfiguration().redisTemplate(factory,
-                new SecJacksonConfiguration().redisObjectMapper(), new SecurityProperties());
+        keyPrefix = RealRedisTestEnvironment.newKeyPrefix();
+        redis = RealRedisTestEnvironment.template(factory, keyPrefix);
         policy = SessionPolicy.defaults(30, 300);
         var beans = new StaticListableBeanFactory();
         beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
@@ -104,10 +101,16 @@ class SecuritySessionLifecycleRedisTest {
     @AfterEach
     void tearDown() {
         SecurityContextHolder.clearContext();
-        try (var connection = factory.getConnection()) {
-            connection.serverCommands().flushDb();
+        if (factory == null) {
+            return;
         }
-        factory.destroy();
+        try {
+            if (keyPrefix != null) {
+                RealRedisTestEnvironment.clearOwnKeys(factory, keyPrefix);
+            }
+        } finally {
+            factory.destroy();
+        }
     }
 
     @Test
@@ -181,14 +184,12 @@ class SecuritySessionLifecycleRedisTest {
 
     @Test
     void independentRedisConnectionsShareClientRevocation() {
-        var configuration = new RedisStandaloneConfiguration("127.0.0.1", 26379);
-        configuration.setDatabase(14);
+        var configuration = RealRedisTestEnvironment.configuration();
         var otherFactory = new LettuceConnectionFactory(configuration);
         otherFactory.afterPropertiesSet();
         otherFactory.start();
         try {
-            RedisTemplate<String, Object> otherRedis = new SecRedisConfiguration().redisTemplate(otherFactory,
-                    new SecJacksonConfiguration().redisObjectMapper(), new SecurityProperties());
+            RedisTemplate<String, Object> otherRedis = RealRedisTestEnvironment.template(otherFactory, keyPrefix);
             var beans = new StaticListableBeanFactory();
             beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
             var otherStore = new SecuritySessionStore(otherRedis, new SecurityProperties(),
@@ -325,8 +326,7 @@ class SecuritySessionLifecycleRedisTest {
                 .get(SecurityRedisKey.SESSION.format(
                         TokenDigestService.digest(first.getAccessToken())), "familyId");
         assertNotNull(familyId);
-        var configuration = new RedisStandaloneConfiguration("127.0.0.1", 26379);
-        configuration.setDatabase(14);
+        var configuration = RealRedisTestEnvironment.configuration();
         var otherFactory = new LettuceConnectionFactory(configuration);
         otherFactory.afterPropertiesSet();
         otherFactory.start();
@@ -336,8 +336,7 @@ class SecuritySessionLifecycleRedisTest {
         var firstAtIssue = new CountDownLatch(1);
         var releaseIssue = new CountDownLatch(1);
         try {
-            RedisTemplate<String, Object> otherRedis = new SecRedisConfiguration().redisTemplate(otherFactory,
-                    new SecJacksonConfiguration().redisObjectMapper(), new SecurityProperties());
+            RedisTemplate<String, Object> otherRedis = RealRedisTestEnvironment.template(otherFactory, keyPrefix);
             var beans = new StaticListableBeanFactory();
             beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
             var otherStore = new SecuritySessionStore(otherRedis, new SecurityProperties(),

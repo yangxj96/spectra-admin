@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 /** 在专用合成库验证真实审计切面、JSONB 及本地事务边界。 */
-@EnabledIfSystemProperty(named = "spectra.test.postgres.port", matches = "25432")
+@EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class AuditTransactionPostgresTest {
     private JdbcTemplate jdbc;
     private FixtureApplication application;
@@ -29,7 +29,15 @@ class AuditTransactionPostgresTest {
 
     @BeforeEach
     void setUp() {
-        var source = new DriverManagerDataSource("jdbc:postgresql://127.0.0.1:25432/b02_test", "b02_test", "");
+        String url = System.getenv("DB_URL");
+        if (url == null || !url.matches("^jdbc:postgresql://[^/]+/devops00_spectra_db_test(?:\\?.*)?$")) {
+            throw new IllegalStateException("真实依赖测试只允许 devops00_spectra_db_test");
+        }
+        String username = System.getenv("DB_USERNAME");
+        if (username == null || username.isBlank()) {
+            throw new IllegalStateException("真实依赖测试缺少 DB_USERNAME");
+        }
+        var source = new DriverManagerDataSource(url, username, System.getenv("DB_PASSWORD"));
         jdbc = new JdbcTemplate(source);
         jdbc.execute("CREATE TABLE IF NOT EXISTS b02_audit_business (marker text)");
         jdbc.execute("CREATE TABLE IF NOT EXISTS b02_audit_records (payload jsonb)");

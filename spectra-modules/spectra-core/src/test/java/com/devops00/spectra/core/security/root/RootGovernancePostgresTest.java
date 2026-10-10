@@ -3,7 +3,7 @@ package com.devops00.spectra.core.security.root;
 import com.devops00.spectra.core.security.root.repository.JdbcRootPolicyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -12,15 +12,26 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@EnabledIfEnvironmentVariable(named = "SPECTRA_B02_ROOT_POSTGRES", matches = "true")
+@EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class RootGovernancePostgresTest {
 
-    private final JdbcTemplate jdbc = new JdbcTemplate(new DriverManagerDataSource(
-            "jdbc:postgresql://127.0.0.1:25432/b02_root_test", "b02_test", ""));
+    private final JdbcTemplate jdbc = new JdbcTemplate(testDataSource());
 
     private final JdbcRootPolicyRepository repository = new JdbcRootPolicyRepository(jdbc);
 
     private UUID userId;
+
+    private static DriverManagerDataSource testDataSource() {
+        String url = System.getenv("DB_URL");
+        if (url == null || !url.matches("^jdbc:postgresql://[^/]+/devops00_spectra_db_test(?:\\?.*)?$")) {
+            throw new IllegalStateException("真实依赖测试只允许 devops00_spectra_db_test");
+        }
+        String username = System.getenv("DB_USERNAME");
+        if (username == null || username.isBlank()) {
+            throw new IllegalStateException("真实依赖测试缺少 DB_USERNAME");
+        }
+        return new DriverManagerDataSource(url, username, System.getenv("DB_PASSWORD"));
+    }
 
     @BeforeEach
     void prepare() {
