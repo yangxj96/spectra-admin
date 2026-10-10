@@ -36,6 +36,15 @@ public enum SecurityRedisKey implements RedisKey {
     /** 用户所有 token 集合（全端踢出 & 在线查询）。 */
     USER_TOKENS(SecurityRedisNamespace.PREFIX + "ut:%s"),
 
+    /** 用户待提交的会话名额；签发失败后由租约到期回收。 */
+    SESSION_ISSUE_RESERVATIONS(SecurityRedisNamespace.PREFIX + "issue:pending:%s"),
+
+    /** 同用户同客户端踢旧签发的互斥租约。 */
+    SESSION_ISSUE_CLIENT_LOCK(SecurityRedisNamespace.PREFIX + "issue:client:%s:%s"),
+
+    /** 同用户同客户端尚未提交的会话，用于踢旧模式与其他模式交错时保护边界。 */
+    SESSION_ISSUE_CLIENT_RESERVATIONS(SecurityRedisNamespace.PREFIX + "issue:client:pending:%s:%s"),
+
     /** 在线用户 ID 集合。 */
     ONLINE_USERS(SecurityRedisNamespace.PREFIX + "online"),
 

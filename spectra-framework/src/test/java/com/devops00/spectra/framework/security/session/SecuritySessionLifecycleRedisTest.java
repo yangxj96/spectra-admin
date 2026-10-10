@@ -31,11 +31,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +49,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -188,6 +191,11 @@ class SecuritySessionLifecycleRedisTest {
 
         assertThrows(SecurityRedisUnavailableException.class, () -> issuer.createToken(user, ClientType.WEB));
         assertFalse(redis.opsForHash().entries(refreshKey).isEmpty());
+        assertEquals(accessDigest, redis.opsForValue()
+                .get(SecurityRedisKey.USER_CLIENT.format(user.getId(), ClientType.WEB.getName())));
+        redis.opsForHash().put(refreshKey, "accessToken", accessDigest);
+        SecurityToken replacement = issuer.createToken(user, ClientType.WEB);
+        assertNotNull(reader.getCurrentUser(replacement.getAccessToken()));
     }
 
     @Test
@@ -239,6 +247,235 @@ class SecuritySessionLifecycleRedisTest {
             assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(second.getRefreshToken()));
             assertNotNull(reader.getCurrentUser(operatorToken));
         } finally {
+            otherFactory.destroy();
+        }
+    }
+
+    @Test
+    void twoConnectionsCannotExceedRejectNewLimitDuringParallelLogins() throws Exception {
+        policy = new SessionPolicy(SessionConcurrencyMode.REJECT_NEW, 2, 30, 300, null, null);
+        var otherFactory = new LettuceConnectionFactory(RealRedisTestEnvironment.configuration());
+        otherFactory.afterPropertiesSet();
+        otherFactory.start();
+        var executor = Executors.newFixedThreadPool(12);
+        var start = new CountDownLatch(1);
+        try {
+            var otherRedis = RealRedisTestEnvironment.template(otherFactory, keyPrefix);
+            var beans = new StaticListableBeanFactory();
+            beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
+            var otherStore = new SecuritySessionStore(otherRedis, new SecurityProperties(),
+                    beans.getBeanProvider(SecuritySessionPolicyProvider.class));
+            var otherRevoker = new SecuritySessionRevocationService(otherStore, () -> null);
+            var otherIssuer = new SecuritySessionIssueService(otherStore, otherRevoker,
+                    new SessionConcurrencyStrategyResolver(List.of(new AllowSessionConcurrencyStrategy(),
+                            new RejectNewSessionConcurrencyStrategy(), new KickOldSessionConcurrencyStrategy(otherStore))),
+                    clock);
+            var futures = new ArrayList<Future<SecurityToken>>();
+            ClientType[] clients = {ClientType.WEB, ClientType.APP, ClientType.MINI};
+            for (int index = 0; index < 12; index++) {
+                SecuritySessionIssueService candidate = index % 2 == 0 ? issuer : otherIssuer;
+                ClientType client = clients[index % clients.length];
+                futures.add(executor.submit(() -> {
+                    awaitLatch(start);
+                    return candidate.createToken(user, client);
+                }));
+            }
+            start.countDown();
+            var accepted = new ArrayList<SecurityToken>();
+            for (Future<SecurityToken> future : futures) {
+                try {
+                    accepted.add(future.get(10, TimeUnit.SECONDS));
+                } catch (ExecutionException exception) {
+                    assertInstanceOf(IllegalStateException.class, exception.getCause());
+                }
+            }
+            assertFalse(accepted.isEmpty());
+            assertTrue(accepted.size() <= 2);
+            assertEquals(accepted.size(), redis.opsForSet().size(SecurityRedisKey.USER_TOKENS.format(user.getId())));
+            for (SecurityToken token : accepted) {
+                assertNotNull(reader.getCurrentUser(token.getAccessToken()));
+            }
+        } finally {
+            start.countDown();
+            executor.shutdownNow();
+            otherFactory.destroy();
+        }
+    }
+
+    @Test
+    void reservationsCountAcrossClientsAndRecoverAfterRelease() {
+        var admission = new SecuritySessionAdmissionStore(redis);
+        var limit = new SessionPolicy(SessionConcurrencyMode.REJECT_NEW, 1, 30, 300, null, null);
+        String userId = user.getId().toString();
+        String first = TokenDigestService.digest("first-reservation");
+        String second = TokenDigestService.digest("second-reservation");
+        admission.reserve(userId, ClientType.WEB.getName(), first, limit);
+        assertThrows(IllegalStateException.class,
+                () -> admission.reserve(userId, ClientType.APP.getName(), second, limit));
+        admission.release(userId, ClientType.WEB.getName(), first, limit.concurrencyMode());
+        admission.reserve(userId, ClientType.APP.getName(), second, limit);
+        admission.commit(userId, ClientType.APP.getName(), second, UUID.randomUUID().toString(), limit);
+        assertThrows(IllegalStateException.class,
+                () -> admission.reserve(userId, ClientType.WEB.getName(), first, limit));
+    }
+
+    @Test
+    void rejectNewRechecksLimitWhenAllowClientCommitsAfterReservation() {
+        var admission = new SecuritySessionAdmissionStore(redis);
+        var limited = new SessionPolicy(SessionConcurrencyMode.REJECT_NEW, 1, 30, 300, null, null);
+        var allowed = SessionPolicy.defaults(30, 300);
+        String userId = user.getId().toString();
+        String limitedDigest = TokenDigestService.digest("reserved-reject-new");
+        String allowedDigest = TokenDigestService.digest("later-allow");
+        admission.reserve(userId, ClientType.WEB.getName(), limitedDigest, limited);
+        admission.reserve(userId, ClientType.APP.getName(), allowedDigest, allowed);
+        admission.commit(userId, ClientType.APP.getName(), allowedDigest, UUID.randomUUID().toString(), allowed);
+        assertThrows(IllegalStateException.class,
+                () -> admission.commit(userId, ClientType.WEB.getName(), limitedDigest,
+                        UUID.randomUUID().toString(), limited));
+        String index = SecurityRedisKey.USER_TOKENS.format(userId);
+        assertEquals(1L, redis.opsForSet().size(index));
+        assertFalse(Boolean.TRUE.equals(redis.opsForSet().isMember(index, limitedDigest)));
+        admission.release(userId, ClientType.WEB.getName(), limitedDigest, limited.concurrencyMode());
+    }
+
+    @Test
+    void lostClientLeaseAndFamilyFenceCannotCommitPartialSession() {
+        var admission = new SecuritySessionAdmissionStore(redis);
+        var kick = new SessionPolicy(SessionConcurrencyMode.KICK_OLD, 1, 30, 300, null, null);
+        String userId = user.getId().toString();
+        String client = ClientType.WEB.getName();
+        String first = TokenDigestService.digest("lost-lease");
+        String second = TokenDigestService.digest("fenced-family");
+        admission.reserve(userId, client, first, kick);
+        assertThrows(IllegalStateException.class, () -> admission.reserve(userId, client, second, kick));
+        redis.delete(SecurityRedisKey.SESSION_ISSUE_CLIENT_LOCK.format(userId, client));
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> admission.commit(userId, client, first, UUID.randomUUID().toString(), kick));
+        admission.release(userId, client, first, kick.concurrencyMode());
+        admission.reserve(userId, client, second, kick);
+        String familyId = UUID.randomUUID().toString();
+        redis.opsForValue().set(SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId), "REVOKED");
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> admission.commit(userId, client, second, familyId, kick));
+        assertEquals(0L, redis.opsForSet().size(SecurityRedisKey.USER_TOKENS.format(userId)));
+        admission.release(userId, client, second, kick.concurrencyMode());
+    }
+
+    @Test
+    void allowReservationsShareClientWhileKickOldWaitsForThem() {
+        var admission = new SecuritySessionAdmissionStore(redis);
+        var allow = SessionPolicy.defaults(30, 300);
+        var kick = new SessionPolicy(SessionConcurrencyMode.KICK_OLD, 1, 30, 300, null, null);
+        String userId = user.getId().toString();
+        String client = ClientType.WEB.getName();
+        String first = TokenDigestService.digest("allow-first");
+        String second = TokenDigestService.digest("allow-second");
+        String replacement = TokenDigestService.digest("kick-replacement");
+        admission.reserve(userId, client, first, allow);
+        admission.reserve(userId, client, second, allow);
+        assertThrows(IllegalStateException.class, () -> admission.reserve(userId, client, replacement, kick));
+        admission.release(userId, client, first, allow.concurrencyMode());
+        admission.release(userId, client, second, allow.concurrencyMode());
+        admission.reserve(userId, client, replacement, kick);
+        assertThrows(IllegalStateException.class, () -> admission.reserve(userId, client, first, allow));
+        admission.release(userId, client, replacement, kick.concurrencyMode());
+    }
+
+    @Test
+    void persistentUserIndexBlocksCommitUntilTtlIsRepaired() {
+        var admission = new SecuritySessionAdmissionStore(redis);
+        var allow = SessionPolicy.defaults(30, 300);
+        String userId = user.getId().toString();
+        String client = ClientType.WEB.getName();
+        String digest = TokenDigestService.digest("pending-with-persistent-index");
+        String index = SecurityRedisKey.USER_TOKENS.format(userId);
+        redis.opsForSet().add(index, TokenDigestService.digest("old-index-entry"));
+        admission.reserve(userId, client, digest, allow);
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> admission.commit(userId, client, digest, UUID.randomUUID().toString(), allow));
+        assertFalse(Boolean.TRUE.equals(redis.opsForSet().isMember(index, digest)));
+        redis.expire(index, java.time.Duration.ofSeconds(300));
+        admission.commit(userId, client, digest, UUID.randomUUID().toString(), allow);
+        assertTrue(Boolean.TRUE.equals(redis.opsForSet().isMember(index, digest)));
+    }
+
+    @Test
+    void unavailableConnectionRejectsAdmissionAndHealthyConnectionCanRecover() {
+        var unavailableConfiguration = new RedisStandaloneConfiguration("127.0.0.1", 1);
+        unavailableConfiguration.setDatabase(5);
+        var unavailableFactory = new LettuceConnectionFactory(unavailableConfiguration);
+        unavailableFactory.afterPropertiesSet();
+        unavailableFactory.start();
+        var limit = new SessionPolicy(SessionConcurrencyMode.REJECT_NEW, 1, 30, 300, null, null);
+        String userId = user.getId().toString();
+        String digest = TokenDigestService.digest("recovery-admission");
+        try {
+            var unavailableRedis = RealRedisTestEnvironment.template(unavailableFactory, keyPrefix);
+            var unavailableAdmission = new SecuritySessionAdmissionStore(unavailableRedis);
+            assertThrows(SecurityRedisUnavailableException.class,
+                    () -> unavailableAdmission.reserve(userId, ClientType.WEB.getName(), digest, limit));
+        } finally {
+            unavailableFactory.destroy();
+        }
+        var healthyAdmission = new SecuritySessionAdmissionStore(redis);
+        healthyAdmission.reserve(userId, ClientType.WEB.getName(), digest, limit);
+        healthyAdmission.commit(userId, ClientType.WEB.getName(), digest, UUID.randomUUID().toString(), limit);
+        assertTrue(Boolean.TRUE.equals(redis.opsForSet()
+                .isMember(SecurityRedisKey.USER_TOKENS.format(userId), digest)));
+    }
+
+    @Test
+    void parallelKickOldFromTwoConnectionsLeavesOneRefreshFamily() throws Exception {
+        policy = new SessionPolicy(SessionConcurrencyMode.KICK_OLD, 1, 30, 300, null, null);
+        SecurityToken original = issuer.createToken(user, ClientType.WEB);
+        var otherFactory = new LettuceConnectionFactory(RealRedisTestEnvironment.configuration());
+        otherFactory.afterPropertiesSet();
+        otherFactory.start();
+        var executor = Executors.newFixedThreadPool(2);
+        var start = new CountDownLatch(1);
+        try {
+            var otherRedis = RealRedisTestEnvironment.template(otherFactory, keyPrefix);
+            var beans = new StaticListableBeanFactory();
+            beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
+            var otherStore = new SecuritySessionStore(otherRedis, new SecurityProperties(),
+                    beans.getBeanProvider(SecuritySessionPolicyProvider.class));
+            var otherRevoker = new SecuritySessionRevocationService(otherStore, () -> null);
+            var otherIssuer = new SecuritySessionIssueService(otherStore, otherRevoker,
+                    new SessionConcurrencyStrategyResolver(List.of(new AllowSessionConcurrencyStrategy(),
+                            new RejectNewSessionConcurrencyStrategy(), new KickOldSessionConcurrencyStrategy(otherStore))),
+                    clock);
+            Future<SecurityToken> first = executor.submit(() -> {
+                awaitLatch(start);
+                return issuer.createToken(user, ClientType.WEB);
+            });
+            Future<SecurityToken> second = executor.submit(() -> {
+                awaitLatch(start);
+                return otherIssuer.createToken(user, ClientType.WEB);
+            });
+            start.countDown();
+            var returned = new ArrayList<SecurityToken>();
+            for (Future<SecurityToken> future : List.of(first, second)) {
+                try {
+                    returned.add(future.get(10, TimeUnit.SECONDS));
+                } catch (ExecutionException exception) {
+                    assertInstanceOf(IllegalStateException.class, exception.getCause());
+                }
+            }
+            assertFalse(returned.isEmpty());
+            assertEquals(1L, redis.opsForSet().size(SecurityRedisKey.USER_TOKENS.format(user.getId())));
+            assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(original.getRefreshToken()));
+            long live = returned.stream().filter(token -> reader.getCurrentUser(token.getAccessToken()) != null).count();
+            assertEquals(1L, live);
+            for (SecurityToken token : returned) {
+                if (reader.getCurrentUser(token.getAccessToken()) == null) {
+                    assertThrows(BadCredentialsException.class,
+                            () -> refresher.refreshByRefreshToken(token.getRefreshToken()));
+                }
+            }
+        } finally {
+            start.countDown();
+            executor.shutdownNow();
             otherFactory.destroy();
         }
     }

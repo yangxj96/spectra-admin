@@ -23,6 +23,7 @@ import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
+import com.devops00.spectra.framework.security.redis.store.RefreshTokenRotationStore;
 import com.devops00.spectra.framework.security.redis.value.SecurityRedisValueParser;
 import com.devops00.spectra.framework.security.session.lifecycle.SecuritySessionIssuer;
 import com.devops00.spectra.framework.security.session.concurrency.SessionConcurrencyStrategyResolver;
@@ -30,9 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.data.redis.core.ExpireChanges;
-import org.springframework.data.redis.connection.ExpirationOptions;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -73,6 +71,8 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
 
     private final SecuritySessionHandleStore handleStore;
 
+    private final SecuritySessionAdmissionStore admissionStore;
+
     private final Clock clock;
 
     public SecuritySessionIssueService(SecuritySessionStore store,
@@ -83,6 +83,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         this.revocationService = revocationService;
         this.concurrencyStrategyResolver = concurrencyStrategyResolver;
         this.handleStore = new SecuritySessionHandleStore(store.redis());
+        this.admissionStore = new SecuritySessionAdmissionStore(store.redis());
         this.clock = clock;
     }
 
@@ -134,10 +135,6 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             throw new BadCredentialsException("会话已过期，请重新登录");
         }
         SecuritySessionLifetime currentLifetime = lifetime.touch(now);
-        Set<String> activeTokens = activeTokenDigests(userId);
-        concurrencyStrategyResolver.resolve(policy.concurrencyMode())
-                .enforce(policy, clientCode, activeTokens, revocationService::deleteAccessDigest);
-
         Duration accessTtl = currentLifetime.accessTtl(policy, now);
         Duration refreshTtl = currentLifetime.refreshTtl(policy, now);
         Duration accessIndexTtl = Duration.ofSeconds(policy.accessTtlSeconds());
@@ -149,6 +146,7 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         String refreshToken = TokenDigestService.generateToken();
         String tokenDigest = TokenDigestService.digest(token);
         String refreshDigest = TokenDigestService.digest(refreshToken);
+        activeTokenDigests(userId);
 
         Map<String, Object> session = new LinkedHashMap<>();
         session.put("userId", userId);
@@ -182,13 +180,17 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         var keys = new PartialSessionKeys(sessionKey, ucKey, userTokensKey, accessRefreshKey, sessionFamilyKey,
                 refreshKey, refreshFamilyKey, summaryKey);
         var identity = new PartialSessionIdentity(tokenDigest, refreshDigest, userId, familyId);
+        admissionStore.reserve(userId, clientCode, tokenDigest, policy);
+        boolean handleReady = false;
         try {
+            Set<String> activeTokens = activeTokenDigests(userId);
+            concurrencyStrategyResolver.resolve(policy.concurrencyMode())
+                    .enforce(policy, clientCode, activeTokens, revocationService::deleteAccessDigest);
             summary.put("sessionId", handleStore.createOrGet(familyId, refreshIndexTtl));
+            handleReady = true;
             redis.opsForHash().putAll(sessionKey, session);
             redis.expire(sessionKey, accessTtl);
             redis.opsForValue().set(ucKey, tokenDigest, accessIndexTtl);
-            redis.opsForSet().add(userTokensKey, tokenDigest);
-            extendUserTokensTtl(userTokensKey, refreshIndexTtl);
             redis.opsForValue().set(accessRefreshKey, refreshDigest, refreshIndexTtl);
             redis.opsForSet().add(sessionFamilyKey, tokenDigest);
             redis.expire(sessionFamilyKey, familyTtl);
@@ -196,10 +198,10 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             redis.expire(refreshKey, refreshTtl);
             redis.opsForSet().add(refreshFamilyKey, refreshDigest);
             redis.expire(refreshFamilyKey, refreshIndexTtl);
-            redis.opsForSet().add(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
             redis.opsForValue().set(summaryKey, summary, accessTtl);
             redis.opsForSet().add(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), tokenDigest);
             ensureFamilyNotRevoked(familyId);
+            admissionStore.commit(userId, clientCode, tokenDigest, familyId, policy);
 
             var authorities = user.getAuthorityNames()
                     .stream()
@@ -209,7 +211,8 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return buildToken(user, token, refreshToken);
         } catch (RuntimeException exception) {
-            cleanupPartialSession(redis, keys, identity);
+            cleanupPartialSession(redis, keys, identity, handleReady);
+            deleteQuietly(() -> admissionStore.release(userId, clientCode, tokenDigest, policy.concurrencyMode()));
             throw exception;
         }
     }
@@ -225,9 +228,10 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
      * 处理清理会话相关数据。
      */
     private void cleanupPartialSession(RedisTemplate<String, Object> redis, PartialSessionKeys keys,
-                                       PartialSessionIdentity identity) {
+                                       PartialSessionIdentity identity, boolean handleReady) {
         deleteQuietly(() -> redis.delete(keys.sessionKey()));
-        deleteQuietly(() -> redis.delete(keys.userClientKey()));
+        deleteQuietly(() -> RefreshTokenRotationStore.compareAndDelete(redis, keys.userClientKey(),
+                identity.tokenDigest()));
         deleteQuietly(() -> redis.delete(keys.accessRefreshKey()));
         deleteQuietly(() -> redis.delete(keys.refreshKey()));
         deleteQuietly(() -> redis.delete(keys.refreshFamilyKey()));
@@ -237,9 +241,10 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         deleteQuietly(() -> redis.opsForSet()
                 .remove(SecurityRedisKey.ONLINE_SESSIONS.getPattern(),
                         identity.tokenDigest()));
-        deleteQuietly(() -> redis.opsForSet().remove(SecurityRedisKey.ONLINE_USERS.getPattern(), identity.userId()));
         deleteQuietly(() -> redis.opsForSet().remove(keys.refreshFamilyKey(), identity.refreshDigest()));
-        deleteQuietly(() -> handleStore.deleteFamilyHandle(identity.familyId()));
+        if (handleReady) {
+            deleteQuietly(() -> handleStore.deleteFamilyHandle(identity.familyId()));
+        }
     }
 
     /**
@@ -317,23 +322,6 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
             }
         }
         return active;
-    }
-
-    /** 用户索引至少存活到其中最长的 Refresh 生命周期结束；不同客户端策略不得缩短已有索引。 */
-    private void extendUserTokensTtl(String userTokensKey, Duration refreshTtl) {
-        var expiration = Expiration.from(refreshTtl);
-        var noExpiry = SecurityRedisExecutor.require("设置用户会话索引有效期", () -> store.redis()
-                .expire(
-                        userTokensKey, expiration, ExpirationOptions.builder().nx().build()));
-        if (ExpireChanges.ExpiryChangeState.DOES_NOT_EXIST.equals(noExpiry)) {
-            throw new com.devops00.spectra.common.exception.SecurityRedisUnavailableException("用户会话索引不存在", null);
-        }
-        var extended = SecurityRedisExecutor.require("延长用户会话索引有效期", () -> store.redis()
-                .expire(
-                        userTokensKey, expiration, ExpirationOptions.builder().gt().build()));
-        if (ExpireChanges.ExpiryChangeState.DOES_NOT_EXIST.equals(extended)) {
-            throw new com.devops00.spectra.common.exception.SecurityRedisUnavailableException("用户会话索引不存在", null);
-        }
     }
 
     /**
