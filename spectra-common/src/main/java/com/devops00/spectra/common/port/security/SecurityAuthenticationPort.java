@@ -37,12 +37,12 @@ public interface SecurityAuthenticationPort {
     /** 轮换 Refresh Token 并签发新的会话令牌。 */
     SecurityToken refreshByRefreshToken(String refreshToken);
 
-    /** 检查主体是否处于登录失败锁定窗口。 */
-    boolean isLockedOut(String username);
+    /** 检查登录标识摘要桶是否处于失败锁定窗口。 */
+    boolean isLockedOut(String identityBucket);
 
-    /** 记录一次认证失败。 */
-    void recordLoginFail(String username);
+    /** 记录一次认证失败；参数为与身份查询一致的规范化摘要桶。 */
+    void recordLoginFail(String identityBucket);
 
-    /** 清理主体的认证失败计数。 */
-    void clearLoginFail(String username);
+    /** 清理认证失败计数；参数与锁定检查使用同一摘要桶。 */
+    void clearLoginFail(String identityBucket);
 }

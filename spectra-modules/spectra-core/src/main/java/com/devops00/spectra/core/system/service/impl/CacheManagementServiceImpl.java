@@ -23,6 +23,7 @@ import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
+import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.system.cache.CacheInvalidationCoordinator;
 import com.devops00.spectra.core.system.cache.CacheManagementResult;
 import com.devops00.spectra.core.system.cache.CacheRegionDescriptor;
@@ -211,9 +212,7 @@ public class CacheManagementServiceImpl implements CacheManagementService {
     @Override
     public CacheOperationVO clearLoginFailure(SecurityLoginFailureClearFrom from) {
         requireSecurityConfirmation(from.reason(), from.confirmed());
-        String username = normalizeTarget(from.username());
-        loginFailureTracker.clearLoginFail(
-                com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash.digest(username));
+        loginFailureTracker.clearLoginFail(AuthenticationIdentifierHash.digest(from.username()));
         return completed("LOGIN_FAILURE", 1L, "已清理登录失败计数；未改变用户生命周期状态");
     }
 

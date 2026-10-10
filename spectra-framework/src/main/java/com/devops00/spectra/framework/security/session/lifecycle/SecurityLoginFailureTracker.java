@@ -25,12 +25,12 @@ package com.devops00.spectra.framework.security.session.lifecycle;
  */
 public interface SecurityLoginFailureTracker {
 
-    /** 记录一次登录失败。 */
-    void recordLoginFail(String username);
+    /** 记录一次登录失败；参数为登录标识规范化后的摘要桶，不传原文。 */
+    void recordLoginFail(String identityBucket);
 
-    /** 判断登录失败锁定状态。 */
-    boolean isLockedOut(String username);
+    /** 判断登录失败锁定状态；参数为登录标识规范化后的摘要桶。 */
+    boolean isLockedOut(String identityBucket);
 
-    /** 清理登录失败计数。 */
-    void clearLoginFail(String username);
+    /** 清理登录失败计数；参数与登录锁定检查使用同一摘要桶。 */
+    void clearLoginFail(String identityBucket);
 }

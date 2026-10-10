@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.javabean.from;
 /**
  * 承载安全失败清理相关的请求参数。
  *
- * @param username  用户登录名
+ * @param username  用户登录标识；按登录链的规则规范化后定位失败计数
  * @param reason    本次操作或审计事件对应的原因
  * @param confirmed 已确认状态
  * @author yangxj96
