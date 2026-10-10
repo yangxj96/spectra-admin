@@ -69,4 +69,13 @@ public final class TokenDigestService {
             throw new IllegalStateException("JDK必须提供SHA-256", exception);
         }
     }
+
+    /** 对安全 Redis 中的令牌摘要作恒时比较；缺失的摘要不匹配。 */
+    public static boolean equalDigests(String expected, String actual) {
+        if (expected == null || actual == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
+                actual.getBytes(StandardCharsets.UTF_8));
+    }
 }

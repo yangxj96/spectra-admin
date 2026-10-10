@@ -105,6 +105,18 @@ class PageFromSortTest {
     }
 
     @Test
+    void longAndMalformedServerColumnsAreRejectedWithoutChangingAllowedSyntax() {
+        var request = new PageFrom(15L, 1L, List.of(new PageOrderFrom("id", true)));
+        for (String column : List.of(".id", "d.", "d..id", "d.id.extra", "9id", "d.9id", "d.ïd",
+                "d." + "a".repeat(16_384) + "!")) {
+            var failure = assertThrows(IllegalStateException.class,
+                    () -> request.toPage(Map.of("id", column)));
+            assertEquals("分页排序字段映射无效", failure.getMessage());
+        }
+        assertEquals("_d._id9", request.toPage(Map.of("id", "_d._id9")).orders().getFirst().getColumn());
+    }
+
+    @Test
     void fixedOrderRejectsNonemptyOrders() {
         var request = new PageFrom();
         request.requireUnsorted();

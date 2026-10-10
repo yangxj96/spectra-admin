@@ -109,6 +109,7 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
      * @return 流式、资源、String、byte[]、{@code R} 和 {@code ResponseEntity} 原样返回；普通对象包装为 {@code R.success(body)}，204/304 空响应返回 null。
      */
     @Override
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-003: ResponseBodyAdvice 固定回调签名。
     public Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
                                   Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request, ServerHttpResponse response) {
 

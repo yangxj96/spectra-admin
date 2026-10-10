@@ -28,6 +28,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Map;
 import java.util.UUID;
+import java.time.Clock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,7 +56,7 @@ class SecuritySessionRefreshServiceTest {
                 store,
                 mock(SecuritySessionIssueService.class),
                 mock(SecuritySessionRevocationService.class),
-                mock(SecurityUserLoader.class));
+                mock(SecurityUserLoader.class), Clock.systemUTC());
 
         var exception = assertThrows(BadCredentialsException.class,
                 () -> service.refreshByRefreshToken("invalid-refresh-token"));
@@ -68,11 +69,15 @@ class SecuritySessionRefreshServiceTest {
         var store = mock(SecuritySessionStore.class);
         RedisTemplate<String, Object> redis = mock();
         SetOperations<String, Object> sets = mock();
+        long now = Clock.systemUTC().millis();
         when(store.hash(anyString(), anyString())).thenReturn(Map.of(
                 "accessToken", "access-digest",
                 "userId", UUID.randomUUID().toString(),
                 "clientType", "web",
-                "familyId", "family-id"));
+                "familyId", "family-id",
+                "loginTime", now,
+                "lastActiveTime", now,
+                "refreshExpiresAt", now + 300_000));
         when(store.redis()).thenReturn(redis);
         when(store.sessionPolicy("web")).thenReturn(SessionPolicy.defaults(30, 300));
         when(redis.opsForSet()).thenReturn(sets);
@@ -84,7 +89,7 @@ class SecuritySessionRefreshServiceTest {
                 store,
                 mock(SecuritySessionIssueService.class),
                 mock(SecuritySessionRevocationService.class),
-                loader);
+                loader, Clock.systemUTC());
 
         assertThrows(SecurityRedisUnavailableException.class,
                 () -> service.refreshByRefreshToken("synthetic-refresh-token"));

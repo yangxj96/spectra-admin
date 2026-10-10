@@ -69,6 +69,12 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
     /** 默认只覆盖项目 Controller，具体接口仍可通过 {@link Encrypt} 注解细化加密范围。 */
     private static final Pattern CONTROLLER_PACKAGE = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller(?:\\..*)?");
 
+    private enum AnnotationDecision {
+        UNSPECIFIED,
+        ENABLED,
+        DISABLED
+    }
+
     private final ObjectMapper om;
 
     private final CryptoKeyManager cryptoKeyManager;
@@ -94,9 +100,9 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         // 方法级注解优先于类级注解；显式关闭时不能被包名兜底规则重新打开。
         Method method = returnType.getMethod();
         if (method != null) {
-            var annotated = annotationDecision(method);
-            if (annotated != null)
-                return annotated;
+            AnnotationDecision decision = annotationDecision(method);
+            if (decision != AnnotationDecision.UNSPECIFIED)
+                return decision == AnnotationDecision.ENABLED;
         }
 
         if (!encryptionConfigured()) {
@@ -124,13 +130,15 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
                 || ResourceHttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
-    private Boolean annotationDecision(Method method) {
+    private AnnotationDecision annotationDecision(Method method) {
         var annotation = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
         if (annotation == null)
             annotation = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
         if (annotation == null)
-            return null;
-        return annotation.value() && annotation.response() && encryptionConfigured();
+            return AnnotationDecision.UNSPECIFIED;
+        return annotation.value() && annotation.response() && encryptionConfigured()
+                ? AnnotationDecision.ENABLED
+                : AnnotationDecision.DISABLED;
     }
 
     /**
@@ -145,6 +153,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
      * @return 不需要加密的响应原样返回；普通响应加密成功时返回密文 JSON，密钥缺失或加密失败时抛出加密异常。
      */
     @Override
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-002: ResponseBodyAdvice 固定回调签名。
     public @Nullable Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
                                             Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request,
                                             ServerHttpResponse response) {

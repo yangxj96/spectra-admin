@@ -42,6 +42,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Duration;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -72,13 +73,17 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
 
     private final SecuritySessionHandleStore handleStore;
 
+    private final Clock clock;
+
     public SecuritySessionIssueService(SecuritySessionStore store,
                                        SecuritySessionRevocationService revocationService,
-                                       SessionConcurrencyStrategyResolver concurrencyStrategyResolver) {
+                                       SessionConcurrencyStrategyResolver concurrencyStrategyResolver,
+                                       Clock clock) {
         this.store = store;
         this.revocationService = revocationService;
         this.concurrencyStrategyResolver = concurrencyStrategyResolver;
         this.handleStore = new SecuritySessionHandleStore(store.redis());
+        this.clock = clock;
     }
 
     /**
@@ -89,7 +94,11 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
      */
     @Override
     public SecurityToken createToken(SecurityPrincipal user) {
-        return SecurityRedisExecutor.execute("签发安全会话", () -> createToken(user, resolveClientType(), UUID.randomUUID().toString()));
+        return SecurityRedisExecutor.execute("签发安全会话", () -> {
+            long now = clock.millis();
+            return createToken(user, resolveClientType(), UUID.randomUUID().toString(),
+                    new SecuritySessionLifetime(now, now));
+        });
     }
 
     /**
@@ -101,12 +110,16 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
      */
     @Override
     public SecurityToken createToken(SecurityPrincipal user, ClientType clientType) {
-        return SecurityRedisExecutor.execute("签发安全会话",
-                () -> createToken(user, clientType, UUID.randomUUID().toString()));
+        return SecurityRedisExecutor.execute("签发安全会话", () -> {
+            long now = clock.millis();
+            return createToken(user, clientType, UUID.randomUUID().toString(),
+                    new SecuritySessionLifetime(now, now));
+        });
     }
 
     /** 按已有 Token Family 创建下一代会话，供 Refresh 用例调用。 */
-    SecurityToken createToken(SecurityPrincipal user, ClientType clientType, String familyId) {
+    SecurityToken createToken(SecurityPrincipal user, ClientType clientType, String familyId,
+                              SecuritySessionLifetime lifetime) {
         Objects.requireNonNull(user, "user");
         Objects.requireNonNull(clientType, "clientType");
         Objects.requireNonNull(familyId, "familyId");
@@ -116,18 +129,26 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         String clientCode = clientType.getName();
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
         SessionPolicy policy = store.sessionPolicy(clientCode);
+        long now = clock.millis();
+        if (lifetime.expired(policy, now)) {
+            throw new BadCredentialsException("会话已过期，请重新登录");
+        }
+        SecuritySessionLifetime currentLifetime = lifetime.touch(now);
         Set<String> activeTokens = activeTokenDigests(userId);
         concurrencyStrategyResolver.resolve(policy.concurrencyMode())
                 .enforce(policy, clientCode, activeTokens, revocationService::deleteAccessDigest);
 
-        Duration accessTtl = Duration.ofSeconds(policy.accessTtlSeconds());
-        Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
-        Duration familyTtl = Duration.ofSeconds(Math.max(policy.accessTtlSeconds(), policy.refreshTtlSeconds()));
+        Duration accessTtl = currentLifetime.accessTtl(policy, now);
+        Duration refreshTtl = currentLifetime.refreshTtl(policy, now);
+        Duration accessIndexTtl = Duration.ofSeconds(policy.accessTtlSeconds());
+        Duration refreshIndexTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
+        Duration familyTtl = accessIndexTtl.compareTo(refreshIndexTtl) >= 0
+                ? accessIndexTtl
+                : refreshIndexTtl;
         String token = TokenDigestService.generateToken();
         String refreshToken = TokenDigestService.generateToken();
         String tokenDigest = TokenDigestService.digest(token);
         String refreshDigest = TokenDigestService.digest(refreshToken);
-        long now = System.currentTimeMillis();
 
         Map<String, Object> session = new LinkedHashMap<>();
         session.put("userId", userId);
@@ -135,8 +156,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         session.put("clientType", clientCode);
         session.put("deviceId", resolveDeviceId());
         session.put("ip", resolveClientIp());
-        session.put("loginTime", now);
-        session.put("lastActiveTime", now);
+        session.put("loginTime", currentLifetime.loginTime());
+        session.put("lastActiveTime", currentLifetime.lastActiveTime());
+        session.put("accessExpiresAt", SecuritySessionLifetime.deadline(now, policy.accessTtlSeconds()));
         session.put("familyId", familyId);
 
         RedisTemplate<String, Object> redis = store.redis();
@@ -149,6 +171,9 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
         refreshData.put("userId", userId);
         refreshData.put("clientType", clientCode);
         refreshData.put("familyId", familyId);
+        refreshData.put("loginTime", currentLifetime.loginTime());
+        refreshData.put("lastActiveTime", currentLifetime.lastActiveTime());
+        refreshData.put("refreshExpiresAt", SecuritySessionLifetime.deadline(now, policy.refreshTtlSeconds()));
         String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
         String refreshFamilyKey = SecurityRedisKey.REFRESH_FAMILY.format(familyId);
         String summaryKey = SecurityRedisKey.SESSION_SUMMARY.format(tokenDigest);
@@ -158,19 +183,19 @@ public class SecuritySessionIssueService implements SecuritySessionIssuer {
                 refreshKey, refreshFamilyKey, summaryKey);
         var identity = new PartialSessionIdentity(tokenDigest, refreshDigest, userId, familyId);
         try {
-            summary.put("sessionId", handleStore.createOrGet(familyId, refreshTtl));
+            summary.put("sessionId", handleStore.createOrGet(familyId, refreshIndexTtl));
             redis.opsForHash().putAll(sessionKey, session);
             redis.expire(sessionKey, accessTtl);
-            redis.opsForValue().set(ucKey, tokenDigest, accessTtl);
+            redis.opsForValue().set(ucKey, tokenDigest, accessIndexTtl);
             redis.opsForSet().add(userTokensKey, tokenDigest);
-            extendUserTokensTtl(userTokensKey, refreshTtl);
-            redis.opsForValue().set(accessRefreshKey, refreshDigest, refreshTtl);
+            extendUserTokensTtl(userTokensKey, refreshIndexTtl);
+            redis.opsForValue().set(accessRefreshKey, refreshDigest, refreshIndexTtl);
             redis.opsForSet().add(sessionFamilyKey, tokenDigest);
             redis.expire(sessionFamilyKey, familyTtl);
             redis.opsForHash().putAll(refreshKey, refreshData);
             redis.expire(refreshKey, refreshTtl);
             redis.opsForSet().add(refreshFamilyKey, refreshDigest);
-            redis.expire(refreshFamilyKey, refreshTtl);
+            redis.expire(refreshFamilyKey, refreshIndexTtl);
             redis.opsForSet().add(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
             redis.opsForValue().set(summaryKey, summary, accessTtl);
             redis.opsForSet().add(SecurityRedisKey.ONLINE_SESSIONS.getPattern(), tokenDigest);

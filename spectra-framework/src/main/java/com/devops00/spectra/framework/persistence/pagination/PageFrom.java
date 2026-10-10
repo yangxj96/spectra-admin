@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * REST 分页查询的通用入参。
@@ -44,8 +43,6 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageFrom {
-
-    private static final Pattern SQL_COLUMN = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)?");
 
     private static final String INVALID_SORT = "不支持的分页排序字段";
 
@@ -108,9 +105,37 @@ public class PageFrom {
         if (column == null) {
             throw new IllegalArgumentException(INVALID_SORT);
         }
-        if (!SQL_COLUMN.matcher(column).matches()) {
+        if (!validSqlColumn(column)) {
             throw new IllegalStateException("分页排序字段映射无效");
         }
         return column;
+    }
+
+    /** 只接受单列或带一个表别名的列；逐字符校验避免正则回溯。 */
+    private static boolean validSqlColumn(String column) {
+        int dot = column.indexOf('.');
+        if (dot < 0) {
+            return validIdentifier(column, 0, column.length());
+        }
+        return dot == column.lastIndexOf('.')
+                && validIdentifier(column, 0, dot)
+                && validIdentifier(column, dot + 1, column.length());
+    }
+
+    private static boolean validIdentifier(String value, int start, int end) {
+        if (start == end || !identifierStart(value.charAt(start))) {
+            return false;
+        }
+        for (int index = start + 1; index < end; index++) {
+            char current = value.charAt(index);
+            if (!identifierStart(current) && (current < '0' || current > '9')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean identifierStart(char value) {
+        return value == '_' || value >= 'A' && value <= 'Z' || value >= 'a' && value <= 'z';
     }
 }

@@ -141,6 +141,7 @@ public class SecurityConfiguration {
      * @param meterRegistryProvider   提供限流指标注册表；没有外部注册表时使用临时注册表。
      */
     @Bean
+    @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-001: Spring Bean 装配依赖逐项注入。
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager,
                                                    SecurityContextAccessor securityContextAccessor,
                                                    SecurityUserLookupPort securityUserLookupPort,

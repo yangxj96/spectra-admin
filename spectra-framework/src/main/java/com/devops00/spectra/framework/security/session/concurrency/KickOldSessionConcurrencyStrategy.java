@@ -20,6 +20,7 @@ import com.devops00.spectra.common.security.policy.SessionConcurrencyMode;
 import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
+import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import com.devops00.spectra.framework.security.redis.value.SecurityRedisValueParser;
 import com.devops00.spectra.framework.security.session.SecuritySessionStore;
 import org.springframework.stereotype.Component;
@@ -99,7 +100,7 @@ public final class KickOldSessionConcurrencyStrategy implements SessionConcurren
             return "";
         }
         String mappedAccess = SecurityRedisValueParser.requiredText(refresh.get("accessToken"), "Refresh.accessToken");
-        if (!accessDigest.equals(mappedAccess)) {
+        if (!TokenDigestService.equalDigests(accessDigest, mappedAccess)) {
             throw new SecurityRedisUnavailableException("安全 Redis Access Refresh 映射不一致", null);
         }
         return SecurityRedisValueParser.requiredText(refresh.get("clientType"), "Refresh.clientType");

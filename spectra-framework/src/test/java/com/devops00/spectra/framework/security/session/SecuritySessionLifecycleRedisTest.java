@@ -39,12 +39,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
@@ -72,6 +83,7 @@ class SecuritySessionLifecycleRedisTest {
     private SessionPolicy policy;
     private String operatorToken;
     private String keyPrefix;
+    private Clock clock;
 
     @BeforeEach
     void setUp() {
@@ -80,6 +92,7 @@ class SecuritySessionLifecycleRedisTest {
         factory.afterPropertiesSet();
         factory.start();
         keyPrefix = RealRedisTestEnvironment.newKeyPrefix();
+        clock = Clock.systemUTC();
         redis = RealRedisTestEnvironment.template(factory, keyPrefix);
         policy = SessionPolicy.defaults(30, 300);
         var beans = new StaticListableBeanFactory();
@@ -91,11 +104,16 @@ class SecuritySessionLifecycleRedisTest {
         when(user.getUsername()).thenReturn("isolated-session-test");
         when(user.getAuthorityNames()).thenReturn(List.of());
         revoker = new SecuritySessionRevocationService(store, () -> operatorToken);
+        useClock(clock);
+    }
+
+    private void useClock(Clock source) {
+        clock = source;
         issuer = new SecuritySessionIssueService(store, revoker, new SessionConcurrencyStrategyResolver(List.of(
                 new AllowSessionConcurrencyStrategy(), new RejectNewSessionConcurrencyStrategy(),
-                new KickOldSessionConcurrencyStrategy(store))));
-        refresher = new SecuritySessionRefreshService(store, issuer, revoker, id -> user);
-        reader = new SecuritySessionReaderService(store, id -> user);
+                new KickOldSessionConcurrencyStrategy(store))), clock);
+        refresher = new SecuritySessionRefreshService(store, issuer, revoker, id -> user, clock);
+        reader = new SecuritySessionReaderService(store, id -> user, clock);
     }
 
     @AfterEach
@@ -160,6 +178,19 @@ class SecuritySessionLifecycleRedisTest {
     }
 
     @Test
+    void kickOldRejectsInconsistentRefreshMappingBeforeIssuingReplacement() {
+        policy = new SessionPolicy(SessionConcurrencyMode.KICK_OLD, 5, 30, 300, null, null);
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        String accessDigest = TokenDigestService.digest(first.getAccessToken());
+        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(TokenDigestService.digest(first.getRefreshToken()));
+        redis.delete(SecurityRedisKey.SESSION.format(accessDigest));
+        redis.opsForHash().put(refreshKey, "accessToken", "wrong-digest");
+
+        assertThrows(SecurityRedisUnavailableException.class, () -> issuer.createToken(user, ClientType.WEB));
+        assertFalse(redis.opsForHash().entries(refreshKey).isEmpty());
+    }
+
+    @Test
     void rejectNewCountsRefreshAfterItsAccessExpired() {
         policy = new SessionPolicy(SessionConcurrencyMode.REJECT_NEW, 1, 30, 300, null, null);
         SecurityToken first = issuer.createToken(user, ClientType.WEB);
@@ -197,7 +228,8 @@ class SecuritySessionLifecycleRedisTest {
             var otherRevoker = new SecuritySessionRevocationService(otherStore, () -> operatorToken);
             var otherIssuer = new SecuritySessionIssueService(otherStore, otherRevoker,
                     new SessionConcurrencyStrategyResolver(List.of(new AllowSessionConcurrencyStrategy(),
-                            new RejectNewSessionConcurrencyStrategy(), new KickOldSessionConcurrencyStrategy(otherStore))));
+                            new RejectNewSessionConcurrencyStrategy(), new KickOldSessionConcurrencyStrategy(otherStore))),
+                    clock);
             operatorToken = issuer.createToken(user, ClientType.APP).getAccessToken();
             SecurityToken first = otherIssuer.createToken(user, ClientType.WEB);
             SecurityToken second = issuer.createToken(user, ClientType.WEB);
@@ -347,14 +379,16 @@ class SecuritySessionLifecycleRedisTest {
                 awaitLatch(releaseReplay);
                 return user;
             };
-            var replaying = new SecuritySessionRefreshService(otherStore, issuer, otherRevoker, replayLoader);
+            var replaying = new SecuritySessionRefreshService(otherStore, issuer, otherRevoker, replayLoader, clock);
             var pausedIssuer = spy(issuer);
             doAnswer(invocation -> {
                 firstAtIssue.countDown();
                 awaitLatch(releaseIssue);
                 return invocation.callRealMethod();
-            }).when(pausedIssuer).createToken(any(SecurityPrincipal.class), any(ClientType.class), anyString());
-            var rotating = new SecuritySessionRefreshService(store, pausedIssuer, revoker, id -> user);
+            }).when(pausedIssuer)
+                    .createToken(any(SecurityPrincipal.class), any(ClientType.class), anyString(),
+                            any(SecuritySessionLifetime.class));
+            var rotating = new SecuritySessionRefreshService(store, pausedIssuer, revoker, id -> user, clock);
 
             var replayFuture = executor.submit(() -> replaying.refreshByRefreshToken(first.getRefreshToken()));
             awaitLatch(replayLoaded);
@@ -448,5 +482,168 @@ class SecuritySessionLifecycleRedisTest {
         assertEquals(loginTime, redis.opsForHash()
                 .get(SecurityRedisKey.SESSION.format(
                         TokenDigestService.digest(next.getAccessToken())), "loginTime"));
+    }
+
+    @Test
+    void activityExtendsIdleButCannotExtendAccessOrAbsoluteDeadline() {
+        var testClock = new MutableClock(Clock.systemUTC().millis());
+        useClock(testClock);
+        policy = new SessionPolicy(SessionConcurrencyMode.ALLOW, 5, 2, 10, 3L, 1L);
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        long loginTime = testClock.millis();
+
+        testClock.advanceMillis(700);
+        assertNotNull(reader.getCurrentUser(first.getAccessToken()));
+        testClock.advanceMillis(700);
+        assertNotNull(reader.getCurrentUser(first.getAccessToken()));
+        testClock.advanceMillis(700);
+        assertNull(reader.getCurrentUser(first.getAccessToken()), "读取活动不能延长 Access 自身的两秒期限");
+
+        SecurityToken next = refresher.refreshByRefreshToken(first.getRefreshToken());
+        String nextKey = SecurityRedisKey.SESSION.format(TokenDigestService.digest(next.getAccessToken()));
+        assertEquals(loginTime, redis.opsForHash().get(nextKey, "loginTime"));
+        testClock.advanceMillis(900);
+        assertNull(reader.getCurrentUser(next.getAccessToken()));
+        assertThrows(BadCredentialsException.class, () -> refresher.refreshByRefreshToken(next.getRefreshToken()));
+    }
+
+    @Test
+    void refreshAfterAccessNaturallyExpiresKeepsOriginalLoginTime() throws InterruptedException {
+        policy = new SessionPolicy(SessionConcurrencyMode.ALLOW, 5, 1, 5, 3L, null);
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        String firstKey = SecurityRedisKey.SESSION.format(TokenDigestService.digest(first.getAccessToken()));
+        Object loginTime = redis.opsForHash().get(firstKey, "loginTime");
+        Thread.sleep(1100);
+        assertFalse(Boolean.TRUE.equals(redis.hasKey(firstKey)));
+
+        SecurityToken next = refresher.refreshByRefreshToken(first.getRefreshToken());
+        String nextKey = SecurityRedisKey.SESSION.format(TokenDigestService.digest(next.getAccessToken()));
+        assertEquals(loginTime, redis.opsForHash().get(nextKey, "loginTime"));
+        assertNotNull(reader.getCurrentUser(next.getAccessToken()));
+    }
+
+    @Test
+    void independentRedisConnectionsObserveIdleActivity() {
+        var testClock = new MutableClock(Clock.systemUTC().millis());
+        useClock(testClock);
+        policy = new SessionPolicy(SessionConcurrencyMode.ALLOW, 5, 5, 10, null, 1L);
+        SecurityToken issued = issuer.createToken(user, ClientType.WEB);
+        var otherFactory = new LettuceConnectionFactory(RealRedisTestEnvironment.configuration());
+        otherFactory.afterPropertiesSet();
+        otherFactory.start();
+        try {
+            var otherRedis = RealRedisTestEnvironment.template(otherFactory, keyPrefix);
+            var beans = new StaticListableBeanFactory();
+            beans.addBean("policy", (SecuritySessionPolicyProvider) code -> policy);
+            var otherStore = new SecuritySessionStore(otherRedis, new SecurityProperties(),
+                    beans.getBeanProvider(SecuritySessionPolicyProvider.class));
+            var otherReader = new SecuritySessionReaderService(otherStore, id -> user, testClock);
+            testClock.advanceMillis(700);
+            assertNotNull(otherReader.getCurrentUser(issued.getAccessToken()));
+            testClock.advanceMillis(700);
+            assertNotNull(reader.getCurrentUser(issued.getAccessToken()));
+        } finally {
+            otherFactory.destroy();
+        }
+    }
+
+    @Test
+    void activeSessionKeepsRefreshIndexAndOnlineSummaryBeyondFirstIdleWindow() throws InterruptedException {
+        policy = new SessionPolicy(SessionConcurrencyMode.ALLOW, 5, 5, 10, null, 1L);
+        SecurityToken issued = issuer.createToken(user, ClientType.WEB);
+        String digest = TokenDigestService.digest(issued.getAccessToken());
+        String userIndex = SecurityRedisKey.USER_TOKENS.format(user.getId());
+        String summaryKey = SecurityRedisKey.SESSION_SUMMARY.format(digest);
+        Long indexTtl = redis.getExpire(userIndex, TimeUnit.MILLISECONDS);
+        assertNotNull(indexTtl);
+        assertTrue(indexTtl > 5000, "可撤销用户索引必须覆盖 Refresh 原始期限");
+
+        Thread.sleep(550);
+        assertNotNull(reader.getCurrentUser(issued.getAccessToken()));
+        Thread.sleep(550);
+        assertTrue(Boolean.TRUE.equals(redis.hasKey(summaryKey)), "活动读取应延长在线摘要的空闲窗口");
+        assertTrue(Boolean.TRUE.equals(redis.opsForSet().isMember(userIndex, digest)));
+        assertNotNull(refresher.refreshByRefreshToken(issued.getRefreshToken()));
+    }
+
+    @Test
+    void revokedSessionCannotBeRecreatedByLateActivityTouch() {
+        SecurityToken issued = issuer.createToken(user, ClientType.WEB);
+        String digest = TokenDigestService.digest(issued.getAccessToken());
+        String sessionKey = SecurityRedisKey.SESSION.format(digest);
+        String refreshDigest = TokenDigestService.digest(issued.getRefreshToken());
+        revoker.deleteByUserId(user.getId());
+
+        var activity = new SecuritySessionActivityStore.Activity(digest, "revoked-family", refreshDigest,
+                clock.millis(), java.time.Duration.ofSeconds(30), java.time.Duration.ofSeconds(300));
+        assertFalse(SecuritySessionActivityStore.touch(redis, activity));
+        assertFalse(Boolean.TRUE.equals(redis.hasKey(sessionKey)));
+    }
+
+    @Test
+    void concurrentReadAndRevocationLeaveNoSessionKey() throws Exception {
+        SecurityToken issued = issuer.createToken(user, ClientType.WEB);
+        String sessionKey = SecurityRedisKey.SESSION.format(TokenDigestService.digest(issued.getAccessToken()));
+        var start = new CountDownLatch(1);
+        var executor = Executors.newFixedThreadPool(2);
+        try {
+            var reading = executor.submit(() -> {
+                awaitLatch(start);
+                return reader.getCurrentUser(issued.getAccessToken());
+            });
+            var revoking = executor.submit(() -> {
+                awaitLatch(start);
+                revoker.deleteByUserId(user.getId());
+            });
+            start.countDown();
+            reading.get(5, TimeUnit.SECONDS);
+            revoking.get(5, TimeUnit.SECONDS);
+            assertFalse(Boolean.TRUE.equals(redis.hasKey(sessionKey)));
+            assertNull(reader.getCurrentUser(issued.getAccessToken()));
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void missingRefreshLifetimeIsRejectedWithoutMintingAnotherSession() {
+        SecurityToken first = issuer.createToken(user, ClientType.WEB);
+        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(TokenDigestService.digest(first.getRefreshToken()));
+        redis.opsForHash().delete(refreshKey, "loginTime");
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> refresher.refreshByRefreshToken(first.getRefreshToken()));
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> reader.getCurrentUser(first.getAccessToken()));
+    }
+
+    private static final class MutableClock extends Clock {
+        private final AtomicLong now;
+
+        private MutableClock(long initialMillis) {
+            now = new AtomicLong(initialMillis);
+        }
+
+        void advanceMillis(long millis) {
+            now.addAndGet(millis);
+        }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            if (!ZoneOffset.UTC.equals(zone)) {
+                throw new IllegalArgumentException("测试时钟仅支持 UTC");
+            }
+            return this;
+        }
+
+        @Override
+        public Instant instant() {
+            return Instant.ofEpochMilli(now.get());
+        }
     }
 }

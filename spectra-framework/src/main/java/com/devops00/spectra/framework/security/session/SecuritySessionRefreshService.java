@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
+import java.time.Clock;
 
 /**
  * Refresh Token 轮换用例，集中处理一次性消费、重放和 Family 撤销。
@@ -53,14 +54,18 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
 
     private final SecurityUserLoader securityUserLoader;
 
+    private final Clock clock;
+
     public SecuritySessionRefreshService(SecuritySessionStore store,
                                          SecuritySessionIssueService issueService,
                                          SecuritySessionRevocationService revocationService,
-                                         SecurityUserLoader securityUserLoader) {
+                                         SecurityUserLoader securityUserLoader,
+                                         Clock clock) {
         this.store = store;
         this.issueService = issueService;
         this.revocationService = revocationService;
         this.securityUserLoader = securityUserLoader;
+        this.clock = clock;
     }
 
     /**
@@ -110,7 +115,7 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
             if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
                 throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
             }
-            return issueService.createToken(currentUser, parsedClientType, context.familyId());
+            return issueService.createToken(currentUser, parsedClientType, context.familyId(), context.lifetime());
         } catch (RuntimeException exception) {
             revocationService.revokeFamilyForRefreshReplay(context.familyId(), fenceTtlSeconds);
             throw exception;
@@ -141,19 +146,26 @@ public class SecuritySessionRefreshService implements SecuritySessionRefresher {
                 : SecurityRedisValueParser.requiredText(session.get("clientType"), "Session.clientType");
         var clientType = SecurityRedisValueParser.requiredClientType(clientTypeName, "Refresh.clientType");
         SessionPolicy policy = store.sessionPolicy(clientType.getName());
+        SecuritySessionLifetime lifetime = SecuritySessionLifetime.from(refreshData);
+        long now = clock.millis();
+        long refreshDeadline = SecurityRedisValueParser.requiredLong(refreshData.get("refreshExpiresAt"),
+                "Refresh.refreshExpiresAt");
+        if (lifetime.expired(policy, now) || refreshDeadline <= now) {
+            throw new BadCredentialsException("会话已过期，请重新登录");
+        }
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (store.hasKey("检查 Refresh 重放栅栏", replayFenceKey)) {
             throw new BadCredentialsException("刷新token所属会话已因重放风险撤销");
         }
         return new RefreshContext(refreshDigest, accessDigest, userId, familyId, clientTypeName,
-                clientType, policy, replayFenceKey, currentUser);
+                clientType, policy, replayFenceKey, currentUser, lifetime);
     }
 
     private record RefreshContext(String refreshDigest, String accessDigest, UUID userId,
                                   String familyId, String clientTypeName,
                                   ClientType clientType,
                                   SessionPolicy policy, String replayFenceKey,
-                                  SecurityPrincipal currentUser) {
+                                  SecurityPrincipal currentUser, SecuritySessionLifetime lifetime) {
     }
 
     /**

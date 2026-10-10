@@ -119,23 +119,12 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
     private @Nullable RevocableSession readRevocableSession(String accessDigest) {
         Map<Object, Object> session = store.hash("读取待撤销安全会话",
                 SecurityRedisKey.SESSION.format(accessDigest));
-        Object refreshValue = store.value("读取 Access Refresh 映射",
-                SecurityRedisKey.REFRESH_TOKEN.format(accessDigest));
-        String refreshDigest = refreshValue == null
-                ? null
-                : SecurityRedisValueParser.requiredText(refreshValue, "Access.refreshDigest");
-        Map<Object, Object> refresh = refreshDigest == null
-                ? Map.of()
-                : store.hash("读取待撤销 Refresh Token", SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest));
+        String refreshDigest = readMappedRefreshDigest(accessDigest);
+        Map<Object, Object> refresh = readMappedRefresh(refreshDigest);
         if (session.isEmpty() && refresh.isEmpty()) {
             return null;
         }
-        if (!refresh.isEmpty()) {
-            String mappedAccess = SecurityRedisValueParser.requiredText(refresh.get("accessToken"), "Refresh.accessToken");
-            if (!accessDigest.equals(mappedAccess)) {
-                throw new SecurityRedisUnavailableException("安全 Redis Access Refresh 映射不一致", null);
-            }
-        }
+        validateMappedAccess(accessDigest, refresh);
         Map<Object, Object> source = session.isEmpty() ? refresh : session;
         String sourceName = session.isEmpty() ? "Refresh" : "Session";
         RevocableSession identity = new RevocableSession(
@@ -143,14 +132,44 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
                 SecurityRedisValueParser.requiredText(source.get("clientType"), sourceName + ".clientType"),
                 SecurityRedisValueParser.requiredText(source.get("familyId"), sourceName + ".familyId"),
                 refreshDigest);
-        if (!session.isEmpty()
-                && !refresh.isEmpty()
-                && (!identity.userId().equals(SecurityRedisValueParser.requiredText(refresh.get("userId"), "Refresh.userId"))
-                        || !identity.clientType().equals(SecurityRedisValueParser.requiredText(refresh.get("clientType"), "Refresh.clientType"))
-                        || !identity.familyId().equals(SecurityRedisValueParser.requiredText(refresh.get("familyId"), "Refresh.familyId")))) {
+        validateRefreshOwner(identity, session, refresh);
+        return identity;
+    }
+
+    private @Nullable String readMappedRefreshDigest(String accessDigest) {
+        Object refreshValue = store.value("读取 Access Refresh 映射",
+                SecurityRedisKey.REFRESH_TOKEN.format(accessDigest));
+        return refreshValue == null
+                ? null
+                : SecurityRedisValueParser.requiredText(refreshValue, "Access.refreshDigest");
+    }
+
+    private Map<Object, Object> readMappedRefresh(@Nullable String refreshDigest) {
+        return refreshDigest == null
+                ? Map.of()
+                : store.hash("读取待撤销 Refresh Token", SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest));
+    }
+
+    private void validateMappedAccess(String accessDigest, Map<Object, Object> refresh) {
+        if (refresh.isEmpty()) {
+            return;
+        }
+        String mappedAccess = SecurityRedisValueParser.requiredText(refresh.get("accessToken"), "Refresh.accessToken");
+        if (!TokenDigestService.equalDigests(accessDigest, mappedAccess)) {
+            throw new SecurityRedisUnavailableException("安全 Redis Access Refresh 映射不一致", null);
+        }
+    }
+
+    private void validateRefreshOwner(RevocableSession identity, Map<Object, Object> session,
+                                      Map<Object, Object> refresh) {
+        if (session.isEmpty() || refresh.isEmpty()) {
+            return;
+        }
+        if (!identity.userId().equals(SecurityRedisValueParser.requiredText(refresh.get("userId"), "Refresh.userId"))
+                || !identity.clientType().equals(SecurityRedisValueParser.requiredText(refresh.get("clientType"), "Refresh.clientType"))
+                || !identity.familyId().equals(SecurityRedisValueParser.requiredText(refresh.get("familyId"), "Refresh.familyId"))) {
             throw new SecurityRedisUnavailableException("安全 Redis Access Refresh 会话归属不一致", null);
         }
-        return identity;
     }
 
     private record RevocableSession(String userId, String clientType, String familyId,
@@ -278,7 +297,7 @@ public class SecuritySessionRevocationService implements SecuritySessionRevoker 
         boolean removedStale = false;
         for (Object token : tokens) {
             String tokenDigest = SecurityRedisValueParser.requiredText(token, "UserTokens.accessDigest");
-            if (!Objects.equals(exceptDigest, tokenDigest)) {
+            if (exceptDigest == null || !TokenDigestService.equalDigests(exceptDigest, tokenDigest)) {
                 RevocableSession identity = readRevocableSession(tokenDigest);
                 if (identity != null) {
                     if (!userId.toString().equals(identity.userId())) {
