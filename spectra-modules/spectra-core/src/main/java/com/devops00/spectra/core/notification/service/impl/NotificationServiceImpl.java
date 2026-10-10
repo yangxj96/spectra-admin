@@ -22,7 +22,9 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -40,8 +42,28 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationReceipt send(NotificationSendRequest request) {
+        return send(request, null);
+    }
+
+    @Override
+    public NotificationReceipt sendAsSystem(NotificationSendRequest request, NotificationSystemActor actor) {
+        if (actor == null) {
+            throw new AccessDeniedException("通知缺少系统运行身份");
+        }
+        return send(request, actor);
+    }
+
+    private NotificationReceipt send(NotificationSendRequest request, NotificationSystemActor actor) {
         if (request == null) {
             throw new DataSaveException("通知发送请求不能为空");
+        }
+        var gatewayRequest = new NotificationRequest(
+                request.requestId(), request.idempotencyKey(), request.purpose(), request.channels(),
+                request.recipientUserIds(), request.directAddresses(), request.templateGroupCode(), request.parameters(),
+                request.sensitiveParameters(), request.businessType(), request.businessId(), request.sourceModule(),
+                request.sourceDepartmentId(), request.scheduledAt(), request.expiresAt(), request.priority(), request.link());
+        if (actor != null && !actor.permits(gatewayRequest)) {
+            throw new AccessDeniedException("系统通知运行身份与来源、用途或收件人不匹配");
         }
         for (var channel : request.channels()) {
             var availability = notificationGateway.availability(channel);
@@ -50,10 +72,8 @@ public class NotificationServiceImpl implements NotificationService {
                 throw new DataSaveException("通知渠道暂不可用: " + channel + "，" + reason);
             }
         }
-        return notificationGateway.enqueue(new NotificationRequest(
-                request.requestId(), request.idempotencyKey(), request.purpose(), request.channels(),
-                request.recipientUserIds(), request.directAddresses(), request.templateGroupCode(), request.parameters(),
-                request.sensitiveParameters(), request.businessType(), request.businessId(), request.sourceModule(),
-                request.sourceDepartmentId(), request.scheduledAt(), request.expiresAt(), request.priority(), request.link()));
+        return actor == null
+                ? notificationGateway.enqueue(gatewayRequest)
+                : notificationGateway.enqueueAsSystem(gatewayRequest, actor);
     }
 }

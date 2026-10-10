@@ -20,6 +20,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.service.ApplicationService;
@@ -94,13 +95,13 @@ public class OaApplicationWorkflowSupport {
      */
     public void sendNotification(Application application, String typeCode, String title, String content) {
         var normalizedTypeCode = typeCode.toLowerCase(Locale.ROOT);
-        notificationService.send(NotificationSendRequest.inApp("oa:" + normalizedTypeCode + ":" + application.getBizId() + ":" + title,
+        notificationService.sendAsSystem(NotificationSendRequest.inApp("oa:" + normalizedTypeCode + ":" + application.getBizId() + ":" + title,
                 NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), NotificationTemplateCode.OA_APPLICATION_STATUS)
                 .parameter("title", title)
                 .parameter("content", content)
                 .businessReference("OA_" + normalizedTypeCode.toUpperCase(Locale.ROOT), application.getBizId().toString())
                 .sourceModule("OA")
                 .link("/oa/" + normalizedTypeCode + "/" + application.getBizId())
-                .build());
+                .build(), NotificationSystemActor.OA_WORKFLOW_RESULT);
     }
 }

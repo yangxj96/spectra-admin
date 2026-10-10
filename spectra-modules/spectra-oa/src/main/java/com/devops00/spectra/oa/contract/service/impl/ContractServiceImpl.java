@@ -27,6 +27,7 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.contract.javabean.converter.ContractConverter;
@@ -397,7 +398,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                 continue;
             }
             try {
-                notificationService.send(NotificationSendRequest.inApp("oa:contract-milestone:" + milestone.getId(),
+                notificationService.sendAsSystem(NotificationSendRequest.inApp("oa:contract-milestone:" + milestone.getId(),
                         NotificationPurpose.OA_REMINDER, List.of(receiverId), NotificationTemplateCode.OA_CONTRACT_MILESTONE_REMINDER)
                         .parameter("contract_title", Objects.toString(contract.getTitle(), ""))
                         .parameter("milestone_name", Objects.toString(milestone.getName(), ""))
@@ -405,7 +406,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                         .businessReference("OA_CONTRACT_MILESTONE", milestone.getId().toString())
                         .sourceModule("OA")
                         .link("/oa/contract/" + contract.getId())
-                        .build());
+                        .build(), NotificationSystemActor.OA_CONTRACT_REMINDER);
                 sent++;
             } catch (RuntimeException exception) {
                 milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())

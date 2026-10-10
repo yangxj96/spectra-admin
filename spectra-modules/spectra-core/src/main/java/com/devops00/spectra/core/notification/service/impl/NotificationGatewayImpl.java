@@ -29,6 +29,7 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationRequestStatus;
@@ -51,6 +52,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -178,10 +180,27 @@ public class NotificationGatewayImpl implements NotificationGateway {
     @Transactional
     public NotificationReceipt enqueue(NotificationRequest request,
                                        Map<NotificationChannel, UUID> templateVersionIds) {
+        return enqueue(request, templateVersionIds, null);
+    }
+
+    @Override
+    @Transactional
+    public NotificationReceipt enqueueAsSystem(NotificationRequest request, NotificationSystemActor actor) {
+        if (actor == null || !actor.permits(request)) {
+            throw new AccessDeniedException("系统通知运行身份与来源、用途或收件人不匹配");
+        }
+        return enqueue(request, Map.of(), actor);
+    }
+
+    private NotificationReceipt enqueue(NotificationRequest request,
+                                        Map<NotificationChannel, UUID> templateVersionIds,
+                                        NotificationSystemActor actor) {
         validateEnqueue(request);
         var channels = policy.resolve(request.purpose(), request.channels());
         var lockedTemplateVersions = lockedTemplateVersions(templateVersionIds, channels);
-        var recipients = recipientDirectory.resolve(request.recipientUserIds());
+        var recipients = actor == null
+                ? recipientDirectory.resolve(request.recipientUserIds())
+                : recipientDirectory.resolveAsSystem(request.recipientUserIds(), actor);
         var existingReceipt = existingReceipt(request);
         if (existingReceipt != null) {
             return existingReceipt;
@@ -244,7 +263,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
     }
 
     private Map<NotificationChannel, UUID> lockedTemplateVersions(Map<NotificationChannel, UUID> input,
-                                                                   List<NotificationChannel> channels) {
+                                                                  List<NotificationChannel> channels) {
         var locked = input == null ? Map.<NotificationChannel, UUID>of() : Map.copyOf(input);
         if (!locked.isEmpty() && channels.stream().anyMatch(channel -> !locked.containsKey(channel))) {
             throw new DataSaveException("受控发送模板版本未覆盖全部渠道");

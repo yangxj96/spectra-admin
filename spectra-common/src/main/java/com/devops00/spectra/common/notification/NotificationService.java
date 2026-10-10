@@ -132,6 +132,12 @@ public interface NotificationService {
      */
     NotificationReceipt send(NotificationSendRequest request);
 
+    /**
+     * 以已登记的内部运行身份发送明确收件人的系统通知。
+     * 来源模块、用途和模板必须与运行身份匹配。
+     */
+    NotificationReceipt sendAsSystem(NotificationSendRequest request, NotificationSystemActor actor);
+
     /** 用户通知快捷入口的参数对象。 */
     record UserNotificationRequest(String idempotencyKey, NotificationPurpose purpose,
                                    Collection<UUID> recipientUserIds,

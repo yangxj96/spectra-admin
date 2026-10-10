@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -31,6 +32,7 @@ import com.devops00.spectra.common.security.authorization.ScopeQuery;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -68,10 +70,24 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         if (userIds == null || userIds.isEmpty()) {
             return List.of();
         }
+        requireCurrentUser();
         return userIds.stream()
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(this::resolveOne)
+                .map(userId -> resolveOne(userId, false))
+                .toList();
+    }
+
+    @Override
+    public List<NotificationRecipient> resolveAsSystem(List<UUID> userIds, NotificationSystemActor actor) {
+        requireSystemActor(actor);
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+        return userIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(userId -> resolveOne(userId, true))
                 .toList();
     }
 
@@ -80,6 +96,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         if (loginNames == null || loginNames.isEmpty()) {
             return List.of();
         }
+        requireCurrentUser();
         return loginNames.stream()
                 .filter(StringUtils::hasText)
                 .distinct()
@@ -91,11 +108,31 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .toList();
     }
 
+    @Override
+    public List<NotificationRecipient> resolveByLoginNamesAsSystem(List<String> loginNames, NotificationSystemActor actor) {
+        requireSystemActor(actor);
+        if (!actor.permitsLoginNameLookup()) {
+            throw new AccessDeniedException("该系统身份不能按登录名查询通知收件人");
+        }
+        if (loginNames == null || loginNames.isEmpty()) {
+            return List.of();
+        }
+        return loginNames.stream()
+                .filter(StringUtils::hasText)
+                .distinct()
+                .map(userService::getByUsername)
+                .filter(Objects::nonNull)
+                .map(User::getId)
+                .filter(Objects::nonNull)
+                .flatMap(userId -> resolveAsSystem(List.of(userId), actor).stream())
+                .toList();
+    }
+
     /**
      * 转换、解析或规范化数据（{@code resolveOne}）。
      */
-    private NotificationRecipient resolveOne(UUID userId) {
-        if (!allowedByCurrentUserScope(userId)) {
+    private NotificationRecipient resolveOne(UUID userId, boolean systemActor) {
+        if (!systemActor && !allowedByCurrentUserScope(userId)) {
             return new NotificationRecipient(userId, null, null, false, false, null);
         }
         var user = userService.getById(userId);
@@ -115,14 +152,9 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
     }
 
-    /**
-     * 当前登录用户发起的通知必须遵守其有效数据范围；无登录上下文的定时任务由服务身份负责授权。
-     */
+    /** 当前登录用户发起的通知必须遵守其有效数据范围。 */
     private boolean allowedByCurrentUserScope(UUID recipientUserId) {
-        var currentUserId = securityContextAccessor.currentUserId();
-        if (currentUserId == null) {
-            return true;
-        }
+        var currentUserId = requireCurrentUser();
         AuthorizationSnapshot snapshot = authorizationSnapshotProvider.load(currentUserId);
         var boundaries = snapshot.accessBoundaries("user:read");
         if (!boundaries.isEmpty()
@@ -141,6 +173,20 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .stream()
                 .anyMatch(departmentId -> snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId,
                         departmentId, departmentLineage(departmentId))));
+    }
+
+    private UUID requireCurrentUser() {
+        var currentUserId = securityContextAccessor.currentUserId();
+        if (currentUserId == null) {
+            throw new AccessDeniedException("通知收件人查询缺少认证身份");
+        }
+        return currentUserId;
+    }
+
+    private void requireSystemActor(NotificationSystemActor actor) {
+        if (actor == null) {
+            throw new AccessDeniedException("通知收件人查询缺少系统运行身份");
+        }
     }
 
     /**

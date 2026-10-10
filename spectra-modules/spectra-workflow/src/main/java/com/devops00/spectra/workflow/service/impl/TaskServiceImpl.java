@@ -24,6 +24,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
@@ -274,7 +275,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
      * 执行内部处理逻辑（{@code notifyWorkflowResult}）。
      */
     private void notifyWorkflowResult(org.flowable.task.api.Task task, String operator, boolean approved) {
-        var recipients = recipientDirectory.resolveByLoginNames(List.of(operator))
+        var recipients = recipientDirectory.resolveByLoginNamesAsSystem(List.of(operator), NotificationSystemActor.WORKFLOW_TASK)
                 .stream()
                 .filter(item -> item.active() && item.userId() != null)
                 .map(item -> item.userId())
@@ -283,7 +284,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
         if (recipients.isEmpty()) {
             return;
         }
-        notificationService.send(NotificationSendRequest.inApp(
+        notificationService.sendAsSystem(NotificationSendRequest.inApp(
                 "workflow:result:" + task.getId() + ":" + approved,
                 NotificationPurpose.WORKFLOW_RESULT,
                 recipients,
@@ -292,7 +293,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
                 .businessReference("WORKFLOW", task.getProcessInstanceId())
                 .sourceModule("WORKFLOW")
                 .link("/workflow/tasks/done")
-                .build());
+                .build(), NotificationSystemActor.WORKFLOW_TASK);
     }
 
     /**
@@ -303,7 +304,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
             if (!StringUtils.hasText(task.getAssignee())) {
                 return;
             }
-            var recipients = recipientDirectory.resolveByLoginNames(List.of(task.getAssignee()))
+            var recipients = recipientDirectory.resolveByLoginNamesAsSystem(List.of(task.getAssignee()),
+                    NotificationSystemActor.WORKFLOW_TASK)
                     .stream()
                     .filter(item -> item.active() && item.userId() != null)
                     .map(item -> item.userId())
@@ -312,7 +314,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
             if (recipients.isEmpty()) {
                 return;
             }
-            notificationService.send(NotificationSendRequest.inApp(
+            notificationService.sendAsSystem(NotificationSendRequest.inApp(
                     "workflow:todo:" + task.getId(),
                     NotificationPurpose.WORKFLOW_TODO,
                     recipients,
@@ -321,7 +323,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
                     .businessReference("WORKFLOW", processInstanceId)
                     .sourceModule("WORKFLOW")
                     .link("/workflow/tasks/todo")
-                    .build());
+                    .build(), NotificationSystemActor.WORKFLOW_TASK);
         });
     }
 }

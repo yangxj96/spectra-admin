@@ -37,10 +37,18 @@ public interface NotificationRecipientDirectory {
     List<NotificationRecipient> resolve(List<UUID> userIds);
 
     /**
+     * 按明确用户 ID 解析内部任务的收件人；调用方必须提供已登记的系统运行身份。
+     */
+    List<NotificationRecipient> resolveAsSystem(List<UUID> userIds, NotificationSystemActor actor);
+
+    /**
      * 按登录名解析流程任务等内部调用方使用的收件人快照。
      *
      * @param loginNames 用户登录名；空值和重复值由实现过滤
      * @return 可解析登录名对应的收件人快照
      */
     List<NotificationRecipient> resolveByLoginNames(List<String> loginNames);
+
+    /** 按工作流任务明确的处理人登录名解析收件人。 */
+    List<NotificationRecipient> resolveByLoginNamesAsSystem(List<String> loginNames, NotificationSystemActor actor);
 }

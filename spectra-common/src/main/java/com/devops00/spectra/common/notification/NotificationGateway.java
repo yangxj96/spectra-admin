@@ -52,4 +52,7 @@ public interface NotificationGateway {
      * @return 入队回执
      */
     NotificationReceipt enqueue(NotificationRequest request, Map<NotificationChannel, UUID> templateVersionIds);
+
+    /** 以已登记的内部运行身份提交明确收件人的通知。 */
+    NotificationReceipt enqueueAsSystem(NotificationRequest request, NotificationSystemActor actor);
 }
