@@ -30,6 +30,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -49,6 +50,8 @@ public class PasswordCredentialServiceImpl implements PasswordCredentialService 
 
     private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
 
+    private final Clock clock;
+
     @Override
     public @Nullable PasswordCredential getByUserId(UUID userId) {
         return mapper.selectOne(new LambdaQueryWrapper<PasswordCredential>().eq(PasswordCredential::getUserId, userId));
@@ -62,7 +65,7 @@ public class PasswordCredentialServiceImpl implements PasswordCredentialService 
             var credential = new PasswordCredential();
             credential.setUserId(userId);
             credential.setPasswordHash(passwordHash);
-            credential.setChangedAt(Instant.now());
+            credential.setChangedAt(clock.instant());
             credential.setMustChange(mustChange);
             credential.setFailedAttempts(0);
             if (mapper.insert(credential) != 1) {
@@ -90,7 +93,7 @@ public class PasswordCredentialServiceImpl implements PasswordCredentialService 
      */
     private void update(PasswordCredential credential, String passwordHash, boolean mustChange, Instant expiresAt) {
         credential.setPasswordHash(passwordHash);
-        credential.setChangedAt(Instant.now());
+        credential.setChangedAt(clock.instant());
         credential.setExpiresAt(expiresAt);
         credential.setMustChange(mustChange);
         credential.setFailedAttempts(0);
