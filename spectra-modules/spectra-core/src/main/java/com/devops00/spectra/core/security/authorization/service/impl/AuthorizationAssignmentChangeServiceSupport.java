@@ -135,7 +135,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
 
     @Override
     public AuthorizationChangePreviewVO preview(UUID targetUserId, AuthorizationAssignmentChangeFrom from) {
-        var prepared = prepare(targetUserId, from, from.getAssignmentId());
+        var prepared = prepare(targetUserId, from, from.getAssignmentId(), false);
         var expiresAt = Instant.now().plusSeconds(300);
         var token = new AuthorizationChangeToken(UUID.randomUUID(), prepared.operatorId(), targetUserId,
                 prepared.role().getId(), prepared.assignmentId(), from.getExpectedVersion(), prepared.requestHash(), expiresAt);
@@ -168,7 +168,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
             throw new DataException("授权变更 token 与 Assignment 不匹配");
         }
         var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
-        var prepared = prepare(targetUserId, from, assignmentId);
+        var prepared = prepare(targetUserId, from, assignmentId, true);
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("授权变更请求已被修改，请重新生成预览");
         }
@@ -330,7 +330,8 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     /**
      * 创建或构建目标数据（{@code prepare}）。
      */
-    private PreparedChange prepare(UUID targetUserId, AuthorizationAssignmentChangeFrom from, UUID assignmentId) {
+    private PreparedChange prepare(UUID targetUserId, AuthorizationAssignmentChangeFrom from, UUID assignmentId,
+                                   boolean lockRole) {
         validateInput(targetUserId, from);
         var operatorId = currentOperatorId();
         var target = loadTarget(targetUserId);
@@ -341,7 +342,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         }
         long targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
         epochGuard.assertCurrent(targetUserId, targetSecurityVersion);
-        var role = requireActiveRole(from.getRoleId());
+        var role = requireActiveRole(from.getRoleId(), lockRole);
         var requests = toGrantRequests(role, from.getBoundaries());
         var rootPolicy = rootAuthorizationPolicy.getIfAvailable();
         var root = rootPolicy != null && rootPolicy.isRoot(securityContextAccessor.currentUser());
@@ -388,11 +389,15 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     /**
      * 校验并确保数据满足当前约束（{@code requireActiveRole}）。
      */
-    private SecurityRole requireActiveRole(UUID roleId) {
+    private SecurityRole requireActiveRole(UUID roleId, boolean lockRole) {
         if (roleId == null) {
             throw new DataException("目标 Role 不能为空");
         }
-        var role = securityRoleMapper.selectById(roleId);
+        var roleQuery = new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getId, roleId);
+        if (lockRole) {
+            roleQuery.last("FOR SHARE");
+        }
+        var role = securityRoleMapper.selectOne(roleQuery);
         if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
             throw new DataNotExistException("目标 Role 不存在或已停用");
         }

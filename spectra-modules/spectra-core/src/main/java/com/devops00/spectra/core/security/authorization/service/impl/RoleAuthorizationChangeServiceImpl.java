@@ -96,6 +96,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private final RolePermissionMapper rolePermissionMapper;
     private final RoleGrantablePermissionMapper roleGrantablePermissionMapper;
     private final RoleAssignmentMapper roleAssignmentMapper;
+    private final JdbcRoleAssignmentBoundaryReconciler boundaryReconciler;
     private final UserMapper userMapper;
     private final AuthorizationSnapshotLoader snapshotLoader;
     private final GrantBoundaryService grantBoundaryService;
@@ -209,8 +210,12 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     }
 
     private void validateInput(UUID roleId, RoleAuthorizationChangeFrom from) {
-        if (roleId == null || from == null || from.getExpectedVersion() == null || from.getAuthorityLevel() == null
-                || from.getPermissionCodes() == null || from.getGrantablePermissionCodes() == null) {
+        if (roleId == null
+                || from == null
+                || from.getExpectedVersion() == null
+                || from.getAuthorityLevel() == null
+                || from.getPermissionCodes() == null
+                || from.getGrantablePermissionCodes() == null) {
             throw new DataException("Role 授权变更参数不能为空");
         }
     }
@@ -348,6 +353,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
                 .eq(RoleGrantablePermission::getRoleId, role.getId()));
         insertRolePermissions(role.getId(), permissionIds, false);
         insertRolePermissions(role.getId(), grantableIds, true);
+        boundaryReconciler.reconcile(role.getId());
         for (var userId : affectedUserIds(role.getId())) {
             var user = userMapper.selectById(userId);
             if (user == null) {
