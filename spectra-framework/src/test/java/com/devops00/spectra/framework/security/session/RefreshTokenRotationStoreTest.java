@@ -23,7 +23,10 @@ import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
@@ -60,6 +63,15 @@ class RefreshTokenRotationStoreTest {
     }
 
     @Test
+    void overflowingClaimResultCannotBecomeClaimed() {
+        RedisTemplate<String, Object> redis = mock();
+        when(redis.execute(any(RedisScript.class), anyList(), any(), any())).thenReturn(4_294_967_297L);
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> RefreshTokenRotationStore.claim(redis, IDENTITY, 300));
+    }
+
+    @Test
     void failedFenceCommandFailsClosed() {
         RedisTemplate<String, Object> redis = mock();
         when(redis.execute(any(RedisScript.class), anyList(), any())).thenThrow(
@@ -67,5 +79,40 @@ class RefreshTokenRotationStoreTest {
 
         assertThrows(SecurityRedisUnavailableException.class,
                 () -> RefreshTokenRotationStore.markFamilyRevoked(redis, "family-id", 300));
+    }
+
+    @Test
+    void unknownFenceResultFailsClosed() {
+        RedisTemplate<String, Object> redis = mock();
+        when(redis.execute(any(RedisScript.class), anyList(), any())).thenReturn(0L);
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> RefreshTokenRotationStore.markFamilyRevoked(redis, "family-id", 300));
+    }
+
+    @Test
+    void confirmedFenceResultSucceeds() {
+        RedisTemplate<String, Object> redis = mock();
+        when(redis.execute(any(RedisScript.class), anyList(), any())).thenReturn(1L);
+
+        assertDoesNotThrow(() -> RefreshTokenRotationStore.markFamilyRevoked(redis, "family-id", 300));
+    }
+
+    @Test
+    void unknownCompareAndDeleteResultFailsClosed() {
+        RedisTemplate<String, Object> redis = mock();
+        when(redis.execute(any(RedisScript.class), anyList(), any())).thenReturn(2L);
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> RefreshTokenRotationStore.compareAndDelete(redis, "mapping", "digest"));
+    }
+
+    @Test
+    void confirmedCompareAndDeleteResultsRemainDistinct() {
+        RedisTemplate<String, Object> redis = mock();
+        when(redis.execute(any(RedisScript.class), anyList(), any())).thenReturn(0L, 1L);
+
+        assertFalse(RefreshTokenRotationStore.compareAndDelete(redis, "mapping", "digest"));
+        assertTrue(RefreshTokenRotationStore.compareAndDelete(redis, "mapping", "digest"));
     }
 }

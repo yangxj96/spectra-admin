@@ -154,14 +154,22 @@ public final class RefreshTokenRotationStore {
                 SecurityRedisKey.SESSION.format(identity.accessDigest()));
         Long result = SecurityRedisExecutor.require("消费 Refresh Token",
                 () -> redis.execute(CLAIM_SCRIPT, keys, identity.accessDigest(), ttlMillis(minimumTtlSeconds)));
-        return switch (result.intValue()) {
-            case 1 -> ClaimResult.CLAIMED;
-            case 0 -> ClaimResult.REPLAY;
-            case -1 -> ClaimResult.MISSING;
-            case 2 -> ClaimResult.ORPHAN;
-            case 3 -> ClaimResult.FENCED;
-            default -> throw new SecurityRedisUnavailableException("安全 Redis 返回未知 Refresh 消费状态", null);
-        };
+        if (result == 1L) {
+            return ClaimResult.CLAIMED;
+        }
+        if (result == 0L) {
+            return ClaimResult.REPLAY;
+        }
+        if (result == -1L) {
+            return ClaimResult.MISSING;
+        }
+        if (result == 2L) {
+            return ClaimResult.ORPHAN;
+        }
+        if (result == 3L) {
+            return ClaimResult.FENCED;
+        }
+        throw new SecurityRedisUnavailableException("安全 Redis 返回未知 Refresh 消费状态", null);
     }
 
     /** 在清理 Family 前安装只延长的重放围栏；保留期覆盖现存 Family 索引。 */
@@ -171,8 +179,11 @@ public final class RefreshTokenRotationStore {
                 SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId),
                 SecurityRedisKey.REFRESH_FAMILY.format(familyId),
                 SecurityRedisKey.SESSION_FAMILY.format(familyId));
-        SecurityRedisExecutor.require("安装 Refresh Family 撤销围栏",
+        Long result = SecurityRedisExecutor.require("安装 Refresh Family 撤销围栏",
                 () -> redis.execute(FENCE_SCRIPT, keys, ttlMillis(minimumTtlSeconds)));
+        if (result != 1L) {
+            throw new SecurityRedisUnavailableException("安全 Redis 返回未知 Refresh Family 围栏状态", null);
+        }
     }
 
     private static long ttlMillis(long seconds) {
@@ -194,6 +205,12 @@ public final class RefreshTokenRotationStore {
         }
         Long result = SecurityRedisExecutor.require("原子清理安全 Redis 映射",
                 () -> redis.execute(COMPARE_AND_DELETE_SCRIPT, List.of(key), expectedValue));
-        return Long.valueOf(1L).equals(result);
+        if (result == 1L) {
+            return true;
+        }
+        if (result == 0L) {
+            return false;
+        }
+        throw new SecurityRedisUnavailableException("安全 Redis 返回未知映射清理状态", null);
     }
 }
