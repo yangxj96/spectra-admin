@@ -1,14 +1,37 @@
 package com.devops00.spectra.core.security.root;
 
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
+import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.security.authentication.mapper.AuthenticationIdentityMapper;
+import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
+import com.devops00.spectra.core.security.authentication.service.impl.AuthenticationIdentityServiceImpl;
+import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
+import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
+import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
+import com.devops00.spectra.core.security.initialization.javabean.entity.SystemState;
+import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationCompleteFrom;
+import com.devops00.spectra.core.security.initialization.mapper.SystemStateMapper;
+import com.devops00.spectra.core.security.initialization.service.SystemSecretInitializer;
+import com.devops00.spectra.core.security.initialization.service.impl.SystemInitializationServiceImpl;
+import com.devops00.spectra.core.security.initialization.service.impl.SystemInitializationTokenManager;
 import com.devops00.spectra.core.security.root.repository.JdbcRootPolicyRepository;
 import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
+import com.devops00.spectra.core.system.service.ConfiguredService;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
+import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
@@ -19,7 +42,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class RootGovernancePostgresTest {
@@ -271,6 +296,157 @@ class RootGovernancePostgresTest {
     @Test
     void refusesRootLockWithoutCallerTransaction() {
         assertThrows(RootGovernanceException.class, guard::lockForChange);
+    }
+
+    @Test
+    void initializationCompleteActivatesRootWithinLimit() {
+        UUID pendingUser = addPendingRoot();
+
+        transactions.execute(status -> {
+            completeInitialization(pendingUser);
+            return null;
+        });
+
+        assertEquals(2L, repository.countEffectiveDevOpsUsers());
+        assertEquals("ACTIVE", jdbc.queryForObject("SELECT status FROM spectra_core.sys_user WHERE id = ?",
+                String.class, pendingUser));
+        assertEquals(1L, assignmentCount(pendingUser));
+    }
+
+    @Test
+    void initializationCompleteCannotExceedRootLimitAndRollsBack() {
+        addRoot();
+        addRoot();
+        UUID pendingUser = addPendingRoot();
+
+        assertThrows(RootGovernanceConflictException.class, () -> transactions.execute(status -> {
+            completeInitialization(pendingUser);
+            return null;
+        }));
+
+        assertEquals(3L, repository.countEffectiveDevOpsUsers());
+        assertEquals("LOCKED", jdbc.queryForObject("SELECT status FROM spectra_core.sys_user WHERE id = ?",
+                String.class, pendingUser));
+        assertEquals(0L, assignmentCount(pendingUser));
+    }
+
+    @Test
+    void identityServiceKeepsTheLastRootIdentity() {
+        UUID identityId = jdbc.queryForObject("""
+                SELECT id FROM spectra_security.sec_authentication_identity WHERE user_id = ?
+                """, UUID.class, userId);
+        var service = identityService(identityId);
+
+        assertThrows(RootGovernanceConflictException.class, () -> transactions.execute(status -> {
+            service.revokeByUserIdAndId(userId, identityId);
+            return null;
+        }));
+
+        assertEquals("ACTIVE", identityState(identityId));
+        assertEquals(1L, repository.countEffectiveDevOpsUsers());
+    }
+
+    @Test
+    void identityServiceCanRevokeRedundantRootIdentity() {
+        UUID identityId = UUID.randomUUID();
+        jdbc.update("""
+                INSERT INTO spectra_security.sec_authentication_identity (id, user_id, method_code, provider_code, state)
+                VALUES (?, ?, 'SMS', 'LOCAL', 'ACTIVE')
+                """, identityId, userId);
+        var service = identityService(identityId);
+
+        transactions.execute(status -> {
+            service.revokeByUserIdAndId(userId, identityId);
+            return null;
+        });
+
+        assertEquals("REVOKED", identityState(identityId));
+        assertEquals(1L, repository.countEffectiveDevOpsUsers());
+    }
+
+    private AuthenticationIdentityServiceImpl identityService(UUID identityId) {
+        var mapper = mock(AuthenticationIdentityMapper.class);
+        var identity = new AuthenticationIdentity();
+        identity.setId(identityId);
+        identity.setUserId(userId);
+        identity.setState("ACTIVE");
+        when(mapper.selectOne(any())).thenReturn(identity);
+        when(mapper.updateById(any(AuthenticationIdentity.class))).thenAnswer(call -> {
+            AuthenticationIdentity changed = call.getArgument(0);
+            return jdbc.update("UPDATE spectra_security.sec_authentication_identity SET state = ? WHERE id = ?",
+                    changed.getState(), changed.getId());
+        });
+        return new AuthenticationIdentityServiceImpl(mapper, guard);
+    }
+
+    private String identityState(UUID identityId) {
+        return jdbc.queryForObject("SELECT state FROM spectra_security.sec_authentication_identity WHERE id = ?",
+                String.class, identityId);
+    }
+
+    private void completeInitialization(UUID pendingUser) {
+        UUID initializationId = UUID.randomUUID();
+        var state = new SystemState();
+        state.setState(SystemStateKeys.INITIALIZING);
+        state.setInitializationId(initializationId);
+        var stateMapper = mock(SystemStateMapper.class);
+        when(stateMapper.selectForUpdateByStateKey(SystemStateKeys.SYSTEM)).thenReturn(state);
+        when(stateMapper.updateById(any(SystemState.class))).thenReturn(1);
+
+        var user = new User();
+        user.setId(pendingUser);
+        user.setStatus(UserStatus.LOCKED);
+        var userMapper = mock(UserMapper.class);
+        when(userMapper.selectOne(any())).thenReturn(user);
+        when(userMapper.updateById(any(User.class))).thenAnswer(call -> {
+            User changed = call.getArgument(0);
+            return jdbc.update("UPDATE spectra_core.sys_user SET status = ? WHERE id = ?",
+                    changed.getStatus().getCode(), changed.getId());
+        });
+
+        UUID roleId = jdbc.queryForObject("SELECT id FROM spectra_security.sec_role LIMIT 1", UUID.class);
+        var role = new SecurityRole();
+        role.setId(roleId);
+        role.setCode("ROLE_DEV_OPS");
+        role.setState("ACTIVE");
+        var roleMapper = mock(SecurityRoleMapper.class);
+        when(roleMapper.selectOne(any())).thenReturn(role);
+        var assignmentMapper = mock(RoleAssignmentMapper.class);
+        when(assignmentMapper.insert(any(RoleAssignment.class))).thenAnswer(call -> {
+            RoleAssignment assignment = call.getArgument(0);
+            return jdbc.update("""
+                    INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id, state)
+                    VALUES (?, ?, ?, ?)
+                    """, UUID.randomUUID(), assignment.getUserId(), assignment.getRoleId(), assignment.getState());
+        });
+
+        var service = new SystemInitializationServiceImpl(stateMapper, userMapper, mock(ConfiguredService.class),
+                roleMapper, assignmentMapper, mock(AuthorizationAssignmentChangeService.class),
+                mock(AuthenticationIdentityService.class), mock(PasswordCredentialService.class),
+                mock(SystemInitializationTokenManager.class), mock(SecurityPasswordPolicyProvider.class),
+                mock(PasswordEncoder.class), jdbc, mock(SystemSecretInitializer.class), guard);
+        var request = new SystemInitializationCompleteFrom();
+        request.setInitializationId(initializationId.toString());
+        service.complete(request);
+    }
+
+    private UUID addPendingRoot() {
+        UUID pendingUser = UUID.randomUUID();
+        jdbc.update("INSERT INTO spectra_core.sys_user (id, status) VALUES (?, 'LOCKED')", pendingUser);
+        jdbc.update("""
+                INSERT INTO spectra_security.sec_authentication_identity (id, user_id, method_code, provider_code, state)
+                VALUES (?, ?, 'PASSWORD', 'LOCAL', 'ACTIVE')
+                """, UUID.randomUUID(), pendingUser);
+        jdbc.update("""
+                INSERT INTO spectra_security.sec_password_credential (id, user_id, password_hash, changed_at)
+                VALUES (?, ?, 'test-hash', CURRENT_TIMESTAMP)
+                """, UUID.randomUUID(), pendingUser);
+        return pendingUser;
+    }
+
+    private long assignmentCount(UUID target) {
+        return jdbc.queryForObject(
+                "SELECT COUNT(*) FROM spectra_security.sec_role_assignment WHERE user_id = ?", Long.class, target);
     }
 
     private boolean tryDisableAfter(CountDownLatch start, UUID target) throws InterruptedException {

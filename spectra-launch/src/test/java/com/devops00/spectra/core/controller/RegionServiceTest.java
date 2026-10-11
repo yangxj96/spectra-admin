@@ -56,7 +56,7 @@ import java.util.UUID;
 @EnabledIfEnvironmentVariable(named = "SPECTRA_REGION_IMPORT", matches = "true")
 @Tag("manual-integration")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@SpringBootTest(classes = RegionImportTestApplication.class)
+@SpringBootTest(classes = RegionImportTestApplication.class, properties = "spectra.test.region-import=true")
 public class RegionServiceTest {
 
     private static final int BATCH_SIZE = 500;

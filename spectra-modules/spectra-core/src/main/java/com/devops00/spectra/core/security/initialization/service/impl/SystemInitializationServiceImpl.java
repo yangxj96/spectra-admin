@@ -36,6 +36,7 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 import com.devops00.spectra.core.security.initialization.mapper.SystemStateMapper;
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
 import com.devops00.spectra.core.security.initialization.service.SystemSecretInitializer;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
@@ -80,6 +81,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
     private final SystemSecretInitializer systemSecretInitializer;
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
 
     @Override
     public SystemInitializationStatusVO status() {
@@ -141,10 +143,12 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         lockInitialization();
         SystemState state = loadState(true);
         validateInitialization(state, parseInitializationId(from.getInitializationId()));
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         User user = findLockedDevOpsUser();
         SecurityRole role = findDevOpsRole();
         activateUser(user);
         ensureRoleAssignment(user, role);
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
         authorizationAssignmentChangeService.ensureDefaultUserRole(user.getId());
         systemSecretInitializer.initialize();
         markInitialized(state, user.getId());
@@ -160,7 +164,9 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
 
     private User findLockedDevOpsUser() {
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getEmployeeNo, "DEV_OPS").eq(User::getStatus, UserStatus.LOCKED).last("LIMIT 1"));
+                .eq(User::getEmployeeNo, "DEV_OPS")
+                .eq(User::getStatus, UserStatus.LOCKED)
+                .last("LIMIT 1"));
         if (user == null || !UserStatus.LOCKED.equals(user.getStatus())) {
             throw new IllegalStateException("初始化用户状态无效");
         }
@@ -170,7 +176,8 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     private SecurityRole findDevOpsRole() {
         SecurityRole role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, DEV_OPS_ROLE)
-                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()).last("LIMIT 1"));
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name())
+                .last("LIMIT 1"));
         if (role == null) {
             throw new IllegalStateException("ROLE_DEV_OPS 种子不存在");
         }
@@ -186,8 +193,10 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
 
     private void ensureRoleAssignment(User user, SecurityRole role) {
         RoleAssignment assignment = roleAssignmentMapper.selectOne(new LambdaQueryWrapper<RoleAssignment>()
-                .eq(RoleAssignment::getUserId, user.getId()).eq(RoleAssignment::getRoleId, role.getId())
-                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()).last("LIMIT 1"));
+                .eq(RoleAssignment::getUserId, user.getId())
+                .eq(RoleAssignment::getRoleId, role.getId())
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())
+                .last("LIMIT 1"));
         if (assignment != null) {
             return;
         }

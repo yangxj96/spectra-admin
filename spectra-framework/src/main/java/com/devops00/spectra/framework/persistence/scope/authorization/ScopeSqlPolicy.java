@@ -61,16 +61,13 @@ public final class ScopeSqlPolicy {
      *
      * @param annotation        当前方法声明的数据权限配置。
      * @param mappedStatementId MyBatis mapped statement 标识，用于选择数据权限规则。
-     * @return 返回数据权限注解声明的权限策略编码；INSERT/CREATE 等无需读取权限的操作返回 null，缺失映射配置时抛出异常。
+     * @return 返回数据权限注解声明的权限策略编码；缺失映射配置时抛出异常。插入语句不经过数据范围的查询/更新拦截器。
      */
     public static String permissionFor(DataScope annotation, String mappedStatementId) {
         if (annotation == null) {
             throw new IllegalArgumentException("受保护 SQL 缺少 DataScope 策略");
         }
         String method = mappedStatementId == null ? "" : mappedStatementId.substring(mappedStatementId.lastIndexOf('.') + 1).toLowerCase();
-        if (method.contains("insert") || method.contains("create") || method.contains("add")) {
-            return null;
-        }
         if (method.contains("export")) {
             return required(annotation.exportPermission(), "exportPermission");
         }
@@ -242,7 +239,7 @@ public final class ScopeSqlPolicy {
     /**
      * 处理内部业务逻辑（{@code relationSubquery}）。
      */
-    private static Expression relationSubquery(Table ignored, DataScope.Relation relation, Expression where) {
+    private static Expression relationSubquery(Table table, DataScope.Relation relation, Expression where) {
         Table relationTable = new Table(relation.schema(), relation.table());
         PlainSelect select = new PlainSelect();
         select.addSelectItems(new Column(relationTable, relation.joinColumn()));
@@ -250,7 +247,7 @@ public final class ScopeSqlPolicy {
         select.setWhere(where);
         ParenthesedSelect subquery = new ParenthesedSelect();
         subquery.setSelect(select);
-        return new InExpression(new Column(relation.mainColumn()), subquery);
+        return new InExpression(new Column(table, relation.mainColumn()), subquery);
     }
 
     /**

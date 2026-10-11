@@ -24,6 +24,7 @@ import com.devops00.spectra.framework.persistence.mybatis.MetaObjectHandlerImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.quartz.autoconfigure.QuartzAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
@@ -41,6 +42,7 @@ import java.util.UUID;
  * @since 2026/09/13
  */
 @SpringBootConfiguration
+@ConditionalOnProperty(name = "spectra.test.region-import", havingValue = "true")
 @EnableAutoConfiguration(exclude = {
         CoreModule.class,
         FrameworkModule.class,

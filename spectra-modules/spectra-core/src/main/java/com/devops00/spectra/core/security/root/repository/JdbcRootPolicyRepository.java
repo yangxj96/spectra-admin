@@ -44,11 +44,15 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
     @Override
     public RootPolicy lock() {
         try {
-            return jdbcTemplate.queryForObject(
+            RootPolicy policy = jdbcTemplate.queryForObject(
                     "SELECT min_effective_dev_ops_users, max_dev_ops_users, version FROM " + TABLE
                             + " WHERE policy_key = ? AND deleted IS NULL FOR UPDATE",
                     (resultSet, _) -> new RootPolicy(resultSet.getInt(1), resultSet.getInt(2), resultSet.getLong(3)),
                     SINGLETON_KEY);
+            if (policy == null) {
+                throw new RootGovernanceException("Root 策略不可用，拒绝执行 Root 治理操作");
+            }
+            return policy;
         } catch (DataAccessException exception) {
             throw new RootGovernanceException("Root 策略不可用，拒绝执行 Root 治理操作", exception);
         }
@@ -117,7 +121,10 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
                                          - policy.max_age_days * INTERVAL '1 day'))
                       )
                     """, Long.class);
-            return count == null ? 0L : count;
+            if (count == null) {
+                throw new RootGovernanceException("无法核验有效 DEV_OPS 数量，拒绝执行 Root 治理操作");
+            }
+            return count;
         } catch (DataAccessException exception) {
             throw new RootGovernanceException("无法核验有效 DEV_OPS 数量，拒绝执行 Root 治理操作", exception);
         }

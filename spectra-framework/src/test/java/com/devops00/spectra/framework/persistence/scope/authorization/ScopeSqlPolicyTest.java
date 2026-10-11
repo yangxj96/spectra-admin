@@ -2,10 +2,15 @@ package com.devops00.spectra.framework.persistence.scope.authorization;
 
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.security.authorization.AuthorizationScope;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.common.security.authorization.PermissionBoundary;
 import com.devops00.spectra.common.security.authorization.ScopeMode;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.framework.persistence.scope.context.DataScopeEntityRegistry;
 import net.sf.jsqlparser.schema.Table;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -15,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ScopeSqlPolicyTest {
 
@@ -85,6 +92,42 @@ class ScopeSqlPolicyTest {
         assertEquals("1 = 0", expression.toString());
     }
 
+    @Test
+    void queryNamesContainingInsertCreateAndAddStillRequireReadPermission() {
+        var annotation = NamedOperationScopedRecord.class.getAnnotation(DataScope.class);
+
+        assertEquals("record:read", ScopeSqlPolicy.permissionFor(annotation, "example.Mapper.selectInsertedRows"));
+        assertEquals("record:read", ScopeSqlPolicy.permissionFor(annotation, "example.Mapper.selectCreatedBy"));
+        assertEquals("record:read", ScopeSqlPolicy.permissionFor(annotation, "example.Mapper.selectAdditionalRows"));
+        assertEquals("record:read", ScopeSqlPolicy.permissionFor(annotation, "example.Mapper.addedRowsQuery"));
+    }
+
+    @Test
+    void writeNamesContainingAddDoNotBypassScope() {
+        var annotation = NamedOperationScopedRecord.class.getAnnotation(DataScope.class);
+
+        assertEquals("record:write", ScopeSqlPolicy.permissionFor(annotation, "example.Mapper.updateAddress"));
+        assertEquals("record:write", ScopeSqlPolicy.permissionFor(annotation, "example.Mapper.deleteCreatedRecord"));
+    }
+
+    @Test
+    void mappedQueryAndWriteNamesWithCreateOrAddReachScopeInterceptor() {
+        var annotation = NamedOperationScopedRecord.class.getAnnotation(DataScope.class);
+        var registry = mock(DataScopeEntityRegistry.class);
+        when(registry.find("record")).thenReturn(annotation);
+        var securityContext = mock(SecurityContextAccessor.class);
+        when(securityContext.currentUserId()).thenReturn(UUID.randomUUID());
+        var beans = new StaticListableBeanFactory();
+        beans.addBean("snapshotProvider", (AuthorizationSnapshotProvider) ignored -> AuthorizationSnapshot.of(List.of()));
+        var interceptor = new DataScopeInnerInterceptor(beans.getBeanProvider(AuthorizationSnapshotProvider.class),
+                registry, securityContext);
+
+        assertEquals("1 = 0", interceptor.getSqlSegment(new Table("record"), null,
+                "example.Mapper.selectAdditionalRows").toString());
+        assertEquals("1 = 0", interceptor.getSqlSegment(new Table("record"), null,
+                "example.Mapper.updateAddress").toString());
+    }
+
     private static PermissionBoundary boundary(Set<UUID> departments, boolean descendants) {
         return boundary(departments, descendants, ScopeMode.RULES);
     }
@@ -110,6 +153,10 @@ class ScopeSqlPolicyTest {
     @DataScope(readPermission = "record:read", column = "department_id", relations = {
             @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id", departmentColumn = "department_id")})
     private static class RelationScopedRecord {
+    }
+
+    @DataScope(readPermission = "record:read", writePermission = "record:write")
+    private static class NamedOperationScopedRecord {
     }
 
     private static final DataScope RELATION_DATA_SCOPE = RelationScopedRecord.class.getAnnotation(DataScope.class);

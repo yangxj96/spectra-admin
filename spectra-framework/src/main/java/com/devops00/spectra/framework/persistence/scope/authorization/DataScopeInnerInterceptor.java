@@ -114,9 +114,6 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
             throw new DataScopeViolationException("授权快照提供者未配置，已拒绝访问");
         }
         String permission = ScopeSqlPolicy.permissionFor(annotation, mappedStatementId);
-        if (permission == null) {
-            return null;
-        }
         AuthorizationSnapshot snapshot = snapshotProvider.load(userId);
         if (snapshot.isRoot()) {
             return null;
