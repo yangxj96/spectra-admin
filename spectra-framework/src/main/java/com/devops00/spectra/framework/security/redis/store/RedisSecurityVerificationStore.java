@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.security.redis.store;
 
 import com.devops00.spectra.common.port.security.SecurityVerificationAttemptStore;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisExecutor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,6 +44,44 @@ public class RedisSecurityVerificationStore implements SecurityVerificationCodeS
             if current ~= false and current == ARGV[1] then
                 redis.call('DEL', KEYS[1])
                 return 1
+            end
+            return 0
+            """, Long.class);
+
+    private static final RedisScript<Long> CONSUME_WITH_BUDGET_SCRIPT = new DefaultRedisScript<>("""
+            local current = redis.call('GET', KEYS[1])
+            if current == false then
+                return 0
+            end
+            local codeTtl = redis.call('PTTL', KEYS[1])
+            if codeTtl <= 0 then
+                return redis.error_reply('verification code expiration unavailable')
+            end
+            local storedOwner = string.match(cjson.decode(current), '^([^:]+):')
+            local submittedOwner = string.match(cjson.decode(ARGV[1]), '^([^:]+):')
+            if storedOwner == nil or submittedOwner == nil then
+                return redis.error_reply('verification code owner unavailable')
+            end
+            if storedOwner ~= submittedOwner then
+                return 0
+            end
+            local attempts = redis.call('INCR', KEYS[2])
+            if attempts == 1 then
+                redis.call('PEXPIRE', KEYS[2], codeTtl)
+            elseif redis.call('PTTL', KEYS[2]) <= 0 then
+                return redis.error_reply('verification attempt expiration unavailable')
+            end
+            if attempts > tonumber(ARGV[2]) then
+                redis.call('DEL', KEYS[1], KEYS[2])
+                return -1
+            end
+            if current == ARGV[1] then
+                redis.call('DEL', KEYS[1], KEYS[2])
+                return 1
+            end
+            if attempts == tonumber(ARGV[2]) then
+                redis.call('DEL', KEYS[1], KEYS[2])
+                return -1
             end
             return 0
             """, Long.class);
@@ -95,6 +134,24 @@ public class RedisSecurityVerificationStore implements SecurityVerificationCodeS
         Long result = SecurityRedisExecutor.require("消费验证码",
                 () -> redis.execute(COMPARE_AND_DELETE_SCRIPT, List.of(key), expectedValue));
         return Long.valueOf(1L).equals(result);
+    }
+
+    @Override
+    public VerificationResult consumeWithinAttemptBudget(
+                                                         String key, String attemptsKey, String expectedValue, int maxAttempts) {
+        if (expectedValue == null || expectedValue.isBlank() || maxAttempts < 1) {
+            throw new IllegalArgumentException("验证码尝试预算参数无效");
+        }
+        Long result = SecurityRedisExecutor.require("核验绑定验证码",
+                () -> redis.execute(CONSUME_WITH_BUDGET_SCRIPT, List.of(key, attemptsKey), expectedValue,
+                        maxAttempts));
+        return switch (result.intValue()) {
+            case 1 -> VerificationResult.MATCHED;
+            case 0 -> VerificationResult.INVALID;
+            case -1 -> VerificationResult.EXHAUSTED;
+            default -> throw new SecurityRedisUnavailableException(
+                    "安全 Redis 返回未知验证码核验结果", null);
+        };
     }
 
     /**

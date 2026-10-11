@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -72,7 +74,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     @Override
     @Transactional
     public void bindPhone(UUID userId, String phone, String code) {
-        consumeBindingCode(RedisCacheKey.BIND_PHONE_CODE, phone, code);
+        consumeBindingCode(userId, RedisCacheKey.BIND_PHONE_CODE, phone, code);
         identityService.createIdentity(userId, LoginType.SMS.name(), phone);
         userContactService.upsertVerified(userId, UserContactService.PHONE, phone);
     }
@@ -80,7 +82,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     @Override
     @Transactional
     public void bindEmail(UUID userId, String email, String code) {
-        consumeBindingCode(RedisCacheKey.BIND_EMAIL_CODE, email, code);
+        consumeBindingCode(userId, RedisCacheKey.BIND_EMAIL_CODE, email, code);
         identityService.createIdentity(userId, LoginType.EMAIL.name(), email);
         userContactService.upsertVerified(userId, UserContactService.EMAIL, email);
     }
@@ -110,15 +112,20 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     /**
      * 更新或推进目标状态（{@code consumeBindingCode}）。
      */
-    private void consumeBindingCode(String prefix, String address, String code) {
+    private void consumeBindingCode(UUID userId, String prefix, String address, String code) {
+        Objects.requireNonNull(userId, "绑定用户不能为空");
         if (code == null || code.isBlank()) {
             throw new SpectraException("绑定验证码不能为空");
         }
         var key = prefix + address;
-        var digest = VerificationCodeDigest.digest(code, secretRuntimeService.requireActiveValue(
+        var expected = userId + ":" + VerificationCodeDigest.digest(code, secretRuntimeService.requireActiveValue(
                 "security.verification-code-hmac"));
-        if (!verificationCodeStore.compareAndDelete(key, digest)) {
-            throw new SpectraException("绑定验证码无效或已过期");
+        var result = verificationCodeStore.consumeWithinAttemptBudget(key, key + ":attempts", expected,
+                securityProperties.getVerificationCodeMaxAttempts());
+        if (result != SecurityVerificationCodeStore.VerificationResult.MATCHED) {
+            throw new KaptchaNotMatchException(result == SecurityVerificationCodeStore.VerificationResult.EXHAUSTED
+                    ? "绑定验证码尝试次数过多"
+                    : "绑定验证码无效或已过期");
         }
     }
 }

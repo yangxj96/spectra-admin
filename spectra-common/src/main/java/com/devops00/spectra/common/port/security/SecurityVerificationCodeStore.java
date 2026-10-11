@@ -36,6 +36,15 @@ public interface SecurityVerificationCodeStore {
     /** 仅在值匹配时原子删除验证码。 */
     boolean compareAndDelete(String key, String expectedValue);
 
+    /** 在同一原子操作中检查验证码、累计尝试并在耗尽时使验证码失效。 */
+    VerificationResult consumeWithinAttemptBudget(String key, String attemptsKey, String expectedValue, int maxAttempts);
+
+    enum VerificationResult {
+        MATCHED,
+        INVALID,
+        EXHAUSTED
+    }
+
     /** 删除验证码。 */
     void delete(String key);
 }

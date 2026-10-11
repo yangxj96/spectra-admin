@@ -141,7 +141,7 @@ public class AuthenticationController {
     @PostMapping(value = "/bind/sms", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public void sendBindingSms(@Validated @RequestBody SmsCodeFrom params) {
-        verificationCodeService.sendBindingSmsCode(params.getPhone());
+        verificationCodeService.sendBindingSmsCode(securityContextAccessor.currentUserId(), params.getPhone());
     }
 
     /**
@@ -152,7 +152,7 @@ public class AuthenticationController {
     @PostMapping(value = "/bind/email", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public void sendBindingEmail(@Validated @RequestBody EmailCodeFrom params) {
-        verificationCodeService.sendBindingEmailCode(params.getEmail());
+        verificationCodeService.sendBindingEmailCode(securityContextAccessor.currentUserId(), params.getEmail());
     }
 
     /**

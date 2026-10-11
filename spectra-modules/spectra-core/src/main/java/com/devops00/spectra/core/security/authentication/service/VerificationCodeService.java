@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.security.authentication.service;
 
+import java.util.UUID;
+
 /**
  * 认证验证码用例。
  *
@@ -42,14 +44,16 @@ public interface VerificationCodeService {
     /**
      * 发送绑定手机号验证码。
      *
-     * @param phone 待验证或匹配的手机号码。
+     * @param userId 发起绑定的已认证用户。
+     * @param phone  待验证或匹配的手机号码。
      */
-    void sendBindingSmsCode(String phone);
+    void sendBindingSmsCode(UUID userId, String phone);
 
     /**
      * 发送绑定邮箱验证码。
      *
-     * @param email 待验证或匹配的电子邮箱地址。
+     * @param userId 发起绑定的已认证用户。
+     * @param email  待验证或匹配的电子邮箱地址。
      */
-    void sendBindingEmailCode(String email);
+    void sendBindingEmailCode(UUID userId, String email);
 }

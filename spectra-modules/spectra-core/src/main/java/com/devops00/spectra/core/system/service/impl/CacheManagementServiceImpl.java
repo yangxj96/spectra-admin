@@ -336,7 +336,9 @@ public class CacheManagementServiceImpl implements CacheManagementService {
         return switch (type) {
             case LOGIN_SMS -> RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + target;
             case LOGIN_EMAIL -> RedisCacheKey.LOGIN_EMAIL_CODE_ATTEMPTS + target;
-            default -> throw new IllegalArgumentException("该验证码类型没有登录失败计数");
+            case BIND_PHONE -> RedisCacheKey.BIND_PHONE_CODE + target + ":attempts";
+            case BIND_EMAIL -> RedisCacheKey.BIND_EMAIL_CODE + target + ":attempts";
+            default -> throw new IllegalArgumentException("该验证码类型没有尝试计数");
         };
     }
 
@@ -344,6 +346,9 @@ public class CacheManagementServiceImpl implements CacheManagementService {
      * 判断尝试类型。
      */
     private static boolean isAttemptType(SecurityVerificationType type) {
-        return type == SecurityVerificationType.LOGIN_SMS || type == SecurityVerificationType.LOGIN_EMAIL;
+        return type == SecurityVerificationType.LOGIN_SMS
+                || type == SecurityVerificationType.LOGIN_EMAIL
+                || type == SecurityVerificationType.BIND_PHONE
+                || type == SecurityVerificationType.BIND_EMAIL;
     }
 }
