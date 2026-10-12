@@ -20,6 +20,7 @@ import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.BuiltinDataException;
+import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.domain.RoleAuthorizationState;
@@ -62,6 +63,7 @@ import com.devops00.spectra.common.security.authorization.RootAuthorizationPolic
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,10 +93,43 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChangeService {
 
+    private static final String SOFT_DELETE_ROLE_PERMISSION = """
+            UPDATE spectra_security.sec_role_permission
+            SET deleted = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
+                updated_by = ?, version = version + 1
+            WHERE role_id = ? AND deleted IS NULL
+            """;
+
+    private static final String SOFT_DELETE_GRANTABLE_PERMISSION = """
+            UPDATE spectra_security.sec_role_grantable_permission
+            SET deleted = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
+                updated_by = ?, version = version + 1
+            WHERE role_id = ? AND deleted IS NULL
+            """;
+
+    private static final String UPSERT_ROLE_PERMISSION = """
+            INSERT INTO spectra_security.sec_role_permission
+                (role_id, permission_id, created_by, updated_by) VALUES (?, ?, ?, ?)
+            ON CONFLICT (role_id, permission_id) DO UPDATE
+            SET deleted = NULL, updated_at = CURRENT_TIMESTAMP,
+                updated_by = EXCLUDED.updated_by,
+                version = sec_role_permission.version + 1
+            """;
+
+    private static final String UPSERT_GRANTABLE_PERMISSION = """
+            INSERT INTO spectra_security.sec_role_grantable_permission
+                (role_id, permission_id, created_by, updated_by) VALUES (?, ?, ?, ?)
+            ON CONFLICT (role_id, permission_id) DO UPDATE
+            SET deleted = NULL, updated_at = CURRENT_TIMESTAMP,
+                updated_by = EXCLUDED.updated_by,
+                version = sec_role_grantable_permission.version + 1
+            """;
+
     private final SecurityRoleMapper roleMapper;
     private final PermissionMapper permissionMapper;
     private final RolePermissionMapper rolePermissionMapper;
     private final RoleGrantablePermissionMapper roleGrantablePermissionMapper;
+    private final JdbcTemplate jdbc;
     private final RoleAssignmentMapper roleAssignmentMapper;
     private final JdbcRoleAssignmentBoundaryReconciler boundaryReconciler;
     private final UserMapper userMapper;
@@ -237,7 +272,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
         long expectedVersion = role.getVersion() == null ? 0L : role.getVersion();
         if (expectedVersion != from.getExpectedVersion()) {
-            throw new DataException("Role version 已变化，请重新生成授权变更预览");
+            throw new BusinessConflictException("Role version 已变化，请重新生成授权变更预览");
         }
         return expectedVersion;
     }
@@ -344,15 +379,12 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
                 .set(SecurityRole::getAuthorityLevel, prepared.after().authorityLevel())
                 .set(SecurityRole::getVersion, prepared.expectedVersion() + 1);
         if (roleMapper.update(null, roleUpdate) != 1) {
-            throw new DataException("Role version 并发变化，授权变更已拒绝");
+            throw new BusinessConflictException("Role version 并发变化，授权变更已拒绝");
         }
         var permissionIds = permissionIds(prepared.after().permissions());
         var grantableIds = permissionIds(prepared.after().grantablePermissions());
-        rolePermissionMapper.delete(new LambdaQueryWrapper<RolePermission>().eq(RolePermission::getRoleId, role.getId()));
-        roleGrantablePermissionMapper.delete(new LambdaQueryWrapper<RoleGrantablePermission>()
-                .eq(RoleGrantablePermission::getRoleId, role.getId()));
-        insertRolePermissions(role.getId(), permissionIds, false);
-        insertRolePermissions(role.getId(), grantableIds, true);
+        replaceRolePermissions(role.getId(), permissionIds, false, prepared.operatorId());
+        replaceRolePermissions(role.getId(), grantableIds, true, prepared.operatorId());
         boundaryReconciler.reconcile(role.getId());
         for (var userId : affectedUserIds(role.getId())) {
             var user = userMapper.selectById(userId);
@@ -383,20 +415,18 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     }
 
     /**
-     * 处理内部业务逻辑（{@code insertRolePermissions}）。
+     * 复用角色权限关系的唯一键；撤销后重新授予时恢复原行。
      */
-    private void insertRolePermissions(UUID roleId, Set<UUID> permissionIds, boolean grantable) {
-        for (var permissionId : permissionIds) {
-            if (grantable) {
-                var row = new RoleGrantablePermission();
-                row.setRoleId(roleId);
-                row.setPermissionId(permissionId);
-                roleGrantablePermissionMapper.insert(row);
-            } else {
-                var row = new RolePermission();
-                row.setRoleId(roleId);
-                row.setPermissionId(permissionId);
-                rolePermissionMapper.insert(row);
+    private void replaceRolePermissions(UUID roleId, Set<UUID> permissionIds, boolean grantable, UUID operatorId) {
+        if (grantable) {
+            jdbc.update(SOFT_DELETE_GRANTABLE_PERMISSION, operatorId, roleId);
+            for (var permissionId : permissionIds) {
+                jdbc.update(UPSERT_GRANTABLE_PERMISSION, roleId, permissionId, operatorId, operatorId);
+            }
+        } else {
+            jdbc.update(SOFT_DELETE_ROLE_PERMISSION, operatorId, roleId);
+            for (var permissionId : permissionIds) {
+                jdbc.update(UPSERT_ROLE_PERMISSION, roleId, permissionId, operatorId, operatorId);
             }
         }
     }
