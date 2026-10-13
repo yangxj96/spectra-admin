@@ -17,7 +17,15 @@
 package com.devops00.spectra.core.security.root;
 
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.exception.BusinessConflictException;
+import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
+import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
+import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
+import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.launch.LaunchApplication;
 import org.junit.jupiter.api.Test;
@@ -33,9 +41,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.SecureRandom;
+import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -97,7 +111,9 @@ class RootGovernanceFullHttpTest {
                     assertEquals(1L, List.of(firstResult.statusCode(), secondResult.statusCode())
                             .stream()
                             .filter(status -> status == 200)
-                            .count());
+                            .count(),
+                            "concurrent role removal statuses: "
+                                    + firstResult.statusCode() + ", " + secondResult.statusCode());
                     assertEquals(1L, List.of(firstResult.statusCode(), secondResult.statusCode())
                             .stream()
                             .filter(status -> status == 409)
@@ -269,6 +285,128 @@ class RootGovernanceFullHttpTest {
         }
     }
 
+    @Test
+    void identityUnbindPreservesLastRootAndAllowsRedundantLocalIdentityRemoval() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
+                        "--spectra.security.secret.master-key=" + randomTestSecret())) {
+            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
+                    application.getBean(PasswordEncoder.class));
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            var identities = application.getBean(AuthenticationIdentityService.class);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            var verificationCodes = application.getBean(SecurityVerificationCodeStore.class);
+            var secrets = application.getBean(SecretRuntimeService.class);
+            var secretManagement = application.getBean(SecretManagementService.class);
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            ObjectMapper mapper = application.getBean(ObjectMapper.class);
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                String email = fixture.operator.username() + "@example.test";
+                UUID secretVersionId = null;
+                try {
+                    assertEquals(0L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(0L, fixture.activeSecretCount("security.verification-code-hmac"));
+                    secretVersionId = secretManagement.createPending("security.verification-code-hmac",
+                            randomTestSecret(), "GENERATED").getId();
+                    secretManagement.publish(secretVersionId);
+                    fixture.insertRoot(fixture.operator);
+                    UUID localEmailId = identities.createIdentity(fixture.operator.id(), "EMAIL", email).getId();
+                    fixture.insertExternalIdentity(fixture.operator);
+                    identities.revokeByUserIdAndMethod(fixture.operator.id(), "PASSWORD");
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    String operatorToken = loginByEmail(client, port, mapper, verificationCodes, secrets, email);
+
+                    assertConflict(unbind(client, port, operatorToken, localEmailId), mapper);
+                    assertEquals("ACTIVE", fixture.identityState(localEmailId));
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(200, context(client, port, operatorToken).statusCode());
+
+                    identities.updatePasswordIdentifier(fixture.operator.id(), fixture.operator.username());
+                    assertEquals(200, unbind(client, port, operatorToken, localEmailId).statusCode());
+                    assertEquals("REVOKED", fixture.identityState(localEmailId));
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(401, context(client, port, operatorToken).statusCode());
+                } finally {
+                    try {
+                        revocation.revokeUserSessions(fixture.operator.id());
+                    } finally {
+                        verificationCodes.delete(RedisCacheKey.LOGIN_EMAIL_CODE + email);
+                        verificationCodes.delete(RedisCacheKey.LOGIN_EMAIL_CODE_ATTEMPTS + email);
+                        try {
+                            fixture.clean();
+                        } finally {
+                            if (secretVersionId != null) {
+                                fixture.deleteSecretVersion(secretVersionId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    void concurrentUnbindsKeepOneIdentityForOrdinaryUser() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
+                    application.getBean(PasswordEncoder.class));
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            var identities = application.getBean(AuthenticationIdentityService.class);
+            var binding = application.getBean(AuthenticationIdentityBindingService.class);
+            try {
+                assertEquals(0L, rootPolicy.countEffectiveDevOpsUsers());
+                fixture.insertRoot(fixture.operator);
+                fixture.insertRoot(fixture.firstTarget);
+                fixture.removeRootAssignment(fixture.firstTarget);
+                UUID emailId = identities.createIdentity(fixture.firstTarget.id(), "EMAIL",
+                        fixture.firstTarget.username() + "@example.test").getId();
+                UUID smsId = identities.createIdentity(fixture.firstTarget.id(), "SMS",
+                        "138" + fixture.firstTarget.id().toString().replace("-", "").substring(0, 8)).getId();
+                identities.revokeByUserIdAndMethod(fixture.firstTarget.id(), "PASSWORD");
+                assertEquals(2L, fixture.activeIdentityCount(fixture.firstTarget));
+                assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+
+                var start = new CountDownLatch(1);
+                try (var workers = Executors.newFixedThreadPool(2)) {
+                    var first = workers.submit(() -> tryUnbind(start, binding, fixture.firstTarget.id(), emailId));
+                    var second = workers.submit(() -> tryUnbind(start, binding, fixture.firstTarget.id(), smsId));
+                    start.countDown();
+                    assertEquals(1L, List.of(first.get(20, TimeUnit.SECONDS), second.get(20, TimeUnit.SECONDS))
+                            .stream()
+                            .filter(Boolean::booleanValue)
+                            .count());
+                }
+                assertEquals(1L, fixture.activeIdentityCount(fixture.firstTarget));
+                assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+            } finally {
+                fixture.clean();
+            }
+        }
+    }
+
+    private static boolean tryUnbind(CountDownLatch start, AuthenticationIdentityBindingService binding,
+                                     UUID userId, UUID identityId)
+            throws InterruptedException {
+        start.await();
+        try {
+            binding.unbind(userId, identityId);
+            return true;
+        } catch (BusinessConflictException exception) {
+            return false;
+        }
+    }
+
+    private static String randomTestSecret() {
+        byte[] bytes = new byte[32];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
     private static void requireIsolatedDependencies() {
         String url = System.getenv("DB_URL");
         if (url == null || !url.matches("^jdbc:postgresql://[^/]+/devops00_spectra_db_test(?:\\?.*)?$")) {
@@ -294,9 +432,41 @@ class RootGovernanceFullHttpTest {
         return token;
     }
 
+    private static String loginByEmail(HttpClient client, int port, ObjectMapper mapper,
+                                       SecurityVerificationCodeStore verificationCodes, SecretRuntimeService secrets,
+                                       String email)
+            throws Exception {
+        String code = "214365";
+        verificationCodes.save(RedisCacheKey.LOGIN_EMAIL_CODE + email,
+                VerificationCodeDigest.digest(code, secrets.requireActiveValue("security.verification-code-hmac")),
+                Duration.ofMinutes(5));
+        var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/security/authentication/login"))
+                .header("Api-Version", "1.0.0")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
+                        "type", "EMAIL", "username", email, "email_code", code))))
+                .build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+        String token = mapper.readTree(response.body()).path("data").path("access_token").asText();
+        assertFalse(token.isBlank());
+        return token;
+    }
+
     private static HttpResponse<String> disable(HttpClient client, int port, String token, UUID userId)
             throws Exception {
         return client.send(disableRequest(port, token, userId), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static HttpResponse<String> unbind(HttpClient client, int port, String token, UUID identityId)
+            throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/security/identities/" + identityId))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .DELETE()
+                .build(), HttpResponse.BodyHandlers.ofString());
     }
 
     private static HttpRequest disableRequest(int port, String token, UUID userId) {
@@ -396,6 +566,38 @@ class RootGovernanceFullHttpTest {
         private String assignmentState(TestUser user) {
             return jdbc.queryForObject("SELECT state FROM spectra_security.sec_role_assignment "
                     + "WHERE user_id = ? AND role_id = ?", String.class, user.id(), rootRole);
+        }
+
+        private void removeRootAssignment(TestUser user) {
+            jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE user_id = ?", user.id());
+        }
+
+        private void insertExternalIdentity(TestUser user) {
+            jdbc.update("INSERT INTO spectra_security.sec_authentication_identity "
+                    + "(user_id, method_code, provider_code, identifier_hash) VALUES (?, 'EMAIL', 'EXTERNAL', ?)",
+                    user.id(), AuthenticationIdentifierHash.digest(user.username() + ".external@example.test"));
+        }
+
+        private String identityState(UUID identityId) {
+            return jdbc.queryForObject("SELECT state FROM spectra_security.sec_authentication_identity WHERE id = ?",
+                    String.class, identityId);
+        }
+
+        private long activeIdentityCount(TestUser user) {
+            return jdbc.queryForObject("SELECT count(*) FROM spectra_security.sec_authentication_identity "
+                    + "WHERE user_id = ? AND state = 'ACTIVE'", Long.class, user.id());
+        }
+
+        private long activeSecretCount(String code) {
+            return jdbc.queryForObject("SELECT count(*) FROM spectra_security.sec_secret_version version "
+                    + "JOIN spectra_security.sec_secret_definition definition "
+                    + "ON definition.id = version.secret_definition_id "
+                    + "WHERE definition.code = ? AND version.state = 'ACTIVE' AND version.deleted IS NULL",
+                    Long.class, code);
+        }
+
+        private void deleteSecretVersion(UUID versionId) {
+            jdbc.update("DELETE FROM spectra_security.sec_secret_version WHERE id = ?", versionId);
         }
 
         private long defaultRoleCount(TestUser user) {

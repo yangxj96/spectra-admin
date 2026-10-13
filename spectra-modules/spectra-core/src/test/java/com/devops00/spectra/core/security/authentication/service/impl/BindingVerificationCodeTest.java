@@ -17,11 +17,13 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
+import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -153,6 +155,7 @@ class BindingVerificationCodeTest {
     }
 
     private AuthenticationIdentityBindingServiceImpl bindingService() {
-        return new AuthenticationIdentityBindingServiceImpl(codes, properties, secrets, identities, contacts);
+        return new AuthenticationIdentityBindingServiceImpl(codes, properties, secrets, identities, contacts,
+                mock(LastEffectiveDevOpsGuard.class), mock(SecuritySessionRevocationPort.class));
     }
 }

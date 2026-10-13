@@ -17,14 +17,17 @@
 package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
+import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
@@ -66,6 +69,10 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
 
     private final UserContactService userContactService;
 
+    private final LastEffectiveDevOpsGuard lastEffectiveDevOpsGuard;
+
+    private final SecuritySessionRevocationPort sessionRevocationPort;
+
     @Override
     public List<AuthenticationIdentity> listByUserId(UUID userId) {
         return identityService.listByUserId(userId);
@@ -90,6 +97,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     @Override
     @Transactional
     public void unbind(UUID userId, UUID identityId) {
+        lastEffectiveDevOpsGuard.lockForChange();
         var identities = identityService.listByUserId(userId);
         var identity = identities.stream()
                 .filter(item -> identityId.equals(item.getId()))
@@ -99,7 +107,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
             throw new SpectraException("密码认证身份不允许解绑");
         }
         if (identities.stream().filter(item -> STATE_ACTIVE.equals(item.getState())).count() <= 1) {
-            throw new SpectraException("至少需要保留一个认证身份");
+            throw new BusinessConflictException("至少需要保留一个认证身份");
         }
         identityService.revokeByUserIdAndId(userId, identityId);
         if (LoginType.SMS.name().equals(identity.getMethodCode())) {
@@ -107,6 +115,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
         } else if (LoginType.EMAIL.name().equals(identity.getMethodCode())) {
             userContactService.revokeByUserIdAndType(userId, UserContactService.EMAIL);
         }
+        sessionRevocationPort.revokeUserSessions(userId);
     }
 
     /**

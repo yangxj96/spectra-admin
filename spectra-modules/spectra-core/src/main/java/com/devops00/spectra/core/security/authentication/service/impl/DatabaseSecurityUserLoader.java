@@ -31,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -80,15 +81,22 @@ public class DatabaseSecurityUserLoader implements SecurityUserLoader {
         if (user == null || user.getUsername() == null) {
             return null;
         }
-        AuthenticationIdentity identity = authenticationIdentityService.findPasswordIdentity(user.getUsername());
         PasswordCredential credential = passwordCredentialService.getByUserId(userId);
-        if (identity == null || credential == null) {
+        if (credential == null) {
             return null;
         }
-        try {
-            return securityUserAssembler.toSecurityUser(LoginType.PASSWORD, identity, credential, user);
-        } catch (RuntimeException exception) {
-            return null;
+        List<AuthenticationIdentity> identities = authenticationIdentityService.listByUserId(userId);
+        for (LoginType type : List.of(LoginType.PASSWORD, LoginType.EMAIL, LoginType.SMS)) {
+            for (AuthenticationIdentity identity : identities) {
+                if ("LOCAL".equals(identity.getProviderCode()) && type.name().equals(identity.getMethodCode())) {
+                    try {
+                        return securityUserAssembler.toSecurityUser(type, identity, credential, user);
+                    } catch (RuntimeException exception) {
+                        return null;
+                    }
+                }
+            }
         }
+        return null;
     }
 }
