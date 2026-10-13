@@ -217,6 +217,58 @@ class RootGovernanceFullHttpTest {
         }
     }
 
+    @Test
+    void missingDefaultRoleDoesNotRevokeSessionBeforeRejectedRootRemoval() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
+                    application.getBean(PasswordEncoder.class));
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            ObjectMapper mapper = application.getBean(ObjectMapper.class);
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                try {
+                    assertEquals(0L, rootPolicy.countEffectiveDevOpsUsers());
+                    fixture.insertDepartment();
+                    fixture.insertRoot(fixture.operator);
+                    fixture.attachDepartment(fixture.operator);
+                    String operatorToken = login(client, port, mapper, fixture.operator);
+                    assertEquals(0L, fixture.defaultRoleCount(fixture.operator));
+
+                    assertConflict(client.send(removeRoleRequest(port, operatorToken, fixture, fixture.operator,
+                            mapper), HttpResponse.BodyHandlers.ofString()), mapper);
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals("ACTIVE", fixture.assignmentState(fixture.operator));
+                    assertEquals(0L, fixture.defaultRoleCount(fixture.operator));
+                    assertEquals(200, context(client, port, operatorToken).statusCode());
+
+                    fixture.insertRoot(fixture.firstTarget);
+                    fixture.attachDepartment(fixture.firstTarget);
+                    String targetToken = login(client, port, mapper, fixture.firstTarget);
+                    assertEquals(0L, fixture.defaultRoleCount(fixture.firstTarget));
+                    assertEquals(200, client.send(removeRoleRequest(port, operatorToken, fixture,
+                            fixture.firstTarget, mapper), HttpResponse.BodyHandlers.ofString()).statusCode());
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals("REVOKED", fixture.assignmentState(fixture.firstTarget));
+                    assertEquals(1L, fixture.defaultRoleCount(fixture.firstTarget));
+                    assertEquals(401, context(client, port, targetToken).statusCode());
+                    assertEquals(200, context(client, port, operatorToken).statusCode());
+                } finally {
+                    try {
+                        for (var user : fixture.users()) {
+                            revocation.revokeUserSessions(user.id());
+                        }
+                    } finally {
+                        fixture.clean();
+                    }
+                }
+            }
+        }
+    }
+
     private static void requireIsolatedDependencies() {
         String url = System.getenv("DB_URL");
         if (url == null || !url.matches("^jdbc:postgresql://[^/]+/devops00_spectra_db_test(?:\\?.*)?$")) {
@@ -344,6 +396,13 @@ class RootGovernanceFullHttpTest {
         private String assignmentState(TestUser user) {
             return jdbc.queryForObject("SELECT state FROM spectra_security.sec_role_assignment "
                     + "WHERE user_id = ? AND role_id = ?", String.class, user.id(), rootRole);
+        }
+
+        private long defaultRoleCount(TestUser user) {
+            return jdbc.queryForObject("SELECT count(*) FROM spectra_security.sec_role_assignment assignment "
+                    + "JOIN spectra_security.sec_role role ON role.id = assignment.role_id "
+                    + "WHERE assignment.user_id = ? AND role.code = 'ROLE_USER' AND assignment.state = 'ACTIVE'",
+                    Long.class, user.id());
         }
 
         private String status(UUID userId) {

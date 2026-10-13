@@ -111,6 +111,9 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 previousPrimaryDepartmentId, previousAssociatedIds, userParams.getPrimaryDepartmentId(),
                 userParams.getAssociatedDepartmentIds()));
         submitAuthorization(user.getId(), params.getAuthorization());
+        if (previous != null) {
+            assignmentChangeService.ensureDefaultUserRole(user.getId());
+        }
         return user;
     }
 

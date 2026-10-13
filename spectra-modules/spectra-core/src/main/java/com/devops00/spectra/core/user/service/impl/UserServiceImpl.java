@@ -267,8 +267,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!defaultAccountUpdateFlag) {
             authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getUsername());
         }
-        authorizationAssignmentChangeService.ensureDefaultUserRole(entity.getId());
-
     }
 
     @Override
