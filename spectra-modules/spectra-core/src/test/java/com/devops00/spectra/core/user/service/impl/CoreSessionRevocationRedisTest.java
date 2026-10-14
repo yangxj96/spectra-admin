@@ -24,6 +24,7 @@ import com.devops00.spectra.common.security.policy.SessionPolicy;
 import com.devops00.spectra.core.audit.AuditRecordFactory;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
+import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import com.devops00.spectra.core.system.javabean.from.SecuritySessionRevokeFrom;
 import com.devops00.spectra.core.system.service.impl.CacheManagementServiceImpl;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -211,6 +212,7 @@ class CoreSessionRevocationRedisTest {
         when(encoder.matches("new-pass-2", "old-hash")).thenReturn(false);
         when(encoder.encode("new-pass-2")).thenReturn("new-hash");
         ReflectionTestUtils.setField(service, "passwordCredentialService", credentials);
+        ReflectionTestUtils.setField(service, "lastEffectiveDevOpsGuard", mock(LastEffectiveDevOpsGuard.class));
         ReflectionTestUtils.setField(service, "passwordEncoder", encoder);
         ReflectionTestUtils.setField(service, "securityPasswordPolicyProvider",
                 (com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider) () -> new PasswordPolicy(8, false, false, false, false,

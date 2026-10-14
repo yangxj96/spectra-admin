@@ -24,26 +24,35 @@ import com.devops00.spectra.core.security.authentication.identity.Authentication
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.secret.service.SecretManagementService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
+import com.devops00.spectra.framework.security.redis.key.SecurityRedisNamespace;
 import com.devops00.spectra.launch.LaunchApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.server.context.WebServerApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 使用正式 HTTP、MyBatis、PostgreSQL 和 Redis Session 验证最后有效 Root 保护。
@@ -65,13 +75,237 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class RootGovernanceFullHttpTest {
 
     @Test
+    void concurrentRootCredentialExpiryKeepsOneEffectiveRoot() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var encoder = application.getBean(PasswordEncoder.class);
+            var fixture = newFixture(application);
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            var credentials = application.getBean(PasswordCredentialService.class);
+            try {
+                assertEquals(0L, rootPolicy.countEffectiveDevOpsUsers());
+                fixture.insertRoot(fixture.firstTarget);
+                fixture.insertRoot(fixture.secondTarget);
+                assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                Instant expiredAt = Instant.now().minusSeconds(10);
+                String firstHash = encoder.encode(randomTestPassword());
+                String secondHash = encoder.encode(randomTestPassword());
+                var start = new CountDownLatch(1);
+                try (var workers = Executors.newFixedThreadPool(2)) {
+                    var first = workers.submit(() -> tryExpireCredential(start, credentials,
+                            fixture.firstTarget.id(), firstHash, expiredAt));
+                    var second = workers.submit(() -> tryExpireCredential(start, credentials,
+                            fixture.secondTarget.id(), secondHash, expiredAt));
+                    start.countDown();
+                    assertEquals(1L, List.of(first.get(20, TimeUnit.SECONDS), second.get(20, TimeUnit.SECONDS))
+                            .stream()
+                            .filter(Boolean::booleanValue)
+                            .count());
+                }
+                assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                assertEquals(1L, jdbc.queryForObject("SELECT count(*) FROM "
+                        + "spectra_security.sec_password_credential WHERE user_id IN (?, ?) "
+                        + "AND expires_at IS NOT NULL", Long.class, fixture.firstTarget.id(),
+                        fixture.secondTarget.id()));
+            } finally {
+                fixture.clean();
+            }
+        }
+    }
+
+    private static boolean tryExpireCredential(CountDownLatch start, PasswordCredentialService credentials,
+                                               UUID userId, String hash, Instant expiredAt)
+            throws InterruptedException {
+        start.await();
+        try {
+            credentials.updatePassword(userId, hash, false, expiredAt);
+            return true;
+        } catch (RootGovernanceConflictException exception) {
+            return false;
+        }
+    }
+
+    @Test
+    void expiredCredentialCanBeResetAndChangedWithSessionRevocation() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var encoder = application.getBean(PasswordEncoder.class);
+            var fixture = newFixture(application);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            var assignments = application.getBean(AuthorizationAssignmentChangeService.class);
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            ObjectMapper mapper = application.getBean(ObjectMapper.class);
+            String resetPassword = randomTestPassword();
+            String changedPassword = randomTestPassword();
+            String resetHash = encoder.encode(resetPassword);
+            boolean configuredPassword = false;
+            boolean configuredMaxAge = false;
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                try {
+                    assertEquals(0L, rootPolicy.countEffectiveDevOpsUsers());
+                    fixture.insertDepartment();
+                    fixture.insertRoot(fixture.operator);
+                    fixture.attachDepartment(fixture.operator);
+                    fixture.insertRoot(fixture.firstTarget);
+                    fixture.removeRootAssignment(fixture.firstTarget);
+                    fixture.attachDepartment(fixture.firstTarget);
+                    assignments.ensureDefaultUserRole(fixture.firstTarget.id());
+                    String operatorToken = login(client, port, mapper, fixture.operator);
+                    String oldToken = login(client, port, mapper, fixture.firstTarget);
+                    configuredMaxAge = jdbc.update("UPDATE spectra_security.sec_password_policy "
+                            + "SET max_age_days = 1 WHERE policy_key = 'SYSTEM' AND max_age_days IS NULL") == 1;
+                    assertTrue(configuredMaxAge, "expected the isolated test password policy");
+                    jdbc.update("UPDATE spectra_security.sec_password_credential "
+                            + "SET changed_at = statement_timestamp() - INTERVAL '2 days' WHERE user_id = ?",
+                            fixture.firstTarget.id());
+                    assertEquals(401, context(client, port, oldToken).statusCode());
+                    assertEquals(401, passwordLogin(client, port, mapper, fixture.firstTarget.username(),
+                            fixture.firstTarget.password()).statusCode());
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+
+                    configuredPassword = jdbc.update("UPDATE spectra_core.sys_config SET value = ? "
+                            + "WHERE key = 'user.default-password' AND value = ''", resetHash) == 1;
+                    assertTrue(configuredPassword, "expected the isolated test default password setting");
+                    assertEquals(200, client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                            + "/api/user/password/reset/" + fixture.firstTarget.id()))
+                            .header("Api-Version", "1.0.0")
+                            .header("Authorization", "Bearer " + operatorToken)
+                            .PUT(HttpRequest.BodyPublishers.noBody())
+                            .build(),
+                            HttpResponse.BodyHandlers.ofString()).statusCode());
+                    assertEquals(401, context(client, port, oldToken).statusCode());
+                    assertEquals(Boolean.TRUE, jdbc.queryForObject("SELECT must_change FROM "
+                            + "spectra_security.sec_password_credential WHERE user_id = ?", Boolean.class,
+                            fixture.firstTarget.id()));
+                    String resetToken = loginWithPassword(client, port, mapper, fixture.firstTarget.username(),
+                            resetPassword);
+                    var restricted = context(client, port, resetToken);
+                    assertEquals(403, restricted.statusCode());
+                    assertEquals(403, mapper.readTree(restricted.body()).path("code").asInt());
+                    assertEquals(200, client.send(changePasswordRequest(port, resetToken, mapper, resetPassword,
+                            changedPassword), HttpResponse.BodyHandlers.ofString()).statusCode());
+                    assertEquals(401, context(client, port, resetToken).statusCode());
+                    String newToken = loginWithPassword(client, port, mapper, fixture.firstTarget.username(),
+                            changedPassword);
+                    assertEquals(200, context(client, port, newToken).statusCode());
+                    assertEquals(Boolean.FALSE, jdbc.queryForObject("SELECT must_change FROM "
+                            + "spectra_security.sec_password_credential WHERE user_id = ?", Boolean.class,
+                            fixture.firstTarget.id()));
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                } finally {
+                    try {
+                        for (var user : fixture.users()) {
+                            revocation.revokeUserSessions(user.id());
+                        }
+                    } finally {
+                        if (configuredPassword) {
+                            jdbc.update("UPDATE spectra_core.sys_config SET value = '' "
+                                    + "WHERE key = 'user.default-password' AND value = ?", resetHash);
+                        }
+                        if (configuredMaxAge) {
+                            jdbc.update("UPDATE spectra_security.sec_password_policy SET max_age_days = NULL "
+                                    + "WHERE policy_key = 'SYSTEM' AND max_age_days = 1");
+                        }
+                        fixture.clean();
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    void concurrentPasswordChangesCannotBothUseTheSameOldPassword() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            DataSource dataSource = application.getBean(DataSource.class);
+            var jdbc = new JdbcTemplate(dataSource);
+            var fixture = newFixture(application);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            var assignments = application.getBean(AuthorizationAssignmentChangeService.class);
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            ObjectMapper mapper = application.getBean(ObjectMapper.class);
+            String firstPassword = randomTestPassword();
+            String secondPassword = randomTestPassword();
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                try {
+                    fixture.insertRoot(fixture.operator);
+                    fixture.insertRoot(fixture.firstTarget);
+                    fixture.removeRootAssignment(fixture.firstTarget);
+                    assignments.ensureDefaultUserRole(fixture.firstTarget.id());
+                    String token = login(client, port, mapper, fixture.firstTarget);
+                    HttpResponse<String> firstResult;
+                    HttpResponse<String> secondResult;
+                    try (Connection blocker = dataSource.getConnection()) {
+                        blocker.setAutoCommit(false);
+                        try (var lock = blocker.prepareStatement("SELECT policy_key FROM "
+                                + "spectra_security.sec_root_policy WHERE policy_key = 'SYSTEM' FOR UPDATE")) {
+                            lock.executeQuery().close();
+                        }
+                        try {
+                            var first = client.sendAsync(changePasswordRequest(port, token, mapper,
+                                    fixture.firstTarget.password(), firstPassword),
+                                    HttpResponse.BodyHandlers.ofString());
+                            var second = client.sendAsync(changePasswordRequest(port, token, mapper,
+                                    fixture.firstTarget.password(), secondPassword),
+                                    HttpResponse.BodyHandlers.ofString());
+                            awaitTwoPasswordChangesBlocked(jdbc);
+                            blocker.commit();
+                            firstResult = first.get(20, TimeUnit.SECONDS);
+                            secondResult = second.get(20, TimeUnit.SECONDS);
+                        } finally {
+                            blocker.rollback();
+                        }
+                    }
+                    assertEquals(1L, List.of(firstResult.statusCode(), secondResult.statusCode())
+                            .stream()
+                            .filter(status -> status == 200)
+                            .count());
+                    assertEquals(1L, List.of(firstResult.statusCode(), secondResult.statusCode())
+                            .stream()
+                            .filter(status -> status == 400 || status == 401)
+                            .count());
+                    assertEquals(401, context(client, port, token).statusCode());
+                    int firstLogin = passwordLogin(client, port, mapper, fixture.firstTarget.username(),
+                            firstPassword).statusCode();
+                    int secondLogin = passwordLogin(client, port, mapper, fixture.firstTarget.username(),
+                            secondPassword).statusCode();
+                    assertEquals(1L, List.of(firstLogin, secondLogin)
+                            .stream()
+                            .filter(status -> status == 200)
+                            .count());
+                    assertEquals(1L, List.of(firstLogin, secondLogin)
+                            .stream()
+                            .filter(status -> status == 401)
+                            .count());
+                } finally {
+                    try {
+                        for (var user : fixture.users()) {
+                            revocation.revokeUserSessions(user.id());
+                        }
+                    } finally {
+                        fixture.clean();
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     void concurrentDisablesPreserveLastRootAndRevokeOnlyCommittedSessions() throws Exception {
         requireIsolatedDependencies();
         try (var application = new SpringApplicationBuilder(LaunchApplication.class)
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
-            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
-                    application.getBean(PasswordEncoder.class));
+            var fixture = newFixture(application);
             var rootPolicy = application.getBean(RootPolicyRepository.class);
             var revocation = application.getBean(SecuritySessionRevocationPort.class);
             int port = ((WebServerApplicationContext) application).getWebServer().getPort();
@@ -156,8 +390,7 @@ class RootGovernanceFullHttpTest {
         try (var application = new SpringApplicationBuilder(LaunchApplication.class)
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
-            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
-                    application.getBean(PasswordEncoder.class));
+            var fixture = newFixture(application);
             var rootPolicy = application.getBean(RootPolicyRepository.class);
             var revocation = application.getBean(SecuritySessionRevocationPort.class);
             var assignmentChanges = application.getBean(AuthorizationAssignmentChangeService.class);
@@ -239,8 +472,7 @@ class RootGovernanceFullHttpTest {
         try (var application = new SpringApplicationBuilder(LaunchApplication.class)
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
-            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
-                    application.getBean(PasswordEncoder.class));
+            var fixture = newFixture(application);
             var rootPolicy = application.getBean(RootPolicyRepository.class);
             var revocation = application.getBean(SecuritySessionRevocationPort.class);
             int port = ((WebServerApplicationContext) application).getWebServer().getPort();
@@ -292,8 +524,7 @@ class RootGovernanceFullHttpTest {
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
                         "--spectra.security.secret.master-key=" + randomTestSecret())) {
-            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
-                    application.getBean(PasswordEncoder.class));
+            var fixture = newFixture(application);
             var rootPolicy = application.getBean(RootPolicyRepository.class);
             var identities = application.getBean(AuthenticationIdentityService.class);
             var revocation = application.getBean(SecuritySessionRevocationPort.class);
@@ -353,8 +584,7 @@ class RootGovernanceFullHttpTest {
         try (var application = new SpringApplicationBuilder(LaunchApplication.class)
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
-            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
-                    application.getBean(PasswordEncoder.class));
+            var fixture = newFixture(application);
             var rootPolicy = application.getBean(RootPolicyRepository.class);
             var identities = application.getBean(AuthenticationIdentityService.class);
             var binding = application.getBean(AuthenticationIdentityBindingService.class);
@@ -407,6 +637,42 @@ class RootGovernanceFullHttpTest {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
+    private static String randomTestPassword() {
+        return "B02a!" + UUID.randomUUID().toString().substring(0, 10);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Fixture newFixture(ApplicationContext application) throws Exception {
+        // 各 HTTP 场景共用回环 IP；仅清除专用 Redis DB 中当前登录窗口的对应计数。
+        var redis = (RedisTemplate<String, Object>) application.getBean("securityRedisTemplate");
+        String subject = "ip:127.0.0.1";
+        String digest = HexFormat.of()
+                .formatHex(MessageDigest.getInstance("SHA-256")
+                        .digest(subject.getBytes(StandardCharsets.UTF_8)));
+        long window = Math.floorDiv(System.currentTimeMillis(), Duration.ofMinutes(1).toMillis());
+        String key = SecurityRedisNamespace.PREFIX + "ratelimit:v1:authentication-login:" + digest + ":" + window;
+        Boolean deleted = redis.delete(key);
+        if (deleted == null) {
+            throw new IllegalStateException("无法确认测试登录限流窗口状态");
+        }
+        return new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
+                application.getBean(PasswordEncoder.class));
+    }
+
+    private static void awaitTwoPasswordChangesBlocked(JdbcTemplate jdbc) throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(12);
+        while (System.nanoTime() < deadline) {
+            Long waiting = jdbc.queryForObject("SELECT count(*) FROM pg_stat_activity "
+                    + "WHERE datname = current_database() AND wait_event_type = 'Lock' "
+                    + "AND query ILIKE '%sec_root_policy%'", Long.class);
+            if (waiting != null && waiting >= 2) {
+                return;
+            }
+            Thread.sleep(30);
+        }
+        throw new AssertionError("two password changes did not reach the root policy lock");
+    }
+
     private static void requireIsolatedDependencies() {
         String url = System.getenv("DB_URL");
         if (url == null || !url.matches("^jdbc:postgresql://[^/]+/devops00_spectra_db_test(?:\\?.*)?$")) {
@@ -418,18 +684,43 @@ class RootGovernanceFullHttpTest {
     }
 
     private static String login(HttpClient client, int port, ObjectMapper mapper, TestUser user) throws Exception {
+        return loginWithPassword(client, port, mapper, user.username(), user.password());
+    }
+
+    private static String loginWithPassword(HttpClient client, int port, ObjectMapper mapper, String username,
+                                            String password)
+            throws Exception {
+        var response = passwordLogin(client, port, mapper, username, password);
+        assertEquals(200, response.statusCode());
+        String token = mapper.readTree(response.body()).path("data").path("access_token").asText();
+        assertFalse(token.isBlank());
+        return token;
+    }
+
+    private static HttpResponse<String> passwordLogin(HttpClient client, int port, ObjectMapper mapper,
+                                                      String username, String password)
+            throws Exception {
         var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
                 + "/api/security/authentication/login"))
                 .header("Api-Version", "1.0.0")
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
-                        "type", "PASSWORD", "username", user.username(), "password", user.password()))))
+                        "type", "PASSWORD", "username", username, "password", password))))
                 .build();
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
-        String token = mapper.readTree(response.body()).path("data").path("access_token").asText();
-        assertFalse(token.isBlank());
-        return token;
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static HttpRequest changePasswordRequest(int port, String token, ObjectMapper mapper,
+                                                     String oldPassword, String newPassword)
+            throws Exception {
+        return HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/user/password"))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
+                        "old_password", oldPassword, "new_password", newPassword,
+                        "verify_password", newPassword))))
+                .build();
     }
 
     private static String loginByEmail(HttpClient client, int port, ObjectMapper mapper,

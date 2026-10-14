@@ -502,6 +502,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public void changePassword(UUID userId, ChangePasswordFrom params) {
+        // 旧密码校验和凭证写入必须处于同一序列化边界，避免并发请求重复使用旧密码。
+        lastEffectiveDevOpsGuard.lockForChange();
         // 1. 获取用户
         var user = this.getById(userId);
         if (user == null) {

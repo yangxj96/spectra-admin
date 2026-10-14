@@ -174,7 +174,8 @@ public class SecurityConfiguration {
                 // 注册过滤器
                 .addFilterBefore(new WebCookieCsrfFilter(properties, restAccessDeniedHandler),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new TokenAuthenticationFilter(securityContextAccessor, securityUserLookupPort),
+                .addFilterBefore(new TokenAuthenticationFilter(securityContextAccessor, securityUserLookupPort,
+                        objectMapper),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(requestRateLimitFilter, TokenAuthenticationFilter.class)
                 // 允许同源iframe

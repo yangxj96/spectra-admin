@@ -21,6 +21,7 @@ import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.common.port.security.SecurityUserLookupPort;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
+import com.devops00.spectra.framework.web.response.R;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
 
 import java.io.IOException;
 
@@ -50,9 +54,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityUserLookupPort securityUserLookupPort;
 
-    public TokenAuthenticationFilter(SecurityContextAccessor securityContextAccessor, SecurityUserLookupPort securityUserLookupPort) {
+    private final ObjectWriter responseWriter;
+
+    public TokenAuthenticationFilter(SecurityContextAccessor securityContextAccessor,
+                                     SecurityUserLookupPort securityUserLookupPort, ObjectMapper objectMapper) {
         this.securityContextAccessor = securityContextAccessor;
         this.securityUserLookupPort = securityUserLookupPort;
+        this.responseWriter = objectMapper.writerFor(R.class);
     }
 
     @Override
@@ -66,7 +74,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.clearContext();
                 } else if (user.isPasswordChangeRequired() && !isPasswordChangeRequest(request)) {
                     SecurityContextHolder.clearContext();
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "请先修改密码");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json;charset=UTF-8");
+                    responseWriter.writeValue(response.getWriter(), R.failure(HttpStatus.FORBIDDEN, "请先修改密码"));
                     return;
                 } else {
                     var authorities = user.getAuthorityNames()
