@@ -22,6 +22,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -70,13 +71,31 @@ public class StandardCacheKeyGenerator implements KeyGenerator {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
             for (Object param : params) {
-                md.update(stableString(param).getBytes(StandardCharsets.UTF_8));
+                byte[] bytes = (typeTag(param) + ":" + stableString(param)).getBytes(StandardCharsets.UTF_8);
+                md.update(ByteBuffer.allocate(Integer.BYTES).putInt(bytes.length).array());
+                md.update(bytes);
             }
 
             return HexFormat.of().formatHex(md.digest()).substring(0, 16);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 not available", e);
         }
+    }
+
+    /**
+     * 计算缓存参数的类型标记（{@code typeTag}），用于区分同文本的不同类型与 null。
+     */
+    private static String typeTag(@Nullable Object param) {
+        if (param == null) {
+            return "null";
+        }
+        if (param instanceof Collection<?>) {
+            return "collection";
+        }
+        if (param instanceof Map<?, ?>) {
+            return "map";
+        }
+        return param.getClass().getName();
     }
 
     /**
