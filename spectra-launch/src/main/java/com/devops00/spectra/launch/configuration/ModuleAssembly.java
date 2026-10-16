@@ -61,10 +61,22 @@ public record ModuleAssembly(Set<String> enabledModules) {
         var enabledModules = new LinkedHashSet<String>();
         enabledModules.add(CORE);
         KNOWN_OPTIONAL_MODULES.stream()
-                .filter(module -> Boolean.parseBoolean(environment.getProperty(
-                        "spectra.modules." + module + ".enabled", "true")))
+                .filter(module -> strictEnabled(environment, module))
                 .forEach(enabledModules::add);
         return new ModuleAssembly(enabledModules);
+    }
+
+    /** 模块开关只接受明确的 true/false；拼写错误或其他文本一律拒绝启动，避免静默关闭模块。 */
+    private static boolean strictEnabled(Environment environment, String module) {
+        String key = "spectra.modules." + module + ".enabled";
+        String value = environment.getProperty(key, "true").trim();
+        if ("true".equalsIgnoreCase(value)) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(value)) {
+            return false;
+        }
+        throw new IllegalStateException("模块装配失败：" + key + " 只接受 true 或 false，实际为 '" + value + "'");
     }
 
     /**

@@ -116,6 +116,11 @@ public class CryptoKeyManager {
     public void init() {
         log.info(LogPrefix.WEB.f("初始化密钥管理器，从统一密钥服务加载配置"));
         refresh();
+        // 启动门禁：显式启用加解密但密钥未就绪时直接失败退出，不能带病启动后在运行期拒绝加密请求。
+        // 明确关闭（DISABLED，含未配置）时保持可启动，支持首次初始化在密钥创建前完成装配。
+        if (keys.state() == State.UNAVAILABLE) {
+            throw new CryptoConfigurationException("接口加解密已启用但密钥未就绪，拒绝启动");
+        }
     }
 
     /**

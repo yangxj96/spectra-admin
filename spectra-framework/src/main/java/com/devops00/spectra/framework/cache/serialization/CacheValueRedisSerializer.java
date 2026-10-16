@@ -34,7 +34,8 @@ import java.util.UUID;
  * 当前 framework 缓存值的显式 serializer。
  *
  * <p>缓存目前只保存部门名称 Map 和部门 UUID 集合，因此使用窄 envelope 保留这两种类型的语义。
- * 未识别的旧值或非法值按 cache miss 处理，不把 payload 交给项目类多态反序列化。</p>
+ * 只有键确实不存在（null/空字节）才作为正常 miss；损坏内容、未知格式或与声明类型不一致一律显式拒绝，
+ * 与正常 miss 区分，不把 payload 交给项目类多态反序列化。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -93,30 +94,43 @@ public final class CacheValueRedisSerializer implements RedisSerializer<Object> 
      * 将 Redis 字节数组恢复为受控的业务对象。
      *
      * @param source 从 Redis 读取的缓存 JSON 字节数组。
-     * @return 返回从受控 envelope 恢复的 UUID 到字符串 Map 或 UUID 列表；source 为 null、空数组、旧格式或损坏内容时返回 null 作为 cache miss，不把异常 payload 交给调用方。
-     * @throws SerializationException 依赖不可用或输入不满足组件约束时抛出。
+     * @return 返回从受控 envelope 恢复的 UUID 到字符串 Map 或 UUID 列表；source 为 null 或空数组时返回 null 作为正常 miss，不把异常 payload 交给调用方。
+     * @throws SerializationException 内容损坏、格式未知或与声明类型不一致时抛出，明确拒绝而不是当作 miss。
      */
     @Override
     public Object deserialize(byte[] source) throws SerializationException {
         if (source == null || source.length == 0) {
             return null;
         }
+        Map<String, Object> envelope;
         try {
-            Map<String, Object> envelope = mapper.readValue(source, ENVELOPE_TYPE);
-            Object type = envelope.get(TYPE);
-            Object value = envelope.get(VALUE);
+            envelope = mapper.readValue(source, ENVELOPE_TYPE);
+        } catch (Exception exception) {
+            throw new SerializationException("缓存值损坏，拒绝使用", exception);
+        }
+        Object type = envelope.get(TYPE);
+        Object value = envelope.get(VALUE);
+        try {
             if (UUID_STRING_MAP.equals(type)) {
-                return decodeMap(value);
+                return requireDecoded(decodeMap(value));
             }
             if (UUID_COLLECTION.equals(type)) {
-                return decodeCollection(value);
+                return requireDecoded(decodeCollection(value));
             }
-            // 旧格式、未知版本和带 @class 的 payload 都自然失效为 cache miss。
-            return null;
-        } catch (Exception exception) {
-            // 缓存不是安全事实源；损坏或迁移期旧值不阻塞业务请求，等待自然重建。
-            return null;
+            throw new SerializationException("缓存值格式不受支持，拒绝使用: " + type);
+        } catch (SerializationException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            throw new SerializationException("缓存值解析失败，拒绝使用", exception);
         }
+    }
+
+    /** 解码结果必须与声明类型一致；结构不符时显式拒绝。 */
+    private static Object requireDecoded(@Nullable Object decoded) {
+        if (decoded == null) {
+            throw new SerializationException("缓存值结构与声明类型不一致，拒绝使用");
+        }
+        return decoded;
     }
 
     /**

@@ -52,4 +52,14 @@ public class FileUploadConfiguration {
         executor.initialize();
         return executor;
     }
+
+    /**
+     * 启动校验默认存储为 S3 时的必需配置；缺失或非法即时失败退出。
+     */
+    @Bean
+    public FileUploadStorageConfigurationValidator fileUploadStorageConfigurationValidator(
+                                                                                           FileUploadProperties properties,
+                                                                                           S3Properties s3Properties) {
+        return new FileUploadStorageConfigurationValidator(properties, s3Properties);
+    }
 }

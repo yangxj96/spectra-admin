@@ -22,8 +22,8 @@ COPY --from=builder /layers/app/spring-boot-loader/ ./
 COPY --from=builder /layers/app/snapshot-dependencies/ ./
 COPY --from=builder /layers/app/application/ ./
 
-# 暴露端口
-EXPOSE 8888
+# 暴露端口（与 application-dev.yml / application-prod.yml 的 server.port=4004 一致）
+EXPOSE 4004
 
 # 启动命令
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.launch.JarLauncher"]

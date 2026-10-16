@@ -22,6 +22,7 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * 工作流配置
@@ -35,12 +36,16 @@ public class WorkflowConfiguration {
 
     /**
      * 配置流程引擎
+     *
+     * <p>数据库 schema 更新只跟随 {@code flowable.database-schema-update} 配置，缺省为 false；
+     * 生产必须由 Flyway 迁移基线管理表结构，运行角色无 DDL 权限，不能由引擎无条件尝试建表。</p>
      */
     @Bean
-    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer() {
+    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer(Environment environment) {
         return configuration -> {
-            // 启用数据库 schema 自动更新
-            configuration.setDatabaseSchemaUpdate("true");
+            // 只按配置决定是否允许 schema 自动更新，缺省 false，避免生产绕过 Flyway
+            configuration.setDatabaseSchemaUpdate(
+                    environment.getProperty("flowable.database-schema-update", "false"));
             // 配置流程定义部署
             configuration.setDeploymentMode("single-resource");
             // 配置流程图生成器字体（中文支持）

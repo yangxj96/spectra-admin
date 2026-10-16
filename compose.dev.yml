@@ -10,8 +10,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-devops00_spectra_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    # PostgreSQL 18 官方镜像将数据目录迁到 /var/lib/postgresql（PGDATA=/var/lib/postgresql/18/docker），
+    # 卷必须挂在该父目录，挂在旧的 /var/lib/postgresql/data 不会持久化实际数据。
     volumes:
-      - spectra-postgres-data:/var/lib/postgresql/data
+      - spectra-postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -25,6 +27,8 @@ services:
       - "${SPECTRA_REDIS_PORT:-6379}:6379"
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD}
+    # 安全 Redis 有意不持久化（--save "" --appendonly no）：Session、防重放和锁定是短期运行态，
+    # 重启后 Key 丢失按 fail-closed 处理，客户端需重新登录；不会因此放宽任何安全判定。
     command: ["sh", "-c", "exec redis-server --requirepass \"$${REDIS_PASSWORD}\" --save \"\" --appendonly no"]
     healthcheck:
       test: ["CMD-SHELL", "redis-cli --no-auth-warning -a \"$${REDIS_PASSWORD}\" ping | grep -q PONG"]
