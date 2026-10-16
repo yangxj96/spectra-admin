@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 必需依赖（数据库 + 安全 Redis）运行期探针。
@@ -58,7 +59,7 @@ public class DependencyReadinessProbe implements SmartLifecycle {
 
     private volatile ScheduledExecutorService executor;
     private volatile boolean running;
-    private volatile long currentIntervalMs;
+    private final AtomicLong currentIntervalMs = new AtomicLong();
 
     public DependencyReadinessProbe(ObjectProvider<DataSource> dataSourceProvider,
                                     @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> securityRedisTemplate,
@@ -71,13 +72,13 @@ public class DependencyReadinessProbe implements SmartLifecycle {
         this.state = state;
         this.baseIntervalMs = properties.probeIntervalMs();
         this.maxIntervalMs = properties.maxIntervalMs();
-        this.currentIntervalMs = baseIntervalMs;
+        this.currentIntervalMs.set(baseIntervalMs);
     }
 
     @Override
     public void start() {
         running = true;
-        currentIntervalMs = baseIntervalMs;
+        currentIntervalMs.set(baseIntervalMs);
         executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable, "spectra-readiness-probe");
             thread.setDaemon(true);
@@ -103,17 +104,17 @@ public class DependencyReadinessProbe implements SmartLifecycle {
     private void scheduleNext() {
         ScheduledExecutorService current = executor;
         if (running && current != null) {
-            current.schedule(this::probe, currentIntervalMs, TimeUnit.MILLISECONDS);
+            current.schedule(this::probe, currentIntervalMs.get(), TimeUnit.MILLISECONDS);
         }
     }
 
-    private void probe() {
+    void probe() {
         boolean wasUnready = !state.isReady();
         try {
             pingDatabase();
             pingRedis();
             state.markReady();
-            currentIntervalMs = baseIntervalMs;
+            currentIntervalMs.set(baseIntervalMs);
             if (wasUnready) {
                 log.warn(LogPrefix.WEB.f("必需依赖恢复，运行态重新就绪"));
                 resumeBackgroundWork();
@@ -125,7 +126,7 @@ public class DependencyReadinessProbe implements SmartLifecycle {
                 pauseBackgroundWork();
             }
             state.markUnready(exception.getClass().getSimpleName());
-            currentIntervalMs = Math.min(maxIntervalMs, currentIntervalMs * 2);
+            currentIntervalMs.set(Math.min(maxIntervalMs, currentIntervalMs.get() * 2));
         } finally {
             scheduleNext();
         }
