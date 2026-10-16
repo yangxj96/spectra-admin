@@ -48,7 +48,7 @@ public interface QuartzJobExecutionHistoryMapper extends BaseMapper<QuartzJobExe
 
     /** 分页查询执行历史，不返回参数原文。 */
     IPage<QuartzJobExecutionHistoryEntity> selectHistoryPage(
-            IPage<QuartzJobExecutionHistoryEntity> page, @Param("query") HistoryPageQuery query);
+                                                             IPage<QuartzJobExecutionHistoryEntity> page, @Param("query") HistoryPageQuery query);
 
     /** 执行历史分页筛选条件。 */
     record HistoryPageQuery(String jobKey, String triggerKey, QuartzExecutionHistoryStatus status,

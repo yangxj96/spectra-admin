@@ -132,7 +132,8 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
             var item = params.getItems().get(index);
             if (setting.getType() != ConfiguredValueType.SECRET || StrUtils.isNotBlank(item.getValue())) {
                 setting.setValue(setting.getType() == ConfiguredValueType.SECRET
-                        ? passwordEncoder.encode(item.getValue()) : item.getValue());
+                        ? passwordEncoder.encode(item.getValue())
+                        : item.getValue());
             }
             setting.setRemarks(item.getRemarks());
             if (!this.updateById(setting)) {

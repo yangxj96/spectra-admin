@@ -250,9 +250,13 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     }
 
     private void validateInput(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
-        if ((changeType == ChangeType.UPDATE && departmentId == null) || from == null
-                || from.getExpectedOrganizationVersion() == null || from.getName() == null || from.getName().isBlank()
-                || from.getType() == null || from.getRegionId() == null) {
+        if ((changeType == ChangeType.UPDATE && departmentId == null)
+                || from == null
+                || from.getExpectedOrganizationVersion() == null
+                || from.getName() == null
+                || from.getName().isBlank()
+                || from.getType() == null
+                || from.getRegionId() == null) {
             throw new DataException("组织变更参数不能为空");
         }
     }
@@ -263,7 +267,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         String permission = changeType == ChangeType.CREATE ? "department:create" : "department:update";
         grantBoundaryService.evaluate(snapshotLoader.load(operatorId), operatorId, null,
                 List.of(new AuthorizationGrantRequest(permission, AuthorizationScope.of(ScopeMode.NONE),
-                        AuthorizationScope.of(ScopeMode.NONE), 1)), root);
+                        AuthorizationScope.of(ScopeMode.NONE), 1)),
+                root);
     }
 
     private void assertApproval(ChangeType changeType, String requestHash) {

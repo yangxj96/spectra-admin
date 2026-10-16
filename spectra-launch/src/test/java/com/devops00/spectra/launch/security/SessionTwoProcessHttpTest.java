@@ -51,13 +51,16 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -73,6 +76,12 @@ class SessionTwoProcessHttpTest {
     private static final String WEB_POLICY_SQL = """
             UPDATE spectra_security.sec_session_policy
             SET access_ttl_seconds = ?, refresh_ttl_seconds = ?, absolute_ttl_seconds = ?, idle_ttl_seconds = ?
+            WHERE client_id = (SELECT id FROM spectra_security.sec_security_client WHERE code = 'web')
+            """;
+
+    private static final String WEB_CONCURRENCY_SQL = """
+            UPDATE spectra_security.sec_session_policy
+            SET concurrency_mode = ?, max_sessions = ?
             WHERE client_id = (SELECT id FROM spectra_security.sec_security_client WHERE code = 'web')
             """;
 
@@ -176,6 +185,239 @@ class SessionTwoProcessHttpTest {
         }
     }
 
+    @Test
+    void refreshReplayIsFencedAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        Path temporary = Files.createTempDirectory(Path.of("target"), "session-replay-two-process-");
+        UUID userId = UUID.randomUUID();
+        try (var first = new SpringApplicationBuilder(LaunchApplication.class, SyntheticConfiguration.class)
+                .run(applicationArgs(userId))) {
+            Path ready = temporary.resolve("second-port.txt");
+            Process second = startSecond(userId, ready, temporary.resolve("second.log"));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                int secondPort = awaitPort(second, ready);
+                assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                var identity = first.getBean(SyntheticIdentity.class);
+                var issuer = first.getBean(SecuritySessionIssuer.class);
+                var revocation = first.getBean(SecuritySessionRevocationPort.class);
+                var properties = first.getBean(SecurityProperties.class);
+                var mapper = first.getBean(ObjectMapper.class);
+                try {
+                    SecurityToken issued = issuer.createToken(identity.load(userId), ClientType.WEB);
+                    var rotated = refresh(client, secondPort, issued.getRefreshToken(), properties);
+                    assertEquals(200, rotated.statusCode());
+                    String replacementAccess = mapper.readTree(rotated.body())
+                            .path("data")
+                            .path("access_token")
+                            .asText();
+                    assertFalse(replacementAccess.isBlank());
+                    assertEquals(200, contextStatus(client, firstPort, replacementAccess));
+
+                    assertEquals(401, refresh(client, firstPort, issued.getRefreshToken(), properties).statusCode());
+                    assertEquals(401, contextStatus(client, firstPort, replacementAccess));
+                    assertEquals(401, contextStatus(client, secondPort, replacementAccess));
+                    assertEquals(401, refresh(client, secondPort, refreshCookie(rotated, properties),
+                            properties).statusCode());
+                } finally {
+                    revocation.revokeUserSessions(userId);
+                }
+            } finally {
+                stop(second);
+            }
+        }
+    }
+
+    @Test
+    void concurrentRefreshClaimsOnceAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        Path temporary = Files.createTempDirectory(Path.of("target"), "session-concurrent-two-process-");
+        UUID userId = UUID.randomUUID();
+        try (var first = new SpringApplicationBuilder(LaunchApplication.class, SyntheticConfiguration.class)
+                .run(applicationArgs(userId))) {
+            Path ready = temporary.resolve("second-port.txt");
+            Process second = startSecond(userId, ready, temporary.resolve("second.log"));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                int secondPort = awaitPort(second, ready);
+                assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                var identity = first.getBean(SyntheticIdentity.class);
+                var issuer = first.getBean(SecuritySessionIssuer.class);
+                var revocation = first.getBean(SecuritySessionRevocationPort.class);
+                var properties = first.getBean(SecurityProperties.class);
+                var mapper = first.getBean(ObjectMapper.class);
+                try {
+                    SecurityToken issued = issuer.createToken(identity.load(userId), ClientType.WEB);
+                    var firstFuture = refreshAsync(client, firstPort, issued.getRefreshToken(), properties);
+                    var secondFuture = refreshAsync(client, secondPort, issued.getRefreshToken(), properties);
+                    HttpResponse<String> firstResponse = firstFuture.get(30, TimeUnit.SECONDS);
+                    HttpResponse<String> secondResponse = secondFuture.get(30, TimeUnit.SECONDS);
+                    assertTrue(List.of(firstResponse, secondResponse)
+                            .stream()
+                            .anyMatch(response -> response.statusCode() == 401),
+                            "至少一个并发刷新必须作为重放被拒绝");
+                    for (HttpResponse<String> response : List.of(firstResponse, secondResponse)) {
+                        if (response.statusCode() == 200) {
+                            String access = mapper.readTree(response.body())
+                                    .path("data")
+                                    .path("access_token")
+                                    .asText();
+                            assertFalse(access.isBlank());
+                            assertEquals(401, contextStatus(client, firstPort, access));
+                            assertEquals(401, contextStatus(client, secondPort, access));
+                        } else {
+                            assertEquals(401, response.statusCode());
+                        }
+                    }
+                    assertEquals(401, refresh(client, firstPort, issued.getRefreshToken(), properties).statusCode());
+                } finally {
+                    revocation.revokeUserSessions(userId);
+                }
+            } finally {
+                stop(second);
+            }
+        }
+    }
+
+    @Test
+    void rejectNewSessionQuotaIsSharedAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        Path temporary = Files.createTempDirectory(Path.of("target"), "session-quota-two-process-");
+        UUID userId = UUID.randomUUID();
+        try (var first = new SpringApplicationBuilder(LaunchApplication.class, SyntheticConfiguration.class)
+                .run(applicationArgs(userId))) {
+            Path ready = temporary.resolve("second-port.txt");
+            Process second = startSecond(userId, ready, temporary.resolve("second.log"));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                int secondPort = awaitPort(second, ready);
+                assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                var jdbc = first.getBean(JdbcTemplate.class);
+                var original = webConcurrency(jdbc);
+                var revocation = first.getBean(SecuritySessionRevocationPort.class);
+                var identity = first.getBean(SyntheticIdentity.class);
+                var issuer = first.getBean(SecuritySessionIssuer.class);
+                var redis = securityRedisTemplate(first);
+                try {
+                    SecurityToken control = issuer.createToken(identity.load(userId), ClientType.WEB);
+                    assertEquals(200, issueSessionStatus(client, secondPort, control.getAccessToken()),
+                            "第二进程的合成签发入口应可正常签发");
+                    revocation.revokeUserSessions(userId);
+
+                    assertEquals(1, jdbc.update(WEB_CONCURRENCY_SQL, "REJECT_NEW", 1));
+                    SecurityToken session = issuer.createToken(identity.load(userId), ClientType.WEB);
+                    assertEquals(200, contextStatus(client, secondPort, session.getAccessToken()));
+
+                    assertEquals(409, issueSessionStatus(client, secondPort, session.getAccessToken()),
+                            "共享配额应拒绝第二进程的新会话");
+
+                    assertEquals(Boolean.TRUE, redis.hasKey(
+                            SecurityRedisKey.SESSION.format(TokenDigestService.digest(session.getAccessToken()))));
+                    Set<Object> active = redis.opsForSet()
+                            .members(SecurityRedisKey.USER_TOKENS.format(userId.toString()));
+                    assertNotNull(active);
+                    assertEquals(1, active.size());
+                    assertEquals(200, contextStatus(client, firstPort, session.getAccessToken()));
+                } finally {
+                    assertEquals(1, jdbc.update(WEB_CONCURRENCY_SQL, original.mode(), original.maxSessions()));
+                    revocation.revokeUserSessions(userId);
+                }
+            } finally {
+                stop(second);
+            }
+        }
+    }
+
+    @Test
+    void revocationAfterAccessExpiryRejectsRefreshAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        Path temporary = Files.createTempDirectory(Path.of("target"), "session-expired-revoke-two-process-");
+        UUID userId = UUID.randomUUID();
+        try (var first = new SpringApplicationBuilder(LaunchApplication.class, SyntheticConfiguration.class)
+                .run(applicationArgs(userId))) {
+            Path ready = temporary.resolve("second-port.txt");
+            Process second = startSecond(userId, ready, temporary.resolve("second.log"));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                int secondPort = awaitPort(second, ready);
+                var jdbc = first.getBean(JdbcTemplate.class);
+                var original = webPolicy(jdbc);
+                var identity = first.getBean(SyntheticIdentity.class);
+                var issuer = first.getBean(SecuritySessionIssuer.class);
+                var revocation = first.getBean(SecuritySessionRevocationPort.class);
+                var properties = first.getBean(SecurityProperties.class);
+                try {
+                    assertEquals(1, jdbc.update(WEB_POLICY_SQL, 3, original.refreshTtlSeconds(),
+                            original.absoluteTtlSeconds(), original.idleTtlSeconds()));
+                    SecurityToken doomed = issuer.createToken(identity.load(userId), ClientType.WEB);
+                    SecurityToken kept = issuer.createToken(identity.load(userId), ClientType.WEB);
+                    assertEquals(200, contextStatus(client, secondPort, kept.getAccessToken()));
+                    awaitRedisExpiry(first, SecurityRedisKey.SESSION.format(
+                            TokenDigestService.digest(kept.getAccessToken())), 8);
+                    assertEquals(401, contextStatus(client, firstPort, kept.getAccessToken()));
+                    assertEquals(401, contextStatus(client, secondPort, kept.getAccessToken()));
+
+                    revocation.revokeUserSessionsExceptToken(userId, kept.getAccessToken());
+                    assertEquals(401, refresh(client, secondPort, doomed.getRefreshToken(), properties).statusCode());
+                    var rotated = refresh(client, secondPort, kept.getRefreshToken(), properties);
+                    assertEquals(200, rotated.statusCode());
+
+                    revocation.revokeUserSessions(userId);
+                    assertEquals(401, refresh(client, firstPort, refreshCookie(rotated, properties),
+                            properties).statusCode());
+                } finally {
+                    assertEquals(1, jdbc.update(WEB_POLICY_SQL, original.accessTtlSeconds(),
+                            original.refreshTtlSeconds(), original.absoluteTtlSeconds(), original.idleTtlSeconds()));
+                    revocation.revokeUserSessions(userId);
+                }
+            } finally {
+                stop(second);
+            }
+        }
+    }
+
+    private static CompletableFuture<HttpResponse<String>> refreshAsync(HttpClient client, int port, String token,
+                                                                        SecurityProperties properties) {
+        String csrf = UUID.randomUUID().toString();
+        var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/security/authentication/refresh"))
+                .header("Api-Version", "1.0.0")
+                .header("Cookie", properties.getRefreshCookieName() + "=" + token + "; "
+                        + properties.getCsrfCookieName() + "=" + csrf)
+                .header(properties.getCsrfHeaderName(), csrf)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static int issueSessionStatus(HttpClient client, int port, String accessToken) throws Exception {
+        var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/security/test/session/issue"))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + accessToken)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+        return client.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
+    }
+
+    private static WebConcurrency webConcurrency(JdbcTemplate jdbc) {
+        return jdbc.queryForObject("""
+                SELECT policy.concurrency_mode, policy.max_sessions
+                FROM spectra_security.sec_session_policy policy
+                JOIN spectra_security.sec_security_client client ON client.id = policy.client_id
+                WHERE client.code = 'web'
+                """,
+                (row, _) -> new WebConcurrency(row.getString("concurrency_mode"), row.getInt("max_sessions")));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static RedisTemplate<String, Object> securityRedisTemplate(ApplicationContext application) {
+        return (RedisTemplate<String, Object>) application.getBean("securityRedisTemplate");
+    }
+
+    private record WebConcurrency(String mode, int maxSessions) {
+    }
+
     private static WebPolicy webPolicy(JdbcTemplate jdbc) {
         return jdbc.queryForObject("""
                 SELECT policy.access_ttl_seconds, policy.refresh_ttl_seconds,
@@ -259,7 +501,10 @@ class SessionTwoProcessHttpTest {
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(90);
         while (System.nanoTime() < deadline) {
             if (Files.exists(ready)) {
-                return Integer.parseInt(Files.readString(ready));
+                String value = Files.readString(ready).trim();
+                if (!value.isEmpty()) {
+                    return Integer.parseInt(value);
+                }
             }
             if (!process.isAlive()) {
                 throw new IllegalStateException("第二应用进程启动失败，退出码 " + process.exitValue());

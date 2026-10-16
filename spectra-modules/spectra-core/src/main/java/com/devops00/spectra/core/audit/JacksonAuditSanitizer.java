@@ -26,7 +26,8 @@ import java.util.Map;
  */
 public final class JacksonAuditSanitizer implements AuditSanitizer {
 
-    private static final TypeReference<Map<String, Object>> SNAPSHOT_TYPE = new TypeReference<>() { };
+    private static final TypeReference<Map<String, Object>> SNAPSHOT_TYPE = new TypeReference<>() {
+    };
     private final ObjectMapper mapper;
     private final AuditSanitizer delegate = new DefaultAuditSanitizer();
 

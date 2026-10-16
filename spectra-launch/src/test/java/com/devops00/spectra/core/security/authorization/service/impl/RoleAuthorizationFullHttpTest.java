@@ -38,13 +38,18 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -121,6 +126,113 @@ class RoleAuthorizationFullHttpTest {
                 } finally {
                     fixture.clean();
                 }
+            }
+        }
+    }
+
+    @Test
+    void roleChangeRevokesSessionAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        Path temporary = Files.createTempDirectory(Path.of("target"), "role-two-process-");
+        try (var first = new SpringApplicationBuilder(LaunchApplication.class, TestConfiguration.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
+                        "--spectra.test.role-http=true")) {
+            Path ready = temporary.resolve("second-port.txt");
+            Process second = startSecond(ready, temporary.resolve("second.log"));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                int secondPort = awaitPort(second, ready);
+                assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                var fixture = new Fixture(new JdbcTemplate(first.getBean(DataSource.class)),
+                        first.getBean(PasswordEncoder.class));
+                try {
+                    fixture.insert();
+                    ObjectMapper mapper = first.getBean(ObjectMapper.class);
+                    String operatorToken = login(client, firstPort, mapper, fixture.operatorUsername, fixture.password);
+                    String targetToken = login(client, secondPort, mapper, fixture.targetUsername, fixture.password);
+                    assertEquals(200, get(client, firstPort, "/api/security/context", targetToken).statusCode(),
+                            "首进程应接受第二进程签署的目标用户 Access");
+
+                    String path = "/api/security/authorization/roles/" + fixture.targetRole + "/impact-preview";
+                    String requested = mapper.writeValueAsString(Map.of("expected_version", 0,
+                            "authority_level", 100, "permission_codes", List.of("role:read"),
+                            "grantable_permission_codes", List.of("role:read")));
+                    var preview = post(client, firstPort, path, operatorToken, requested);
+                    assertEquals(200, preview.statusCode());
+                    String previewToken = mapper.readTree(preview.body()).path("data").path("preview_token").asText();
+                    assertFalse(previewToken.isBlank());
+                    String applied = mapper.writeValueAsString(Map.of("expected_version", 0,
+                            "authority_level", 100, "permission_codes", List.of("role:read"),
+                            "grantable_permission_codes", List.of("role:read"), "preview_token", previewToken));
+                    String applyPath = "/api/security/authorization/roles/" + fixture.targetRole + "/impact-apply";
+                    assertEquals(200, post(client, firstPort, applyPath, operatorToken, applied).statusCode());
+
+                    assertEquals(401, get(client, secondPort, "/api/security/context", targetToken).statusCode(),
+                            "角色缩权后第二进程应拒绝旧 Access");
+                    String renewed = login(client, secondPort, mapper, fixture.targetUsername, fixture.password);
+                    JsonNode reduced = context(client, secondPort, mapper, renewed);
+                    assertTrue(hasPermission(reduced, "role:read"));
+                    assertFalse(hasPermission(reduced, "role:grant"), "重新登录快照应反映收缩");
+                } finally {
+                    var revocation = first.getBean(SecuritySessionRevocationPort.class);
+                    revocation.revokeUserSessions(fixture.operator);
+                    revocation.revokeUserSessions(fixture.target);
+                    fixture.clean();
+                }
+            } finally {
+                stop(second);
+            }
+        }
+    }
+
+    private static Process startSecond(Path ready, Path log) throws Exception {
+        String java = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
+        return new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp", System.getProperty("java.class.path"),
+                SecondApplication.class.getName(), ready.toString())
+                .redirectErrorStream(true)
+                .redirectOutput(log.toFile())
+                .start();
+    }
+
+    private static int awaitPort(Process process, Path ready) throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(90);
+        while (System.nanoTime() < deadline) {
+            if (Files.exists(ready)) {
+                String value = Files.readString(ready).trim();
+                if (!value.isEmpty()) {
+                    return Integer.parseInt(value);
+                }
+            }
+            if (!process.isAlive()) {
+                throw new IllegalStateException("第二应用进程启动失败，退出码 " + process.exitValue());
+            }
+            Thread.sleep(100);
+        }
+        throw new IllegalStateException("第二应用进程未在 90 秒内就绪");
+    }
+
+    private static void stop(Process process) throws InterruptedException {
+        process.destroy();
+        if (!process.waitFor(10, TimeUnit.SECONDS)) {
+            process.destroyForcibly();
+            assertTrue(process.waitFor(10, TimeUnit.SECONDS));
+        }
+    }
+
+    /** 第二个 JVM 中启动完整应用，仅共享数据库与 Redis。 */
+    public static final class SecondApplication {
+        private SecondApplication() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            Path ready = Path.of(args[0]);
+            try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                    .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                            "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+                int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+                Files.writeString(ready, Integer.toString(port));
+                new CountDownLatch(1).await();
             }
         }
     }

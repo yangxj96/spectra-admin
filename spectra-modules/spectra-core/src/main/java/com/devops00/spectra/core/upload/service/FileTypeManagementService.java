@@ -206,7 +206,9 @@ public class FileTypeManagementService extends BaseServiceImpl<FileTypeMapper, F
     }
 
     private void validateMagicBytes(JsonNode bytes) {
-        if (bytes == null || !bytes.isTextual() || !bytes.asText().matches("(?i)^[0-9a-f]+$")
+        if (bytes == null
+                || !bytes.isTextual()
+                || !bytes.asText().matches("(?i)^[0-9a-f]+$")
                 || bytes.asText().length() % 2 != 0) {
             throw invalid("魔数规则 bytes 必须是偶数位十六进制文本");
         }

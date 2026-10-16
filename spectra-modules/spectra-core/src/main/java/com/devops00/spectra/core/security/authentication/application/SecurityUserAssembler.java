@@ -114,7 +114,8 @@ public class SecurityUserAssembler {
         }
         if (policy.maxAgeDays() != null) {
             var changedAt = credential.getChangedAt();
-            if (changedAt == null || changedAt.isAfter(now)
+            if (changedAt == null
+                    || changedAt.isAfter(now)
                     || !changedAt.isAfter(now.minus(policy.maxAgeDays(), ChronoUnit.DAYS))) {
                 throw new LoginException("密码已过期，请联系管理员重置密码");
             }

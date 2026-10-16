@@ -207,9 +207,10 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         if (!NotificationPreviewStatus.APPLIED.name().equals(entity.getStatus()) || entity.getAppliedRequestId() == null) {
             return null;
         }
-        var taskCount = Math.toIntExact(taskMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity>()
-                .eq(com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity::getNotificationRequestId,
-                        entity.getAppliedRequestId())));
+        var taskCount = Math.toIntExact(
+                taskMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity>()
+                        .eq(com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity::getNotificationRequestId,
+                                entity.getAppliedRequestId())));
         return new NotificationControlledSendApplyVO(entity.getAppliedRequestId(), NotificationPreviewStatus.APPLIED.name(),
                 taskCount, true);
     }
@@ -217,7 +218,8 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     private void validateApplyWindow(NotificationSendPreviewEntity entity,
                                      NotificationControlledSendApplyFrom params, Instant now) {
         if (!NotificationPreviewStatus.PREVIEWED.name().equals(entity.getStatus())
-                || entity.getExpiresAt() == null || !now.isBefore(entity.getExpiresAt())) {
+                || entity.getExpiresAt() == null
+                || !now.isBefore(entity.getExpiresAt())) {
             markExpired(entity);
             throw new DataException("通知发送 Preview 已过期或已消费");
         }
@@ -365,9 +367,13 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
      * 校验并确保数据满足当前约束（{@code validate}）。
      */
     private void validate(NotificationControlledSendFrom params) {
-        if (params == null || params.getPurpose() == null || params.getChannels() == null
-                || params.getChannels().isEmpty() || params.getTemplateVersionIds() == null
-                || params.getAudience() == null || params.getParameters() == null) {
+        if (params == null
+                || params.getPurpose() == null
+                || params.getChannels() == null
+                || params.getChannels().isEmpty()
+                || params.getTemplateVersionIds() == null
+                || params.getAudience() == null
+                || params.getParameters() == null) {
             throw new DataException("受控发送参数不完整");
         }
         validateIdempotency(params);

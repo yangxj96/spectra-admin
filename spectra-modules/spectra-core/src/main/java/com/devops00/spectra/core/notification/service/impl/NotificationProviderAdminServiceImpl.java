@@ -538,8 +538,10 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     }
 
     private void requireTencent(String credentialId, String appId, String signName, String templateCode) {
-        if (!StringUtils.hasText(credentialId) || !StringUtils.hasText(appId)
-                || !StringUtils.hasText(signName) || !StringUtils.hasText(templateCode)) {
+        if (!StringUtils.hasText(credentialId)
+                || !StringUtils.hasText(appId)
+                || !StringUtils.hasText(signName)
+                || !StringUtils.hasText(templateCode)) {
             throw new DataSaveException("腾讯云短信必须配置 SecretId、SDK AppID、短信签名和模板 ID");
         }
     }

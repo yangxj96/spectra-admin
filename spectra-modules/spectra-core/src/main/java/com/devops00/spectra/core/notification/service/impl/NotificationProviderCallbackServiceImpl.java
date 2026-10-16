@@ -188,7 +188,8 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
     }
 
     private static void validateSignatureConfiguration(NotificationProviderConfiguration configuration) {
-        if (configuration == null || !configuration.enabled()
+        if (configuration == null
+                || !configuration.enabled()
                 || !StringUtils.hasText(configuration.providerType())
                 || !StringUtils.hasText(configuration.secret())) {
             throw new DataSaveException("Provider 回执验签配置不可用");
