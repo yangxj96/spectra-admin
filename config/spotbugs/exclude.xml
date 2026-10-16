@@ -47,6 +47,11 @@
         <Class name="com.devops00.spectra.framework.health.DataSourceHealthContributor"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
+    <!-- Spring-managed readiness probe retains the RedisTemplate only to ping it periodically. -->
+    <Match>
+        <Class name="com.devops00.spectra.framework.health.readiness.DependencyReadinessProbe"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
     <!-- Spring-managed collaborators are intentionally retained by private services/controllers. -->
     <Match>
         <Class name="com.devops00.spectra.core.common.runner.FolderCheckRunner"/>

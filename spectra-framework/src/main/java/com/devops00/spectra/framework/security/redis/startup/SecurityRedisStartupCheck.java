@@ -17,7 +17,6 @@
 package com.devops00.spectra.framework.security.redis.startup;
 
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -33,17 +32,14 @@ import org.springframework.stereotype.Component;
  * @since 2026/10/16
  */
 @Component
-public class SecurityRedisStartupCheck {
-
-    private final RedisTemplate<String, Object> securityRedisTemplate;
+public final class SecurityRedisStartupCheck {
 
     public SecurityRedisStartupCheck(
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> securityRedisTemplate) {
-        this.securityRedisTemplate = securityRedisTemplate;
+                                     @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> securityRedisTemplate) {
+        verify(securityRedisTemplate);
     }
 
-    @PostConstruct
-    void verify() {
+    private static void verify(RedisTemplate<String, Object> securityRedisTemplate) {
         try {
             var factory = securityRedisTemplate.getConnectionFactory();
             if (factory == null) {
