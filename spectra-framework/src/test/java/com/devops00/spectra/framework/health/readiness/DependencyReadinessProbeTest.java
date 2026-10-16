@@ -26,6 +26,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -128,5 +130,41 @@ class DependencyReadinessProbeTest {
 
         assertFalse(state.isReady());
         verify(scheduler, times(1)).pauseAll();
+    }
+
+    @Test
+    void inconsistentRecoveryStaysUnreadyUntilVerified() throws Exception {
+        Scheduler scheduler = mock(Scheduler.class);
+        DependencyReadinessState state = new DependencyReadinessState();
+        DataSource dataSource = dataSource(true);
+        AtomicBoolean consistent = new AtomicBoolean(true);
+        ReadinessVerifier verifier = () -> {
+            if (!consistent.get()) {
+                throw new IllegalStateException("密钥未就绪");
+            }
+        };
+        var probe = new DependencyReadinessProbe(
+                provider(dataSource), redisTemplate(), provider(scheduler),
+                state, new ReadinessProperties(5000L, 30000L));
+        probe.setReadinessVerifiers(List.of(verifier));
+
+        probe.probe();
+        assertTrue(state.isReady());
+
+        when(dataSource.getConnection()).thenThrow(new SQLException("db down"));
+        probe.probe();
+        assertFalse(state.isReady());
+        verify(scheduler, times(1)).pauseAll();
+
+        doReturn(dataSource(true).getConnection()).when(dataSource).getConnection();
+        consistent.set(false);
+        probe.probe();
+        assertFalse(state.isReady(), "一致性校验失败时不得重新就绪");
+        verify(scheduler, never()).resumeAll();
+
+        consistent.set(true);
+        probe.probe();
+        assertTrue(state.isReady());
+        verify(scheduler, times(1)).resumeAll();
     }
 }

@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.SmartLifecycle;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +40,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * 必需依赖（数据库 + 安全 Redis）运行期探针。
  *
  * <p>周期性探测依赖可用性：任一不可用时把 {@link DependencyReadinessState} 标记为 UNREADY 并暂停后台调度；
- * 恢复后标记 READY 并恢复调度。探测失败使用有界退避，避免故障期间高频重试。</p>
+ * 恢复时先执行 {@link ReadinessVerifier} 一致性校验，通过后标记 READY 并恢复调度。探测失败使用有界退避，
+ * 避免故障期间高频重试。</p>
  *
  * @author yangxj96
  * @version 1.0
@@ -57,6 +60,8 @@ public class DependencyReadinessProbe implements SmartLifecycle {
     private final long baseIntervalMs;
     private final long maxIntervalMs;
 
+    private List<ReadinessVerifier> readinessVerifiers = List.of();
+
     private volatile ScheduledExecutorService executor;
     private volatile boolean running;
     private final AtomicLong currentIntervalMs = new AtomicLong();
@@ -73,6 +78,16 @@ public class DependencyReadinessProbe implements SmartLifecycle {
         this.baseIntervalMs = properties.probeIntervalMs();
         this.maxIntervalMs = properties.maxIntervalMs();
         this.currentIntervalMs.set(baseIntervalMs);
+    }
+
+    /**
+     * 注入恢复后一致性校验器；无实现时保持空列表。
+     *
+     * @param readinessVerifiers 一致性校验器列表
+     */
+    @Autowired(required = false)
+    void setReadinessVerifiers(List<ReadinessVerifier> readinessVerifiers) {
+        this.readinessVerifiers = readinessVerifiers;
     }
 
     @Override
@@ -113,6 +128,9 @@ public class DependencyReadinessProbe implements SmartLifecycle {
         try {
             pingDatabase();
             pingRedis();
+            if (wasUnready) {
+                verifyConsistency();
+            }
             state.markReady();
             currentIntervalMs.set(baseIntervalMs);
             if (wasUnready) {
@@ -129,6 +147,12 @@ public class DependencyReadinessProbe implements SmartLifecycle {
             currentIntervalMs.set(Math.min(maxIntervalMs, currentIntervalMs.get() * 2));
         } finally {
             scheduleNext();
+        }
+    }
+
+    private void verifyConsistency() throws Exception {
+        for (ReadinessVerifier verifier : readinessVerifiers) {
+            verifier.verifyRecovery();
         }
     }
 
