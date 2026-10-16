@@ -17,9 +17,9 @@
 package com.devops00.spectra.core.security.policy.service.impl;
 
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
+import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.core.security.policy.javabean.from.SecurityPasswordPolicyFrom;
 import com.devops00.spectra.core.security.policy.javabean.from.SecuritySessionPolicyFrom;
 import com.devops00.spectra.core.security.policy.javabean.vo.SecurityPasswordPolicyVO;
@@ -121,7 +121,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
                     from.getAccessTtlSeconds(), from.getRefreshTtlSeconds(), from.getAbsoluteTtlSeconds(),
                     from.getIdleTtlSeconds(), clientId, from.getExpectedVersion());
             if (updated != 1) {
-                throw new EntityUpdateException("会话策略版本冲突，请刷新后重试");
+                throw new BusinessConflictException("会话策略版本冲突，请刷新后重试");
             }
             log.info("会话策略已更新: clientId={}", clientId);
             return after;
@@ -163,7 +163,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
                     requested.minLength(), requested.requireUppercase(), requested.requireLowercase(),
                     requested.requireDigit(), requested.requireSpecial(), requested.maxAgeDays(), from.getExpectedVersion());
             if (updated != 1) {
-                throw new EntityUpdateException("密码策略版本冲突，请刷新后重试");
+                throw new BusinessConflictException("密码策略版本冲突，请刷新后重试");
             }
             lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
             log.info("系统密码策略已更新");
@@ -269,7 +269,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
      */
     private static void requireVersion(Long current, Long expected) {
         if (expected == null || !expected.equals(current)) {
-            throw new EntityUpdateException("安全策略版本冲突，请刷新后重试");
+            throw new BusinessConflictException("安全策略版本冲突，请刷新后重试");
         }
     }
 

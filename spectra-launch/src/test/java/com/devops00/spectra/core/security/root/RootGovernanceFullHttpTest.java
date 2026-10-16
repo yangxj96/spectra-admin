@@ -53,6 +53,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -125,6 +126,82 @@ class RootGovernanceFullHttpTest {
             return true;
         } catch (RootGovernanceConflictException exception) {
             return false;
+        }
+    }
+
+    @Test
+    void passwordPolicyHttpProtectsLastRootAndSerializesConcurrentUpdates() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var fixture = newFixture(application);
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            ObjectMapper mapper = application.getBean(ObjectMapper.class);
+            long originalVersion = jdbc.queryForObject("SELECT version FROM spectra_security.sec_password_policy "
+                    + "WHERE policy_key = 'SYSTEM'", Long.class);
+            Integer originalMaxAge = jdbc.queryForObject("SELECT max_age_days FROM "
+                    + "spectra_security.sec_password_policy WHERE policy_key = 'SYSTEM'", Integer.class);
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                try {
+                    assertEquals(null, originalMaxAge, "expected the isolated test password policy");
+                    fixture.insertRoot(fixture.operator);
+                    String operatorToken = login(client, port, mapper, fixture.operator);
+                    jdbc.update("UPDATE spectra_security.sec_password_credential "
+                            + "SET changed_at = statement_timestamp() - INTERVAL '2 days' WHERE user_id = ?",
+                            fixture.operator.id());
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertConflict(client.send(passwordPolicyRequest(port, operatorToken, mapper, 1,
+                            originalVersion), HttpResponse.BodyHandlers.ofString()), mapper);
+                    assertEquals(originalMaxAge, jdbc.queryForObject("SELECT max_age_days FROM "
+                            + "spectra_security.sec_password_policy WHERE policy_key = 'SYSTEM'", Integer.class));
+                    assertEquals(originalVersion, jdbc.queryForObject("SELECT version FROM "
+                            + "spectra_security.sec_password_policy WHERE policy_key = 'SYSTEM'", Long.class));
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+
+                    fixture.insertRoot(fixture.firstTarget);
+                    String freshRootToken = login(client, port, mapper, fixture.firstTarget);
+                    assertConflict(client.send(staleSessionPolicyRequest(jdbc, port, freshRootToken, mapper),
+                            HttpResponse.BodyHandlers.ofString()), mapper);
+                    var accepted = client.send(passwordPolicyRequest(port, operatorToken, mapper, 1,
+                            originalVersion), HttpResponse.BodyHandlers.ofString());
+                    assertEquals(200, accepted.statusCode());
+                    assertEquals(1, mapper.readTree(accepted.body()).path("data").path("max_age_days").asInt());
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(401, context(client, port, operatorToken).statusCode());
+                    assertEquals(200, context(client, port, freshRootToken).statusCode());
+
+                    var first = client.sendAsync(passwordPolicyRequest(port, freshRootToken, mapper, 1,
+                            originalVersion + 1), HttpResponse.BodyHandlers.ofString());
+                    var second = client.sendAsync(passwordPolicyRequest(port, freshRootToken, mapper, 2,
+                            originalVersion + 1), HttpResponse.BodyHandlers.ofString());
+                    var firstResult = first.get(20, TimeUnit.SECONDS);
+                    var secondResult = second.get(20, TimeUnit.SECONDS);
+                    assertEquals(1L, List.of(firstResult.statusCode(), secondResult.statusCode())
+                            .stream()
+                            .filter(status -> status == 200)
+                            .count());
+                    assertEquals(1L, List.of(firstResult.statusCode(), secondResult.statusCode())
+                            .stream()
+                            .filter(status -> status == 409)
+                            .count());
+                    assertEquals(originalVersion + 2, jdbc.queryForObject("SELECT version FROM "
+                            + "spectra_security.sec_password_policy WHERE policy_key = 'SYSTEM'", Long.class));
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                } finally {
+                    try {
+                        revocation.revokeUserSessions(fixture.operator.id());
+                        revocation.revokeUserSessions(fixture.firstTarget.id());
+                    } finally {
+                        jdbc.update("UPDATE spectra_security.sec_password_policy SET max_age_days = ?, version = ? "
+                                + "WHERE policy_key = 'SYSTEM'", originalMaxAge, originalVersion);
+                        fixture.clean();
+                    }
+                }
+            }
         }
     }
 
@@ -720,6 +797,42 @@ class RootGovernanceFullHttpTest {
                 .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
                         "old_password", oldPassword, "new_password", newPassword,
                         "verify_password", newPassword))))
+                .build();
+    }
+
+    private static HttpRequest passwordPolicyRequest(int port, String token, ObjectMapper mapper,
+                                                     int maxAgeDays, long expectedVersion)
+            throws Exception {
+        var request = Map.of("min_length", 12, "require_uppercase", true, "require_lowercase", true,
+                "require_digit", true, "require_special", true, "max_age_days", maxAgeDays,
+                "expected_version", expectedVersion);
+        return HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/security/policy/password"))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(request)))
+                .build();
+    }
+
+    private static HttpRequest staleSessionPolicyRequest(JdbcTemplate jdbc, int port, String token,
+                                                         ObjectMapper mapper)
+            throws Exception {
+        var row = jdbc.queryForMap("SELECT client_id, concurrency_mode, allow_concurrent, max_sessions, "
+                + "access_ttl_seconds, refresh_ttl_seconds, absolute_ttl_seconds, idle_ttl_seconds, version "
+                + "FROM spectra_security.sec_session_policy WHERE client_id = "
+                + "(SELECT id FROM spectra_security.sec_security_client WHERE code = 'web')");
+        var request = new LinkedHashMap<String, Object>();
+        for (String field : List.of("concurrency_mode", "allow_concurrent", "max_sessions",
+                "access_ttl_seconds", "refresh_ttl_seconds", "absolute_ttl_seconds", "idle_ttl_seconds")) {
+            request.put(field, row.get(field));
+        }
+        request.put("expected_version", ((Number) row.get("version")).longValue() + 1);
+        return HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/security/policy/session/" + row.get("client_id")))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(request)))
                 .build();
     }
 
