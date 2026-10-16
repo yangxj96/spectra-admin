@@ -94,4 +94,12 @@ public class RegionImportTestApplication {
     MetaObjectHandler regionImportMetaObjectHandler(SecurityContextAccessor securityContextAccessor) {
         return new MetaObjectHandlerImpl(securityContextAccessor);
     }
+
+    /**
+     * 在上下文装配阶段校验目标数据库属于显式允许的隔离库；不满足时启动失败，避免连接后写入业务库。
+     */
+    @Bean
+    RegionImportDatabaseGuard regionImportDatabaseGuard(org.springframework.core.env.Environment environment) {
+        return new RegionImportDatabaseGuard(environment);
+    }
 }
