@@ -113,7 +113,7 @@ public class FileAssetStreamController {
                 .filename(file.displayName(), StandardCharsets.UTF_8)
                 .build());
         if (range.start() != null) {
-            long end = range.end() == null ? range.start() + file.size() - 1 : range.end();
+            long end = range.start() + file.size() - 1;
             headers.set(HttpHeaders.CONTENT_RANGE, "bytes " + range.start() + "-" + end + "/*");
             return new ResponseEntity<>(new InputStreamResource(file.stream()), headers, HttpStatus.PARTIAL_CONTENT);
         }
