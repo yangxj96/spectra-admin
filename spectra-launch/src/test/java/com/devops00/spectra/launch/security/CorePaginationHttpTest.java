@@ -76,6 +76,13 @@ class CorePaginationHttpTest {
                 assertEquals(200, get(client, port, token, "/api/audit/page?pageNum=1&pageSize=5").statusCode());
                 assertEquals(400, get(client, port, token, "/api/audit/page?orders%5B0%5D.column=id").statusCode(),
                         "固定排序入口必须拒绝客户端排序");
+
+                assertEquals(200, get(client, port, token, "/api/role/page?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/role/page?orders%5B0%5D.column=name").statusCode(), "未注册排序的角色分页应拒绝排序");
+                assertEquals(400, get(client, port, token,
+                        "/api/role/page?orders%5B0%5D.column=name%3Bdrop%20table%20spectra_security.sec_role")
+                        .statusCode(), "恶意排序表达式应被拒绝");
             } finally {
                 fixture.clean();
             }
