@@ -109,9 +109,11 @@ public class UploadSessionService {
         if (totalParts > properties.getMaxParts()) {
             throw invalid("文件分片数量超过系统限制");
         }
-        var storage = createStorageSession(totalParts);
+        UUID sessionId = UUID.randomUUID();
+        var storage = createStorageSession(sessionId, totalParts);
 
         var session = new FileUploadSession();
+        session.setId(sessionId);
         session.setOwnerUserId(userId);
         session.setOriginalName(request.getOriginalName().replace('\u0000', '_'));
         session.setDeclaredContentType(contentType);
@@ -160,11 +162,10 @@ public class UploadSessionService {
         }
     }
 
-    private StorageSession createStorageSession(int totalParts) {
+    private StorageSession createStorageSession(UUID storageSessionId, int totalParts) {
         StorageProviderType providerType = properties.getDefaultStorage();
         TransportMode transportMode = providerType == StorageProviderType.S3 ? TransportMode.PRESIGNED : TransportMode.LOCAL_PROXY;
         FileStorageProvider provider = providerRegistry.require(providerType);
-        UUID storageSessionId = UUID.randomUUID();
         String container = providerType == StorageProviderType.S3 ? s3Properties.getBucket() : "local";
         String key = "assets/" + storageSessionId + "/content.bin";
         try {
