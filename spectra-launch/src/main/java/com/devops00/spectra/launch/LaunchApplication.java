@@ -22,6 +22,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import com.devops00.spectra.launch.configuration.ModuleAssemblyConfiguration;
 
+import java.util.TimeZone;
+
 /**
  * 启动类
  *
@@ -41,6 +43,9 @@ public class LaunchApplication {
      * 处理内部业务逻辑（{@code main}）。
      */
     static void main(String[] args) {
+        // 固定 JVM 默认时区为 UTC，避免宿主机/容器时区影响数据库会话与时间解析。
+        System.setProperty("user.timezone", "UTC");
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(LaunchApplication.class, args);
     }
 }

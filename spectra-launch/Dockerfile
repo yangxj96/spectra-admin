@@ -16,6 +16,9 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
+# 统一容器时区为 UTC，避免日志与数据库会话受宿主机时区影响
+ENV TZ=UTC
+
 # 复制 Spring Boot 分层
 COPY --from=builder /layers/app/dependencies/ ./
 COPY --from=builder /layers/app/spring-boot-loader/ ./
@@ -26,4 +29,4 @@ COPY --from=builder /layers/app/application/ ./
 EXPOSE 4004
 
 # 启动命令
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-Duser.timezone=UTC", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.launch.JarLauncher"]

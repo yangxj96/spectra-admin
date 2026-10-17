@@ -23,6 +23,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.time.Clock;
 import java.time.Instant;
 
 /**
@@ -36,9 +37,11 @@ import java.time.Instant;
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     private final SecurityContextAccessor securityContextAccessor;
+    private final Clock clock;
 
-    public MetaObjectHandlerImpl(SecurityContextAccessor securityContextAccessor) {
+    public MetaObjectHandlerImpl(SecurityContextAccessor securityContextAccessor, Clock clock) {
         this.securityContextAccessor = securityContextAccessor;
+        this.clock = clock;
     }
 
     /**
@@ -85,13 +88,13 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
             setFieldValByName(CREATED_BY, securityContextAccessor.currentUserId(), metaObject);
         }
         if (getFieldValByName(CREATED_AT, metaObject) == null) {
-            setFieldValByName(CREATED_AT, Instant.now(), metaObject);
+            setFieldValByName(CREATED_AT, Instant.now(clock), metaObject);
         }
         if (getFieldValByName(UPDATED_BY, metaObject) == null) {
             setFieldValByName(UPDATED_BY, securityContextAccessor.currentUserId(), metaObject);
         }
         if (getFieldValByName(UPDATED_AT, metaObject) == null) {
-            setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
+            setFieldValByName(UPDATED_AT, Instant.now(clock), metaObject);
         }
         // 只要实体声明了 departmentId，就由当前安全用户统一写入，避免客户端伪造归属。
         // 系统任务没有用户上下文时保留显式值，由专用服务/受控执行器负责赋值。
@@ -116,6 +119,6 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         log.debug(LogPrefix.PERSISTENCE.f("updateFill"));
         setFieldValByName(UPDATED_BY, securityContextAccessor.currentUserId(), metaObject);
-        setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
+        setFieldValByName(UPDATED_AT, Instant.now(clock), metaObject);
     }
 }

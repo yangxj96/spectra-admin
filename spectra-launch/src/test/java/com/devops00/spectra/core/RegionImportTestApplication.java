@@ -92,7 +92,7 @@ public class RegionImportTestApplication {
 
     @Bean
     MetaObjectHandler regionImportMetaObjectHandler(SecurityContextAccessor securityContextAccessor) {
-        return new MetaObjectHandlerImpl(securityContextAccessor);
+        return new MetaObjectHandlerImpl(securityContextAccessor, java.time.Clock.systemUTC());
     }
 
     /**

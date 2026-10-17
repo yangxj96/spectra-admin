@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Objects;
 
@@ -83,9 +84,9 @@ public class MyBatisPlusConfiguration {
      * @return 返回填充 createdBy、createdAt、updatedBy、updatedAt 审计字段的 MyBatis 元对象处理器 Bean；Bean 创建失败时启动失败，不返回 null。
      */
     @Bean
-    public MetaObjectHandler metaObjectHandler(@Lazy SecurityContextAccessor securityContextAccessor) {
+    public MetaObjectHandler metaObjectHandler(@Lazy SecurityContextAccessor securityContextAccessor, Clock clock) {
         log.debug(LogPrefix.PERSISTENCE.f("载入元数据处理器"));
-        return new MetaObjectHandlerImpl(securityContextAccessor);
+        return new MetaObjectHandlerImpl(securityContextAccessor, clock);
     }
 
     /**
