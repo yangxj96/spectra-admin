@@ -25,7 +25,19 @@ package com.devops00.spectra.common.exception;
  */
 public class BusinessConflictException extends SpectraException {
 
+    private final Enum<?> errorCode;
+
     public BusinessConflictException(String message) {
         super(message);
+        this.errorCode = null;
+    }
+
+    public BusinessConflictException(String message, Enum<?> errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorCode() {
+        return errorCode == null ? null : errorCode.name();
     }
 }

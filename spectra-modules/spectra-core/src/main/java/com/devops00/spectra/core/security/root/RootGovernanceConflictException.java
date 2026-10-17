@@ -27,7 +27,13 @@ import com.devops00.spectra.common.exception.BusinessConflictException;
  */
 public class RootGovernanceConflictException extends BusinessConflictException {
 
-    public RootGovernanceConflictException(String message) {
-        super(message);
+    public enum Code {
+        ROOT_EFFECTIVE_MINIMUM,
+        ROOT_EFFECTIVE_MAXIMUM,
+        ROOT_POLICY_VERSION_CONFLICT
+    }
+
+    public RootGovernanceConflictException(Code code, String message) {
+        super(message, code);
     }
 }

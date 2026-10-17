@@ -55,10 +55,12 @@ public class JdbcLastEffectiveDevOpsGuard implements LastEffectiveDevOpsGuard {
         }
         long current = rootPolicyRepository.countEffectiveDevOpsUsers();
         if (current < before.effectiveCount() && current < before.policy().minEffectiveDevOpsUsers()) {
-            throw new RootGovernanceConflictException("拒绝移除最后一个有效 DEV_OPS");
+            throw new RootGovernanceConflictException(RootGovernanceConflictException.Code.ROOT_EFFECTIVE_MINIMUM,
+                    "拒绝移除最后一个有效 DEV_OPS");
         }
         if (current > before.effectiveCount() && current > before.policy().maxDevOpsUsers()) {
-            throw new RootGovernanceConflictException("已达到 maxDevOpsUsers，拒绝新增 DEV_OPS");
+            throw new RootGovernanceConflictException(RootGovernanceConflictException.Code.ROOT_EFFECTIVE_MAXIMUM,
+                    "已达到 maxDevOpsUsers，拒绝新增 DEV_OPS");
         }
     }
 

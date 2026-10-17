@@ -40,76 +40,88 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ExceptionResponseResolverTest {
 
+    private enum TestConflictCode {
+        ROOT_EFFECTIVE_MINIMUM
+    }
+
     private final ExceptionResponseResolver resolver = new ExceptionResponseResolver();
 
     @Test
     void dataNotFoundMapsToNotFound() {
         var resolution = resolver.resolve(new DataNotExistException("缺失"));
         assertEquals(HttpStatus.NOT_FOUND, resolution.status());
-        assertEquals(WebErrorCode.DATA_NOT_FOUND, resolution.errorCode());
+        assertEquals(WebErrorCode.DATA_NOT_FOUND.name(), resolution.errorCode());
     }
 
     @Test
     void dataExistMapsToConflict() {
         var resolution = resolver.resolve(new DataExistException("重复"));
         assertEquals(HttpStatus.CONFLICT, resolution.status());
-        assertEquals(WebErrorCode.DATA_EXIST, resolution.errorCode());
+        assertEquals(WebErrorCode.DATA_EXIST.name(), resolution.errorCode());
     }
 
     @Test
     void entityUpdateMapsToVersionConflict() {
         var resolution = resolver.resolve(new EntityUpdateException("更新冲突"));
         assertEquals(HttpStatus.CONFLICT, resolution.status());
-        assertEquals(WebErrorCode.ENTITY_UPDATE_CONFLICT, resolution.errorCode());
+        assertEquals(WebErrorCode.ENTITY_UPDATE_CONFLICT.name(), resolution.errorCode());
     }
 
     @Test
     void businessConflictMapsToConflict() {
         var resolution = resolver.resolve(new BusinessConflictException("状态冲突"));
         assertEquals(HttpStatus.CONFLICT, resolution.status());
-        assertEquals(WebErrorCode.BUSINESS_CONFLICT, resolution.errorCode());
+        assertEquals(WebErrorCode.BUSINESS_CONFLICT.name(), resolution.errorCode());
+    }
+
+    @Test
+    void domainConflictKeepsItsStableCodeAcrossWrappedCauses() {
+        var conflict = new BusinessConflictException("最后一个 Root", TestConflictCode.ROOT_EFFECTIVE_MINIMUM);
+        var resolution = resolver.resolve(new RuntimeException("wrapped", conflict));
+        assertEquals(HttpStatus.CONFLICT, resolution.status());
+        assertEquals("ROOT_EFFECTIVE_MINIMUM", resolution.errorCode());
     }
 
     @Test
     void businessRuleMapsToBadRequest() {
         var resolution = resolver.resolve(new BusinessRuleViolationException("规则"));
         assertEquals(HttpStatus.BAD_REQUEST, resolution.status());
-        assertEquals(WebErrorCode.BUSINESS_RULE_VIOLATION, resolution.errorCode());
+        assertEquals(WebErrorCode.BUSINESS_RULE_VIOLATION.name(), resolution.errorCode());
     }
 
     @Test
     void securityRedisMapsToServiceUnavailable() {
         var resolution = resolver.resolve(new SecurityRedisUnavailableException("redis", null));
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, resolution.status());
-        assertEquals(WebErrorCode.SECURITY_REDIS_UNAVAILABLE, resolution.errorCode());
+        assertEquals(WebErrorCode.SECURITY_REDIS_UNAVAILABLE.name(), resolution.errorCode());
     }
 
     @Test
     void securitySecretMapsToServiceUnavailable() {
         var resolution = resolver.resolve(new SecuritySecretUnavailableException("secret", null));
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, resolution.status());
-        assertEquals(WebErrorCode.SECURITY_SECRET_UNAVAILABLE, resolution.errorCode());
+        assertEquals(WebErrorCode.SECURITY_SECRET_UNAVAILABLE.name(), resolution.errorCode());
     }
 
     @Test
     void accessDeniedMapsToForbidden() {
         var resolution = resolver.resolve(new AccessDeniedException("denied"));
         assertEquals(HttpStatus.FORBIDDEN, resolution.status());
-        assertEquals(WebErrorCode.ACCESS_DENIED, resolution.errorCode());
+        assertEquals(WebErrorCode.ACCESS_DENIED.name(), resolution.errorCode());
     }
 
     @Test
     void badCredentialsMapsToUnauthorized() {
         var resolution = resolver.resolve(new BadCredentialsException("bad"));
         assertEquals(HttpStatus.UNAUTHORIZED, resolution.status());
-        assertEquals(WebErrorCode.AUTHENTICATION_FAILED, resolution.errorCode());
+        assertEquals(WebErrorCode.AUTHENTICATION_FAILED.name(), resolution.errorCode());
     }
 
     @Test
     void unknownMapsToInternalErrorWithStackTrace() {
         var resolution = resolver.resolve(new RuntimeException("boom"));
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, resolution.status());
-        assertEquals(WebErrorCode.INTERNAL_ERROR, resolution.errorCode());
+        assertEquals(WebErrorCode.INTERNAL_ERROR.name(), resolution.errorCode());
         assertEquals(true, resolution.logStackTrace());
     }
 }

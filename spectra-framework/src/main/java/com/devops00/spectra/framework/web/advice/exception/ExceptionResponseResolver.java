@@ -70,7 +70,7 @@ public class ExceptionResponseResolver {
      * @param errorCode     稳定错误码
      * @param logStackTrace 是否需要在边界层记录完整堆栈
      */
-    public record ExceptionResolution(HttpStatus status, String message, WebErrorCode errorCode,
+    public record ExceptionResolution(HttpStatus status, String message, String errorCode,
                                       boolean logStackTrace) {
     }
 
@@ -112,7 +112,9 @@ public class ExceptionResponseResolver {
         var businessConflict = findCause(exception, BusinessConflictException.class);
         if (businessConflict != null) {
             return known(HttpStatus.CONFLICT, messageOr(businessConflict.getMessage(), "当前状态不允许执行此操作"),
-                    WebErrorCode.BUSINESS_CONFLICT);
+                    businessConflict.getErrorCode() == null
+                            ? WebErrorCode.BUSINESS_CONFLICT.name()
+                            : businessConflict.getErrorCode());
         }
 
         var businessRule = findCause(exception, BusinessRuleViolationException.class);
@@ -216,7 +218,8 @@ public class ExceptionResponseResolver {
         }
 
         // 只有没有任何已知异常语义时才进入这里；完整堆栈由 CommonExceptionAdvice 记录。
-        return new ExceptionResolution(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_MESSAGE, WebErrorCode.INTERNAL_ERROR,
+        return new ExceptionResolution(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_MESSAGE,
+                WebErrorCode.INTERNAL_ERROR.name(),
                 true);
     }
 
@@ -244,12 +247,16 @@ public class ExceptionResponseResolver {
 
     /** 已知业务异常：允许边界层记录摘要，不需要完整堆栈。 */
     private static ExceptionResolution known(HttpStatus status, String message, WebErrorCode errorCode) {
+        return known(status, message, errorCode.name());
+    }
+
+    private static ExceptionResolution known(HttpStatus status, String message, String errorCode) {
         return new ExceptionResolution(status, message, errorCode, false);
     }
 
     /** 基础设施异常：对外返回安全消息，同时要求边界层保留完整堆栈用于排障。 */
     private static ExceptionResolution infrastructure(HttpStatus status, String message, WebErrorCode errorCode) {
-        return new ExceptionResolution(status, message, errorCode, true);
+        return new ExceptionResolution(status, message, errorCode.name(), true);
     }
 
     /** 统一处理异常消息为空或只包含空白的情况。 */

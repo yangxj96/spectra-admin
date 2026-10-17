@@ -121,6 +121,15 @@ class RootGovernancePostgresTest {
     }
 
     @Test
+    void rootPolicyVersionConflictKeepsItsDomainCode() {
+        var policy = repository.lock();
+        var conflict = assertThrows(RootGovernanceConflictException.class,
+                () -> repository.update(policy, policy.version() + 1));
+        assertEquals("ROOT_POLICY_VERSION_CONFLICT", conflict.getErrorCode());
+        assertEquals(policy.version(), repository.lock().version());
+    }
+
+    @Test
     void countsOnlyCurrentlyLoginCapableRoot() {
         assertEquals(1L, repository.countEffectiveDevOpsUsers());
         jdbc.update("UPDATE spectra_core.sys_user SET deleted = CURRENT_TIMESTAMP WHERE id = ?", userId);
@@ -169,7 +178,8 @@ class RootGovernancePostgresTest {
         UUID secondRoot = addRoot();
         disableWithGuard(userId);
         assertEquals(1L, repository.countEffectiveDevOpsUsers());
-        assertThrows(RootGovernanceConflictException.class, () -> disableWithGuard(secondRoot));
+        var conflict = assertThrows(RootGovernanceConflictException.class, () -> disableWithGuard(secondRoot));
+        assertEquals("ROOT_EFFECTIVE_MINIMUM", conflict.getErrorCode());
         assertEquals(1L, repository.countEffectiveDevOpsUsers());
         assertEquals("ACTIVE", jdbc.queryForObject("SELECT status FROM spectra_core.sys_user WHERE id = ?",
                 String.class, secondRoot));
@@ -230,12 +240,13 @@ class RootGovernancePostgresTest {
     void rejectsAddingAFourthEffectiveRoot() {
         addRoot();
         addRoot();
-        assertThrows(RootGovernanceConflictException.class, () -> transactions.execute(status -> {
+        var conflict = assertThrows(RootGovernanceConflictException.class, () -> transactions.execute(status -> {
             var before = guard.lockForChange();
             addRoot();
             guard.assertWithinLimits(before);
             return null;
         }));
+        assertEquals("ROOT_EFFECTIVE_MAXIMUM", conflict.getErrorCode());
         assertEquals(3L, repository.countEffectiveDevOpsUsers());
     }
 

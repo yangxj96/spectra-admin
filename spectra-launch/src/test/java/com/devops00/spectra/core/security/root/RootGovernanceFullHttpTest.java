@@ -155,7 +155,8 @@ class RootGovernanceFullHttpTest {
                             fixture.operator.id());
                     assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
                     assertConflict(client.send(passwordPolicyRequest(port, operatorToken, mapper, 1,
-                            originalVersion), HttpResponse.BodyHandlers.ofString()), mapper);
+                            originalVersion), HttpResponse.BodyHandlers.ofString()), mapper,
+                            "ROOT_EFFECTIVE_MINIMUM");
                     assertEquals(originalMaxAge, jdbc.queryForObject("SELECT max_age_days FROM "
                             + "spectra_security.sec_password_policy WHERE policy_key = 'SYSTEM'", Integer.class));
                     assertEquals(originalVersion, jdbc.queryForObject("SELECT version FROM "
@@ -394,7 +395,8 @@ class RootGovernanceFullHttpTest {
                     assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
                     String operatorToken = login(client, port, mapper, fixture.operator);
 
-                    assertConflict(disable(client, port, operatorToken, fixture.operator.id()), mapper);
+                    assertConflict(disable(client, port, operatorToken, fixture.operator.id()), mapper,
+                            "ROOT_EFFECTIVE_MINIMUM");
                     assertEquals("ACTIVE", fixture.status(fixture.operator.id()));
                     assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
                     assertEquals(200, context(client, port, operatorToken).statusCode());
@@ -909,6 +911,12 @@ class RootGovernanceFullHttpTest {
     private static void assertConflict(HttpResponse<String> response, ObjectMapper mapper) throws Exception {
         assertEquals(409, response.statusCode());
         assertEquals(409, mapper.readTree(response.body()).path("code").asInt());
+    }
+
+    private static void assertConflict(HttpResponse<String> response, ObjectMapper mapper, String errorCode)
+            throws Exception {
+        assertConflict(response, mapper);
+        assertEquals(errorCode, mapper.readTree(response.body()).path("error_code").asText());
     }
 
     private record TestUser(UUID id, String username, String password) {

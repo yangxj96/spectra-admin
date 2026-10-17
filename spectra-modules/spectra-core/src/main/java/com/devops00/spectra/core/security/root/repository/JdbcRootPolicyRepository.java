@@ -66,7 +66,8 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
                             + " WHERE policy_key = ? AND version = ?",
                     policy.minEffectiveDevOpsUsers(), policy.maxDevOpsUsers(), SINGLETON_KEY, expectedVersion);
             if (updated != 1) {
-                throw new RootGovernanceConflictException("Root 策略版本冲突，拒绝覆盖并发修改");
+                throw new RootGovernanceConflictException(RootGovernanceConflictException.Code.ROOT_POLICY_VERSION_CONFLICT,
+                        "Root 策略版本冲突，拒绝覆盖并发修改");
             }
         } catch (DataAccessException exception) {
             throw new RootGovernanceException("Root 策略更新失败", exception);
