@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.security.session.query;
 
 import com.devops00.spectra.common.config.SystemConfigValueProvider;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.framework.security.session.token.SecurityTokenAccessor;
@@ -85,43 +86,43 @@ public class SecuritySessionContextAccessor implements SecurityContextAccessor {
     }
 
     /**
-     * 读取当前用户时区；无法确认安全主体时按安全策略失败。
+     * 读取当前用户时区；已配置但无效的时区显式失败，只有未配置时才回退到系统时区和 UTC。
      *
-     * @return 返回当前用户时区 ID；未认证、用户时区无效或系统配置缺失时依次回退到系统时区和 UTC，不返回 null。
+     * @return 返回当前用户时区 ID；用户与系统均未配置时返回 UTC，不返回 null
+     * @throws SpectraException 用户或系统时区已配置但不是合法 ZoneId
      */
     @Override
     public String currentUserZoneId() {
         SecurityPrincipal user = currentUser();
-        var userZoneId = normalizeZoneId(user == null ? null : user.getTimezone());
-        if (userZoneId != null) {
-            return userZoneId;
+        String userZoneId = user == null ? null : user.getTimezone();
+        if (hasText(userZoneId)) {
+            return requireValidZoneId(userZoneId);
         }
 
         var provider = systemConfigValueProvider.getIfAvailable();
         if (provider != null) {
-            var systemZoneId = provider.find(SYSTEM_DEFAULT_TIMEZONE_KEY)
-                    .map(this::normalizeZoneId)
-                    .orElse(null);
-            if (systemZoneId != null) {
-                return systemZoneId;
+            var systemZoneId = provider.find(SYSTEM_DEFAULT_TIMEZONE_KEY).orElse(null);
+            if (hasText(systemZoneId)) {
+                return requireValidZoneId(systemZoneId);
             }
         }
         return UTC_ZONE_ID;
     }
 
+    private static boolean hasText(@Nullable String value) {
+        return value != null && !value.isBlank();
+    }
+
     /**
-     * 转换、解析或规范化数据（{@code normalizeZoneId}）。
+     * 校验并返回合法 ZoneId；非法配置显式失败，避免静默回退掩盖错误。
      */
-    private String normalizeZoneId(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+    private static String requireValidZoneId(String value) {
         var zoneId = value.trim();
         try {
             ZoneId.of(zoneId);
             return zoneId;
-        } catch (DateTimeException ignored) {
-            return null;
+        } catch (DateTimeException exception) {
+            throw new SpectraException("时区配置无效: " + zoneId, exception);
         }
     }
 
