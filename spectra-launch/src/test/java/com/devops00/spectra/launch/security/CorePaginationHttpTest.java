@@ -131,6 +131,31 @@ class CorePaginationHttpTest {
                 assertEquals(400, get(client, port, token,
                         "/api/file/uploads/page?orders%5B0%5D.column=status").statusCode(),
                         "未注册的上传管理排序字段应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/meeting/page?pageNum=1&pageSize=5&orders%5B0%5D.column=start_time").statusCode(),
+                        "会议分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/meeting/page?orders%5B0%5D.column=title").statusCode(),
+                        "未注册的会议排序字段应被拒绝");
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/notice/page?pageNum=1&pageSize=5&orders%5B0%5D.column=publish_at").statusCode(),
+                        "公告分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/notice/page?orders%5B0%5D.column=content").statusCode(),
+                        "未注册的公告排序字段应被拒绝");
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/assets/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode(),
+                        "资产分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/assets/page?orders%5B0%5D.column=name").statusCode(),
+                        "未注册的资产排序字段应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/workflow/tasks/todo?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/workflow/tasks/todo?orders%5B0%5D.column=id").statusCode(),
+                        "固定排序的待办任务入口应拒绝客户端排序");
             } finally {
                 fixture.clean();
             }
