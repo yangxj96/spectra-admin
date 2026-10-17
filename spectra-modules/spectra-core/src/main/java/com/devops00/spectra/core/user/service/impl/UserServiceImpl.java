@@ -253,6 +253,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         assertUserWithinPermission(entity, "user:update");
+        // 联系方式与验证码登录身份需要独立的安全验证/撤销契约，编辑入口明确拒绝而非静默忽略。
+        if (StrUtils.isNotBlank(params.getPhone()) || StrUtils.isNotBlank(params.getEmail())) {
+            throw new BusinessRuleViolationException("用户编辑不支持修改手机号或邮箱，请通过联系方式或安全设置入口处理");
+        }
         if (params.getStatus() != entity.getStatus()) {
             throw new DataException("用户生命周期状态必须通过专用状态接口变更");
         }
