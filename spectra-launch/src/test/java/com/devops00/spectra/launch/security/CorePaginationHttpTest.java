@@ -110,6 +110,27 @@ class CorePaginationHttpTest {
                 assertEquals(400, get(client, port, token,
                         "/api/notification/admin/deliveries?orders%5B0%5D.column=recipient_user_id").statusCode(),
                         "未注册的通知投递排序字段应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/tasks?pageNum=1&pageSize=5&orders%5B0%5D.column=channel")
+                        .statusCode(), "通知任务分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/admin/tasks?orders%5B0%5D.column=recipient_user_id").statusCode(),
+                        "未注册的通知任务排序字段应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/file/types/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at")
+                        .statusCode(), "文件类型分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/file/types/page?orders%5B0%5D.column=name").statusCode(),
+                        "未注册的文件类型排序字段应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/file/uploads/page?pageNum=1&pageSize=5&orders%5B0%5D.column=id")
+                        .statusCode(), "上传管理分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/file/uploads/page?orders%5B0%5D.column=status").statusCode(),
+                        "未注册的上传管理排序字段应被拒绝");
             } finally {
                 fixture.clean();
             }
