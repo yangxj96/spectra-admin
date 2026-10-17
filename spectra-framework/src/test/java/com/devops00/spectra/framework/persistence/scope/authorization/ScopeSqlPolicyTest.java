@@ -93,6 +93,24 @@ class ScopeSqlPolicyTest {
     }
 
     @Test
+    void missingBoundaryDefaultsToNone() {
+        var expression = ScopeSqlPolicy.build(new Table("record"), DATA_SCOPE, List.of(), null, Set.of());
+
+        assertNotNull(expression);
+        assertEquals("1 = 0", expression.toString());
+    }
+
+    @Test
+    void selfScopeMatchesOwnerColumn() {
+        UUID subject = UUID.randomUUID();
+        var expression = ScopeSqlPolicy.build(new Table("record"), DATA_SCOPE,
+                List.of(boundary(Set.of(), false, ScopeMode.SELF)), subject, Set.of());
+
+        assertNotNull(expression);
+        assertTrue(expression.toString().contains("created_by = '" + subject + "'"));
+    }
+
+    @Test
     void queryNamesContainingInsertCreateAndAddStillRequireReadPermission() {
         var annotation = NamedOperationScopedRecord.class.getAnnotation(DataScope.class);
 
