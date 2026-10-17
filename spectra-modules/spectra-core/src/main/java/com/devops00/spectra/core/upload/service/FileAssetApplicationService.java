@@ -23,6 +23,7 @@ import com.devops00.spectra.common.port.file.FileAccessContext;
 import com.devops00.spectra.common.port.file.FileAssetPort;
 import com.devops00.spectra.common.port.file.FileAssetSnapshot;
 import com.devops00.spectra.common.port.file.FileDownload;
+import com.devops00.spectra.common.port.file.FileRangeNotSatisfiableException;
 import com.devops00.spectra.core.upload.api.FileErrorCode;
 import com.devops00.spectra.core.upload.api.FileUploadException;
 import com.devops00.spectra.core.upload.javabean.entity.FileReference;
@@ -110,6 +111,10 @@ public class FileAssetApplicationService implements FileAssetPort {
      * 打开文件资产申请。
      */
     private FileDownload openObject(FileAsset asset, Long rangeStart, Long rangeEnd) {
+        long totalSize = asset.getSize() == null ? -1 : asset.getSize();
+        if (rangeStart != null && totalSize >= 0 && rangeStart >= totalSize) {
+            throw new FileRangeNotSatisfiableException("请求范围超出文件大小", totalSize);
+        }
         FileStorageProvider provider = providerRegistry.require(asset.getStorageProvider());
         StorageObject object = provider.open(asset.getStorageContainer(), asset.getStorageKey(), rangeStart, rangeEnd);
         long size = object.metadata().size();

@@ -20,7 +20,7 @@ import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.file.FileAccessContext;
 import com.devops00.spectra.common.port.file.FileDownload;
-import com.devops00.spectra.common.exception.BusinessRuleViolationException;
+import com.devops00.spectra.common.port.file.FileRangeNotSatisfiableException;
 import com.devops00.spectra.core.upload.service.FileAssetApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -134,18 +134,46 @@ public class FileAssetStreamController {
          * 解析范围。
          */
         private static Range parse(String value) {
-            if (value == null || value.isBlank())
+            if (value == null || value.isBlank()) {
                 return new Range(null, null);
-            if (!value.startsWith("bytes=") || value.indexOf(',') >= 0)
-                throw new BusinessRuleViolationException("请求范围无效");
+            }
+            requireSingleByteRange(value);
             String[] bounds = value.substring(6).split("-", -1);
-            if (bounds.length != 2 || bounds[0].isBlank())
-                throw new BusinessRuleViolationException("请求范围无效");
-            long start = Long.parseLong(bounds[0]);
-            Long end = bounds[1].isBlank() ? null : Long.valueOf(bounds[1]);
-            if (start < 0 || (end != null && end < start))
-                throw new BusinessRuleViolationException("请求范围无效");
+            requireTwoBounds(bounds);
+            long start = parseLong(bounds[0]);
+            Long end = bounds[1].isBlank() ? null : parseLong(bounds[1]);
+            requireAscending(start, end);
             return new Range(start, end);
+        }
+
+        private static void requireSingleByteRange(String value) {
+            if (!value.startsWith("bytes=") || value.indexOf(',') >= 0) {
+                throw invalidRange();
+            }
+        }
+
+        private static void requireTwoBounds(String[] bounds) {
+            if (bounds.length != 2 || bounds[0].isBlank()) {
+                throw invalidRange();
+            }
+        }
+
+        private static void requireAscending(long start, Long end) {
+            if (start < 0 || (end != null && end < start)) {
+                throw invalidRange();
+            }
+        }
+
+        private static long parseLong(String value) {
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException exception) {
+                throw new FileRangeNotSatisfiableException("请求范围无效", -1, exception);
+            }
+        }
+
+        private static FileRangeNotSatisfiableException invalidRange() {
+            return new FileRangeNotSatisfiableException("请求范围无效", -1);
         }
     }
 }

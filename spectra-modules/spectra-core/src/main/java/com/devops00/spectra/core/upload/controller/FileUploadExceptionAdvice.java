@@ -16,12 +16,15 @@
 
 package com.devops00.spectra.core.upload.controller;
 
+import com.devops00.spectra.common.port.file.FileRangeNotSatisfiableException;
 import com.devops00.spectra.framework.web.response.R;
 import com.devops00.spectra.core.upload.api.FileUploadException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -58,5 +61,23 @@ public class FileUploadExceptionAdvice {
         };
         response.setStatus(status.value());
         return R.failure(status, exception.getMessage(), exception.getErrorCode().name());
+    }
+
+    /**
+     * 请求范围不可满足时返回 416；已知总长度时附带 {@code Content-Range: bytes *}{@code /<total>}。
+     *
+     * @param exception 范围不可满足异常
+     * @return HTTP 416 统一失败响应，错误码为 {@code FILE_RANGE_NOT_SATISFIABLE}
+     */
+    @ExceptionHandler(FileRangeNotSatisfiableException.class)
+    public ResponseEntity<R<Object>> handleRangeNotSatisfiable(FileRangeNotSatisfiableException exception) {
+        var headers = new HttpHeaders();
+        if (exception.totalSize() >= 0) {
+            headers.set(HttpHeaders.CONTENT_RANGE, "bytes */" + exception.totalSize());
+        }
+        return new ResponseEntity<>(
+                R.failure(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, exception.getMessage(),
+                        "FILE_RANGE_NOT_SATISFIABLE"),
+                headers, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
     }
 }

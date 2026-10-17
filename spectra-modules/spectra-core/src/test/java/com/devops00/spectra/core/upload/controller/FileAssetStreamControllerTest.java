@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.upload.controller;
 
 import com.devops00.spectra.common.port.file.FileDownload;
+import com.devops00.spectra.common.port.file.FileRangeNotSatisfiableException;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.core.upload.service.FileAssetApplicationService;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -78,5 +80,17 @@ class FileAssetStreamControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getHeaders().getFirst(HttpHeaders.CONTENT_RANGE));
         assertEquals(10L, response.getHeaders().getContentLength());
+    }
+
+    @Test
+    void invalidRangeHeaderIsRejectedAsRangeNotSatisfiable() {
+        var download = new FileDownload(InputStream.nullInputStream(), "a.bin", "application/octet-stream",
+                10L, null, null);
+        var request = new MockHttpServletRequest();
+        request.addHeader(HttpHeaders.RANGE, "bytes=abc-5");
+
+        var controller = controller(UUID.randomUUID(), download);
+        assertThrows(FileRangeNotSatisfiableException.class,
+                () -> controller.preview(UUID.randomUUID(), null, null, request));
     }
 }
