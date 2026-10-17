@@ -76,6 +76,79 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RootGovernanceFullHttpTest {
 
     @Test
+    void naturallyExpiredRootAssignmentAndCredentialPreserveLastRoot() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var fixture = newFixture(application);
+            var rootPolicy = application.getBean(RootPolicyRepository.class);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            ObjectMapper mapper = application.getBean(ObjectMapper.class);
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                try {
+                    assertEquals(0L, rootPolicy.countEffectiveDevOpsUsers());
+                    fixture.insertRoot(fixture.operator);
+                    fixture.insertRoot(fixture.firstTarget);
+                    String operatorToken = login(client, port, mapper, fixture.operator);
+                    String expiringToken = login(client, port, mapper, fixture.firstTarget);
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(200, context(client, port, expiringToken).statusCode());
+
+                    assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
+                            + "SET valid_until = statement_timestamp() + INTERVAL '4 seconds' WHERE id = ?",
+                            fixture.assignmentId(fixture.firstTarget)));
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    long assignmentDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(12);
+                    while (rootPolicy.countEffectiveDevOpsUsers() != 1L && System.nanoTime() < assignmentDeadline) {
+                        Thread.sleep(100);
+                    }
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(200, context(client, port, expiringToken).statusCode());
+                    assertEquals(403, disable(client, port, expiringToken, fixture.operator.id()).statusCode());
+                    assertConflict(disable(client, port, operatorToken, fixture.operator.id()), mapper,
+                            "ROOT_EFFECTIVE_MINIMUM");
+                    assertEquals("ACTIVE", fixture.status(fixture.operator.id()));
+
+                    assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
+                            + "SET valid_until = NULL WHERE id = ?", fixture.assignmentId(fixture.firstTarget)));
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(200, context(client, port, expiringToken).statusCode());
+                    assertEquals(1, jdbc.update("UPDATE spectra_security.sec_password_credential "
+                            + "SET expires_at = statement_timestamp() + INTERVAL '4 seconds' WHERE user_id = ?",
+                            fixture.firstTarget.id()));
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(200, context(client, port, expiringToken).statusCode());
+
+                    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(12);
+                    while (rootPolicy.countEffectiveDevOpsUsers() != 1L && System.nanoTime() < deadline) {
+                        Thread.sleep(100);
+                    }
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(401, context(client, port, expiringToken).statusCode());
+                    assertEquals(401, passwordLogin(client, port, mapper, fixture.firstTarget.username(),
+                            fixture.firstTarget.password()).statusCode());
+                    assertEquals(200, context(client, port, operatorToken).statusCode());
+                    assertConflict(disable(client, port, operatorToken, fixture.operator.id()), mapper,
+                            "ROOT_EFFECTIVE_MINIMUM");
+                    assertEquals("ACTIVE", fixture.status(fixture.operator.id()));
+                    assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                } finally {
+                    try {
+                        for (var user : fixture.users()) {
+                            revocation.revokeUserSessions(user.id());
+                        }
+                    } finally {
+                        fixture.clean();
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     void concurrentRootCredentialExpiryKeepsOneEffectiveRoot() throws Exception {
         requireIsolatedDependencies();
         try (var application = new SpringApplicationBuilder(LaunchApplication.class)

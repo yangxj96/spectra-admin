@@ -18,6 +18,7 @@ package com.devops00.spectra.launch.security;
 
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
+import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
@@ -64,6 +65,100 @@ class CoreTwoProcessHttpTest {
             SET concurrency_mode = ?, max_sessions = ?
             WHERE client_id = (SELECT id FROM spectra_security.sec_security_client WHERE code = 'web')
             """;
+
+    @Test
+    void naturalRootAssignmentAndCredentialExpiryPropagatesAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        Path temporary = Files.createTempDirectory(Path.of("target"), "core-root-natural-two-process-");
+        try (var first = new SpringApplicationBuilder(LaunchApplication.class).run(coreArgs())) {
+            Path ready = temporary.resolve("second-port.txt");
+            Process second = startSecond(ready, temporary.resolve("second.log"));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                int secondPort = awaitPort(second, ready);
+                assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                var mapper = first.getBean(ObjectMapper.class);
+                var properties = first.getBean(SecurityProperties.class);
+                var jdbc = first.getBean(JdbcTemplate.class);
+                var rootPolicy = first.getBean(RootPolicyRepository.class);
+                var revocation = first.getBean(SecuritySessionRevocationPort.class);
+                var fixture = new Fixture(first);
+                TestUser operator = TestUser.create("b02rootoper");
+                TestUser target = TestUser.create("b02rootexp");
+                try {
+                    fixture.insertWithRole(operator, "ROLE_DEV_OPS");
+                    fixture.insertWithRole(target, "ROLE_DEV_OPS");
+                    String operatorToken = login(client, firstPort, mapper, properties, operator.username(),
+                            operator.password()).accessToken();
+                    Session targetSession = login(client, secondPort, mapper, properties, target.username(),
+                            target.password());
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(200, context(client, firstPort, targetSession.accessToken()));
+                    assertEquals(200, context(client, secondPort, targetSession.accessToken()));
+
+                    assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
+                            + "SET valid_until = statement_timestamp() + INTERVAL '5 seconds' WHERE user_id = ?",
+                            target.id()));
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    awaitEffectiveRoots(rootPolicy, 1L);
+                    assertEquals(200, context(client, firstPort, targetSession.accessToken()));
+                    assertEquals(200, context(client, secondPort, targetSession.accessToken()));
+                    assertEquals(403, disable(client, firstPort, targetSession.accessToken(),
+                            operator.id()).statusCode());
+                    assertEquals(403, disable(client, secondPort, targetSession.accessToken(),
+                            operator.id()).statusCode());
+                    assertLastRootConflict(disable(client, firstPort, operatorToken, operator.id()), mapper);
+
+                    assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
+                            + "SET valid_until = NULL WHERE user_id = ?", target.id()));
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    assertEquals(1, jdbc.update("UPDATE spectra_security.sec_password_credential "
+                            + "SET expires_at = statement_timestamp() + INTERVAL '5 seconds' WHERE user_id = ?",
+                            target.id()));
+                    assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
+                    awaitEffectiveRoots(rootPolicy, 1L);
+                    assertEquals(401, context(client, firstPort, targetSession.accessToken()));
+                    assertEquals(401, context(client, secondPort, targetSession.accessToken()));
+                    assertEquals(401, refresh(client, secondPort, targetSession.refreshToken(),
+                            properties).statusCode());
+                    assertLastRootConflict(disable(client, secondPort, operatorToken, operator.id()), mapper);
+                    assertEquals("ACTIVE", jdbc.queryForObject(
+                            "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, operator.id()));
+                } finally {
+                    revocation.revokeUserSessions(operator.id());
+                    revocation.revokeUserSessions(target.id());
+                    fixture.clean();
+                }
+            } finally {
+                stop(second);
+            }
+        }
+    }
+
+    private static void awaitEffectiveRoots(RootPolicyRepository rootPolicy, long expected)
+            throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(15);
+        while (rootPolicy.countEffectiveDevOpsUsers() != expected && System.nanoTime() < deadline) {
+            Thread.sleep(100);
+        }
+        assertEquals(expected, rootPolicy.countEffectiveDevOpsUsers());
+    }
+
+    private static HttpResponse<String> disable(HttpClient client, int port, String token, UUID userId)
+            throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/user/disable/" + userId))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static void assertLastRootConflict(HttpResponse<String> response, ObjectMapper mapper)
+            throws Exception {
+        assertEquals(409, response.statusCode());
+        assertEquals("ROOT_EFFECTIVE_MINIMUM", mapper.readTree(response.body()).path("error_code").asText());
+    }
 
     @Test
     void credentialChangeRevokesSessionAcrossProcesses() throws Exception {
