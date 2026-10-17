@@ -20,7 +20,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -112,12 +112,12 @@ public class PurchaseVO {
     /**
      * 下单时间。
      */
-    private LocalDateTime orderedAt;
+    private OffsetDateTime orderedAt;
 
     /**
      * 完成时间。
      */
-    private LocalDateTime completedAt;
+    private OffsetDateTime completedAt;
 
     /**
      * 执行备注。
@@ -139,10 +139,10 @@ public class PurchaseVO {
      */
     private List<PurchaseItemVO> items = List.of();
     private List<PurchaseReceiptVO> receipts = List.of();
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     /**
      * 更新时间。
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }

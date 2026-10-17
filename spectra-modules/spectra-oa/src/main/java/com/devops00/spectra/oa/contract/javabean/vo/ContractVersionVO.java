@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.contract.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -72,5 +72,5 @@ public class ContractVersionVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

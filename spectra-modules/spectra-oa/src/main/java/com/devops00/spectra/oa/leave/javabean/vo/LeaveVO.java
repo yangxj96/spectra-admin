@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.leave.javabean.vo;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -70,12 +70,12 @@ public class LeaveVO {
     /**
      * 开始时间。
      */
-    private LocalDateTime startTime;
+    private OffsetDateTime startTime;
 
     /**
      * 结束时间。
      */
-    private LocalDateTime endTime;
+    private OffsetDateTime endTime;
 
     /**
      * 时长（小时）。
@@ -105,5 +105,5 @@ public class LeaveVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

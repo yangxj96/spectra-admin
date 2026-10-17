@@ -20,7 +20,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -111,5 +111,5 @@ public class SupplyOperationVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

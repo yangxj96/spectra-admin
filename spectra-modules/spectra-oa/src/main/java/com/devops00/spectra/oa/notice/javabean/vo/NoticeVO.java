@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.notice.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -74,7 +74,7 @@ public class NoticeVO {
     /**
      * 发布时间。
      */
-    private LocalDateTime publishAt;
+    private OffsetDateTime publishAt;
 
     /**
      * 是否要求阅读。
@@ -89,10 +89,10 @@ public class NoticeVO {
     /**
      * 阅读时间。
      */
-    private LocalDateTime readAt;
+    private OffsetDateTime readAt;
 
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

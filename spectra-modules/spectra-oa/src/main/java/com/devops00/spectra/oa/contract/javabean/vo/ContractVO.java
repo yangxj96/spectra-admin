@@ -20,7 +20,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -107,7 +107,7 @@ public class ContractVO {
     /**
      * 签署时间。
      */
-    private LocalDateTime signedAt;
+    private OffsetDateTime signedAt;
 
     /**
      * 可见范围。
@@ -122,12 +122,12 @@ public class ContractVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     /**
      * 更新时间。
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     /**
      * 当前版本字段。

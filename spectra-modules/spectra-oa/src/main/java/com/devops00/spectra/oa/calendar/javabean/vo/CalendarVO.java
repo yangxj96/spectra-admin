@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.calendar.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -54,12 +54,12 @@ public class CalendarVO {
     /**
      * 开始时间。
      */
-    private LocalDateTime startTime;
+    private OffsetDateTime startTime;
 
     /**
      * 结束时间。
      */
-    private LocalDateTime endTime;
+    private OffsetDateTime endTime;
 
     /**
      * 是否全天。

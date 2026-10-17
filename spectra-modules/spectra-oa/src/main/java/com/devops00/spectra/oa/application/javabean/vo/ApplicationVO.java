@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.application.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -79,12 +79,12 @@ public class ApplicationVO {
     /**
      * 提交时间。
      */
-    private LocalDateTime submittedAt;
+    private OffsetDateTime submittedAt;
 
     /**
      * 完成时间。
      */
-    private LocalDateTime completedAt;
+    private OffsetDateTime completedAt;
 
     /**
      * 驳回原因。
@@ -94,5 +94,5 @@ public class ApplicationVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

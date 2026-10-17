@@ -20,7 +20,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -112,7 +112,7 @@ public class ReimbursementVO {
     /**
      * 支付时间。
      */
-    private LocalDateTime paymentAt;
+    private OffsetDateTime paymentAt;
 
     /**
      * 支付备注。
@@ -134,10 +134,10 @@ public class ReimbursementVO {
      */
     private List<ReimbursementItemVO> items = List.of();
     private List<ReimbursementAttachmentVO> attachments = List.of();
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     /**
      * 更新时间。
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }

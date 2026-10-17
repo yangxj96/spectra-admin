@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.asset.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -74,10 +74,10 @@ public class AssetCategoryVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     /**
      * 更新时间。
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }
