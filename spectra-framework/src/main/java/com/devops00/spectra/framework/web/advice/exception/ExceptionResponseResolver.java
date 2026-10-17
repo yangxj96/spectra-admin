@@ -22,6 +22,7 @@ import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.KaptchaExpiresException;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.common.exception.NotImplementedException;
@@ -31,6 +32,7 @@ import com.devops00.spectra.common.exception.SecuritySecretUnavailableException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.security.policy.SecurityPolicyUnavailableException;
 import com.devops00.spectra.framework.web.crypto.CryptoConfigurationException;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -65,9 +67,11 @@ public class ExceptionResponseResolver {
      *
      * @param status        对外 HTTP 状态
      * @param message       对外安全消息
+     * @param errorCode     稳定错误码
      * @param logStackTrace 是否需要在边界层记录完整堆栈
      */
-    public record ExceptionResolution(HttpStatus status, String message, boolean logStackTrace) {
+    public record ExceptionResolution(HttpStatus status, String message, WebErrorCode errorCode,
+                                      boolean logStackTrace) {
     }
 
     /**
@@ -91,47 +95,55 @@ public class ExceptionResponseResolver {
     private static ExceptionResolution resolveBusiness(Throwable exception) {
         var dataNotExist = findCause(exception, DataNotExistException.class);
         if (dataNotExist != null) {
-            return known(HttpStatus.NOT_FOUND, messageOr(dataNotExist.getMessage(), "数据不存在"));
+            return known(HttpStatus.NOT_FOUND, messageOr(dataNotExist.getMessage(), "数据不存在"), WebErrorCode.DATA_NOT_FOUND);
         }
 
         var dataExist = findCause(exception, DataExistException.class);
         if (dataExist != null) {
-            return known(HttpStatus.CONFLICT, messageOr(dataExist.getMessage(), "数据已存在"));
+            return known(HttpStatus.CONFLICT, messageOr(dataExist.getMessage(), "数据已存在"), WebErrorCode.DATA_EXIST);
+        }
+
+        var entityUpdate = findCause(exception, EntityUpdateException.class);
+        if (entityUpdate != null) {
+            return known(HttpStatus.CONFLICT, messageOr(entityUpdate.getMessage(), "数据已被更新，请刷新后重试"),
+                    WebErrorCode.ENTITY_UPDATE_CONFLICT);
         }
 
         var businessConflict = findCause(exception, BusinessConflictException.class);
         if (businessConflict != null) {
-            return known(HttpStatus.CONFLICT, messageOr(businessConflict.getMessage(), "当前状态不允许执行此操作"));
+            return known(HttpStatus.CONFLICT, messageOr(businessConflict.getMessage(), "当前状态不允许执行此操作"),
+                    WebErrorCode.BUSINESS_CONFLICT);
         }
 
         var businessRule = findCause(exception, BusinessRuleViolationException.class);
         if (businessRule != null) {
-            return known(HttpStatus.BAD_REQUEST, messageOr(businessRule.getMessage(), "业务规则校验失败"));
+            return known(HttpStatus.BAD_REQUEST, messageOr(businessRule.getMessage(), "业务规则校验失败"),
+                    WebErrorCode.BUSINESS_RULE_VIOLATION);
         }
 
         var dataScope = findCause(exception, DataScopeViolationException.class);
         if (dataScope != null) {
-            return known(HttpStatus.FORBIDDEN, "数据范围不足");
+            return known(HttpStatus.FORBIDDEN, "数据范围不足", WebErrorCode.DATA_SCOPE_VIOLATION);
         }
 
         var notImplemented = findCause(exception, NotImplementedException.class);
         if (notImplemented != null) {
-            return known(HttpStatus.INTERNAL_SERVER_ERROR, "功能暂未实现");
+            return known(HttpStatus.INTERNAL_SERVER_ERROR, "功能暂未实现", WebErrorCode.NOT_IMPLEMENTED);
         }
 
         var noResource = findCause(exception, NoResourceFoundException.class);
         if (noResource != null) {
-            return known(HttpStatus.NOT_FOUND, "未找到资源");
+            return known(HttpStatus.NOT_FOUND, "未找到资源", WebErrorCode.RESOURCE_NOT_FOUND);
         }
 
         var kaptchaNotMatch = findCause(exception, KaptchaNotMatchException.class);
         if (kaptchaNotMatch != null) {
-            return known(HttpStatus.BAD_REQUEST, "验证码不匹配");
+            return known(HttpStatus.BAD_REQUEST, "验证码不匹配", WebErrorCode.KAPTCHA_NOT_MATCH);
         }
 
         var kaptchaExpires = findCause(exception, KaptchaExpiresException.class);
         if (kaptchaExpires != null) {
-            return known(HttpStatus.BAD_REQUEST, "验证码过期");
+            return known(HttpStatus.BAD_REQUEST, "验证码过期", WebErrorCode.KAPTCHA_EXPIRED);
         }
         return null;
     }
@@ -139,32 +151,37 @@ public class ExceptionResponseResolver {
     private static ExceptionResolution resolveInfrastructure(Throwable exception) {
         var scheduler = findCause(exception, SchedulerDatabaseUnavailableException.class);
         if (scheduler != null) {
-            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "调度服务暂不可用");
+            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "调度服务暂不可用",
+                    WebErrorCode.SCHEDULER_DATABASE_UNAVAILABLE);
         }
 
         var redis = findCause(exception, SecurityRedisUnavailableException.class);
         if (redis != null) {
-            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "安全会话服务暂不可用");
+            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "安全会话服务暂不可用",
+                    WebErrorCode.SECURITY_REDIS_UNAVAILABLE);
         }
 
         var secret = findCause(exception, SecuritySecretUnavailableException.class);
         if (secret != null) {
-            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "安全密钥服务暂不可用");
+            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "安全密钥服务暂不可用",
+                    WebErrorCode.SECURITY_SECRET_UNAVAILABLE);
         }
 
         var policy = findCause(exception, SecurityPolicyUnavailableException.class);
         if (policy != null) {
-            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "安全策略服务暂不可用");
+            return infrastructure(HttpStatus.SERVICE_UNAVAILABLE, "安全策略服务暂不可用",
+                    WebErrorCode.SECURITY_POLICY_UNAVAILABLE);
         }
 
         var audit = findCause(exception, AuditService.AuditRecordingException.class);
         if (audit != null) {
-            return known(HttpStatus.SERVICE_UNAVAILABLE, "审计服务暂不可用");
+            return known(HttpStatus.SERVICE_UNAVAILABLE, "审计服务暂不可用", WebErrorCode.AUDIT_SERVICE_UNAVAILABLE);
         }
 
         var cryptoConfiguration = findCause(exception, CryptoConfigurationException.class);
         if (cryptoConfiguration != null) {
-            return infrastructure(HttpStatus.INTERNAL_SERVER_ERROR, "加密配置不可用");
+            return infrastructure(HttpStatus.INTERNAL_SERVER_ERROR, "加密配置不可用",
+                    WebErrorCode.CRYPTO_CONFIGURATION_UNAVAILABLE);
         }
         return null;
     }
@@ -172,7 +189,7 @@ public class ExceptionResponseResolver {
     private static ExceptionResolution resolveStandard(Throwable exception) {
         var accessDenied = findCause(exception, AccessDeniedException.class);
         if (accessDenied != null) {
-            return known(HttpStatus.FORBIDDEN, "权限不足");
+            return known(HttpStatus.FORBIDDEN, "权限不足", WebErrorCode.ACCESS_DENIED);
         }
 
         var authentication = findCause(exception, AuthenticationException.class);
@@ -182,21 +199,25 @@ public class ExceptionResponseResolver {
 
         var illegalArgument = findCause(exception, IllegalArgumentException.class);
         if (illegalArgument != null) {
-            return known(HttpStatus.BAD_REQUEST, messageOr(illegalArgument.getMessage(), "请求参数无效"));
+            return known(HttpStatus.BAD_REQUEST, messageOr(illegalArgument.getMessage(), "请求参数无效"),
+                    WebErrorCode.REQUEST_INVALID);
         }
 
         var illegalState = findCause(exception, IllegalStateException.class);
         if (illegalState != null) {
-            return known(HttpStatus.CONFLICT, messageOr(illegalState.getMessage(), "当前状态不允许执行此操作"));
+            return known(HttpStatus.CONFLICT, messageOr(illegalState.getMessage(), "当前状态不允许执行此操作"),
+                    WebErrorCode.BUSINESS_CONFLICT);
         }
 
         var projectException = findCause(exception, SpectraException.class);
         if (projectException != null) {
-            return known(HttpStatus.INTERNAL_SERVER_ERROR, messageOr(projectException.getMessage(), "业务处理失败"));
+            return known(HttpStatus.INTERNAL_SERVER_ERROR, messageOr(projectException.getMessage(), "业务处理失败"),
+                    WebErrorCode.INTERNAL_ERROR);
         }
 
         // 只有没有任何已知异常语义时才进入这里；完整堆栈由 CommonExceptionAdvice 记录。
-        return new ExceptionResolution(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_MESSAGE, true);
+        return new ExceptionResolution(HttpStatus.INTERNAL_SERVER_ERROR, UNKNOWN_MESSAGE, WebErrorCode.INTERNAL_ERROR,
+                true);
     }
 
     /**
@@ -209,25 +230,26 @@ public class ExceptionResponseResolver {
      */
     private static ExceptionResolution resolveAuthentication(AuthenticationException exception) {
         if (exception instanceof CredentialsExpiredException) {
-            return known(HttpStatus.UNAUTHORIZED, "登录已过期");
+            return known(HttpStatus.UNAUTHORIZED, "登录已过期", WebErrorCode.UNAUTHENTICATED);
         }
         if (exception instanceof InsufficientAuthenticationException) {
-            return known(HttpStatus.UNAUTHORIZED, "用户未登录");
+            return known(HttpStatus.UNAUTHORIZED, "用户未登录", WebErrorCode.UNAUTHENTICATED);
         }
         if (exception instanceof BadCredentialsException) {
-            return known(HttpStatus.UNAUTHORIZED, messageOr(exception.getMessage(), "账号或密码错误"));
+            return known(HttpStatus.UNAUTHORIZED, messageOr(exception.getMessage(), "账号或密码错误"),
+                    WebErrorCode.AUTHENTICATION_FAILED);
         }
-        return known(HttpStatus.UNAUTHORIZED, "认证失败");
+        return known(HttpStatus.UNAUTHORIZED, "认证失败", WebErrorCode.AUTHENTICATION_FAILED);
     }
 
     /** 已知业务异常：允许边界层记录摘要，不需要完整堆栈。 */
-    private static ExceptionResolution known(HttpStatus status, String message) {
-        return new ExceptionResolution(status, message, false);
+    private static ExceptionResolution known(HttpStatus status, String message, WebErrorCode errorCode) {
+        return new ExceptionResolution(status, message, errorCode, false);
     }
 
     /** 基础设施异常：对外返回安全消息，同时要求边界层保留完整堆栈用于排障。 */
-    private static ExceptionResolution infrastructure(HttpStatus status, String message) {
-        return new ExceptionResolution(status, message, true);
+    private static ExceptionResolution infrastructure(HttpStatus status, String message, WebErrorCode errorCode) {
+        return new ExceptionResolution(status, message, errorCode, true);
     }
 
     /** 统一处理异常消息为空或只包含空白的情况。 */

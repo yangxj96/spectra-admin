@@ -56,6 +56,9 @@ public class R<T> implements Serializable {
     /** 成功响应携带的业务数据；无数据响应时为 null。 */
     private transient T data;
 
+    /** 失败响应携带的稳定错误码（对应 {@link WebErrorCode} 名称）；成功响应为 null。 */
+    private String errorCode;
+
     /**
      * 使用给定 HTTP 状态创建响应包装。
      *
@@ -124,5 +127,29 @@ public class R<T> implements Serializable {
      */
     public static R<Object> failure(HttpStatus status, String msg) {
         return R.builder().code(status.value()).msg(msg).build();
+    }
+
+    /**
+     * 创建同时指定 HTTP 状态、说明和稳定错误码的失败响应。
+     *
+     * @param status    表示失败类别的 HTTP 状态；不能为 null
+     * @param msg       面向调用方的失败原因或处理建议；允许为 null
+     * @param errorCode 稳定错误码（{@link WebErrorCode} 名称）；允许为 null
+     * @return code、msg 和 errorCode 来自传入值、data 为 null 的响应；不会返回 null
+     */
+    public static R<Object> failure(HttpStatus status, String msg, WebErrorCode errorCode) {
+        return failure(status, msg, errorCode == null ? null : errorCode.name());
+    }
+
+    /**
+     * 创建同时指定 HTTP 状态、说明和自定义稳定错误码的失败响应。
+     *
+     * @param status    表示失败类别的 HTTP 状态；不能为 null
+     * @param msg       面向调用方的失败原因或处理建议；允许为 null
+     * @param errorCode 稳定错误码文本；允许为 null
+     * @return code、msg 和 errorCode 来自传入值、data 为 null 的响应；不会返回 null
+     */
+    public static R<Object> failure(HttpStatus status, String msg, String errorCode) {
+        return R.builder().code(status.value()).msg(msg).errorCode(errorCode).build();
     }
 }

@@ -25,6 +25,7 @@ import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.NotImplementedException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.framework.web.advice.crypto.RequestCryptoException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -140,9 +141,10 @@ public class CommonExceptionAdvice {
             if (message == null || StrUtils.isEmpty(message)) {
                 message = "参数验证异常";
             }
-            return R.failure(HttpStatus.BAD_REQUEST, message);
+            return R.failure(HttpStatus.BAD_REQUEST, message, WebErrorCode.REQUEST_INVALID);
         } else {
-            return R.failure(HttpStatus.BAD_REQUEST);
+            return R.failure(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    WebErrorCode.REQUEST_INVALID);
         }
     }
 
@@ -157,7 +159,7 @@ public class CommonExceptionAdvice {
     public R<Object> requestCryptoException(RequestCryptoException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.warn("{}请求加密校验失败，correlationId={}", LogPrefix.WEB.p(), correlationId());
-        return R.failure(HttpStatus.BAD_REQUEST, "请求加密数据无效");
+        return R.failure(HttpStatus.BAD_REQUEST, "请求加密数据无效", WebErrorCode.REQUEST_CRYPTO_INVALID);
     }
 
     /**
@@ -167,7 +169,7 @@ public class CommonExceptionAdvice {
     public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.warn("{}请求体不可读，correlationId={}", LogPrefix.WEB.p(), correlationId());
-        return R.failure(HttpStatus.BAD_REQUEST, "请求数据格式错误，请检查请求体");
+        return R.failure(HttpStatus.BAD_REQUEST, "请求数据格式错误，请检查请求体", WebErrorCode.REQUEST_BODY_UNREADABLE);
     }
 
     /**
@@ -228,7 +230,7 @@ public class CommonExceptionAdvice {
             log.warn("{}请求失败，method={}, uri={}, correlationId={}, status={}, message={}", LogPrefix.WEB.p(),
                     requestContext.method(), requestContext.uri(), correlationId(), resolution.status().value(), resolution.message());
         }
-        return R.failure(resolution.status(), resolution.message());
+        return R.failure(resolution.status(), resolution.message(), resolution.errorCode());
     }
 
     /** 获取当前请求的 method 和 URI；异步或非 Web 调用没有上下文时使用安全占位值。 */

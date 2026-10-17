@@ -19,6 +19,7 @@ package com.devops00.spectra.framework.web.advice.exception;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.SchedulerDatabaseUnavailableException;
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import com.devops00.spectra.common.exception.SecurityRedisUnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class SqlExceptionAdvice {
      */
     @ExceptionHandler(DuplicateKeyException.class)
     public R<Object> handleDuplicateKeyException(DuplicateKeyException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.setStatus(HttpStatus.CONFLICT.value());
         var message = e.getMessage();
         var pattern = Pattern.compile("键值\"\\(name\\)=\\((?<value>[^)]+)\\)\" 已经存在");
         var matcher = pattern.matcher(message == null ? "" : message);
@@ -62,11 +63,10 @@ public class SqlExceptionAdvice {
         if (matcher.find()) {
             var value = matcher.group("value");
 
-            return R.failure("\"%s\"已存在,请更换名称".formatted(value));
+            return R.failure(HttpStatus.CONFLICT, "\"%s\"已存在,请更换名称".formatted(value), WebErrorCode.DATA_EXIST);
         }
-        // 记录日志（这里假设你有 log 对象）
         log.error("{}{}, detail: {}", LogPrefix.PERSISTENCE.p(), errorMessage, message, e);
-        return R.failure(errorMessage);
+        return R.failure(HttpStatus.CONFLICT, errorMessage, WebErrorCode.DATA_EXIST);
     }
 
     /**
@@ -76,7 +76,7 @@ public class SqlExceptionAdvice {
     public R<Object> handleBadSqlGrammarException(BadSqlGrammarException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         log.error("{}SQL语法错误: SQL=[{}], 错误=[{}]", LogPrefix.PERSISTENCE.p(), e.getSql(), e.getMessage(), e);
-        return R.failure("请求的数据查询异常,请联系管理员");
+        return R.failure(HttpStatus.INTERNAL_SERVER_ERROR, "请求的数据查询异常,请联系管理员", WebErrorCode.PERSISTENCE_FAILED);
     }
 
     /**
@@ -88,9 +88,9 @@ public class SqlExceptionAdvice {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public R<Object> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setStatus(HttpStatus.CONFLICT.value());
         log.error("{}数据完整性违规: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
-        return R.failure("数据不符合规则,请检查输入内容");
+        return R.failure(HttpStatus.CONFLICT, "数据不符合规则,请检查输入内容", WebErrorCode.BUSINESS_CONFLICT);
     }
 
     /**
@@ -106,11 +106,11 @@ public class SqlExceptionAdvice {
         var sqlException = e.getSQLException();
         if (sqlException == null) {
             log.error("{}未分类SQL异常: 未提供底层 SQLException", LogPrefix.PERSISTENCE.p(), e);
-            return R.failure("数据库操作异常,请稍后重试");
+            return R.failure(HttpStatus.INTERNAL_SERVER_ERROR, "数据库操作异常,请稍后重试", WebErrorCode.PERSISTENCE_FAILED);
         }
         log.error("{}未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]", LogPrefix.PERSISTENCE.p(), sqlException.getSQLState(),
                 sqlException.getErrorCode(), sqlException.getMessage(), e);
-        return R.failure("数据库操作异常,请稍后重试");
+        return R.failure(HttpStatus.INTERNAL_SERVER_ERROR, "数据库操作异常,请稍后重试", WebErrorCode.PERSISTENCE_FAILED);
     }
 
     /**
@@ -124,7 +124,7 @@ public class SqlExceptionAdvice {
     public R<Object> handleDataAccessException(DataAccessException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         log.error("{}数据访问异常（兜底）: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
-        return R.failure("系统内部错误，请联系管理员");
+        return R.failure(HttpStatus.INTERNAL_SERVER_ERROR, "系统内部错误，请联系管理员", WebErrorCode.PERSISTENCE_FAILED);
     }
 
     /**
@@ -139,7 +139,8 @@ public class SqlExceptionAdvice {
                                                         HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         log.warn("{}调度 PostgreSQL 不可用，请求被拒绝: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.SERVICE_UNAVAILABLE, SchedulerDatabaseUnavailableException.CODE);
+        return R.failure(HttpStatus.SERVICE_UNAVAILABLE, "调度服务暂不可用",
+                WebErrorCode.SCHEDULER_DATABASE_UNAVAILABLE);
     }
 
     /**
@@ -153,7 +154,7 @@ public class SqlExceptionAdvice {
     public R<Object> handleSecurityRedisUnavailable(SecurityRedisUnavailableException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         log.warn("{}安全 Redis 不可用，请求被拒绝: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.SERVICE_UNAVAILABLE, "安全会话服务暂不可用");
+        return R.failure(HttpStatus.SERVICE_UNAVAILABLE, "安全会话服务暂不可用", WebErrorCode.SECURITY_REDIS_UNAVAILABLE);
     }
 
     /**
@@ -169,6 +170,6 @@ public class SqlExceptionAdvice {
     public R<Object> handleSQLException(SQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         log.error("{}原始SQLException: SQL状态=[{}], 错误码=[{}], 信息=[{}]", LogPrefix.PERSISTENCE.p(), e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
-        return R.failure("数据库操作失败,请稍后重试");
+        return R.failure(HttpStatus.INTERNAL_SERVER_ERROR, "数据库操作失败,请稍后重试", WebErrorCode.PERSISTENCE_FAILED);
     }
 }

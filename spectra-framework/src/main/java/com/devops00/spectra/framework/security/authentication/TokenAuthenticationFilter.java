@@ -22,6 +22,7 @@ import com.devops00.spectra.common.port.security.SecurityUserLookupPort;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,7 +77,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.clearContext();
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentType("application/json;charset=UTF-8");
-                    responseWriter.writeValue(response.getWriter(), R.failure(HttpStatus.FORBIDDEN, "请先修改密码"));
+                    responseWriter.writeValue(response.getWriter(),
+                            R.failure(HttpStatus.FORBIDDEN, "需要修改密码", WebErrorCode.PASSWORD_CHANGE_REQUIRED));
                     return;
                 } else {
                     var authorities = user.getAuthorityNames()
@@ -90,7 +92,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // Redis 是当前 opaque session 的事实源；依赖不可用时禁止请求继续进入业务层。
                 SecurityContextHolder.clearContext();
                 log.warn("Redis 会话依赖不可用，拒绝当前请求: {} {}", request.getMethod(), request.getRequestURI(), exception);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "安全会话服务暂不可用");
+                response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                response.setContentType("application/json;charset=UTF-8");
+                responseWriter.writeValue(response.getWriter(),
+                        R.failure(HttpStatus.SERVICE_UNAVAILABLE, "安全会话服务暂不可用",
+                                WebErrorCode.SECURITY_REDIS_UNAVAILABLE));
                 return;
             }
         }

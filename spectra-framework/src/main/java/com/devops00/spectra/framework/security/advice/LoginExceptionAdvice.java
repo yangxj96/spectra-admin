@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.security.advice;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -50,6 +51,7 @@ public class LoginExceptionAdvice {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.warn("{}登录失败: {}", LogPrefix.SECURITY.p(), e.getMessage(), e);
         var message = e.getMessage();
-        return R.failure(HttpStatus.UNAUTHORIZED, message == null || message.isBlank() ? "账号或密码错误" : message);
+        return R.failure(HttpStatus.UNAUTHORIZED, message == null || message.isBlank() ? "账号或密码错误" : message,
+                WebErrorCode.AUTHENTICATION_FAILED);
     }
 }

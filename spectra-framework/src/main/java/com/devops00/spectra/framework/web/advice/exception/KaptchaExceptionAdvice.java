@@ -20,6 +20,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.KaptchaExpiresException;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -48,7 +49,7 @@ public class KaptchaExceptionAdvice {
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.error("{}验证码不匹配,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.BAD_REQUEST, "验证码不匹配");
+        return R.failure(HttpStatus.BAD_REQUEST, "验证码不匹配", WebErrorCode.KAPTCHA_NOT_MATCH);
     }
 
     /**
@@ -58,6 +59,6 @@ public class KaptchaExceptionAdvice {
     public R<Object> kaptchaExpiresException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.error("{}验证码过期,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.BAD_REQUEST, "验证码过期");
+        return R.failure(HttpStatus.BAD_REQUEST, "验证码过期", WebErrorCode.KAPTCHA_EXPIRED);
     }
 }

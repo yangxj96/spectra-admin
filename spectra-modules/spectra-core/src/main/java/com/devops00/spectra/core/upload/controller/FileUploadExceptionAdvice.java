@@ -57,6 +57,6 @@ public class FileUploadExceptionAdvice {
             default -> HttpStatus.BAD_REQUEST;
         };
         response.setStatus(status.value());
-        return R.failure(status, exception.getErrorCode().name() + ": " + exception.getMessage());
+        return R.failure(status, exception.getMessage(), exception.getErrorCode().name());
     }
 }
