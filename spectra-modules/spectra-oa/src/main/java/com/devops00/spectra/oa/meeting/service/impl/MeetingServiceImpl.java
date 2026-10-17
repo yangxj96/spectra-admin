@@ -93,7 +93,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             throw new DataSaveException("会议结束时间必须晚于开始时间");
         }
         var entity = meetingConverter.toEntity(from);
-        entity.setInitiatorId(userId.toString());
+        entity.setInitiatorId(userId);
         entity.setDepartmentId(user.getDepartmentId());
         entity.setStatus(MeetingStatus.SCHEDULED);
         entity.setApprovalStatus(MeetingStatus.APPROVED);
@@ -180,7 +180,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     public void respond(UUID meetingId, MeetingResponseFrom from) {
         var userId = securityContextAccessor.currentUserId();
         var participant = participantMapper.selectOne(new LambdaQueryWrapper<MeetingParticipant>()
-                .eq(MeetingParticipant::getMeetingId, meetingId.toString())
+                .eq(MeetingParticipant::getMeetingId, meetingId)
                 .eq(MeetingParticipant::getUserId, userId));
         if (participant == null) {
             throw new DataNotExistException("您不是该会议参与人");
@@ -202,7 +202,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     public void checkIn(UUID meetingId) {
         var userId = securityContextAccessor.currentUserId();
         var participant = participantMapper.selectOne(new LambdaQueryWrapper<MeetingParticipant>()
-                .eq(MeetingParticipant::getMeetingId, meetingId.toString())
+                .eq(MeetingParticipant::getMeetingId, meetingId)
                 .eq(MeetingParticipant::getUserId, userId));
         if (participant == null) {
             throw new DataNotExistException("您不是该会议参与人");
@@ -217,7 +217,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     public void saveRecord(UUID meetingId, MeetingRecordFrom from) {
         var meeting = this.getById(meetingId);
         var userId = securityContextAccessor.currentUserId();
-        if (meeting == null || !userId.toString().equals(meeting.getInitiatorId())) {
+        if (meeting == null || !userId.equals(meeting.getInitiatorId())) {
             throw new DataNotExistException("只有会议发起人可以维护纪要");
         }
         var record = recordMapper.selectOne(new LambdaQueryWrapper<MeetingRecord>().eq(MeetingRecord::getMeetingId, meetingId));
@@ -239,7 +239,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
      */
     private void addParticipant(Meeting meeting, UUID userId, String role, UUID departmentId, String status) {
         var participant = new MeetingParticipant();
-        participant.setMeetingId(meeting.getId().toString());
+        participant.setMeetingId(meeting.getId());
         participant.setUserId(userId);
         participant.setRole(role);
         participant.setStatus(status);

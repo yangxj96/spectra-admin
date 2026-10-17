@@ -47,7 +47,7 @@ public class MeetingParticipant extends BaseEntity {
      * 会议ID
      */
     @TableField("meeting_id")
-    private String meetingId;
+    private UUID meetingId;
 
     /**
      * 参会人ID

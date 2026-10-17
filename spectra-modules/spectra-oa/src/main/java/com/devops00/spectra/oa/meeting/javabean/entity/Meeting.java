@@ -55,7 +55,7 @@ public class Meeting extends BaseEntity {
      * 发起人
      */
     @TableField("initiator_id")
-    private String initiatorId;
+    private UUID initiatorId;
 
     /**
      * 开始时间
