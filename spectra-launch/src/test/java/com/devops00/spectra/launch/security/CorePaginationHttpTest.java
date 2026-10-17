@@ -156,6 +156,32 @@ class CorePaginationHttpTest {
                 assertEquals(400, get(client, port, token,
                         "/api/workflow/tasks/todo?orders%5B0%5D.column=id").statusCode(),
                         "固定排序的待办任务入口应拒绝客户端排序");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/applications/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/applications/page?orders%5B0%5D.column=title").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/document/page?pageNum=1&pageSize=5&orders%5B0%5D.column=updated_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/document/page?orders%5B0%5D.column=content").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/reimbursements/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/reimbursements/page?orders%5B0%5D.column=amount").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/purchases/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/purchases/page?orders%5B0%5D.column=amount").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/contract/page?pageNum=1&pageSize=5&orders%5B0%5D.column=updated_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/contract/page?orders%5B0%5D.column=amount").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/contact/page?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/contact/page?orders%5B0%5D.column=id").statusCode(),
+                        "固定排序的联系人入口应拒绝客户端排序");
             } finally {
                 fixture.clean();
             }
