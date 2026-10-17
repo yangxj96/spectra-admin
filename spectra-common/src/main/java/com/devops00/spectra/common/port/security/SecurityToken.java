@@ -53,10 +53,12 @@ public class SecurityToken implements Serializable {
     /**
      * 访问令牌。
      */
+    @ToString.Exclude
     private String accessToken;
     /**
      * 刷新令牌。
      */
+    @ToString.Exclude
     private String refreshToken;
     /** 当前会话可使用的稳定权限编码列表。 */
     private List<String> permissions;

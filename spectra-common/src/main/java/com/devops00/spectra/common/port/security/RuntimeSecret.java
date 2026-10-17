@@ -45,4 +45,15 @@ public record RuntimeSecret(String code, int version, String value, String finge
             throw new IllegalArgumentException("密钥版本必须大于 0");
         }
     }
+
+    /**
+     * 诊断输出隐藏密钥值，避免日志或异常信息泄漏。
+     *
+     * @return 不包含 {@code value} 的描述
+     */
+    @Override
+    public String toString() {
+        return "RuntimeSecret[code=" + code + ", version=" + version + ", value=<redacted>, fingerprint=" + fingerprint
+                + "]";
+    }
 }
