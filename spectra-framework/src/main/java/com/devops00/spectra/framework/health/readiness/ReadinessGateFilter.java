@@ -45,7 +45,7 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ReadinessGateFilter extends OncePerRequestFilter {
 
-    private static final String UNAVAILABLE_BODY = "{\"code\":503,\"msg\":\"服务暂不可用\"}";
+    private static final String UNAVAILABLE_BODY = "{\"code\":503,\"msg\":\"服务暂不可用\",\"error_code\":\"DEPENDENCY_NOT_READY\"}";
 
     private final DependencyReadinessState state;
 

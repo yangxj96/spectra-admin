@@ -74,6 +74,8 @@ public enum WebErrorCode {
     AUDIT_SERVICE_UNAVAILABLE,
     /** 加密配置不可用。 */
     CRYPTO_CONFIGURATION_UNAVAILABLE,
+    /** 必需依赖运行期未就绪。 */
+    DEPENDENCY_NOT_READY,
     /** 数据完整性或持久化失败。 */
     PERSISTENCE_FAILED,
     /** 未分类的服务器内部错误。 */

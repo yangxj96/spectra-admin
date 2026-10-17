@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.security.advice;
 
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
@@ -68,7 +69,10 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             default -> "认证失败";
         };
 
-        var body = om.writeValueAsString(R.failure(HttpStatus.UNAUTHORIZED, message));
+        var errorCode = e instanceof BadCredentialsException
+                ? WebErrorCode.AUTHENTICATION_FAILED
+                : WebErrorCode.UNAUTHENTICATED;
+        var body = om.writeValueAsString(R.failure(HttpStatus.UNAUTHORIZED, message, errorCode));
         response.getWriter().write(body);
     }
 }

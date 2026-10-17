@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.security.advice;
 
 import com.devops00.spectra.framework.web.response.R;
+import com.devops00.spectra.framework.web.response.WebErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
@@ -58,7 +59,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
 
-        var body = R.failure(HttpStatus.FORBIDDEN, "权限不足");
+        var body = R.failure(HttpStatus.FORBIDDEN, "权限不足", WebErrorCode.ACCESS_DENIED);
 
         response.getWriter().write(om.writeValueAsString(body));
     }
