@@ -40,6 +40,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListPartsRequest;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.UploadPartPresignRequest;
@@ -129,7 +130,32 @@ public class S3FileStorageProvider implements FileStorageProvider {
         if (providerEtag == null || providerEtag.isBlank()) {
             throw new FileUploadException(FileErrorCode.FILE_PART_INVALID, "S3 ETag is required");
         }
-        return new StoredPart(partNumber, expectedSize, expectedSha256, providerEtag);
+        try {
+            // 以存储侧 ListParts 的实际大小/ETag 为准，避免客户端声明与迟到写入不一致。
+            var stored = client.listParts(ListPartsRequest.builder()
+                    .bucket(multipart.container())
+                    .key(multipart.key())
+                    .uploadId(multipart.providerUploadId())
+                    .build())
+                    .parts()
+                    .stream()
+                    .filter(part -> part.partNumber() == partNumber)
+                    .findFirst()
+                    .orElseThrow(() -> new FileUploadException(FileErrorCode.FILE_PART_INVALID,
+                            "S3 分片尚未上传"));
+            if (stored.size() != expectedSize || !normalizeEtag(providerEtag).equals(normalizeEtag(stored.eTag()))) {
+                throw new FileUploadException(FileErrorCode.FILE_PART_HASH_MISMATCH, "S3 分片大小或 ETag 与声明不一致");
+            }
+            return new StoredPart(partNumber, stored.size(), expectedSha256, stored.eTag());
+        } catch (FileUploadException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw unavailable("unable to inspect S3 uploaded part", e);
+        }
+    }
+
+    private static String normalizeEtag(String etag) {
+        return etag == null ? "" : etag.replace("\"", "").trim();
     }
 
     @Override
