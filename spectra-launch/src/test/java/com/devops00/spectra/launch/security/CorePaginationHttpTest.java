@@ -199,6 +199,39 @@ class CorePaginationHttpTest {
                         "/api/oa/supplies/page?pageNum=1&pageSize=5&orders%5B0%5D.column=sku").statusCode());
                 assertEquals(400, get(client, port, token,
                         "/api/oa/supplies/page?orders%5B0%5D.column=price").statusCode());
+
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/list?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/list?orders%5B0%5D.column=status").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/templates?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/admin/templates?orders%5B0%5D.column=id").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/templates/groups?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/admin/templates/groups?orders%5B0%5D.column=id").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/scheduler/quartz/execution-history?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/scheduler/quartz/execution-history?orders%5B0%5D.column=id").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/file/assets/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/file/assets/page?orders%5B0%5D.column=status").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/file/references/page?pageNum=1&pageSize=5&orders%5B0%5D.column=id").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/file/references/page?orders%5B0%5D.column=status").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/user/online?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/user/online?orders%5B0%5D.column=id").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/workflow/tasks/done?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/workflow/tasks/done?orders%5B0%5D.column=id").statusCode());
             } finally {
                 fixture.clean();
             }
