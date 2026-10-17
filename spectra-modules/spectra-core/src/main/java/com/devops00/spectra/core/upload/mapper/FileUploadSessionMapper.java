@@ -44,6 +44,15 @@ public interface FileUploadSessionMapper extends BaseMapper<FileUploadSession> {
     int countActiveByOwner(@Param("ownerUserId") UUID ownerUserId);
 
     /**
+     * 统计操作者通过就绪上传会话关联到指定资产的次数。
+     *
+     * @param fileAssetId 文件资产标识。
+     * @param ownerUserId 所有者用户标识。
+     * @return 符合条件的数量。
+     */
+    int countReadyOwner(@Param("fileAssetId") UUID fileAssetId, @Param("ownerUserId") UUID ownerUserId);
+
+    /**
      * 查询可恢复状态。
      *
      * @param ownerUserId 所有者用户标识。

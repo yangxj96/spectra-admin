@@ -84,6 +84,12 @@
           AND expires_at &gt; CURRENT_TIMESTAMP AND deleted IS NULL
     </select>
 
+    <select id="countReadyOwner" resultType="int">
+        SELECT COUNT(*) FROM spectra_core.file_upload_session
+        WHERE file_asset_id = #{fileAssetId} AND owner_user_id = #{ownerUserId}
+          AND status = 'READY' AND deleted IS NULL
+    </select>
+
     <select id="findResumable" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
         SELECT * FROM spectra_core.file_upload_session
         WHERE owner_user_id = #{ownerUserId} AND content_sha256 = #{sha256} AND size = #{size}

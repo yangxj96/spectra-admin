@@ -35,6 +35,7 @@ import com.devops00.spectra.core.upload.javabean.vo.FileAssetVO;
 import com.devops00.spectra.core.upload.mapper.FileAssetMapper;
 import com.devops00.spectra.core.upload.mapper.FileReferenceMapper;
 import com.devops00.spectra.core.upload.mapper.FileTypeMapper;
+import com.devops00.spectra.core.upload.mapper.FileUploadSessionMapper;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.security.FileReferencePermissionResolver;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
@@ -62,6 +63,7 @@ public class FileAssetApplicationService implements FileAssetPort {
     private final FileAssetMapper assetMapper;
     private final FileReferenceMapper referenceMapper;
     private final FileTypeMapper typeMapper;
+    private final FileUploadSessionMapper sessionMapper;
     private final FileStorageProviderRegistry providerRegistry;
     private final FileUploadProperties uploadProperties;
     private final SecurityContextAccessor securityContextAccessor;
@@ -77,7 +79,20 @@ public class FileAssetApplicationService implements FileAssetPort {
     @Override
     @Transactional(readOnly = true)
     public FileAssetSnapshot requireReadyForReference(UUID fileAssetId, UUID operatorId) {
-        return snapshot(requireAsset(fileAssetId));
+        FileAsset asset = requireAsset(fileAssetId);
+        if (operatorId == null || !isReferenceOwner(asset, operatorId)) {
+            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED,
+                    "operator is not authorized to reference file asset");
+        }
+        return snapshot(asset);
+    }
+
+    /**
+     * 操作者必须是资产创建者，或持有引用该资产的就绪上传会话（全局去重场景）。
+     */
+    private boolean isReferenceOwner(FileAsset asset, UUID operatorId) {
+        return operatorId.equals(asset.getCreatedBy())
+                || sessionMapper.countReadyOwner(asset.getId(), operatorId) > 0;
     }
 
     @Override

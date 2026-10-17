@@ -50,7 +50,7 @@ public class FileReferenceApplicationService implements FileReferenceService {
     @Transactional
     public FileReferenceView register(FileReferenceCommand command) {
         requireBusinessPermission(command.referenceType(), command.referenceId());
-        assetService.requireReadyForReference(command.fileAssetId(), null);
+        assetService.requireReadyForReference(command.fileAssetId(), securityContextAccessor.currentUserId());
         FileReference existing = referenceMapper.findByKey(command.fileAssetId(), command.referenceType(), command.referenceId(), command.purpose());
         if (existing != null)
             return view(existing);
