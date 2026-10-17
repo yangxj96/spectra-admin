@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -144,14 +145,19 @@ public class TimeMapper {
     }
 
     /**
-     * LocalTime 转 Instant
-     * Instant 需要日期，这里默认用今天
+     * LocalTime 转 Instant。
+     *
+     * <p>LocalTime 不包含日期，无法确定绝对时刻；不再隐式使用“今天”，调用方需先补全日期。</p>
      *
      * @param localTime {@link LocalTime}
-     * @return 返回以当前用户时区当天承载 LocalTime 后得到的 Instant；输入为 null 时返回 null。
+     * @return 输入为 null 时返回 null
+     * @throws DateTimeException 输入非 null 时始终抛出，要求调用方提供日期
      */
     public @Nullable Instant toInstant(@Nullable LocalTime localTime) {
-        return localTime == null ? null : LocalDate.now(getUserZoneId()).atTime(localTime).atZone(getUserZoneId()).toInstant();
+        if (localTime == null) {
+            return null;
+        }
+        throw new DateTimeException("LocalTime 缺少日期，无法转换为 Instant");
     }
 
     /**

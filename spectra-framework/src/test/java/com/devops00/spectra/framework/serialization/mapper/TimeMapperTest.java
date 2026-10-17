@@ -19,8 +19,10 @@ package com.devops00.spectra.framework.serialization.mapper;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
@@ -114,5 +116,10 @@ class TimeMapperTest {
         var value = mapper("Asia/Shanghai").toOffsetDateTime(LocalDate.of(2020, 1, 1));
         assertEquals(Instant.parse("2019-12-31T16:00:00Z"), value.toInstant());
         assertEquals(ZoneOffset.ofHours(8), value.getOffset());
+    }
+
+    @Test
+    void localTimeWithoutDateIsRejected() {
+        assertThrows(DateTimeException.class, () -> mapper().toInstant(LocalTime.NOON));
     }
 }
