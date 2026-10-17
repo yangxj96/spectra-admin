@@ -18,6 +18,7 @@ package com.devops00.spectra.core.upload.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.upload.javabean.entity.FileUploadPart;
+import com.devops00.spectra.core.upload.storage.StoredPart;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -76,37 +77,34 @@ public interface FileUploadPartMapper extends BaseMapper<FileUploadPart> {
      *
      * @param sessionId  会话标识。
      * @param partNumber 分片编号参数。
-     * @param size       大小参数。
-     * @param sha256     文件内容的 SHA-256 摘要。
-     * @param etag       ETag参数。
+     * @param stored     已存储分片（大小、摘要、ETag）。
+     * @param attempt    当前上传尝试序号。
      * @return 符合条件的数量。
      */
     int markUploaded(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
-                     @Param("size") long size, @Param("sha256") String sha256, @Param("etag") String etag);
+                     @Param("stored") StoredPart stored, @Param("attempt") int attempt);
 
     /**
      * 设置已确认状态。
      *
      * @param sessionId  会话标识。
      * @param partNumber 分片编号参数。
-     * @param size       大小参数。
-     * @param sha256     文件内容的 SHA-256 摘要。
-     * @param etag       ETag参数。
+     * @param stored     已存储分片（大小、摘要、ETag）。
+     * @param attempt    当前上传尝试序号。
      * @return 符合条件的数量。
      */
     int markConfirmed(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
-                      @Param("size") long size, @Param("sha256") String sha256, @Param("etag") String etag);
+                      @Param("stored") StoredPart stored, @Param("attempt") int attempt);
 
     /**
      * 设置外部已确认状态。
      *
      * @param sessionId  会话标识。
      * @param partNumber 分片编号参数。
-     * @param size       大小参数。
-     * @param sha256     文件内容的 SHA-256 摘要。
-     * @param etag       ETag参数。
+     * @param stored     已存储分片（大小、摘要、ETag）。
+     * @param attempt    当前上传尝试序号。
      * @return 符合条件的数量。
      */
     int markExternalConfirmed(@Param("sessionId") UUID sessionId, @Param("partNumber") int partNumber,
-                              @Param("size") long size, @Param("sha256") String sha256, @Param("etag") String etag);
+                              @Param("stored") StoredPart stored, @Param("attempt") int attempt);
 }

@@ -76,25 +76,27 @@
 
     <update id="markUploaded">
         UPDATE spectra_core.file_upload_part
-        SET uploaded_size = #{size}, actual_sha256 = #{sha256}, provider_etag = #{etag},
+        SET uploaded_size = #{stored.size}, actual_sha256 = #{stored.sha256}, provider_etag = #{stored.etag},
             status = 'UPLOADED', uploaded_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
         WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber}
-          AND status &lt;&gt; 'CONFIRMED' AND deleted IS NULL
+          AND status &lt;&gt; 'CONFIRMED' AND upload_attempt = #{attempt} AND deleted IS NULL
     </update>
 
     <update id="markConfirmed">
         UPDATE spectra_core.file_upload_part
-        SET status = 'CONFIRMED', uploaded_size = #{size}, actual_sha256 = #{sha256}, provider_etag = #{etag},
+        SET status = 'CONFIRMED', uploaded_size = #{stored.size}, actual_sha256 = #{stored.sha256},
+            provider_etag = #{stored.etag},
             uploaded_at = COALESCE(uploaded_at, CURRENT_TIMESTAMP), updated_at = CURRENT_TIMESTAMP
         WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber}
-          AND status IN ('UPLOADED', 'CONFIRMED') AND deleted IS NULL
+          AND status IN ('UPLOADED', 'CONFIRMED') AND upload_attempt = #{attempt} AND deleted IS NULL
     </update>
 
     <update id="markExternalConfirmed">
         UPDATE spectra_core.file_upload_part
-        SET status = 'CONFIRMED', uploaded_size = #{size}, actual_sha256 = #{sha256}, provider_etag = #{etag},
+        SET status = 'CONFIRMED', uploaded_size = #{stored.size}, actual_sha256 = #{stored.sha256},
+            provider_etag = #{stored.etag},
             uploaded_at = COALESCE(uploaded_at, CURRENT_TIMESTAMP), updated_at = CURRENT_TIMESTAMP
         WHERE upload_session_id = #{sessionId} AND part_number = #{partNumber}
-          AND status = 'PENDING' AND deleted IS NULL
+          AND status = 'PENDING' AND upload_attempt = #{attempt} AND deleted IS NULL
     </update>
 </mapper>

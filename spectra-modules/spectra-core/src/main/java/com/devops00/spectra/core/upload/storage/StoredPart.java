@@ -28,4 +28,16 @@ package com.devops00.spectra.core.upload.storage;
  * @since 2026/09/13
  */
 public record StoredPart(int partNumber, long size, String sha256, String etag) {
+
+    public long getSize() {
+        return size;
+    }
+
+    public String getSha256() {
+        return sha256;
+    }
+
+    public String getEtag() {
+        return etag;
+    }
 }

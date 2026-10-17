@@ -113,12 +113,15 @@ public class UploadPartService {
         if (part.getExpectedSha256() == null) {
             throw invalid("请先申请分片上传目标");
         }
+        if (part.getUploadAttempt() == null) {
+            throw invalid("分片上传尝试缺失，请重新申请上传目标");
+        }
         if (contentLength >= 0 && contentLength != part.getExpectedSize()) {
             throw invalid("分片内容长度无效");
         }
         FileStorageProvider provider = providerRegistry.require(session.getStorageProvider());
         StoredPart stored = provider.putLocalPart(toMultipart(session), partNumber, body, part.getExpectedSize(), part.getExpectedSha256());
-        if (partMapper.markUploaded(session.getId(), partNumber, stored.size(), stored.sha256(), stored.etag()) != 1) {
+        if (partMapper.markUploaded(session.getId(), partNumber, stored, part.getUploadAttempt()) != 1) {
             throw conflict("分片上传状态已被并发修改");
         }
     }
@@ -127,30 +130,52 @@ public class UploadPartService {
     @Transactional
     public void confirm(FileUploadSession session, int partNumber, ConfirmPartRequest request) {
         FileUploadPart part = requirePart(session.getId(), partNumber);
+        requireCurrentAttempt(part, request.getAttempt());
+        requireMatchingDeclaration(part, request);
+        if (part.getStatus() == UploadPartStatus.CONFIRMED) {
+            return;
+        }
+        StoredPart stored = resolveStoredPart(session, partNumber, request, part);
+        requireStoredMatches(part, stored);
+        int updated = session.getTransportMode() == TransportMode.PRESIGNED
+                ? partMapper.markExternalConfirmed(session.getId(), partNumber, stored, request.getAttempt())
+                : partMapper.markConfirmed(session.getId(), partNumber, stored, request.getAttempt());
+        if (updated != 1) {
+            throw conflict("分片确认状态已被并发修改");
+        }
+    }
+
+    /** 旧尝试的确认必须被拒绝，避免迟到回调覆盖最新分片状态。 */
+    private static void requireCurrentAttempt(FileUploadPart part, Integer attempt) {
+        if (part.getUploadAttempt() == null || !attempt.equals(part.getUploadAttempt())) {
+            throw conflict("分片上传尝试已过期，请重新申请上传目标");
+        }
+    }
+
+    private static void requireMatchingDeclaration(FileUploadPart part, ConfirmPartRequest request) {
         if (part.getExpectedSha256() == null
                 || !request.getPartSize().equals(part.getExpectedSize())
                 || !request.getPartSha256().equalsIgnoreCase(part.getExpectedSha256())) {
             throw new FileUploadException(FileErrorCode.FILE_PART_HASH_MISMATCH, "分片声明与上传目标不一致");
         }
-        if (part.getStatus() == UploadPartStatus.CONFIRMED) {
-            return;
+    }
+
+    private StoredPart resolveStoredPart(FileUploadSession session, int partNumber, ConfirmPartRequest request,
+                                         FileUploadPart part) {
+        if (session.getTransportMode() != TransportMode.PRESIGNED) {
+            return new StoredPart(partNumber, part.getUploadedSize() == null ? 0 : part.getUploadedSize(),
+                    part.getActualSha256(), part.getProviderEtag());
         }
         FileStorageProvider provider = providerRegistry.require(session.getStorageProvider());
-        StoredPart stored = session.getTransportMode() == TransportMode.PRESIGNED
-                ? provider.confirmExternalPart(toMultipart(session), partNumber, request.getPartSize(), request.getPartSha256(),
-                        request.getProviderEtag())
-                : new StoredPart(partNumber, part.getUploadedSize() == null ? 0 : part.getUploadedSize(),
-                        part.getActualSha256(), part.getProviderEtag());
+        return provider.confirmExternalPart(toMultipart(session), partNumber, request.getPartSize(),
+                request.getPartSha256(), request.getProviderEtag());
+    }
+
+    private static void requireStoredMatches(FileUploadPart part, StoredPart stored) {
         if (stored.sha256() == null
                 || stored.size() != part.getExpectedSize()
                 || !stored.sha256().equalsIgnoreCase(part.getExpectedSha256())) {
             throw new FileUploadException(FileErrorCode.FILE_PART_HASH_MISMATCH, "存储分片与声明不一致");
-        }
-        int updated = session.getTransportMode() == TransportMode.PRESIGNED
-                ? partMapper.markExternalConfirmed(session.getId(), partNumber, stored.size(), stored.sha256(), stored.etag())
-                : partMapper.markConfirmed(session.getId(), partNumber, stored.size(), stored.sha256(), stored.etag());
-        if (updated != 1) {
-            throw conflict("分片确认状态已被并发修改");
         }
     }
 
