@@ -177,7 +177,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         result.setRoleId(roleId);
         result.setPreviewToken(tokenService.issue(token));
         result.setExpectedVersion(prepared.expectedVersion());
-        result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
+        result.setExpiresAt(timeMapper.toOffsetDateTime(expiresAt));
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());

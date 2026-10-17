@@ -18,7 +18,7 @@ package com.devops00.spectra.core.security.authorization.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -77,7 +77,7 @@ public class DepartmentRestructurePreviewVO {
 
     private Long afterOrganizationVersion;
 
-    private LocalDateTime expiresAt;
+    private OffsetDateTime expiresAt;
 
     private String previewToken;
 }

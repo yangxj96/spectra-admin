@@ -144,7 +144,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         result.setTargetUserId(targetUserId);
         result.setAssignmentId(prepared.assignmentId());
         result.setExpectedVersion(from.getExpectedVersion());
-        result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
+        result.setExpiresAt(timeMapper.toOffsetDateTime(expiresAt));
         result.setAffectedAssignmentCount(1);
         result.setAffectedUserCount(1);
         appendAudit(new AuditInput("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), targetUserId,

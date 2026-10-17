@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -48,7 +48,7 @@ public class AuthenticationIdentityVO implements Serializable {
 
     private String state;
 
-    private LocalDateTime verifiedAt;
+    private OffsetDateTime verifiedAt;
 
     private Boolean current;
 }

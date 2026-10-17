@@ -21,7 +21,7 @@ import com.devops00.spectra.core.security.authorization.constant.SecurityAuthori
 import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -43,7 +43,7 @@ public final class UserAuthorizationStatusCalculator {
      * @return 授权状态
      */
     public static UserAuthorizationStatus calculate(List<AuthorizationAssignmentView> assignments) {
-        return calculate(assignments, LocalDateTime.now());
+        return calculate(assignments, OffsetDateTime.now());
     }
 
     /**
@@ -54,7 +54,7 @@ public final class UserAuthorizationStatusCalculator {
      * @return 授权状态
      */
     public static UserAuthorizationStatus calculate(
-                                                    List<AuthorizationAssignmentView> assignments, LocalDateTime now) {
+                                                    List<AuthorizationAssignmentView> assignments, OffsetDateTime now) {
         if (assignments == null || assignments.isEmpty()) {
             return UserAuthorizationStatus.UNCONFIGURED;
         }
@@ -89,7 +89,7 @@ public final class UserAuthorizationStatusCalculator {
     }
 
     private static AssignmentCounts countAssignments(List<AuthorizationAssignmentView> assignments,
-                                                     LocalDateTime now) {
+                                                     OffsetDateTime now) {
         var counts = new AssignmentCounts();
         for (var assignment : assignments) {
             if (!isEffective(assignment, now)) {
@@ -106,7 +106,7 @@ public final class UserAuthorizationStatusCalculator {
         return counts;
     }
 
-    private static boolean isEffective(AuthorizationAssignmentView assignment, LocalDateTime now) {
+    private static boolean isEffective(AuthorizationAssignmentView assignment, OffsetDateTime now) {
         var assignmentEffective = SecurityAuthorizationState.ACTIVE.name().equals(assignment.state())
                 && (assignment.validFrom() == null || !assignment.validFrom().isAfter(now))
                 && (assignment.validUntil() == null || assignment.validUntil().isAfter(now));

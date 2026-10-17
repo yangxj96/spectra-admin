@@ -71,7 +71,7 @@ public class AuthenticationIdentityController {
             vo.setMethodCode(identity.getMethodCode());
             vo.setProviderCode(identity.getProviderCode());
             vo.setState(identity.getState());
-            vo.setVerifiedAt(timeMapper.toLocalDateTime(identity.getVerifiedAt()));
+            vo.setVerifiedAt(timeMapper.toOffsetDateTime(identity.getVerifiedAt()));
             vo.setCurrent(false);
             return vo;
         }).toList();

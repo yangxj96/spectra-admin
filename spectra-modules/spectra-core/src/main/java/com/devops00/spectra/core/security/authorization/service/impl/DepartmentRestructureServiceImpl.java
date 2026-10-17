@@ -472,7 +472,7 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         result.setNewDepartmentRegionId(department.getRegionId());
         result.setExpectedOrganizationVersion(organizationVersion);
         result.setAfterOrganizationVersion(organizationVersion + 1);
-        result.setExpiresAt(timeMapper.toLocalDateTime(Instant.now().plusSeconds(PREVIEW_TTL_SECONDS)));
+        result.setExpiresAt(timeMapper.toOffsetDateTime(Instant.now().plusSeconds(PREVIEW_TTL_SECONDS)));
         result.setPreviewToken(token);
         result.setHistoricalDataSummary(HISTORY_SUMMARY);
         return result;

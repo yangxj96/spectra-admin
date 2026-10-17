@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization.javabean.vo;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,8 +57,8 @@ public record AuthorizationAssignmentView(UUID assignmentId,
                                           Long rolePermissionCount,
                                           Long version,
                                           String state,
-                                          LocalDateTime validFrom,
-                                          LocalDateTime validUntil,
+                                          OffsetDateTime validFrom,
+                                          OffsetDateTime validUntil,
                                           List<AuthorizationBoundaryView> accessBoundaries,
                                           List<AuthorizationBoundaryView> grantBoundaries) {
 

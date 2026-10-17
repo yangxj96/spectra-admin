@@ -169,8 +169,8 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
                     rolePermissionCounts.getOrDefault(assignment.getRoleId(), 0L),
                     assignment.getVersion() == null ? Long.valueOf(0L) : assignment.getVersion(),
                     assignment.getState(),
-                    timeMapper.toLocalDateTime(assignment.getValidFrom()),
-                    timeMapper.toLocalDateTime(assignment.getValidUntil()),
+                    timeMapper.toOffsetDateTime(assignment.getValidFrom()),
+                    timeMapper.toOffsetDateTime(assignment.getValidUntil()),
                     accessByAssignment.getOrDefault(assignment.getId(), List.of())
                             .stream()
                             .map(row -> toBoundary(row.getPermissionId(), row.getScopeId(), permissions, scopes, rulesByScope))

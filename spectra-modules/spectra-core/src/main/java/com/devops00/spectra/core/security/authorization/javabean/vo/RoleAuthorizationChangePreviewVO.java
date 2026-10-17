@@ -18,7 +18,7 @@ package com.devops00.spectra.core.security.authorization.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -37,7 +37,7 @@ public class RoleAuthorizationChangePreviewVO {
 
     private Long expectedVersion;
 
-    private LocalDateTime expiresAt;
+    private OffsetDateTime expiresAt;
 
     private int affectedAssignmentCount;
 

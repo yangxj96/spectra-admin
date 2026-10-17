@@ -678,7 +678,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var assignments = authorizationAssignmentQueryService.findByUserId(vo.getId());
         vo.setRoles(targetRoles(assignments));
         vo.setAuthorizationStatus(UserAuthorizationStatusCalculator.calculate(
-                assignments, timeMapper.toLocalDateTime(Instant.now())));
+                assignments, timeMapper.toOffsetDateTime(Instant.now())));
     }
 
     /** 一次批量装配一页用户的关联部门名称，避免逐用户查询。 */

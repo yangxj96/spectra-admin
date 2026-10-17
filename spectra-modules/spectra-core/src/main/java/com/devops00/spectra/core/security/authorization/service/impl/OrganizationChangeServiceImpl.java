@@ -141,7 +141,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         result.setPreviewToken(tokenService.issue(token));
         result.setExpectedOrganizationVersion(prepared.impact().beforeVersion());
         result.setAfterOrganizationVersion(prepared.impact().afterVersion());
-        result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
+        result.setExpiresAt(timeMapper.toOffsetDateTime(expiresAt));
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());
