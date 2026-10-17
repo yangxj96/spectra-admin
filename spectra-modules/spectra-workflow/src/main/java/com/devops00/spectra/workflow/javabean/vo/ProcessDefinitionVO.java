@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 流程定义响应VO
@@ -82,5 +82,5 @@ public class ProcessDefinitionVO {
     /**
      * 部署时间
      */
-    private LocalDateTime deploymentTime;
+    private OffsetDateTime deploymentTime;
 }

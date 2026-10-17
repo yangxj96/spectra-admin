@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 任务响应VO
@@ -72,7 +72,7 @@ public class TaskVO {
     /**
      * 任务创建时间
      */
-    private LocalDateTime createTime;
+    private OffsetDateTime createTime;
 
     /**
      * 任务描述

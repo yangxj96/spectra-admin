@@ -165,7 +165,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         if (definition.getDeploymentId() != null) {
             var deployment = repositoryService.createDeploymentQuery().deploymentId(definition.getDeploymentId()).singleResult();
             if (deployment != null && deployment.getDeploymentTime() != null) {
-                vo.setDeploymentTime(timeMapper.toLocalDateTime(deployment.getDeploymentTime()));
+                vo.setDeploymentTime(timeMapper.toOffsetDateTime(deployment.getDeploymentTime()));
             }
         }
         return vo;
