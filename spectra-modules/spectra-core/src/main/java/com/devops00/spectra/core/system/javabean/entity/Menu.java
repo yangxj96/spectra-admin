@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.framework.persistence.base.BaseEntity;
@@ -49,7 +50,7 @@ public class Menu extends BaseEntity {
     /**
      * 父级ID
      */
-    @TableField(value = "pid")
+    @TableField(value = "pid", updateStrategy = FieldStrategy.ALWAYS)
     private UUID pid;
 
     /**
@@ -67,7 +68,7 @@ public class Menu extends BaseEntity {
     /**
      * 对应前端命名路由
      */
-    @TableField(value = "route_name")
+    @TableField(value = "route_name", updateStrategy = FieldStrategy.ALWAYS)
     private String routeName;
 
     /**

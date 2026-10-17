@@ -62,6 +62,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -353,11 +354,17 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
             if (preference == null) {
                 return channel == NotificationChannel.IN_APP ? null : "PREFERENCE_DISABLED_OR_QUIET";
             }
-            if (!Boolean.TRUE.equals(preference.getEnabled())
-                    || NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
-                            Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
-                            NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone()))) {
+            if (!Boolean.TRUE.equals(preference.getEnabled())) {
                 return "PREFERENCE_DISABLED_OR_QUIET";
+            }
+            try {
+                if (NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
+                        Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
+                        NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone()))) {
+                    return "PREFERENCE_DISABLED_OR_QUIET";
+                }
+            } catch (DateTimeException exception) {
+                return "INVALID_TIMEZONE";
             }
         }
         return null;

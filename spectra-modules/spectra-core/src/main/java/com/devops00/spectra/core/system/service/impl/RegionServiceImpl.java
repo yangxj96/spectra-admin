@@ -22,6 +22,7 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.system.javabean.enums.RegionLevel;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.core.system.javabean.converter.RegionConverter;
@@ -117,7 +118,9 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
             throw new DataNotExistException("行政区划不存在");
         }
         converter.toEntity(params, region);
-        this.updateById(region);
+        if (!this.updateById(region)) {
+            throw new EntityUpdateException("更新行政区划发生错误");
+        }
         return converter.toVO(region);
     }
 

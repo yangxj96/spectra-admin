@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.framework.persistence.base.BaseEntity;
@@ -68,6 +69,6 @@ public class Configured extends BaseEntity {
     /**
      * 备注说明
      */
-    @TableField(value = "remarks")
+    @TableField(value = "remarks", updateStrategy = FieldStrategy.ALWAYS)
     private String remarks;
 }

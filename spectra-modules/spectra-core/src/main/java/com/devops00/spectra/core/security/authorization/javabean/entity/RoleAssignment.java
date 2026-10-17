@@ -67,10 +67,4 @@ public class RoleAssignment extends BaseEntity {
      */
     @TableField(value = "valid_until")
     private Instant validUntil;
-
-    /**
-     * 角色分配记录的乐观锁版本号。
-     */
-    @TableField(value = "version")
-    private Long version;
 }

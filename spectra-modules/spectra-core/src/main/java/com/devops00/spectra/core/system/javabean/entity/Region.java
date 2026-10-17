@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.framework.persistence.base.BaseEntity;
@@ -52,31 +53,31 @@ public class Region extends BaseEntity {
     /**
      * 区域全称，如 北京市/北京市/东城区
      */
-    @TableField(value = "full_name")
+    @TableField(value = "full_name", updateStrategy = FieldStrategy.ALWAYS)
     private String fullName;
 
     /**
      * 简称
      */
-    @TableField(value = "short_name")
+    @TableField(value = "short_name", updateStrategy = FieldStrategy.ALWAYS)
     private String shortName;
 
     /**
      * 区域编码
      */
-    @TableField(value = "code")
+    @TableField(value = "code", updateStrategy = FieldStrategy.ALWAYS)
     private String code;
 
     /**
      * 区域路径，如 11/1101/110101，不带前导斜杠
      */
-    @TableField(value = "path")
+    @TableField(value = "path", updateStrategy = FieldStrategy.ALWAYS)
     private String path;
 
     /**
      * 上级ID
      */
-    @TableField(value = "pid")
+    @TableField(value = "pid", updateStrategy = FieldStrategy.ALWAYS)
     private UUID pid;
 
     /**

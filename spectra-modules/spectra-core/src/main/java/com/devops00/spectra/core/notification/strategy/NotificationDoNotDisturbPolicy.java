@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.notification.strategy;
 
-import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 
@@ -70,7 +69,7 @@ public final class NotificationDoNotDisturbPolicy {
     }
 
     /**
-     * 将收件人目录提供的时区文本解析为时区；非法值回退到 UTC。
+     * 将收件人目录提供的时区文本解析为时区；非法值拒绝，不回退 UTC。
      *
      * @param timezone 时区 ID
      * @return 可用时区
@@ -79,10 +78,6 @@ public final class NotificationDoNotDisturbPolicy {
         if (timezone == null || timezone.isBlank()) {
             return DEFAULT_ZONE;
         }
-        try {
-            return ZoneId.of(timezone);
-        } catch (DateTimeException exception) {
-            return DEFAULT_ZONE;
-        }
+        return ZoneId.of(timezone);
     }
 }

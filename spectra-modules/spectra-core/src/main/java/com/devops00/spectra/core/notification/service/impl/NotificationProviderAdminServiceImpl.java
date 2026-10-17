@@ -437,7 +437,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                 .stream()
                 .filter(version -> "ACTIVE".equals(version.getState()))
                 .findFirst()
-                .ifPresent(version -> secretManagementService.retire(version.getId()));
+                .ifPresent(version -> secretManagementService.retire(secretKey(channel), version.getId()));
     }
 
     /**

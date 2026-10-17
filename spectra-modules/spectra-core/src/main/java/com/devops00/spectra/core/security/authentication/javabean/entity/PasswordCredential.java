@@ -82,10 +82,4 @@ public class PasswordCredential extends BaseEntity {
      */
     @TableField(value = "locked_until")
     private Instant lockedUntil;
-
-    /**
-     * 密码凭证的乐观锁版本号。
-     */
-    @TableField(value = "version")
-    private Long version;
 }

@@ -91,6 +91,7 @@ public interface FileUploadConverter {
 
     /** 将文件引用实体转换为业务响应。 */
     @Mapping(target = "referenceId", source = "id")
+    @Mapping(target = "businessReferenceId", source = "referenceId")
     FileReferenceVO toReferenceVO(FileReference source);
 
     /** 将分片上传目标转换为 HTTP 响应。 */

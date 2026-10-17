@@ -56,6 +56,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -461,10 +462,16 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (preference == null) {
             return channel == NotificationChannel.IN_APP;
         }
-        return Boolean.TRUE.equals(preference.getEnabled())
-                && !NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
-                        Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
-                        NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone()));
+        if (!Boolean.TRUE.equals(preference.getEnabled())) {
+            return false;
+        }
+        try {
+            return !NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
+                    Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
+                    NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone()));
+        } catch (DateTimeException exception) {
+            return false;
+        }
     }
 
     /**

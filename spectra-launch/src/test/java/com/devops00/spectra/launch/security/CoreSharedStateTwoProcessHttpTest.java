@@ -108,7 +108,7 @@ class CoreSharedStateTwoProcessHttpTest {
 
                     secretVersionId = secretManagement.createPending("security.verification-code-hmac",
                             randomSecret(), "GENERATED").getId();
-                    secretManagement.publish(secretVersionId);
+                    secretManagement.publish("security.verification-code-hmac", secretVersionId);
 
                     String email = "b02shared" + UUID.randomUUID().toString().replace("-", "") + "@example.test";
                     String code = "246813";

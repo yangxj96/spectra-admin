@@ -76,10 +76,4 @@ public class SecurityRole extends BaseEntity {
      */
     @TableField(value = "remark")
     private String remark;
-
-    /**
-     * 安全角色记录的乐观锁版本号。
-     */
-    @TableField(value = "version")
-    private Long version;
 }

@@ -132,8 +132,9 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
 
     @Override
     @Transactional
-    public void publish(UUID versionId) {
+    public void publish(String code, UUID versionId) {
         SecretVersionEntity target = requireVersion(versionId);
+        requireDefinitionMatches(code, target.getSecretDefinitionId());
         if (!SecretVersionState.PENDING.name().equals(target.getState())) {
             throw new DataSaveException("只有待启用版本可以发布");
         }
@@ -161,16 +162,9 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
 
     @Override
     @Transactional
-    public void publish(String code, UUID versionId) {
+    public void retire(String code, UUID versionId) {
         SecretVersionEntity target = requireVersion(versionId);
         requireDefinitionMatches(code, target.getSecretDefinitionId());
-        publish(versionId);
-    }
-
-    @Override
-    @Transactional
-    public void retire(UUID versionId) {
-        SecretVersionEntity target = requireVersion(versionId);
         if (!SecretVersionState.ACTIVE.name().equals(target.getState())) {
             throw new DataSaveException("只有启用版本可以退役");
         }
@@ -184,14 +178,6 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
         if (updated != 1) {
             throw new DataSaveException("密钥版本已被其他操作修改，请刷新后重试");
         }
-    }
-
-    @Override
-    @Transactional
-    public void retire(String code, UUID versionId) {
-        SecretVersionEntity target = requireVersion(versionId);
-        requireDefinitionMatches(code, target.getSecretDefinitionId());
-        retire(versionId);
     }
 
     @Override

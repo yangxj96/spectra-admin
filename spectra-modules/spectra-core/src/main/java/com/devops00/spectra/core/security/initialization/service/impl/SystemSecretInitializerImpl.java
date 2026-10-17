@@ -89,7 +89,7 @@ public class SystemSecretInitializerImpl implements SystemSecretInitializer {
      */
     private void publishGenerated(String code, String value) {
         var version = secretManagementService.createPending(code, value, "GENERATED");
-        secretManagementService.publish(version.getId());
+        secretManagementService.publish(code, version.getId());
     }
 
     /**

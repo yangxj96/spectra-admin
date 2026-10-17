@@ -76,10 +76,4 @@ public class Permission extends BaseEntity {
      */
     @TableField(value = "system_managed")
     private Boolean systemManaged;
-
-    /**
-     * 权限记录的乐观锁版本号。
-     */
-    @TableField(value = "version")
-    private Long version;
 }

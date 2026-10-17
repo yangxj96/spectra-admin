@@ -80,36 +80,18 @@ public interface SecretManagementService {
     SecretVersionEntity createPending(String code, String plaintext, String source);
 
     /**
-     * 发布指定版本，并在同一事务中退役原 ACTIVE 版本。
-     *
-     * @param versionId 要发布的密钥版本 ID。
-     */
-    void publish(UUID versionId);
-
-    /**
-     * 校验版本属于路径中的密钥编码后发布。
+     * 校验版本属于路径中的密钥编码后发布，并在同一事务中退役原 ACTIVE 版本。
      *
      * @param code      路径中的已注册密钥编码。
      * @param versionId 要发布的密钥版本 ID。
      */
-    default void publish(String code, UUID versionId) {
-        publish(versionId);
-    }
+    void publish(String code, UUID versionId);
 
     /**
-     * 退役指定版本，不删除历史元数据。
-     *
-     * @param versionId 要退役的密钥版本 ID。
-     */
-    void retire(UUID versionId);
-
-    /**
-     * 校验版本属于路径中的密钥编码后退役。
+     * 校验版本属于路径中的密钥编码后退役，不删除历史元数据。
      *
      * @param code      路径中的已注册密钥编码。
      * @param versionId 要退役的密钥版本 ID。
      */
-    default void retire(String code, UUID versionId) {
-        retire(versionId);
-    }
+    void retire(String code, UUID versionId);
 }

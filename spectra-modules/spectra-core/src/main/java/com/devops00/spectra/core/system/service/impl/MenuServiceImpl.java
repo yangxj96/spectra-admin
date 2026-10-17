@@ -21,6 +21,7 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.foundation.collection.CollUtils;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.common.foundation.tree.TreeBuilder;
@@ -100,7 +101,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         }
         validateTreeStructure(params);
         var menu = menuConverter.toEntity(params);
-        menuMapper.updateById(menu);
+        if (menuMapper.updateById(menu) == 0) {
+            throw new EntityUpdateException("更新菜单发生错误");
+        }
     }
 
     /**

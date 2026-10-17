@@ -618,7 +618,7 @@ class RootGovernanceFullHttpTest {
                     assertEquals(0L, fixture.activeSecretCount("security.verification-code-hmac"));
                     secretVersionId = secretManagement.createPending("security.verification-code-hmac",
                             randomTestSecret(), "GENERATED").getId();
-                    secretManagement.publish(secretVersionId);
+                    secretManagement.publish("security.verification-code-hmac", secretVersionId);
                     fixture.insertRoot(fixture.operator);
                     UUID localEmailId = identities.createIdentity(fixture.operator.id(), "EMAIL", email).getId();
                     fixture.insertExternalIdentity(fixture.operator);
