@@ -26,6 +26,7 @@ import java.time.format.DateTimeParseException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,8 +40,12 @@ import static org.mockito.Mockito.when;
 class TimeMapperTest {
 
     private static TimeMapper mapper() {
+        return mapper("UTC");
+    }
+
+    private static TimeMapper mapper(String zoneId) {
         var accessor = mock(SecurityContextAccessor.class);
-        when(accessor.currentUserZoneId()).thenReturn("UTC");
+        when(accessor.currentUserZoneId()).thenReturn(zoneId);
         return new TimeMapper(accessor);
     }
 
@@ -75,5 +80,23 @@ class TimeMapperTest {
         var value = mapper().toOffsetDateTime(Instant.parse("2020-01-01T00:00:00Z").toEpochMilli());
         assertEquals(ZoneOffset.UTC, value.getOffset());
         assertEquals(Instant.parse("2020-01-01T00:00:00Z"), value.toInstant());
+    }
+
+    @Test
+    void isoStringCarriesUserOffset() {
+        var text = mapper("Asia/Shanghai").toString(Instant.parse("2020-01-01T00:00:00Z"));
+        assertTrue(text.contains("+08:00"), text);
+    }
+
+    @Test
+    void dstGapResolvesDeterministically() {
+        assertEquals(Instant.parse("2024-03-10T07:30:00Z"),
+                mapper("America/New_York").toInstant("2024-03-10T02:30:00"));
+    }
+
+    @Test
+    void dstOverlapUsesEarlierOffset() {
+        assertEquals(Instant.parse("2024-11-03T05:30:00Z"),
+                mapper("America/New_York").toInstant("2024-11-03T01:30:00"));
     }
 }

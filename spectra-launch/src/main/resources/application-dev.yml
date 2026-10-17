@@ -73,6 +73,8 @@ spring:
     password: ${DB_PASSWORD}
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
+      # 固定数据库连接会话时区为 UTC，与 JVM/JSON 时间协议保持一致。
+      connection-init-sql: SET TIME ZONE 'UTC'
       data-source-properties:
         currentSchema: public
         reWriteBatchedInserts: true
