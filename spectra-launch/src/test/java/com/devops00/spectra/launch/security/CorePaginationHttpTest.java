@@ -182,6 +182,23 @@ class CorePaginationHttpTest {
                 assertEquals(400, get(client, port, token,
                         "/api/oa/contact/page?orders%5B0%5D.column=id").statusCode(),
                         "固定排序的联系人入口应拒绝客户端排序");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/region/page?pageNum=1&pageSize=5&orders%5B0%5D.column=code").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/region/page?orders%5B0%5D.column=address").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/calendar/page?pageNum=1&pageSize=5&orders%5B0%5D.column=start_time").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/calendar/page?orders%5B0%5D.column=title").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/leave/page?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/leave/page?orders%5B0%5D.column=reason").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/oa/supplies/page?pageNum=1&pageSize=5&orders%5B0%5D.column=sku").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/oa/supplies/page?orders%5B0%5D.column=price").statusCode());
             } finally {
                 fixture.clean();
             }
