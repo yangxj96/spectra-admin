@@ -21,7 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -41,10 +41,10 @@ public class ServiceMonitorHistoryVO {
     private String range;
 
     /** 查询起始时间。 */
-    private LocalDateTime from;
+    private OffsetDateTime from;
 
     /** 查询结束时间。 */
-    private LocalDateTime to;
+    private OffsetDateTime to;
 
     /** 趋势点。 */
     @Builder.Default

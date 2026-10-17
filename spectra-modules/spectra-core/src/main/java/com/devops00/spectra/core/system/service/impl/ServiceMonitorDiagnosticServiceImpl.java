@@ -118,7 +118,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     @Override
     public ServiceMonitorRuntimeDiagnosticVO getRuntimeDiagnostic() {
         return ServiceMonitorRuntimeDiagnosticVO.builder()
-                .generatedAt(timeMapper.toLocalDateTime(Instant.now()))
+                .generatedAt(timeMapper.toOffsetDateTime(Instant.now()))
                 .memoryPools(memoryPools())
                 .garbageCollectors(garbageCollectors())
                 .threadStates(threadStates())
@@ -521,10 +521,10 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .displayName(task.getDisplayName())
                 .fileSize(task.getFileSize())
                 .errorMessage(task.getErrorMessage())
-                .requestedAt(timeMapper.toLocalDateTime(task.getRequestedAt()))
-                .startedAt(timeMapper.toLocalDateTime(task.getStartedAt()))
-                .completedAt(timeMapper.toLocalDateTime(task.getCompletedAt()))
-                .expiresAt(timeMapper.toLocalDateTime(task.getExpiresAt()))
+                .requestedAt(timeMapper.toOffsetDateTime(task.getRequestedAt()))
+                .startedAt(timeMapper.toOffsetDateTime(task.getStartedAt()))
+                .completedAt(timeMapper.toOffsetDateTime(task.getCompletedAt()))
+                .expiresAt(timeMapper.toOffsetDateTime(task.getExpiresAt()))
                 .build();
     }
 

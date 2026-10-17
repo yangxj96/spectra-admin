@@ -19,7 +19,7 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import lombok.Builder;
 import lombok.Value;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * Provider 测试发送结果；不返回测试收件地址或供应商原始响应。
@@ -60,5 +60,5 @@ public class NotificationProviderTestVO {
     /**
      * 测试时间。
      */
-    LocalDateTime testedAt;
+    OffsetDateTime testedAt;
 }

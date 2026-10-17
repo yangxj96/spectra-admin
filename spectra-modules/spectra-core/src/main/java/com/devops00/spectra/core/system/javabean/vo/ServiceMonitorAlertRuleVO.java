@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -47,5 +47,5 @@ public class ServiceMonitorAlertRuleVO {
     private Integer cooldownSeconds;
     private String remark;
     private Long version;
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }

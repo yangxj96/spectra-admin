@@ -18,7 +18,7 @@ package com.devops00.spectra.core.quartz.javabean.vo;
 
 import com.devops00.spectra.core.quartz.javabean.enums.QuartzExecutionHistoryStatus;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -57,10 +57,10 @@ public record QuartzExecutionHistoryVO(
                                        String jobClassName,
                                        String triggerType,
                                        QuartzExecutionHistoryStatus status,
-                                       LocalDateTime scheduledFireAt,
-                                       LocalDateTime actualFireAt,
-                                       LocalDateTime startedAt,
-                                       LocalDateTime finishedAt,
+                                       OffsetDateTime scheduledFireAt,
+                                       OffsetDateTime actualFireAt,
+                                       OffsetDateTime startedAt,
+                                       OffsetDateTime finishedAt,
                                        Long durationMs,
                                        String schedulerInstance,
                                        String correlationId,

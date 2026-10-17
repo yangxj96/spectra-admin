@@ -109,8 +109,8 @@ public class UserImportResultService {
         result.setFileHash(task.getFileHash());
         result.setSkipExisting(task.isSkipExisting());
         result.setStatus(task.getStatus());
-        result.setExpiresAt(timeMapper.toLocalDateTime(task.getExpiresAt()));
-        result.setPreviewExpiresAt(timeMapper.toLocalDateTime(task.getPreviewExpiresAt()));
+        result.setExpiresAt(timeMapper.toOffsetDateTime(task.getExpiresAt()));
+        result.setPreviewExpiresAt(timeMapper.toOffsetDateTime(task.getPreviewExpiresAt()));
         result.setTotalRows(task.getTotalRows());
         result.setValidRows(task.getValidRows());
         result.setErrorRows(task.getErrorRows());

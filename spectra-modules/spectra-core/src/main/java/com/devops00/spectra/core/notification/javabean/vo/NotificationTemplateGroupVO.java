@@ -18,7 +18,7 @@ package com.devops00.spectra.core.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -54,5 +54,5 @@ public class NotificationTemplateGroupVO {
     /**
      * 模板组中最近一次变更时间。
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 }

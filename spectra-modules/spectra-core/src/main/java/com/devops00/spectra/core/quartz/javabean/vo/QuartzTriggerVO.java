@@ -18,7 +18,7 @@ package com.devops00.spectra.core.quartz.javabean.vo;
 
 import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 封装Quartz触发器相关的响应数据。
@@ -41,5 +41,5 @@ import java.time.LocalDateTime;
 public record QuartzTriggerVO(String triggerKey, QuartzTriggerTemplate.TriggerType triggerType,
                               String state, String cronExpression, Long intervalMs, boolean oneShot,
                               String timeZone, QuartzTriggerTemplate.MisfirePolicy misfireInstruction,
-                              LocalDateTime startAt, LocalDateTime previousFireAt, LocalDateTime nextFireAt) {
+                              OffsetDateTime startAt, OffsetDateTime previousFireAt, OffsetDateTime nextFireAt) {
 }

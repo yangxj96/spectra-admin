@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -44,9 +44,9 @@ public class ServiceMonitorAlertEventVO {
     private Double thresholdValue;
     private String expectedValue;
     private String message;
-    private LocalDateTime firstOccurredAt;
-    private LocalDateTime lastOccurredAt;
-    private LocalDateTime recoveredAt;
+    private OffsetDateTime firstOccurredAt;
+    private OffsetDateTime lastOccurredAt;
+    private OffsetDateTime recoveredAt;
     private Integer occurrenceCount;
-    private LocalDateTime lastNotifiedAt;
+    private OffsetDateTime lastNotifiedAt;
 }

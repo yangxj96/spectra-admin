@@ -18,7 +18,7 @@ package com.devops00.spectra.core.user.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -41,9 +41,9 @@ public class UserImportTaskVO {
 
     private String status;
 
-    private LocalDateTime expiresAt;
+    private OffsetDateTime expiresAt;
 
-    private LocalDateTime previewExpiresAt;
+    private OffsetDateTime previewExpiresAt;
 
     private int totalRows;
 

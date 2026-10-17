@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -33,7 +33,7 @@ import java.util.List;
 @Builder
 public class ServiceMonitorRuntimeDiagnosticVO {
 
-    private LocalDateTime generatedAt;
+    private OffsetDateTime generatedAt;
     @Builder.Default
     private List<MemoryPool> memoryPools = List.of();
     @Builder.Default

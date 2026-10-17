@@ -76,7 +76,7 @@ public class NotificationProviderTestServiceImpl implements NotificationProvider
                 .status(result.status().name())
                 .providerMessageId(result.providerMessageId())
                 .summary(result.summary())
-                .testedAt(timeMapper.toLocalDateTime(Instant.now()))
+                .testedAt(timeMapper.toOffsetDateTime(Instant.now()))
                 .build();
     }
 

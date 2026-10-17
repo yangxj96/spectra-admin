@@ -170,7 +170,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                 ? List.<NotificationOverviewVO.ErrorSummary>of()
                 : recentErrorRows.stream()
                         .map(item -> NotificationOverviewVO.ErrorSummary.builder()
-                                .occurredAt(timeMapper.toLocalDateTime(item.getOccurredAt()))
+                                .occurredAt(timeMapper.toOffsetDateTime(item.getOccurredAt()))
                                 .channel(item.getChannel())
                                 .status(item.getStatus())
                                 .errorCode(item.getErrorCode())
@@ -178,13 +178,13 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                                 .build())
                         .toList();
         return NotificationOverviewVO.builder()
-                .generatedAt(timeMapper.toLocalDateTime(to))
+                .generatedAt(timeMapper.toOffsetDateTime(to))
                 .rangeHours(hours)
                 .pendingTaskCount(pendingTaskCount)
                 .processingTaskCount(processingTaskCount)
                 .oldestPendingTaskAt(oldestPendingTask == null
                         ? null
-                        : timeMapper.toLocalDateTime(oldestPendingTask.getScheduledAt()))
+                        : timeMapper.toOffsetDateTime(oldestPendingTask.getScheduledAt()))
                 .failedTaskCount(failedTaskCount)
                 .unknownTaskCount(unknownTaskCount)
                 .deliveryCount(deliveryCount)
@@ -280,7 +280,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         for (var bucket = from.truncatedTo(ChronoUnit.HOURS); bucket.isBefore(to); bucket = bucket.plus(1, ChronoUnit.HOURS)) {
             var row = byBucket.get(bucket);
             result.add(NotificationOverviewVO.TrendPoint.builder()
-                    .bucketAt(timeMapper.toLocalDateTime(bucket))
+                    .bucketAt(timeMapper.toOffsetDateTime(bucket))
                     .totalCount(row == null ? 0L : row.getTotalCount())
                     .successCount(row == null ? 0L : row.getSuccessCount())
                     .failedCount(row == null ? 0L : row.getFailedCount())

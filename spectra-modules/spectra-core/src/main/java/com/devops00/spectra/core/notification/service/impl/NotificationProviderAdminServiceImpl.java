@@ -195,7 +195,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                 .templateParameterOrder(document.templateParameterOrder())
                 .secretConfigured(secretConfigured)
                 .secretKeyId(document.secretKeyId())
-                .updatedAt(timeMapper.toLocalDateTime(document.updatedAt()))
+                .updatedAt(timeMapper.toOffsetDateTime(document.updatedAt()))
                 .build();
         return applyRuntimeHealth(channel, result);
     }
@@ -331,7 +331,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         NotificationProviderHealth health = runtime.snapshot(channel);
         provider.setState(health.state().name());
         provider.setReason(health.reason());
-        provider.setCheckedAt(health.checkedAt() == null ? null : timeMapper.toLocalDateTime(health.checkedAt()));
+        provider.setCheckedAt(health.checkedAt() == null ? null : timeMapper.toOffsetDateTime(health.checkedAt()));
         return provider;
     }
 

@@ -21,7 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -38,7 +38,7 @@ import java.util.List;
 public class ServiceMonitorOverviewVO {
 
     /** 采集时间。 */
-    private LocalDateTime collectedAt;
+    private OffsetDateTime collectedAt;
 
     /** 服务总体状态：HEALTHY、WARNING、DEGRADED 或 DOWN。 */
     private String status;
@@ -161,7 +161,7 @@ public class ServiceMonitorOverviewVO {
     public static class Point {
 
         /** 采集时间。 */
-        private LocalDateTime collectedAt;
+        private OffsetDateTime collectedAt;
 
         /** CPU 使用率，单位为百分比。 */
         private double cpuUsage;
@@ -237,6 +237,6 @@ public class ServiceMonitorOverviewVO {
         private String message;
 
         /** 最近一次检查时间。 */
-        private LocalDateTime checkedAt;
+        private OffsetDateTime checkedAt;
     }
 }

@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -39,8 +39,8 @@ public class ServiceMonitorDiagnosticTaskVO {
     private String displayName;
     private Long fileSize;
     private String errorMessage;
-    private LocalDateTime requestedAt;
-    private LocalDateTime startedAt;
-    private LocalDateTime completedAt;
-    private LocalDateTime expiresAt;
+    private OffsetDateTime requestedAt;
+    private OffsetDateTime startedAt;
+    private OffsetDateTime completedAt;
+    private OffsetDateTime expiresAt;
 }

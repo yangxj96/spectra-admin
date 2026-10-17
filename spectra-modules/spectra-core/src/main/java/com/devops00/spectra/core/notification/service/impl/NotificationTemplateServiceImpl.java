@@ -314,7 +314,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         result.setTitle(renderer.render(title, parameters));
         result.setContent(renderer.render(content, parameters));
         result.setHtml(renderer.render(html, parameters));
-        result.setPreviewedAt(timeMapper.toLocalDateTime(Instant.now()));
+        result.setPreviewedAt(timeMapper.toOffsetDateTime(Instant.now()));
         return result;
     }
 
@@ -472,7 +472,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             value.setChannels(new ArrayList<>());
             return value;
         });
-        var entityUpdatedAt = timeMapper.toLocalDateTime(entity.getUpdatedAt());
+        var entityUpdatedAt = timeMapper.toOffsetDateTime(entity.getUpdatedAt());
         if (group.getUpdatedAt() == null
                 || (entityUpdatedAt != null
                         && entityUpdatedAt.isAfter(group.getUpdatedAt()))) {

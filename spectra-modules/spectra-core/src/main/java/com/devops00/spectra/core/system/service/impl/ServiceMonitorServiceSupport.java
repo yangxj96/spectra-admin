@@ -46,7 +46,7 @@ import java.lang.management.MemoryUsage;
 import java.net.InetAddress;
 import java.time.Instant;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -182,8 +182,8 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         var points = downsample(samples, range.getMaxPoints()).stream().map(this::toPoint).toList();
         return ServiceMonitorHistoryVO.builder()
                 .range(range.getCode())
-                .from(toLocalDateTime(start))
-                .to(toLocalDateTime(to))
+                .from(toOffsetDateTime(start))
+                .to(toOffsetDateTime(to))
                 .points(points)
                 .build();
     }
@@ -398,7 +398,7 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
         var freshness = freshness(sample.collectedAt());
         var status = effectiveStatus(sample.status(), freshness.status());
         return ServiceMonitorOverviewVO.builder()
-                .collectedAt(toLocalDateTime(sample.collectedAt()))
+                .collectedAt(toOffsetDateTime(sample.collectedAt()))
                 .status(status.name())
                 .statusMessage(statusMessage(status, freshness.status()))
                 .dataFreshness(freshness.status().name())
@@ -420,7 +420,7 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
      */
     private ServiceMonitorOverviewVO.Point toPoint(Sample sample) {
         return ServiceMonitorOverviewVO.Point.builder()
-                .collectedAt(toLocalDateTime(sample.collectedAt()))
+                .collectedAt(toOffsetDateTime(sample.collectedAt()))
                 .cpuUsage(sample.cpuUsage())
                 .systemMemoryUsage(sample.systemMemoryUsage())
                 .jvmHeapUsage(sample.jvmHeapUsage())
@@ -437,7 +437,7 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
      */
     private ServiceMonitorOverviewVO.Point toPoint(ServiceMonitorSample sample) {
         return ServiceMonitorOverviewVO.Point.builder()
-                .collectedAt(toLocalDateTime(sample.getCollectedAt()))
+                .collectedAt(toOffsetDateTime(sample.getCollectedAt()))
                 .cpuUsage(sample.getCpuUsage())
                 .systemMemoryUsage(sample.getSystemMemoryUsage())
                 .jvmHeapUsage(sample.getJvmHeapUsage())
@@ -453,7 +453,7 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
      * 转换、解析或规范化数据（{@code toHealthComponents}）。
      */
     private List<ServiceMonitorOverviewVO.HealthComponent> toHealthComponents(Sample sample) {
-        var checkedAt = toLocalDateTime(sample.collectedAt());
+        var checkedAt = toOffsetDateTime(sample.collectedAt());
         return sample.healthComponents()
                 .stream()
                 .map(item -> ServiceMonitorOverviewVO.HealthComponent.builder()
@@ -471,7 +471,7 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
     private ServiceMonitorOverviewVO emptyOverview() {
         var summary = ServiceMonitorOverviewVO.Summary.builder().build();
         return ServiceMonitorOverviewVO.builder()
-                .collectedAt(toLocalDateTime(Instant.now()))
+                .collectedAt(toOffsetDateTime(Instant.now()))
                 .status(ServiceMonitorHealthStatus.DOWN.name())
                 .statusMessage("监控数据暂不可用")
                 .dataFreshness(ServiceMonitorFreshness.UNAVAILABLE.name())
@@ -569,8 +569,8 @@ public class ServiceMonitorServiceSupport implements ServiceMonitorService {
     /**
      * 转换、解析或规范化数据（{@code toLocalDateTime}）。
      */
-    private LocalDateTime toLocalDateTime(Instant instant) {
-        return timeMapper.toLocalDateTime(instant);
+    private OffsetDateTime toOffsetDateTime(Instant instant) {
+        return timeMapper.toOffsetDateTime(instant);
     }
 
     /**

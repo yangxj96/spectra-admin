@@ -553,7 +553,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .cooldownSeconds(rule.getCooldownSeconds())
                 .remark(rule.getRemark())
                 .version(rule.getVersion())
-                .updatedAt(timeMapper.toLocalDateTime(rule.getUpdatedAt()))
+                .updatedAt(timeMapper.toOffsetDateTime(rule.getUpdatedAt()))
                 .build();
     }
 
@@ -573,11 +573,11 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .thresholdValue(event.getThresholdValue())
                 .expectedValue(event.getExpectedValue())
                 .message(event.getMessage())
-                .firstOccurredAt(timeMapper.toLocalDateTime(event.getFirstOccurredAt()))
-                .lastOccurredAt(timeMapper.toLocalDateTime(event.getLastOccurredAt()))
-                .recoveredAt(timeMapper.toLocalDateTime(event.getRecoveredAt()))
+                .firstOccurredAt(timeMapper.toOffsetDateTime(event.getFirstOccurredAt()))
+                .lastOccurredAt(timeMapper.toOffsetDateTime(event.getLastOccurredAt()))
+                .recoveredAt(timeMapper.toOffsetDateTime(event.getRecoveredAt()))
                 .occurrenceCount(event.getOccurrenceCount())
-                .lastNotifiedAt(timeMapper.toLocalDateTime(event.getLastNotifiedAt()))
+                .lastNotifiedAt(timeMapper.toOffsetDateTime(event.getLastNotifiedAt()))
                 .build();
     }
 

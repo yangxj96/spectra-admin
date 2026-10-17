@@ -18,7 +18,7 @@ package com.devops00.spectra.core.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -67,7 +67,7 @@ public class NotificationInboxVO {
     /**
      * 阅读时间。
      */
-    private LocalDateTime readAt;
+    private OffsetDateTime readAt;
     /**
      * 收件用户 ID。
      */
@@ -79,5 +79,5 @@ public class NotificationInboxVO {
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

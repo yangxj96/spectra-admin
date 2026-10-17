@@ -18,7 +18,7 @@ package com.devops00.spectra.core.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -82,9 +82,9 @@ public class NotificationDeliveryAdminVO {
     /**
      * 成功发送时间。
      */
-    private LocalDateTime sentAt;
+    private OffsetDateTime sentAt;
     /**
      * 创建时间。
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

@@ -19,7 +19,7 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * Provider 配置脱敏视图。
@@ -125,10 +125,10 @@ public class NotificationProviderVO {
     /**
      * 配置更新时间。
      */
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     /**
      * 最近一次健康检查时间；尚未检查时为空。
      */
-    private LocalDateTime checkedAt;
+    private OffsetDateTime checkedAt;
 }

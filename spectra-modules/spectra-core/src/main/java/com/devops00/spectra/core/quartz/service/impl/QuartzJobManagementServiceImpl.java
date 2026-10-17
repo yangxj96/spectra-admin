@@ -61,7 +61,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HexFormat;
@@ -583,15 +583,15 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
     /**
      * 处理本地相关数据。
      */
-    private LocalDateTime local(Date value) {
-        return timeMapper.toLocalDateTime(value);
+    private OffsetDateTime local(Date value) {
+        return timeMapper.toOffsetDateTime(value);
     }
 
     /**
      * 处理本地相关数据。
      */
-    private LocalDateTime local(Instant value) {
-        return timeMapper.toLocalDateTime(value);
+    private OffsetDateTime local(Instant value) {
+        return timeMapper.toOffsetDateTime(value);
     }
 
     /**

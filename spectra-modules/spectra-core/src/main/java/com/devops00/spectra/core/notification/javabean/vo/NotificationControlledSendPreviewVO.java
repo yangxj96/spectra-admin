@@ -19,7 +19,7 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -47,7 +47,7 @@ import java.util.UUID;
  * @since 2026/09/13
  */
 public record NotificationControlledSendPreviewVO(UUID previewId, String previewToken, String requestHash,
-                                                  LocalDateTime expiresAt, int candidateUserCount, int eligibleTaskCount,
+                                                  OffsetDateTime expiresAt, int candidateUserCount, int eligibleTaskCount,
                                                   int skippedTaskCount, Map<String, Integer> skippedCounts,
                                                   List<NotificationControlledSendSkippedDetailVO> skippedDetails,
                                                   Map<NotificationChannel, NotificationChannelAvailability> channelAvailability,

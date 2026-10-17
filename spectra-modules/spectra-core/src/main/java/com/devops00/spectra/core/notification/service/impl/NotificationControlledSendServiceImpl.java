@@ -143,7 +143,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
             throw new DataSaveException("创建通知发送 Preview 失败");
         }
         return new NotificationControlledSendPreviewVO(entity.getId(), token, entity.getRequestHash(),
-                timeMapper.toLocalDateTime(entity.getExpiresAt()), evaluation.candidateUserCount(), evaluation.eligibleTaskCount(),
+                timeMapper.toOffsetDateTime(entity.getExpiresAt()), evaluation.candidateUserCount(), evaluation.eligibleTaskCount(),
                 evaluation.skippedTaskCount(), evaluation.skippedCounts(), evaluation.skippedDetails(),
                 evaluation.channelAvailability(),
                 prepared.templates(), evaluation.samples());
