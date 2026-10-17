@@ -104,7 +104,7 @@ public class FileAssetStreamController {
         Range range = Range.parse(request.getHeader(HttpHeaders.RANGE));
         FileAccessContext context = new FileAccessContext(securityContextAccessor.currentUserId(), referenceType, referenceId,
                 range.start(), range.end());
-        FileDownload file = assetService.openForAuthorizedUser(fileAssetId, context);
+        FileDownload file = assetService.openForAuthorizedUser(fileAssetId, context, download);
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(file.contentType()));
         headers.setContentLength(file.size());

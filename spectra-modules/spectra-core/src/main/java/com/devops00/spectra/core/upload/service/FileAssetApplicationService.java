@@ -100,6 +100,7 @@ public class FileAssetApplicationService implements FileAssetPort {
     public FileDownload open(UUID fileAssetId, FileAccessContext context) {
         FileAsset asset = requireAsset(fileAssetId);
         authorize(asset, context);
+        requireOperationAllowed(asset, true);
         return openObject(asset, context.rangeStart(), context.rangeEnd());
     }
 
@@ -113,13 +114,31 @@ public class FileAssetApplicationService implements FileAssetPort {
     }
 
     @Transactional(readOnly = true)
-    public FileDownload openForAuthorizedUser(UUID fileAssetId, FileAccessContext context) {
+    public FileDownload openForAuthorizedUser(UUID fileAssetId, FileAccessContext context, boolean download) {
         FileAsset asset = requireAsset(fileAssetId);
         if (isAdmin(context)) {
             return openObject(asset, context.rangeStart(), context.rangeEnd());
         }
         authorize(asset, context);
+        requireOperationAllowed(asset, download);
         return openObject(asset, context.rangeStart(), context.rangeEnd());
+    }
+
+    /**
+     * 按文件类型策略校验预览或下载操作；管理员入口不经过此策略。
+     */
+    private void requireOperationAllowed(FileAsset asset, boolean download) {
+        var type = typeMapper.findByIdIncludingDisabled(asset.getFileTypeId());
+        if (type == null) {
+            return;
+        }
+        boolean allowed = download
+                ? Boolean.TRUE.equals(type.getDownloadEnabled())
+                : Boolean.TRUE.equals(type.getPreviewEnabled());
+        if (!allowed) {
+            throw new FileUploadException(FileErrorCode.FILE_UPLOAD_PERMISSION_DENIED,
+                    download ? "download is disabled for file type" : "preview is disabled for file type");
+        }
     }
 
     /**

@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +49,7 @@ class FileAssetStreamControllerTest {
         var service = mock(FileAssetApplicationService.class);
         var accessor = mock(SecurityContextAccessor.class);
         when(accessor.currentUserId()).thenReturn(userId);
-        when(service.openForAuthorizedUser(any(), any())).thenReturn(download);
+        when(service.openForAuthorizedUser(any(), any(), anyBoolean())).thenReturn(download);
         return new FileAssetStreamController(service, accessor);
     }
 
