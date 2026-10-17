@@ -195,6 +195,26 @@ public class TimeMapper {
     }
 
     /**
+     * Date 转保留偏移量的日期时间。
+     *
+     * @param date {@link Date}
+     * @return 返回按当前用户时区换算、带偏移量的日期时间；输入为 null 时返回 null
+     */
+    public @Nullable OffsetDateTime toOffsetDateTime(@Nullable Date date) {
+        return date == null ? null : toOffsetDateTime(date.toInstant());
+    }
+
+    /**
+     * 本地日期转保留偏移量的当天开始时刻。
+     *
+     * @param localDate {@link LocalDate}
+     * @return 返回按当前用户时区当天开始时刻、带偏移量的日期时间；输入为 null 时返回 null
+     */
+    public @Nullable OffsetDateTime toOffsetDateTime(@Nullable LocalDate localDate) {
+        return localDate == null ? null : localDate.atStartOfDay(getUserZoneId()).toOffsetDateTime();
+    }
+
+    /**
      * OffsetDateTime 转 Instant
      *
      * @param offsetDateTime {@link OffsetDateTime}

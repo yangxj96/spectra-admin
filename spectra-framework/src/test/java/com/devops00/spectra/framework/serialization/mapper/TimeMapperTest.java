@@ -20,8 +20,10 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -98,5 +100,19 @@ class TimeMapperTest {
     void dstOverlapUsesEarlierOffset() {
         assertEquals(Instant.parse("2024-11-03T05:30:00Z"),
                 mapper("America/New_York").toInstant("2024-11-03T01:30:00"));
+    }
+
+    @Test
+    void dateConvertsToOffsetDateTime() {
+        var value = mapper().toOffsetDateTime(Date.from(Instant.parse("2020-01-01T00:00:00Z")));
+        assertEquals(Instant.parse("2020-01-01T00:00:00Z"), value.toInstant());
+        assertEquals(ZoneOffset.UTC, value.getOffset());
+    }
+
+    @Test
+    void localDateStartsAtUserZoneOffset() {
+        var value = mapper("Asia/Shanghai").toOffsetDateTime(LocalDate.of(2020, 1, 1));
+        assertEquals(Instant.parse("2019-12-31T16:00:00Z"), value.toInstant());
+        assertEquals(ZoneOffset.ofHours(8), value.getOffset());
     }
 }
