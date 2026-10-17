@@ -114,7 +114,7 @@
 
     <select id="findCleanupCandidates" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
         SELECT * FROM spectra_core.file_upload_session
-        WHERE status IN ('FAILED', 'CANCELED', 'EXPIRED', 'CLEANED') AND deleted IS NULL
+        WHERE status IN ('READY', 'FAILED', 'CANCELED', 'EXPIRED', 'CLEANED') AND deleted IS NULL
           AND next_cleanup_at IS NOT NULL AND next_cleanup_at &lt;= #{now}
         ORDER BY next_cleanup_at
         LIMIT #{limit}
@@ -124,7 +124,7 @@
     <update id="claimCleanupCandidate">
         UPDATE spectra_core.file_upload_session
         SET next_cleanup_at = #{claimUntil}, updated_at = CURRENT_TIMESTAMP
-        WHERE id = #{id} AND status IN ('FAILED', 'CANCELED', 'EXPIRED', 'CLEANED') AND deleted IS NULL
+        WHERE id = #{id} AND status IN ('READY', 'FAILED', 'CANCELED', 'EXPIRED', 'CLEANED') AND deleted IS NULL
           AND next_cleanup_at IS NOT NULL AND next_cleanup_at &lt;= #{now}
     </update>
 
@@ -160,7 +160,8 @@
     <update id="markReady">
         UPDATE spectra_core.file_upload_session
         SET status = 'READY', file_asset_id = #{fileAssetId}, completed_at = #{completedAt},
-            verify_finished_at = #{completedAt}, verify_processed_bytes = size, updated_at = CURRENT_TIMESTAMP
+            verify_finished_at = #{completedAt}, verify_processed_bytes = size,
+            next_cleanup_at = #{nextCleanupAt}, updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id} AND status = 'VERIFYING' AND deleted IS NULL
     </update>
 
@@ -199,7 +200,7 @@
     <update id="markCleaned">
         UPDATE spectra_core.file_upload_session
         SET status = 'CLEANED', next_cleanup_at = #{cleanedAt}, updated_at = CURRENT_TIMESTAMP
-        WHERE id = #{id} AND status IN ('FAILED', 'CANCELED', 'EXPIRED', 'CLEANED')
+        WHERE id = #{id} AND status IN ('READY', 'FAILED', 'CANCELED', 'EXPIRED', 'CLEANED')
     </update>
 
     <delete id="deleteByIdPhysically">

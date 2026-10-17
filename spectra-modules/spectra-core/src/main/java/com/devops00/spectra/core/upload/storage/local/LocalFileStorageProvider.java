@@ -139,6 +139,11 @@ public class LocalFileStorageProvider implements FileStorageProvider {
                 }
             }
             Files.move(temporary, destination, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            try {
+                deleteTree(sourceDirectory);
+            } catch (IOException ignored) {
+                // 暂存目录删除失败不阻断完成；就绪会话清理会重试删除。
+            }
         } catch (Exception e) {
             deleteQuietly(temporary);
             throw storageFailure("unable to assemble local upload", e);

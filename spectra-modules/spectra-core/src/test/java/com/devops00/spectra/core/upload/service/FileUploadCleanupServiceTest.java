@@ -18,7 +18,9 @@ package com.devops00.spectra.core.upload.service;
 
 import com.devops00.spectra.core.upload.javabean.constant.FileAssetStatus;
 import com.devops00.spectra.core.upload.javabean.constant.StorageProviderType;
+import com.devops00.spectra.core.upload.javabean.constant.UploadSessionStatus;
 import com.devops00.spectra.core.upload.javabean.entity.FileAsset;
+import com.devops00.spectra.core.upload.javabean.entity.FileUploadSession;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.storage.FileStorageProvider;
 import com.devops00.spectra.core.upload.storage.FileStorageProviderRegistry;
@@ -36,6 +38,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,8 +86,47 @@ class FileUploadCleanupServiceTest {
         assertEquals(1L, result.assetRetryScheduled());
     }
 
+    @Test
+    void readySessionCleanupRemovesLocalStagingAfterRetention() {
+        var transactionService = mock(FileUploadCleanupTransactionService.class);
+        var registry = mock(FileStorageProviderRegistry.class);
+        var localProvider = mock(FileStorageProvider.class);
+        var s3Provider = mock(FileStorageProvider.class);
+        var local = session(StorageProviderType.LOCAL);
+        var s3 = session(StorageProviderType.S3);
+        when(transactionService.claimExpiredSessions(any(), any(), any(), eq(100))).thenReturn(List.of());
+        when(transactionService.claimSessionCleanupCandidates(any(), any(), eq(100))).thenReturn(List.of(local, s3));
+        when(transactionService.markOrphans(any(), any(), eq(100))).thenReturn(0);
+        when(transactionService.claimAssetCleanupCandidates(any(), any(), eq(100))).thenReturn(List.of());
+        when(registry.require(StorageProviderType.LOCAL)).thenReturn(localProvider);
+        when(registry.require(StorageProviderType.S3)).thenReturn(s3Provider);
+        var cleanupService = new FileUploadCleanupService(new FileUploadProperties(), transactionService, registry);
+
+        var result = cleanupService.cleanupBatch(NOW);
+
+        verify(localProvider).abortMultipart(any());
+        verify(s3Provider, never()).abortMultipart(any());
+        verify(transactionService).finishSession(local.getId(), NOW);
+        verify(transactionService).finishSession(s3.getId(), NOW);
+        assertEquals(2L, result.cleanedSessions());
+    }
+
     /**
-     * 创建清理中的文件资产。
+     * 构造测试中的就绪上传会话。
+     */
+    private static FileUploadSession session(StorageProviderType provider) {
+        var session = new FileUploadSession();
+        session.setId(UUID.randomUUID());
+        session.setStatus(UploadSessionStatus.READY);
+        session.setStorageProvider(provider);
+        session.setStorageContainer("local");
+        session.setStagingKey("assets/" + UUID.randomUUID() + "/content.bin");
+        session.setProviderUploadId(UUID.randomUUID().toString());
+        return session;
+    }
+
+    /**
+     * 构造测试中的文件资产。
      */
     private static FileAsset asset(StorageProviderType provider, String key) {
         var asset = new FileAsset();

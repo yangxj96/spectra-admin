@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.upload.service;
 
+import com.devops00.spectra.core.upload.javabean.constant.StorageProviderType;
+import com.devops00.spectra.core.upload.javabean.constant.UploadSessionStatus;
 import com.devops00.spectra.core.upload.javabean.entity.FileUploadSession;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import com.devops00.spectra.core.upload.storage.StorageMultipart;
@@ -111,6 +113,10 @@ public class FileUploadCleanupService {
      * 取消文件上传清理。
      */
     private void abort(FileUploadSession session) {
+        if (session.getStatus() == UploadSessionStatus.READY
+                && session.getStorageProvider() != StorageProviderType.LOCAL) {
+            return;
+        }
         providerRegistry.require(session.getStorageProvider())
                 .abortMultipart(
                         new StorageMultipart(session.getStorageContainer(), session.getStagingKey(), session.getProviderUploadId()));

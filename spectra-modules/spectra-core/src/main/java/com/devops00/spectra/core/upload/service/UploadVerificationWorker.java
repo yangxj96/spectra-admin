@@ -125,7 +125,9 @@ public class UploadVerificationWorker {
             } else {
                 assetId = createAsset(session, actualHash, actualSize);
             }
-            sessionMapper.markReady(uploadId, assetId, Instant.now());
+            Instant completedAt = Instant.now();
+            sessionMapper.markReady(uploadId, assetId, completedAt,
+                    completedAt.plus(properties.getRecordRetention()));
         } catch (IOException | NoSuchAlgorithmException | RuntimeException exception) {
             abortQuietly(provider, multipart);
             sessionMapper.markFailed(uploadId, FileErrorCode.FILE_STORAGE_UNAVAILABLE.name(),

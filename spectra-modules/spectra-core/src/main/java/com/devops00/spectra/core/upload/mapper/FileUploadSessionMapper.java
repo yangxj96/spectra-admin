@@ -147,12 +147,14 @@ public interface FileUploadSessionMapper extends BaseMapper<FileUploadSession> {
     /**
      * 设置就绪状态。
      *
-     * @param id          数据记录的唯一标识。
-     * @param fileAssetId 文件资产标识。
-     * @param completedAt 操作完成时间。
+     * @param id            数据记录的唯一标识。
+     * @param fileAssetId   文件资产标识。
+     * @param completedAt   操作完成时间。
+     * @param nextCleanupAt 下一清理时间。
      * @return 符合条件的数量。
      */
-    int markReady(@Param("id") UUID id, @Param("fileAssetId") UUID fileAssetId, @Param("completedAt") Instant completedAt);
+    int markReady(@Param("id") UUID id, @Param("fileAssetId") UUID fileAssetId,
+                  @Param("completedAt") Instant completedAt, @Param("nextCleanupAt") Instant nextCleanupAt);
 
     /**
      * 设置文件上传会话。
