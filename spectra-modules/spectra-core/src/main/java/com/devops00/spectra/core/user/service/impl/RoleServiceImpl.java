@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
@@ -70,7 +71,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
             var codeProvided = StringUtils.hasText(params.getCode());
             var code = codeProvided ? normalize(params.getCode()) : generatedCode();
             if (codeProvided && codeExists(code, null)) {
-                throw new DataException("角色编码已存在");
+                throw new DataExistException("角色编码已存在");
             }
             role.setCode(code);
             role.setName(name);
@@ -223,7 +224,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
             wrapper.ne(SecurityRole::getId, excludedId);
         }
         if (count(wrapper) > 0) {
-            throw new DataException("角色名称已存在");
+            throw new DataExistException("角色名称已存在");
         }
     }
 
