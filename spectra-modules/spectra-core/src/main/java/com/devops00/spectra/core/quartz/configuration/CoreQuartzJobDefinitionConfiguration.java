@@ -25,6 +25,7 @@ import com.devops00.spectra.common.port.quartz.QuartzParameterSchema;
 import com.devops00.spectra.core.system.job.ServiceMonitorDiagnosticCleanupQuartzJob;
 import com.devops00.spectra.core.system.job.ServiceMonitorSnapshotQuartzJob;
 import com.devops00.spectra.core.upload.job.FileUploadCleanupQuartzJob;
+import com.devops00.spectra.core.upload.job.FileUploadVerificationRecoveryQuartzJob;
 import org.quartz.Job;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,6 +84,18 @@ public class CoreQuartzJobDefinitionConfiguration {
      *
      * @return Quartz作业数据。
      */
+    /**
+     * 定义恢复心跳过期上传校验任务的内置 Quartz 作业。
+     *
+     * @return Quartz 作业定义。
+     */
+    @Bean
+    public QuartzBuiltInJobDefinition fileUploadVerificationRecoveryQuartzJobDefinition() {
+        return definition("file.upload.verification-recovery", "上传校验恢复",
+                FileUploadVerificationRecoveryQuartzJob.class,
+                QuartzTriggerTemplate.fixedInterval(Duration.ofMinutes(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
+    }
+
     @Bean
     public QuartzBuiltInJobDefinition serviceMonitorSnapshotQuartzJobDefinition() {
         return definition("system.monitor.collect-snapshot", "服务监控采样", ServiceMonitorSnapshotQuartzJob.class,

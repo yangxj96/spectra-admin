@@ -124,6 +124,27 @@ public interface FileUploadSessionMapper extends BaseMapper<FileUploadSession> {
     int claimForVerification(@Param("id") UUID id, @Param("startedAt") Instant startedAt);
 
     /**
+     * 查找心跳已过期且仍处于校验中的会话，并跳过被其他节点锁定的事实行。
+     *
+     * @param staleBefore 心跳截止时间。
+     * @param limit       批次上限。
+     * @return 候选会话。
+     */
+    List<FileUploadSession> findStaleVerifyingForUpdate(@Param("staleBefore") Instant staleBefore,
+                                                        @Param("limit") int limit);
+
+    /**
+     * 重新领取过期校验会话；只有心跳仍早于截止时间时才会成功。
+     *
+     * @param id          会话标识。
+     * @param claimedAt   本次领取时间。
+     * @param staleBefore 心跳截止时间。
+     * @return 更新行数。
+     */
+    int claimVerificationRetry(@Param("id") UUID id, @Param("claimedAt") Instant claimedAt,
+                               @Param("staleBefore") Instant staleBefore);
+
+    /**
      * 设置就绪状态。
      *
      * @param id          数据记录的唯一标识。

@@ -142,6 +142,21 @@
         WHERE id = #{id} AND status = 'UPLOADING' AND deleted IS NULL
     </update>
 
+    <select id="findStaleVerifyingForUpdate" resultType="com.devops00.spectra.core.upload.javabean.entity.FileUploadSession">
+        SELECT * FROM spectra_core.file_upload_session
+        WHERE status = 'VERIFYING' AND deleted IS NULL AND updated_at &lt;= #{staleBefore}
+        ORDER BY updated_at
+        LIMIT #{limit}
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <update id="claimVerificationRetry">
+        UPDATE spectra_core.file_upload_session
+        SET updated_at = #{claimedAt}
+        WHERE id = #{id} AND status = 'VERIFYING' AND deleted IS NULL
+          AND updated_at &lt;= #{staleBefore}
+    </update>
+
     <update id="markReady">
         UPDATE spectra_core.file_upload_session
         SET status = 'READY', file_asset_id = #{fileAssetId}, completed_at = #{completedAt},

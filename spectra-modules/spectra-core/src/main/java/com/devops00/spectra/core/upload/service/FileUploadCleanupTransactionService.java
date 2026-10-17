@@ -44,6 +44,23 @@ public class FileUploadCleanupTransactionService {
     private final FileAssetMapper assetMapper;
 
     /** 标记一批已过期会话；事务提交后才允许调用存储提供方。 */
+    /**
+     * 领取心跳过期的校验会话；锁冲突的会话留给下一轮，避免阻塞校验中的节点。
+     *
+     * @param staleBefore 心跳截止时间。
+     * @param claimedAt   本次领取时间。
+     * @param limit       批次上限。
+     * @return 可重新投递的会话标识。
+     */
+    @Transactional
+    public List<UUID> claimStaleVerifications(Instant staleBefore, Instant claimedAt, int limit) {
+        return sessionMapper.findStaleVerifyingForUpdate(staleBefore, limit)
+                .stream()
+                .filter(session -> sessionMapper.claimVerificationRetry(session.getId(), claimedAt, staleBefore) == 1)
+                .map(FileUploadSession::getId)
+                .toList();
+    }
+
     @Transactional
     public List<FileUploadSession> claimExpiredSessions(Instant now, Instant idleBefore,
                                                         Instant nextCleanupAt, int limit) {
