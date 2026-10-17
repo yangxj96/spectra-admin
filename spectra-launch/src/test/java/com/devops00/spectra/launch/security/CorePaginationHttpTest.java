@@ -83,6 +83,12 @@ class CorePaginationHttpTest {
                 assertEquals(400, get(client, port, token,
                         "/api/role/page?orders%5B0%5D.column=name%3Bdrop%20table%20spectra_security.sec_role")
                         .statusCode(), "恶意排序表达式应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/scheduler/quartz/jobs?pageNum=1&pageSize=5").statusCode());
+                assertEquals(400, get(client, port, token,
+                        "/api/scheduler/quartz/jobs?orders%5B0%5D.column=jobKey").statusCode(),
+                        "固定排序的 Quartz 任务入口应拒绝客户端排序");
             } finally {
                 fixture.clean();
             }
