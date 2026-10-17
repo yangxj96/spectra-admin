@@ -89,6 +89,27 @@ class CorePaginationHttpTest {
                 assertEquals(400, get(client, port, token,
                         "/api/scheduler/quartz/jobs?orders%5B0%5D.column=jobKey").statusCode(),
                         "固定排序的 Quartz 任务入口应拒绝客户端排序");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/requests?pageNum=1&pageSize=5").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/requests?pageNum=1&pageSize=5&orders%5B0%5D.column=created_at")
+                        .statusCode(), "通知请求分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/admin/requests?orders%5B0%5D.column=recipient_user_id").statusCode(),
+                        "未注册的通知请求排序字段应被拒绝");
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/admin/requests?orders%5B0%5D.column=created_at%3Bdrop%20table%20spectra_core.sys_user")
+                        .statusCode(), "恶意通知请求排序表达式应被拒绝");
+
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/deliveries?pageNum=1&pageSize=5").statusCode());
+                assertEquals(200, get(client, port, token,
+                        "/api/notification/admin/deliveries?pageNum=1&pageSize=5&orders%5B0%5D.column=result_status")
+                        .statusCode(), "通知投递分页应接受注册排序字段");
+                assertEquals(400, get(client, port, token,
+                        "/api/notification/admin/deliveries?orders%5B0%5D.column=recipient_user_id").statusCode(),
+                        "未注册的通知投递排序字段应被拒绝");
             } finally {
                 fixture.clean();
             }
