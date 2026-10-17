@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.OffsetTime;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -263,44 +262,31 @@ public class TimeMapper {
     }
 
     /**
-     * ISO 8601格式字符串转换到Instant。
-     * <p>
-     * 支持带偏移量/时区的日期时间、无时区日期时间、日期和时间字符串。
-     * 无时区字符串按当前用户时区解释；日期默认当天开始，时间默认当前用户时区的当天。
+     * ISO 8601 日期时间字符串转换到 Instant。
      *
-     * @param text IOS 8601 格式的字符串
-     * @return 返回解析后的 Instant；输入为空白时返回 null，文本不是支持的 ISO 8601 格式时抛出 DateTimeParseException。
+     * <p>只接受带偏移量/时区的日期时间或无偏移量的完整日期时间；无偏移量时按当前用户时区解释。
+     * 不再猜测仅日期或仅时间字符串，避免用“今天”隐式补全导致同一文本在不同日期得到不同时刻。</p>
+     *
+     * @param text ISO 8601 日期时间字符串
+     * @return 返回解析后的 Instant；输入为空白时返回 null
+     * @throws DateTimeParseException 文本不是支持的 ISO 8601 日期时间格式
      */
     public @Nullable Instant toInstant(@Nullable String text) {
-        if (text == null || text.isBlank())
+        if (text == null || text.isBlank()) {
             return null;
+        }
 
         var value = text.trim();
         try {
             return ZonedDateTime.parse(value, ISO_FORMATTER).toInstant();
         } catch (DateTimeParseException ignored) {
-            // 继续尝试其他 ISO 8601 形式。
+            // 继续尝试带偏移量或本地日期时间。
         }
         try {
             return OffsetDateTime.parse(value, ISO_FORMATTER).toInstant();
         } catch (DateTimeParseException ignored) {
-            // 继续尝试其他 ISO 8601 形式。
+            // 继续尝试无偏移量的本地日期时间。
         }
-        try {
-            return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(getUserZoneId()).toInstant();
-        } catch (DateTimeParseException ignored) {
-            // 继续尝试日期或时间形式。
-        }
-        try {
-            return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay(getUserZoneId()).toInstant();
-        } catch (DateTimeParseException ignored) {
-            // 继续尝试时间形式。
-        }
-        try {
-            return OffsetTime.parse(value, DateTimeFormatter.ISO_OFFSET_TIME).atDate(LocalDate.now(getUserZoneId())).toInstant();
-        } catch (DateTimeParseException ignored) {
-            // 继续尝试无时区时间形式。
-        }
-        return LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME).atDate(LocalDate.now(getUserZoneId())).atZone(getUserZoneId()).toInstant();
+        return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(getUserZoneId()).toInstant();
     }
 }
