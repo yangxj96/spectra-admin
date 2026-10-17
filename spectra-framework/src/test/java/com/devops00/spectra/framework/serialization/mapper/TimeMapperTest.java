@@ -20,6 +20,7 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,5 +68,12 @@ class TimeMapperTest {
     @Test
     void blankInputReturnsNull() {
         assertNull(mapper().toInstant("  "));
+    }
+
+    @Test
+    void offsetDateTimeKeepsUserOffset() {
+        var value = mapper().toOffsetDateTime(Instant.parse("2020-01-01T00:00:00Z").toEpochMilli());
+        assertEquals(ZoneOffset.UTC, value.getOffset());
+        assertEquals(Instant.parse("2020-01-01T00:00:00Z"), value.toInstant());
     }
 }

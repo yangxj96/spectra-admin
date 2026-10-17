@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +61,7 @@ public class OnlineUserPageVO {
     private Integer sessionCount;
 
     /** 用户最近一次会话登录时间。 */
-    private LocalDateTime latestLoginTime;
+    private OffsetDateTime latestLoginTime;
 
     /** 当前用户的有效会话摘要。 */
     private List<OnlineSessionVO> sessions;

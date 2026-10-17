@@ -185,6 +185,16 @@ public class TimeMapper {
     }
 
     /**
+     * Unix 毫秒时间戳转保留偏移量的日期时间。
+     *
+     * @param epochMilli Unix 毫秒时间戳
+     * @return 返回按当前用户时区换算、带偏移量的日期时间；输入为 null 时返回 null
+     */
+    public @Nullable OffsetDateTime toOffsetDateTime(@Nullable Long epochMilli) {
+        return epochMilli == null ? null : toOffsetDateTime(Instant.ofEpochMilli(epochMilli));
+    }
+
+    /**
      * OffsetDateTime 转 Instant
      *
      * @param offsetDateTime {@link OffsetDateTime}

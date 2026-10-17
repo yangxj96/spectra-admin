@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 在线用户页面展示的一条会话摘要。
@@ -44,5 +44,5 @@ public class OnlineSessionVO {
     private String ip;
 
     /** 会话登录时间。 */
-    private LocalDateTime loginTime;
+    private OffsetDateTime loginTime;
 }
