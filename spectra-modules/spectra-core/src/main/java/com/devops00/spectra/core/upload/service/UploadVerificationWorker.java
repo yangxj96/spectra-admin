@@ -142,6 +142,9 @@ public class UploadVerificationWorker {
             throw new FileUploadException(FileErrorCode.FILE_PART_INVALID, "校验期间文件类型策略已失效");
         }
         var asset = new FileAsset();
+        // 异步校验线程没有安全上下文，资产归属必须显式继承会话所有者。
+        asset.setCreatedBy(session.getOwnerUserId());
+        asset.setUpdatedBy(session.getOwnerUserId());
         asset.setFileTypeId(fileType.getId());
         asset.setOriginalName(session.getOriginalName());
         asset.setContentSha256(actualHash);
