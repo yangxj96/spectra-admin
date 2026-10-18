@@ -17,6 +17,7 @@
 package com.devops00.spectra.launch.security;
 
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
+import com.devops00.spectra.core.security.root.RootPolicyRepository;
 import com.devops00.spectra.launch.LaunchApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -57,6 +58,70 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  */
 @EnabledIfSystemProperty(named = "spectra.test.real-deps", matches = "true")
 class RedisFaultRecoveryHttpTest {
+
+    @Test
+    void lastRootRemainsProtectedAcrossIsolatedRedisRestart() throws Exception {
+        requireIsolatedDependencies();
+        String redisServer = System.getenv("SPECTRA_TEST_REDIS_SERVER");
+        if (redisServer == null || redisServer.isBlank()) {
+            redisServer = "D:/Develop/Platform/redis/redis-server.exe";
+        }
+        Path redisHome = Files.createTempDirectory(Path.of("target"), "isolated-root-redis-");
+        int redisPort = freePort();
+        String redisUrl = "redis://127.0.0.1:" + redisPort + "/5";
+        Process redis = startRedis(redisServer, redisHome, redisPort);
+        try {
+            awaitListening(redisPort, redis);
+            try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                    .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                            "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
+                            "--spring.data.redis.url=" + redisUrl)) {
+                int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+                var mapper = application.getBean(ObjectMapper.class);
+                var rootPolicy = application.getBean(RootPolicyRepository.class);
+                var fixture = new Fixture(application);
+                TestUser root = TestUser.create();
+                try (HttpClient client = HttpClient.newHttpClient()) {
+                    try {
+                        fixture.insertRoot(root);
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                        String oldToken = login(client, port, mapper, root.username(), root.password());
+                        assertEquals(200, context(client, port, oldToken));
+
+                        stop(redis);
+                        assertEquals(503, context(client, port, oldToken),
+                                "安全 Redis 断开期间旧 Root Access 必须拒绝");
+                        assertEquals(503, passwordLogin(client, port, mapper, root.username(), root.password())
+                                .statusCode(), "安全 Redis 不可用时 Root 登录必须拒绝");
+                        assertEquals(503, disable(client, port, oldToken, root.id()).statusCode(),
+                                "安全 Redis 不可用时 Root 写请求必须拒绝");
+                        assertEquals("ACTIVE", fixture.status(root.id()));
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+
+                        redis = startRedis(redisServer, redisHome, redisPort);
+                        awaitListening(redisPort, redis);
+                        loginWithRetry(client, port, mapper, root.username(), root.password());
+                        String newToken = login(client, port, mapper, root.username(), root.password());
+                        assertEquals(401, context(client, port, oldToken),
+                                "重启后的空白隔离 Redis 不应恢复丢失的旧 Session");
+                        assertEquals(200, context(client, port, newToken));
+                        var rejected = disable(client, port, newToken, root.id());
+                        assertEquals(409, rejected.statusCode());
+                        assertEquals("ROOT_EFFECTIVE_MINIMUM",
+                                mapper.readTree(rejected.body()).path("error_code").asText());
+                        assertEquals("ACTIVE", fixture.status(root.id()));
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    } finally {
+                        fixture.clean();
+                    }
+                }
+            }
+        } finally {
+            if (redis != null && redis.isAlive()) {
+                stop(redis);
+            }
+        }
+    }
 
     @Test
     void redisStopFailsClosedAndRestartRecovers() throws Exception {
@@ -149,6 +214,16 @@ class RedisFaultRecoveryHttpTest {
                 .build(), HttpResponse.BodyHandlers.discarding()).statusCode();
     }
 
+    private static HttpResponse<String> disable(HttpClient client, int port, String token, UUID userId)
+            throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/user/disable/" + userId))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build(), HttpResponse.BodyHandlers.ofString());
+    }
+
     private static String login(HttpClient client, int port, ObjectMapper mapper, String username, String password)
             throws Exception {
         var response = passwordLogin(client, port, mapper, username, password);
@@ -159,10 +234,13 @@ class RedisFaultRecoveryHttpTest {
     private static void loginWithRetry(HttpClient client, int port, ObjectMapper mapper, String username,
                                        String password)
             throws Exception {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
+        // 探针在故障时会退避到 30 秒，且正在执行的 Redis 命令可能再等待 10 秒超时。
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(90);
+        int lastStatus = 0;
         while (System.nanoTime() < deadline) {
             try {
-                if (passwordLogin(client, port, mapper, username, password).statusCode() == 200) {
+                lastStatus = passwordLogin(client, port, mapper, username, password).statusCode();
+                if (lastStatus == 200) {
                     return;
                 }
             } catch (Exception ignored) {
@@ -170,7 +248,7 @@ class RedisFaultRecoveryHttpTest {
             }
             Thread.sleep(500);
         }
-        throw new IllegalStateException("隔离 Redis 重启后登录未恢复");
+        throw new IllegalStateException("隔离 Redis 重启后登录未恢复，最后 HTTP 状态 " + lastStatus);
     }
 
     private static HttpResponse<String> passwordLogin(HttpClient client, int port, ObjectMapper mapper,
@@ -204,6 +282,7 @@ class RedisFaultRecoveryHttpTest {
         private final JdbcTemplate jdbc;
         private final PasswordEncoder encoder;
         private final UUID userRole;
+        private final UUID rootRole;
         private final List<TestUser> users = new java.util.ArrayList<>();
 
         private Fixture(ApplicationContext application) {
@@ -211,9 +290,19 @@ class RedisFaultRecoveryHttpTest {
             this.encoder = application.getBean(PasswordEncoder.class);
             this.userRole = jdbc.queryForObject("SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_USER'",
                     UUID.class);
+            this.rootRole = jdbc.queryForObject("SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS'",
+                    UUID.class);
         }
 
         private void insert(TestUser user) {
+            insertWithRole(user, userRole);
+        }
+
+        private void insertRoot(TestUser user) {
+            insertWithRole(user, rootRole);
+        }
+
+        private void insertWithRole(TestUser user, UUID roleId) {
             jdbc.update("INSERT INTO spectra_core.sys_user (id, username, employee_no, real_name) "
                     + "VALUES (?, ?, ?, ?)", user.id(), user.username(), user.username(), "synthetic redis user");
             jdbc.update("INSERT INTO spectra_security.sec_authentication_identity "
@@ -223,8 +312,13 @@ class RedisFaultRecoveryHttpTest {
                     + "(user_id, password_hash, changed_at) VALUES (?, ?, CURRENT_TIMESTAMP)",
                     user.id(), encoder.encode(user.password()));
             jdbc.update("INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id) VALUES (?, ?, ?)",
-                    UUID.randomUUID(), user.id(), userRole);
+                    UUID.randomUUID(), user.id(), roleId);
             users.add(user);
+        }
+
+        private String status(UUID userId) {
+            return jdbc.queryForObject("SELECT status FROM spectra_core.sys_user WHERE id = ?",
+                    String.class, userId);
         }
 
         private void clean() {

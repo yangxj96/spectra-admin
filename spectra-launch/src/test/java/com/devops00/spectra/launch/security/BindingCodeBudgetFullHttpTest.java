@@ -22,10 +22,18 @@ import com.devops00.spectra.core.security.authentication.crypto.VerificationCode
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.security.secret.service.SecretManagementService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
+import com.devops00.spectra.core.notification.dispatch.NotificationTaskWorker;
+import com.devops00.spectra.core.notification.javabean.from.NotificationProviderSaveFrom;
+import com.devops00.spectra.core.notification.provider.NotificationProviderRuntime;
+import com.devops00.spectra.core.notification.service.NotificationProviderAdminService;
+import com.devops00.spectra.core.quartz.configuration.QuartzSchedulerLifecycle;
+import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.launch.LaunchApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.quartz.JobKey;
+import org.quartz.TriggerKey;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.server.context.WebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
@@ -40,14 +48,19 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 使用正式 HTTP、PostgreSQL 与 Redis DB 5 验证认证身份绑定验证码的用途/地址/用户绑定与原子尝试预算耗尽。
@@ -60,6 +73,258 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class BindingCodeBudgetFullHttpTest {
 
     private static final String WRONG_CODE = "111111";
+
+    @Test
+    void bindingCodeDeliveryRejectsUnavailableChannelAndRecordsOneMockDelivery() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
+                        "--spectra.security.secret.master-key=" + randomSecret())) {
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            var mapper = application.getBean(ObjectMapper.class);
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var redis = securityRedisTemplate(application);
+            var providers = application.getBean(NotificationProviderAdminService.class);
+            var providerRuntime = application.getBean(NotificationProviderRuntime.class);
+            var worker = application.getBean(NotificationTaskWorker.class);
+            var secretManagement = application.getBean(SecretManagementService.class);
+            var fixture = new Fixture(application);
+            TestUser user = TestUser.create();
+            String failedEmail = uniqueEmail();
+            String deliveredEmail = uniqueEmail();
+            UUID requestId = null;
+            List<UUID> secretVersionIds = new ArrayList<>();
+            assertEquals(0L, jdbc.queryForObject("SELECT count(*) FROM spectra_core.sys_config "
+                    + "WHERE key = 'notification.provider.email' AND deleted IS NULL", Long.class),
+                    "隔离测试库不得已有邮件 Provider 配置");
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                for (String code : List.of("security.verification-code-hmac",
+                        "notification.sensitive-payload-key", "notification.address-encryption-key")) {
+                    UUID versionId = secretManagement.createPending(code, randomSecret(), "GENERATED").getId();
+                    secretVersionIds.add(versionId);
+                    secretManagement.publish(code, versionId);
+                }
+                fixture.insert(user);
+                String token = login(client, port, mapper, user.username(), user.password());
+                assertNotEquals(200, sendBindingEmailCode(client, port, mapper, token, failedEmail).statusCode(),
+                        "渠道不可用时必须拒绝验证码发送");
+                assertFalse(Boolean.TRUE.equals(redis.hasKey(RedisCacheKey.BIND_EMAIL_CODE + failedEmail)),
+                        "入队失败后应删除刚保存的验证码");
+                assertEquals(0L, bindingRequestCount(jdbc, user.id()), "拒绝路径不得留下通知请求");
+
+                var configuration = new NotificationProviderSaveFrom();
+                configuration.setProviderType("MOCK");
+                configuration.setEnabled(true);
+                providers.modify(NotificationChannel.EMAIL, configuration);
+                assertEquals("HEALTHY", providerRuntime.check(NotificationChannel.EMAIL).state().name());
+                assertEquals(200, sendBindingEmailCode(client, port, mapper, token, deliveredEmail).statusCode());
+                assertTrue(Boolean.TRUE.equals(redis.hasKey(RedisCacheKey.BIND_EMAIL_CODE + deliveredEmail)));
+                requestId = jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_request "
+                        + "WHERE idempotency_key LIKE ?", UUID.class, bindingRequestPrefix(user.id()));
+                assertEquals(1L, jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_task "
+                        + "WHERE notification_request_id = ? AND status = 'PENDING'", Long.class, requestId));
+                assertTrue(worker.processPending(1) >= 1);
+                assertEquals(1L, jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_task "
+                        + "WHERE notification_request_id = ? AND status = 'SENT'", Long.class, requestId));
+                assertEquals(1L, jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_delivery d "
+                        + "JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id "
+                        + "WHERE t.notification_request_id = ? AND d.provider = 'MOCK' "
+                        + "AND d.result_status = 'SENT'", Long.class, requestId));
+                assertEquals(0, worker.processPending(1), "已投递任务不可重复领取");
+                assertEquals(1L, jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_delivery d "
+                        + "JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id "
+                        + "WHERE t.notification_request_id = ?", Long.class, requestId));
+            } finally {
+                redis.delete(RedisCacheKey.BIND_EMAIL_CODE + failedEmail);
+                redis.delete(RedisCacheKey.BIND_EMAIL_CODE + deliveredEmail);
+                if (requestId != null) {
+                    jdbc.update("DELETE FROM spectra_notification.ntf_delivery WHERE notification_task_id IN "
+                            + "(SELECT id FROM spectra_notification.ntf_task WHERE notification_request_id = ?)", requestId);
+                    jdbc.update("DELETE FROM spectra_notification.ntf_task WHERE notification_request_id = ?", requestId);
+                    jdbc.update("DELETE FROM spectra_notification.ntf_request WHERE id = ?", requestId);
+                }
+                jdbc.update("DELETE FROM spectra_core.sys_config WHERE key = 'notification.provider.email'");
+                fixture.clean();
+                for (UUID versionId : secretVersionIds) {
+                    jdbc.update("DELETE FROM spectra_security.sec_secret_version WHERE id = ?", versionId);
+                }
+            }
+        }
+    }
+
+    @Test
+    void quartzJobDeliversBindingCodeOnceWithoutRequestIdentity() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spectra.scheduler.quartz.enabled=true", "--flowable.async-executor-activate=false",
+                        "--spectra.security.secret.master-key=" + randomSecret())) {
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            var mapper = application.getBean(ObjectMapper.class);
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var redis = securityRedisTemplate(application);
+            var providers = application.getBean(NotificationProviderAdminService.class);
+            var providerRuntime = application.getBean(NotificationProviderRuntime.class);
+            var secretManagement = application.getBean(SecretManagementService.class);
+            var schedulerLifecycle = application.getBean(QuartzSchedulerLifecycle.class);
+            var scheduler = schedulerLifecycle.scheduler();
+            var jobKey = new JobKey("notification.task-worker", "SPECTRA_BUILTIN");
+            var triggerKey = new TriggerKey("notification.task-worker.trigger", "SPECTRA_BUILTIN");
+            var fixture = new Fixture(application);
+            TestUser user = TestUser.create();
+            String email = uniqueEmail();
+            String blockedEmail = uniqueEmail();
+            String recoveredEmail = uniqueEmail();
+            UUID requestId = null;
+            List<UUID> requestIds = new ArrayList<>();
+            List<UUID> secretVersionIds = new ArrayList<>();
+            Instant historyStart = null;
+            assertTrue(schedulerLifecycle.isReady(), "Quartz JDBC Scheduler 必须就绪");
+            assertTrue(scheduler.checkExists(jobKey), "内置通知 Worker Job 必须已注册");
+            assertTrue(scheduler.checkExists(triggerKey), "内置通知 Worker Trigger 必须已注册");
+            assertEquals(0L, jdbc.queryForObject("SELECT count(*) FROM spectra_core.sys_config "
+                    + "WHERE key = 'notification.provider.email' AND deleted IS NULL", Long.class));
+            scheduler.pauseTrigger(triggerKey);
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                for (String code : List.of("security.verification-code-hmac",
+                        "notification.sensitive-payload-key", "notification.address-encryption-key")) {
+                    UUID versionId = secretManagement.createPending(code, randomSecret(), "GENERATED").getId();
+                    secretVersionIds.add(versionId);
+                    secretManagement.publish(code, versionId);
+                }
+                fixture.insert(user);
+                var configuration = new NotificationProviderSaveFrom();
+                configuration.setProviderType("MOCK");
+                configuration.setEnabled(true);
+                providers.modify(NotificationChannel.EMAIL, configuration);
+                assertEquals("HEALTHY", providerRuntime.check(NotificationChannel.EMAIL).state().name());
+                String token = login(client, port, mapper, user.username(), user.password());
+                assertEquals(200, sendBindingEmailCode(client, port, mapper, token, email).statusCode());
+                requestId = jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_request "
+                        + "WHERE idempotency_key LIKE ?", UUID.class, bindingRequestPrefix(user.id()));
+                requestIds.add(requestId);
+                assertEquals(1L, taskStatusCount(jdbc, requestId, "PENDING"));
+                historyStart = Instant.now();
+                scheduler.triggerJob(jobKey);
+                UUID deliveredRequestId = requestId;
+                Instant startedAt = historyStart;
+                assertTrue(await(Duration.ofSeconds(30), () -> taskStatusCount(jdbc, deliveredRequestId, "SENT") == 1L
+                        && quartzSuccessCount(jdbc, startedAt) >= 1L), "Quartz 应完成通知投递并记录成功历史");
+                assertEquals(1L, deliveryCount(jdbc, requestId));
+
+                scheduler.triggerJob(jobKey);
+                assertTrue(await(Duration.ofSeconds(30), () -> quartzSuccessCount(jdbc, startedAt) >= 2L),
+                        "再次触发 Quartz Job 应产生终态历史");
+                assertEquals(1L, deliveryCount(jdbc, requestId), "重复触发不得重复投递已发送任务");
+
+                assertEquals(200, sendBindingEmailCode(client, port, mapper, token, blockedEmail).statusCode());
+                UUID blockedRequestId = jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_request "
+                        + "WHERE idempotency_key LIKE ? AND id <> ?", UUID.class,
+                        bindingRequestPrefix(user.id()), requestId);
+                requestIds.add(blockedRequestId);
+                assertEquals(1L, taskStatusCount(jdbc, blockedRequestId, "PENDING"));
+                configuration.setEnabled(false);
+                providers.modify(NotificationChannel.EMAIL, configuration);
+                assertFalse(providerRuntime.check(NotificationChannel.EMAIL).state().name().equals("HEALTHY"));
+                scheduler.triggerJob(jobKey);
+                assertTrue(await(Duration.ofSeconds(30), () -> taskStatusCount(jdbc, blockedRequestId, "BLOCKED") == 1L
+                        && quartzSuccessCount(jdbc, startedAt) >= 3L),
+                        "入队后渠道停用时 Quartz 必须明确阻断投递");
+                assertEquals(1L, deliveryStatusCount(jdbc, blockedRequestId, "BLOCKED"));
+
+                configuration.setEnabled(true);
+                providers.modify(NotificationChannel.EMAIL, configuration);
+                assertEquals("HEALTHY", providerRuntime.check(NotificationChannel.EMAIL).state().name());
+                assertEquals(200, sendBindingEmailCode(client, port, mapper, token, recoveredEmail).statusCode());
+                UUID recoveredRequestId = jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_request "
+                        + "WHERE idempotency_key LIKE ? AND id NOT IN (?, ?)", UUID.class,
+                        bindingRequestPrefix(user.id()), requestId, blockedRequestId);
+                requestIds.add(recoveredRequestId);
+                scheduler.triggerJob(jobKey);
+                assertTrue(await(Duration.ofSeconds(30), () -> taskStatusCount(jdbc, recoveredRequestId, "SENT") == 1L
+                        && quartzSuccessCount(jdbc, startedAt) >= 4L), "渠道恢复后新通知应成功投递");
+                assertEquals(1L, deliveryStatusCount(jdbc, recoveredRequestId, "SENT"));
+                assertEquals(1L, deliveryCount(jdbc, blockedRequestId), "阻断任务不得在恢复后自动重发");
+            } finally {
+                scheduler.resumeTrigger(triggerKey);
+                redis.delete(RedisCacheKey.BIND_EMAIL_CODE + email);
+                redis.delete(RedisCacheKey.BIND_EMAIL_CODE + blockedEmail);
+                redis.delete(RedisCacheKey.BIND_EMAIL_CODE + recoveredEmail);
+                for (UUID fixtureRequestId : requestIds) {
+                    jdbc.update("DELETE FROM spectra_notification.ntf_delivery WHERE notification_task_id IN "
+                            + "(SELECT id FROM spectra_notification.ntf_task WHERE notification_request_id = ?)", fixtureRequestId);
+                    jdbc.update("DELETE FROM spectra_notification.ntf_task WHERE notification_request_id = ?", fixtureRequestId);
+                    jdbc.update("DELETE FROM spectra_notification.ntf_request WHERE id = ?", fixtureRequestId);
+                }
+                if (historyStart != null) {
+                    jdbc.update("DELETE FROM spectra_core.quartz_job_execution_history "
+                            + "WHERE job_type = 'notification.task-worker' AND started_at >= ?",
+                            Timestamp.from(historyStart));
+                }
+                jdbc.update("DELETE FROM spectra_core.sys_config WHERE key = 'notification.provider.email'");
+                fixture.clean();
+                for (UUID versionId : secretVersionIds) {
+                    jdbc.update("DELETE FROM spectra_security.sec_secret_version WHERE id = ?", versionId);
+                }
+            }
+        }
+    }
+
+    private static long taskStatusCount(JdbcTemplate jdbc, UUID requestId, String status) {
+        return jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_task "
+                + "WHERE notification_request_id = ? AND status = ?", Long.class, requestId, status);
+    }
+
+    private static long deliveryCount(JdbcTemplate jdbc, UUID requestId) {
+        return jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_delivery d "
+                + "JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id "
+                + "WHERE t.notification_request_id = ?", Long.class, requestId);
+    }
+
+    private static long deliveryStatusCount(JdbcTemplate jdbc, UUID requestId, String status) {
+        return jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_delivery d "
+                + "JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id "
+                + "WHERE t.notification_request_id = ? AND d.result_status = ?", Long.class, requestId, status);
+    }
+
+    private static long quartzSuccessCount(JdbcTemplate jdbc, Instant since) {
+        return jdbc.queryForObject("SELECT count(*) FROM spectra_core.quartz_job_execution_history "
+                + "WHERE job_type = 'notification.task-worker' AND status = 'SUCCEEDED' "
+                + "AND started_at >= ?", Long.class, Timestamp.from(since));
+    }
+
+    private static boolean await(Duration timeout, java.util.function.BooleanSupplier condition)
+            throws InterruptedException {
+        long deadline = System.nanoTime() + timeout.toNanos();
+        while (System.nanoTime() < deadline) {
+            if (condition.getAsBoolean()) {
+                return true;
+            }
+            Thread.sleep(100);
+        }
+        return condition.getAsBoolean();
+    }
+
+    private static long bindingRequestCount(JdbcTemplate jdbc, UUID userId) {
+        return jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_request "
+                + "WHERE idempotency_key LIKE ?", Long.class, bindingRequestPrefix(userId));
+    }
+
+    private static String bindingRequestPrefix(UUID userId) {
+        return "security:bind-email-code:EMAIL:" + userId + ":%";
+    }
+
+    private static HttpResponse<String> sendBindingEmailCode(HttpClient client, int port, ObjectMapper mapper,
+                                                             String token, String email)
+            throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/security/authentication/bind/email"))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of("email", email))))
+                .build(), HttpResponse.BodyHandlers.ofString());
+    }
 
     @Test
     void bindingCodeIsBoundByAddressAndExhaustsAtomically() throws Exception {

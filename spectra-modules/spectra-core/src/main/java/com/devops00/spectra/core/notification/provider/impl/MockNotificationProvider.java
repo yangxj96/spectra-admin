@@ -33,7 +33,7 @@ import java.time.Instant;
 /**
  * 内置通知模拟 Provider；除最终发送动作外，其余流程与真实 Provider 完全一致。
  *
- * <p>模拟发送只输出脱敏收件人、标题和正文快照，不访问网络、不写额外业务表，便于本地和测试环境在没有第三方服务时
+ * <p>模拟发送只输出脱敏收件人和安全结果字段，不记录可能包含验证码的标题与正文；不访问网络、不写额外业务表，便于本地和测试环境在没有第三方服务时
  * 验证 Worker、Delivery 和管理页面的完整链路。</p>
  *
  * @author yangxj96
@@ -82,12 +82,9 @@ public class MockNotificationProvider implements NotificationProvider {
             return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
         var taskId = task.getId() == null ? "none" : task.getId().toString();
-        var recipientMasked = task.getRecipientMasked();
-        if (recipientMasked == null || recipientMasked.isBlank()) {
-            recipientMasked = NotificationAddressMasker.maskAddressOrPlaceholder(recipient);
-        }
-        log.info("通知模拟发送: channel={}, taskId={}, recipient={}, title={}, content={}",
-                task.getChannel(), taskId, recipientMasked, task.getTitle(), task.getContent());
+        var recipientMasked = NotificationAddressMasker.maskAddressOrPlaceholder(recipient);
+        log.info("通知模拟发送: channel={}, taskId={}, recipient={}, result=MOCK_ACCEPTED",
+                task.getChannel(), taskId, recipientMasked);
         return ChannelSendResult.sent(CODE, "mock-" + taskId, "MOCK_ACCEPTED");
     }
 

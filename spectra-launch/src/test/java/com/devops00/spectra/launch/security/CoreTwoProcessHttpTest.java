@@ -34,17 +34,26 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -65,6 +74,162 @@ class CoreTwoProcessHttpTest {
             SET concurrency_mode = ?, max_sessions = ?
             WHERE client_id = (SELECT id FROM spectra_security.sec_security_client WHERE code = 'web')
             """;
+
+    @Test
+    void lastRootSurvivesOneApplicationRedisNetworkIsolation() throws Exception {
+        requireIsolatedDependencies();
+        String redisServer = System.getenv("SPECTRA_TEST_REDIS_SERVER");
+        if (redisServer == null || redisServer.isBlank()) {
+            redisServer = "D:/Develop/Platform/redis/redis-server.exe";
+        }
+        Path temporary = Files.createTempDirectory(Path.of("target"), "core-root-redis-isolation-");
+        int redisPort = freePort();
+        Process redis = startRedis(redisServer, temporary, redisPort);
+        try {
+            awaitListening(redisPort, redis);
+            try (var proxy = new RedisProxy(redisPort);
+                    var first = new SpringApplicationBuilder(LaunchApplication.class)
+                            .run(coreArgs("redis://127.0.0.1:" + proxy.port() + "/5"))) {
+                Path ready = temporary.resolve("second-port.txt");
+                Process second = startSecond(ready, temporary.resolve("second.log"),
+                        "redis://127.0.0.1:" + redisPort + "/5");
+                try (HttpClient client = HttpClient.newHttpClient()) {
+                    int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                    int secondPort = awaitPort(second, ready);
+                    assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                    var mapper = first.getBean(ObjectMapper.class);
+                    var properties = first.getBean(SecurityProperties.class);
+                    var rootPolicy = first.getBean(RootPolicyRepository.class);
+                    var jdbc = first.getBean(JdbcTemplate.class);
+                    var fixture = new Fixture(first);
+                    TestUser root = TestUser.create("b02rootni");
+                    try {
+                        fixture.insertWithRole(root, "ROLE_DEV_OPS");
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                        Session before = login(client, firstPort, mapper, properties,
+                                root.username(), root.password());
+                        assertEquals(200, context(client, firstPort, before.accessToken()));
+                        assertEquals(200, context(client, secondPort, before.accessToken()));
+
+                        proxy.isolate();
+                        assertTrue(redis.isAlive());
+                        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                            var firstDenied = executor.submit(() -> context(client, firstPort, before.accessToken()));
+                            var secondAccepted = executor.submit(() -> context(client, secondPort, before.accessToken()));
+                            assertEquals(503, firstDenied.get(30, TimeUnit.SECONDS));
+                            assertEquals(200, secondAccepted.get(30, TimeUnit.SECONDS));
+                        }
+                        assertEquals(503, disable(client, firstPort, before.accessToken(), root.id()).statusCode());
+                        assertEquals(503, passwordLogin(client, firstPort, mapper,
+                                root.username(), root.password()).statusCode());
+                        assertLastRootConflict(disable(client, secondPort, before.accessToken(), root.id()), mapper);
+                        assertEquals(200, context(client, secondPort, before.accessToken()));
+                        assertEquals("ACTIVE", jdbc.queryForObject(
+                                "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, root.id()));
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+
+                        proxy.restore();
+                        awaitLoginRecovery(client, firstPort, mapper, root);
+                        assertTrue(redis.isAlive());
+                        assertEquals(200, context(client, firstPort, before.accessToken()));
+                        assertEquals(200, context(client, secondPort, before.accessToken()));
+                        assertLastRootConflict(disable(client, firstPort, before.accessToken(), root.id()), mapper);
+                        assertEquals("ACTIVE", jdbc.queryForObject(
+                                "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, root.id()));
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    } finally {
+                        fixture.clean();
+                    }
+                } finally {
+                    stop(second);
+                }
+            }
+        } finally {
+            stop(redis);
+        }
+    }
+
+    @Test
+    void lastRootSurvivesSharedIsolatedRedisOutageAcrossProcesses() throws Exception {
+        requireIsolatedDependencies();
+        String redisServer = System.getenv("SPECTRA_TEST_REDIS_SERVER");
+        if (redisServer == null || redisServer.isBlank()) {
+            redisServer = "D:/Develop/Platform/redis/redis-server.exe";
+        }
+        Path temporary = Files.createTempDirectory(Path.of("target"), "core-root-redis-fault-two-process-");
+        int redisPort = freePort();
+        String redisUrl = "redis://127.0.0.1:" + redisPort + "/5";
+        Process redis = startRedis(redisServer, temporary, redisPort);
+        try {
+            awaitListening(redisPort, redis);
+            try (var first = new SpringApplicationBuilder(LaunchApplication.class).run(coreArgs(redisUrl))) {
+                Path ready = temporary.resolve("second-port.txt");
+                Process second = startSecond(ready, temporary.resolve("second.log"), redisUrl);
+                try (HttpClient client = HttpClient.newHttpClient()) {
+                    int firstPort = ((WebServerApplicationContext) first).getWebServer().getPort();
+                    int secondPort = awaitPort(second, ready);
+                    assertNotEquals(ProcessHandle.current().pid(), second.pid());
+                    var mapper = first.getBean(ObjectMapper.class);
+                    var properties = first.getBean(SecurityProperties.class);
+                    var rootPolicy = first.getBean(RootPolicyRepository.class);
+                    var jdbc = first.getBean(JdbcTemplate.class);
+                    var fixture = new Fixture(first);
+                    TestUser root = TestUser.create("b02rootrf");
+                    try {
+                        fixture.insertWithRole(root, "ROLE_DEV_OPS");
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                        Session before = login(client, firstPort, mapper, properties,
+                                root.username(), root.password());
+                        assertEquals(200, context(client, firstPort, before.accessToken()));
+                        assertEquals(200, context(client, secondPort, before.accessToken()));
+
+                        stop(redis);
+                        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                            var firstDenied = executor.submit(() -> context(client, firstPort, before.accessToken()));
+                            var secondDenied = executor.submit(() -> context(client, secondPort, before.accessToken()));
+                            assertEquals(503, firstDenied.get(30, TimeUnit.SECONDS));
+                            assertEquals(503, secondDenied.get(30, TimeUnit.SECONDS));
+                        }
+                        assertEquals(503, disable(client, firstPort, before.accessToken(), root.id()).statusCode());
+                        assertEquals(503, disable(client, secondPort, before.accessToken(), root.id()).statusCode());
+                        assertEquals(503, passwordLogin(client, firstPort, mapper,
+                                root.username(), root.password()).statusCode());
+                        assertEquals(503, passwordLogin(client, secondPort, mapper,
+                                root.username(), root.password()).statusCode());
+                        assertEquals("ACTIVE", jdbc.queryForObject(
+                                "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, root.id()));
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+
+                        redis = startRedis(redisServer, temporary, redisPort);
+                        awaitListening(redisPort, redis);
+                        awaitLoginRecovery(client, firstPort, mapper, root);
+                        awaitLoginRecovery(client, secondPort, mapper, root);
+                        Session after = login(client, secondPort, mapper, properties,
+                                root.username(), root.password());
+                        assertEquals(401, context(client, firstPort, before.accessToken()));
+                        assertEquals(401, context(client, secondPort, before.accessToken()));
+                        assertEquals(401, refresh(client, firstPort, before.refreshToken(), properties).statusCode());
+                        assertEquals(401, refresh(client, secondPort, before.refreshToken(), properties).statusCode());
+                        assertEquals(200, context(client, firstPort, after.accessToken()));
+                        assertEquals(200, context(client, secondPort, after.accessToken()));
+                        assertLastRootConflict(disable(client, firstPort, after.accessToken(), root.id()), mapper);
+                        assertLastRootConflict(disable(client, secondPort, after.accessToken(), root.id()), mapper);
+                        assertEquals("ACTIVE", jdbc.queryForObject(
+                                "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, root.id()));
+                        assertEquals(1L, rootPolicy.countEffectiveDevOpsUsers());
+                    } finally {
+                        fixture.clean();
+                    }
+                } finally {
+                    stop(second);
+                }
+            }
+        } finally {
+            if (redis.isAlive()) {
+                stop(redis);
+            }
+        }
+    }
 
     @Test
     void naturalRootAssignmentAndCredentialExpiryPropagatesAcrossProcesses() throws Exception {
@@ -95,6 +260,7 @@ class CoreTwoProcessHttpTest {
                     assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
                     assertEquals(200, context(client, firstPort, targetSession.accessToken()));
                     assertEquals(200, context(client, secondPort, targetSession.accessToken()));
+                    assertModuleReads(client, firstPort, secondPort, targetSession.accessToken(), 200);
 
                     assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
                             + "SET valid_until = statement_timestamp() + INTERVAL '5 seconds' WHERE user_id = ?",
@@ -103,6 +269,8 @@ class CoreTwoProcessHttpTest {
                     awaitEffectiveRoots(rootPolicy, 1L);
                     assertEquals(200, context(client, firstPort, targetSession.accessToken()));
                     assertEquals(200, context(client, secondPort, targetSession.accessToken()));
+                    assertModuleReads(client, firstPort, secondPort, targetSession.accessToken(), 403);
+                    assertModuleReads(client, firstPort, secondPort, operatorToken, 200);
                     assertEquals(403, disable(client, firstPort, targetSession.accessToken(),
                             operator.id()).statusCode());
                     assertEquals(403, disable(client, secondPort, targetSession.accessToken(),
@@ -119,6 +287,8 @@ class CoreTwoProcessHttpTest {
                     awaitEffectiveRoots(rootPolicy, 1L);
                     assertEquals(401, context(client, firstPort, targetSession.accessToken()));
                     assertEquals(401, context(client, secondPort, targetSession.accessToken()));
+                    assertModuleReads(client, firstPort, secondPort, targetSession.accessToken(), 401);
+                    assertModuleReads(client, firstPort, secondPort, operatorToken, 200);
                     assertEquals(401, refresh(client, secondPort, targetSession.refreshToken(),
                             properties).statusCode());
                     assertLastRootConflict(disable(client, secondPort, operatorToken, operator.id()), mapper);
@@ -558,13 +728,153 @@ class CoreTwoProcessHttpTest {
                 "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false"};
     }
 
+    private static String[] coreArgs(String redisUrl) {
+        String[] base = coreArgs();
+        String[] args = Arrays.copyOf(base, base.length + 1);
+        args[args.length - 1] = "--spring.data.redis.url=" + redisUrl;
+        return args;
+    }
+
     private static Process startSecond(Path ready, Path log) throws Exception {
+        return startSecond(ready, log, null);
+    }
+
+    private static Process startSecond(Path ready, Path log, String redisUrl) throws Exception {
         String java = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
-        return new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp", System.getProperty("java.class.path"),
-                SecondApplication.class.getName(), ready.toString())
+        ProcessBuilder builder = new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp",
+                System.getProperty("java.class.path"), SecondApplication.class.getName(), ready.toString())
                 .redirectErrorStream(true)
-                .redirectOutput(log.toFile())
+                .redirectOutput(log.toFile());
+        if (redisUrl != null) {
+            builder.environment().put("SPRING_DATA_REDIS_URL", redisUrl);
+        }
+        return builder.start();
+    }
+
+    private static Process startRedis(String redisServer, Path home, int port) throws Exception {
+        return new ProcessBuilder(redisServer, "--port", Integer.toString(port), "--bind", "127.0.0.1",
+                "--save", "", "--appendonly", "no", "--dir", home.toAbsolutePath().toString())
+                .redirectErrorStream(true)
+                .redirectOutput(home.resolve("redis.out").toFile())
                 .start();
+    }
+
+    /** 仅转发测试进程的 Redis TCP 流量，可断开一端而保持 Redis 和另一应用可用。 */
+    private static final class RedisProxy implements AutoCloseable {
+        private final int redisPort;
+        private final ServerSocket listener;
+        private final Set<Socket> sockets = ConcurrentHashMap.newKeySet();
+        private final AtomicBoolean isolated = new AtomicBoolean();
+        private final java.util.concurrent.ExecutorService workers = Executors.newVirtualThreadPerTaskExecutor();
+
+        private RedisProxy(int redisPort) throws IOException {
+            this.redisPort = redisPort;
+            this.listener = new ServerSocket();
+            listener.bind(new InetSocketAddress("127.0.0.1", 0));
+            workers.submit(this::accept);
+        }
+
+        private int port() {
+            return listener.getLocalPort();
+        }
+
+        private void isolate() {
+            isolated.set(true);
+            sockets.forEach(RedisProxy::closeSocket);
+        }
+
+        private void restore() {
+            isolated.set(false);
+        }
+
+        private void accept() {
+            while (!listener.isClosed()) {
+                try {
+                    Socket client = listener.accept();
+                    if (isolated.get()) {
+                        closeSocket(client);
+                        continue;
+                    }
+                    workers.submit(() -> forward(client));
+                } catch (IOException exception) {
+                    if (!listener.isClosed()) {
+                        throw new IllegalStateException("隔离 Redis 转发器异常", exception);
+                    }
+                }
+            }
+        }
+
+        private void forward(Socket client) {
+            Socket redis = null;
+            try (client) {
+                redis = new Socket("127.0.0.1", redisPort);
+                sockets.add(client);
+                sockets.add(redis);
+                if (isolated.get()) {
+                    return;
+                }
+                Socket upstream = redis;
+                workers.submit(() -> pump(upstream, client));
+                pump(client, redis);
+            } catch (IOException ignored) {
+                // 断开当前转发链路，让应用直接观察 Redis 连接失败。
+            } finally {
+                sockets.remove(client);
+                closeSocket(client);
+                if (redis != null) {
+                    sockets.remove(redis);
+                    closeSocket(redis);
+                }
+            }
+        }
+
+        private static void pump(Socket source, Socket destination) {
+            try {
+                source.getInputStream().transferTo(destination.getOutputStream());
+            } catch (IOException ignored) {
+                // 对端关闭或主动隔离时结束转发。
+            } finally {
+                closeSocket(source);
+                closeSocket(destination);
+            }
+        }
+
+        private static void closeSocket(Socket socket) {
+            try {
+                socket.close();
+            } catch (IOException ignored) {
+                // 关闭已断开的测试连接是幂等操作。
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            listener.close();
+            sockets.forEach(RedisProxy::closeSocket);
+            workers.shutdownNow();
+        }
+    }
+
+    private static int freePort() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
+    }
+
+    private static void awaitListening(int port, Process process) throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(15);
+        while (System.nanoTime() < deadline) {
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress("127.0.0.1", port), 200);
+                return;
+            } catch (Exception ignored) {
+                if (!process.isAlive()) {
+                    throw new IllegalStateException("隔离 Redis 未启动，退出码 " + process.exitValue());
+                }
+                Thread.sleep(100);
+            }
+        }
+        throw new IllegalStateException("隔离 Redis 未在 15 秒内监听端口 " + port);
     }
 
     private static int awaitPort(Process process, Path ready) throws Exception {
@@ -595,13 +905,7 @@ class CoreTwoProcessHttpTest {
     private static Session login(HttpClient client, int port, ObjectMapper mapper, SecurityProperties properties,
                                  String username, String password)
             throws Exception {
-        var response = client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
-                + "/api/security/authentication/login"))
-                .header("Api-Version", "1.0.0")
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
-                        "type", "PASSWORD", "username", username, "password", password))))
-                .build(), HttpResponse.BodyHandlers.ofString());
+        var response = passwordLogin(client, port, mapper, username, password);
         assertEquals(200, response.statusCode());
         String accessToken = mapper.readTree(response.body()).path("data").path("access_token").asText();
         String prefix = properties.getRefreshCookieName() + "=";
@@ -615,12 +919,64 @@ class CoreTwoProcessHttpTest {
         return new Session(accessToken, refreshToken);
     }
 
+    private static HttpResponse<String> passwordLogin(HttpClient client, int port, ObjectMapper mapper,
+                                                      String username, String password)
+            throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                + "/api/security/authentication/login"))
+                .header("Api-Version", "1.0.0")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
+                        "type", "PASSWORD", "username", username, "password", password))))
+                .build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static void awaitLoginRecovery(HttpClient client, int port, ObjectMapper mapper,
+                                           TestUser user)
+            throws Exception {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(90);
+        int lastStatus = 0;
+        while (System.nanoTime() < deadline) {
+            try {
+                lastStatus = passwordLogin(client, port, mapper, user.username(), user.password()).statusCode();
+                if (lastStatus == 200) {
+                    return;
+                }
+            } catch (Exception ignored) {
+                // 隔离 Redis 重启期间等待两个应用的就绪探针恢复。
+            }
+            Thread.sleep(500);
+        }
+        throw new IllegalStateException("隔离 Redis 重启后登录未恢复，最后 HTTP 状态 " + lastStatus);
+    }
+
     private static int context(HttpClient client, int port, String token) throws Exception {
         return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/security/context"))
                 .header("Api-Version", "1.0.0")
                 .header("Authorization", "Bearer " + token)
                 .GET()
                 .build(), HttpResponse.BodyHandlers.discarding()).statusCode();
+    }
+
+    private static int securedGet(HttpClient client, int port, String token, String path) throws Exception {
+        return client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build(), HttpResponse.BodyHandlers.discarding()).statusCode();
+    }
+
+    private static void assertModuleReads(HttpClient client, int firstPort, int secondPort,
+                                          String token, int expectedStatus)
+            throws Exception {
+        assertEquals(expectedStatus, securedGet(client, firstPort, token,
+                "/api/oa/contact/page?pageNum=1&pageSize=5"));
+        assertEquals(expectedStatus, securedGet(client, secondPort, token,
+                "/api/oa/contact/page?pageNum=1&pageSize=5"));
+        assertEquals(expectedStatus, securedGet(client, firstPort, token,
+                "/api/workflow/process-definitions"));
+        assertEquals(expectedStatus, securedGet(client, secondPort, token,
+                "/api/workflow/process-definitions"));
     }
 
     private static HttpResponse<String> changePassword(HttpClient client, int port, ObjectMapper mapper, String token,
