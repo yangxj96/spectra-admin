@@ -31,6 +31,7 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationSendPreviewEntity;
@@ -55,6 +56,7 @@ import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tools.jackson.databind.ObjectMapper;
@@ -94,6 +96,10 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
 
     private static final int MAX_SAMPLE_COUNT = 10;
 
+    private static final String PREVIEW_PERMISSION = "notification:send:preview";
+
+    private static final String APPLY_PERMISSION = "notification:send:apply";
+
     /** 生成受控发送预览令牌时使用的密码学安全随机数生成器。 */
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -119,6 +125,8 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
     private final ObjectMapper objectMapper;
 
     private final TimeMapper timeMapper;
@@ -126,7 +134,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     @Override
     @Transactional
     public NotificationControlledSendPreviewVO preview(NotificationControlledSendFrom params) {
-        var operatorId = requireOperator();
+        var operatorId = requireOperator(PREVIEW_PERMISSION);
         var prepared = prepare(params);
         var evaluation = evaluate(prepared);
         var token = token();
@@ -153,7 +161,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     @Override
     @Transactional
     public NotificationControlledSendApplyVO apply(NotificationControlledSendApplyFrom params) {
-        var operatorId = requireOperator();
+        var operatorId = requireOperator(APPLY_PERMISSION);
         var entity = previewMapper.selectById(params.getPreviewId());
         if (entity == null || !operatorId.equals(entity.getOperatorUserId())) {
             throw new DataNotExistException("通知发送 Preview 不存在");
@@ -433,10 +441,14 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     /**
      * 校验并确保数据满足当前约束（{@code requireOperator}）。
      */
-    private UUID requireOperator() {
+    private UUID requireOperator(String permission) {
         var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
-            throw new DataException("受控发送必须在登录用户上下文中执行");
+            throw new AccessDeniedException("受控发送必须在登录用户上下文中执行");
+        }
+        var authorization = authorizationSnapshotProvider.load(operatorId);
+        if (authorization == null || !authorization.hasPermission(permission)) {
+            throw new AccessDeniedException("当前用户没有受控发送权限");
         }
         return operatorId;
     }

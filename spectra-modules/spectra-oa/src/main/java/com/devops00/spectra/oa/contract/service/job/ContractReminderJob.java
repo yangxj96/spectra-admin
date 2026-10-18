@@ -17,6 +17,7 @@
 package com.devops00.spectra.oa.contract.service.job;
 
 import com.devops00.spectra.oa.contract.service.ContractService;
+import com.devops00.spectra.common.notification.NotificationSystemActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,7 @@ public class ContractReminderJob {
      * 更新或推进目标状态（{@code sendDueMilestoneReminders}）。
      */
     public int sendDueMilestoneReminders() {
-        var sent = contractService.sendDueMilestoneReminders();
+        var sent = contractService.sendDueMilestoneRemindersAsSystem(NotificationSystemActor.OA_CONTRACT_REMINDER);
         if (sent > 0) {
             log.info("合同履约节点提醒发送完成: count={}", sent);
         }

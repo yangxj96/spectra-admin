@@ -29,6 +29,7 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.oa.contract.javabean.converter.ContractConverter;
 import com.devops00.spectra.oa.contract.javabean.constant.ContractMilestoneStatus;
@@ -58,6 +59,8 @@ import com.devops00.spectra.oa.file.reference.OaFileReferenceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -98,6 +101,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
     private final CurrentDepartmentMemberships currentDepartmentMemberships;
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
@@ -377,13 +382,35 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Override
     @Transactional
     public int sendDueMilestoneReminders() {
+        var userId = securityContextAccessor.currentUserId();
+        if (userId == null) {
+            throw new AccessDeniedException("合同提醒扫描缺少用户身份");
+        }
+        var authorization = authorizationSnapshotProvider.load(userId);
+        if (authorization == null || !authorization.hasPermission("oa:contract:update")) {
+            throw new AccessDeniedException("当前用户无权执行合同提醒扫描");
+        }
+        return scanDueMilestones(false);
+    }
+
+    @Override
+    @Transactional
+    public int sendDueMilestoneRemindersAsSystem(NotificationSystemActor actor) {
+        if (actor != NotificationSystemActor.OA_CONTRACT_REMINDER) {
+            throw new AccessDeniedException("合同提醒扫描缺少已登记的系统身份");
+        }
+        return scanDueMilestones(true);
+    }
+
+    private int scanDueMilestones(boolean systemRun) {
         var deadline = LocalDate.now(ZoneOffset.UTC).plusDays(3).atStartOfDay(ZoneOffset.UTC).toInstant();
         var milestones = milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>().le(ContractMilestone::getDueDate, deadline)
                 .eq(ContractMilestone::getStatus, ContractMilestoneStatus.PENDING.getValue())
-                .isNull(ContractMilestone::getReminderSentAt));
+                .isNull(ContractMilestone::getReminderSentAt)
+                .isNull(ContractMilestone::getDeleted));
         var sent = 0;
         for (var milestone : milestones) {
-            var contract = getById(milestone.getContractId());
+            var contract = systemRun ? loadReminderContract(milestone.getContractId()) : getById(milestone.getContractId());
             if (contract == null || ContractStatus.ARCHIVED.getValue().equals(contract.getStatus())) {
                 continue;
             }
@@ -391,9 +418,13 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             if (receiverId == null) {
                 continue;
             }
+            var claimedAt = Instant.now();
             var claimed = milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())
+                    .eq(ContractMilestone::getStatus, ContractMilestoneStatus.PENDING.getValue())
+                    .le(ContractMilestone::getDueDate, deadline)
                     .isNull(ContractMilestone::getReminderSentAt)
-                    .set(ContractMilestone::getReminderSentAt, Instant.now()));
+                    .isNull(ContractMilestone::getDeleted)
+                    .set(ContractMilestone::getReminderSentAt, claimedAt));
             if (claimed != 1) {
                 continue;
             }
@@ -410,11 +441,28 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                 sent++;
             } catch (RuntimeException exception) {
                 milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())
+                        .eq(ContractMilestone::getReminderSentAt, claimedAt)
                         .set(ContractMilestone::getReminderSentAt, null));
                 log.warn("合同履约节点提醒发送失败: milestoneId={}", milestone.getId(), exception);
             }
         }
         return sent;
+    }
+
+    /** 仅供已登记的合同 Quartz 身份读取提醒所需的四个合同字段。 */
+    private Contract loadReminderContract(UUID contractId) {
+        return jdbcTemplate.query("SELECT id, title, status, owner_id FROM spectra_oa.oa_contract "
+                + "WHERE id = ? AND deleted IS NULL", result -> {
+                    if (!result.next()) {
+                        return null;
+                    }
+                    var contract = new Contract();
+                    contract.setId(result.getObject("id", UUID.class));
+                    contract.setTitle(result.getString("title"));
+                    contract.setStatus(result.getString("status"));
+                    contract.setOwnerId(result.getObject("owner_id", UUID.class));
+                    return contract;
+                }, contractId);
     }
 
     /**

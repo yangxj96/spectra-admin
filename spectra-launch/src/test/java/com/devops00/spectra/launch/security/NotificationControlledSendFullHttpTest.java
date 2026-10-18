@@ -16,6 +16,10 @@
 
 package com.devops00.spectra.launch.security;
 
+import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
+import com.devops00.spectra.core.notification.javabean.from.NotificationControlledSendApplyFrom;
+import com.devops00.spectra.core.notification.service.NotificationControlledSendService;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.framework.security.session.SecuritySessionRevocationService;
 import com.devops00.spectra.launch.LaunchApplication;
@@ -24,6 +28,9 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.server.context.WebServerApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -44,7 +51,10 @@ import java.util.concurrent.CountDownLatch;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * 在隔离 PostgreSQL 与 Redis 上核对受控发送的正式 HTTP Preview/Apply 授权、漂移和并发消费。
@@ -116,6 +126,35 @@ class NotificationControlledSendFullHttpTest {
                 assertNotEquals(200, invalidToken.statusCode());
                 assertEquals(0L, requestCount(jdbc, idempotencyKey));
 
+                var directApply = new NotificationControlledSendApplyFrom();
+                directApply.setPreviewId(UUID.fromString(previewId));
+                directApply.setPreviewToken(previewToken);
+                directApply.setRequestHash(requestHash);
+                var principal = mock(SecurityPrincipal.class);
+                when(principal.getId()).thenReturn(operatorId);
+                SecurityContextHolder.getContext()
+                        .setAuthentication(
+                                new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+                try {
+                    var service = application.getBean(NotificationControlledSendService.class);
+                    directApply.setPreviewToken("wrong-token");
+                    assertThrows(DataException.class, () -> service.apply(directApply),
+                            "有效 Root 直接调用 Service 应先通过权限检查");
+                    directApply.setPreviewToken(previewToken);
+                    jdbc.update("UPDATE spectra_security.sec_role_assignment "
+                            + "SET valid_until = statement_timestamp() - INTERVAL '1 second' WHERE id = ?",
+                            roleAssignmentId);
+                    assertThrows(AccessDeniedException.class, () -> service.apply(directApply),
+                            "角色自然到期后直接调用 Service 必须拒绝");
+                    assertEquals("PREVIEWED", jdbc.queryForObject("SELECT status FROM spectra_notification.ntf_send_preview "
+                            + "WHERE id = ?", String.class, directApply.getPreviewId()));
+                    assertEquals(0L, requestCount(jdbc, idempotencyKey));
+                } finally {
+                    jdbc.update("UPDATE spectra_security.sec_role_assignment SET valid_until = NULL WHERE id = ?",
+                            roleAssignmentId);
+                    SecurityContextHolder.clearContext();
+                }
+
                 jdbc.update("UPDATE spectra_core.sys_user SET status = 'DISABLED' WHERE id = ?", recipientId);
                 var changedAudience = post(client, port, mapper, "/apply", token, applyBody);
                 assertNotEquals(200, changedAudience.statusCode(), "受众变化后必须重新 Preview");
@@ -141,6 +180,7 @@ class NotificationControlledSendFullHttpTest {
                 assertTrue(mapper.readTree(replay.body()).path("data").path("idempotent_replay").asBoolean());
                 assertEquals(1L, requestCount(jdbc, idempotencyKey));
             } finally {
+                SecurityContextHolder.clearContext();
                 application.getBean(SecuritySessionRevocationService.class).deleteByUserId(operatorId);
                 for (UUID requestId : jdbc.queryForList("SELECT id FROM spectra_notification.ntf_request "
                         + "WHERE idempotency_key = ?", UUID.class, idempotencyKey)) {
