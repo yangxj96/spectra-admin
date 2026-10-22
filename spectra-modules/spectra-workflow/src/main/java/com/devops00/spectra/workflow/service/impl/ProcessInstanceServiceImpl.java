@@ -31,7 +31,9 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.image.ProcessDiagramGenerator;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,15 +57,24 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private final ProcessConverter processConverter;
     private final WorkflowService workflowService;
 
+    private final WorkflowTaskTodoNotifier taskTodoNotifier;
+
+    private final JdbcTemplate jdbcTemplate;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String start(String processDefinitionKey, String businessKey) {
         return start(processDefinitionKey, businessKey, new HashMap<>());
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String start(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
         try {
             // 1. 防重复启动
+            jdbcTemplate.queryForObject(
+                    "SELECT 1 FROM pg_advisory_xact_lock(hashtextextended('spectra.workflow.business-key:' || ?, 0))",
+                    Integer.class, businessKey);
             long count = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).count();
 
             if (count > 0) {
@@ -72,6 +83,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
             // 2. 启动流程
             ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
+            taskTodoNotifier.notifyActiveTasks(instance.getId());
 
             log.info("流程已启动: processInstanceId={}, businessKey={}", instance.getId(), businessKey);
             return instance.getId();

@@ -17,6 +17,8 @@
 package com.devops00.spectra.launch.pagination;
 
 import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.oa.contact.javabean.converter.ContactConverter;
 import com.devops00.spectra.oa.contact.service.impl.ContactServiceImpl;
@@ -28,6 +30,7 @@ import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -56,7 +59,12 @@ class FixedPaginationCallerTest {
         when(historyQuery.count()).thenReturn(0L);
         when(taskQuery.listPage(10, 10)).thenReturn(List.of());
         when(historyQuery.listPage(10, 10)).thenReturn(List.of());
-        var service = new TaskServiceImpl(tasks, history, null, null, null, null, null, null);
+        var security = mock(SecurityContextAccessor.class);
+        var principal = mock(SecurityPrincipal.class);
+        when(principal.getId()).thenReturn(UUID.randomUUID());
+        when(principal.getUsername()).thenReturn("synthetic-user");
+        when(security.currentUser()).thenReturn(principal);
+        var service = new TaskServiceImpl(tasks, history, null, null, null, null, null, null, null, security, null);
         var request = new PageFrom(10L, 2L, null);
         assertTrue(service.todo(request, "synthetic-user", null).getRecords().isEmpty());
         request.setOrders(List.of());

@@ -26,6 +26,8 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import com.devops00.spectra.workflow.api.ApprovalCallback;
@@ -37,12 +39,14 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +60,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskService {
+
+    private static final String TASK_UPDATE_PERMISSION = "workflow:task:update";
 
     private final TaskService flowableTaskService;
 
@@ -73,9 +79,16 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
 
     private final NotificationRecipientDirectory recipientDirectory;
 
+    private final WorkflowTaskTodoNotifier taskTodoNotifier;
+
+    private final SecurityContextAccessor securityContextAccessor;
+
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
     @Override
     public IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey) {
         page.requireUnsorted();
+        requireCurrentUserId(assignee);
         var taskQuery = flowableTaskService.createTaskQuery().taskAssignee(assignee).orderByTaskCreateTime().desc();
         if (StringUtils.hasText(processDefinitionKey)) {
             taskQuery.processDefinitionKey(processDefinitionKey);
@@ -95,6 +108,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
     @Override
     public IPage<TaskVO> done(PageFrom page, String assignee, String processDefinitionKey) {
         page.requireUnsorted();
+        requireCurrentUserId(assignee);
         var historicTaskQuery = historyService.createHistoricTaskInstanceQuery()
                 .taskAssignee(assignee)
                 .finished()
@@ -181,7 +195,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
 
     @Override
     public boolean canAccessProcess(String processInstanceId, String username) {
-        if (!StringUtils.hasText(processInstanceId) || !StringUtils.hasText(username)) {
+        if (!StringUtils.hasText(processInstanceId) || !matchesCurrentUsername(username)) {
             return false;
         }
         if (flowableTaskService.createTaskQuery().processInstanceId(processInstanceId).taskAssignee(username).count() > 0) {
@@ -194,14 +208,35 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
      * 校验并确保数据满足当前约束（{@code requireOwnedTask}）。
      */
     private org.flowable.task.api.Task requireOwnedTask(String taskId, String operator) {
-        if (!StringUtils.hasText(operator)) {
-            throw new DataNotExistException("任务不存在或无权处理: " + taskId);
+        var userId = requireCurrentUserId(operator);
+        var authorization = authorizationSnapshotProvider.load(userId);
+        if (authorization == null || !authorization.hasPermission(TASK_UPDATE_PERMISSION)) {
+            throw new AccessDeniedException("当前用户没有流程任务处理权限");
         }
         var task = flowableTaskService.createTaskQuery().taskId(taskId).taskAssignee(operator).singleResult();
         if (task == null) {
             throw new DataNotExistException("任务不存在或无权处理: " + taskId);
         }
         return task;
+    }
+
+    private UUID requireCurrentUserId(String username) {
+        var currentUser = securityContextAccessor.currentUser();
+        if (currentUser == null
+                || currentUser.getId() == null
+                || !StringUtils.hasText(currentUser.getUsername())
+                || !currentUser.getUsername().equals(username)) {
+            throw new AccessDeniedException("流程任务操作人与当前用户不一致");
+        }
+        return currentUser.getId();
+    }
+
+    private boolean matchesCurrentUsername(String username) {
+        var currentUser = securityContextAccessor.currentUser();
+        return currentUser != null
+                && currentUser.getId() != null
+                && StringUtils.hasText(currentUser.getUsername())
+                && currentUser.getUsername().equals(username);
     }
 
     /**
@@ -300,30 +335,6 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
      * 执行内部处理逻辑（{@code notifyNextTasks}）。
      */
     private void notifyNextTasks(String processInstanceId) {
-        flowableTaskService.createTaskQuery().processInstanceId(processInstanceId).list().forEach(task -> {
-            if (!StringUtils.hasText(task.getAssignee())) {
-                return;
-            }
-            var recipients = recipientDirectory.resolveByLoginNamesAsSystem(List.of(task.getAssignee()),
-                    NotificationSystemActor.WORKFLOW_TASK)
-                    .stream()
-                    .filter(item -> item.active() && item.userId() != null)
-                    .map(item -> item.userId())
-                    .distinct()
-                    .toList();
-            if (recipients.isEmpty()) {
-                return;
-            }
-            notificationService.sendAsSystem(NotificationSendRequest.inApp(
-                    "workflow:todo:" + task.getId(),
-                    NotificationPurpose.WORKFLOW_TODO,
-                    recipients,
-                    NotificationTemplateCode.WORKFLOW_TASK_TODO)
-                    .parameter("task_name", task.getName())
-                    .businessReference("WORKFLOW", processInstanceId)
-                    .sourceModule("WORKFLOW")
-                    .link("/workflow/tasks/todo")
-                    .build(), NotificationSystemActor.WORKFLOW_TASK);
-        });
+        taskTodoNotifier.notifyActiveTasks(processInstanceId);
     }
 }
