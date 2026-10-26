@@ -63,6 +63,76 @@ import static org.mockito.Mockito.when;
 class WorkflowInstanceNotificationFullAppTest {
 
     @Test
+    void rejectingReimbursementTaskUpdatesOaApplicationAndSendsOneNotice() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spectra.scheduler.quartz.enabled=false", "--flowable.async-executor-activate=false",
+                        "--spectra.security.secret.master-key=" + randomSecret())) {
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            var repository = application.getBean(RepositoryService.class);
+            var flowableTasks = application.getBean(org.flowable.engine.TaskService.class);
+            var processService = application.getBean(ProcessInstanceService.class);
+            var workflowTasks = application.getBean(com.devops00.spectra.workflow.api.TaskService.class);
+            UUID userId = UUID.randomUUID();
+            UUID assignmentId = UUID.randomUUID();
+            UUID applicationId = UUID.randomUUID();
+            UUID businessId = UUID.randomUUID();
+            String username = "b02oacallback" + UUID.randomUUID().toString().replace("-", "");
+            String deploymentId = null;
+            String taskId = null;
+            String noticeKey = "oa:reimbursement:" + businessId + ":报销申请已驳回";
+            try {
+                UUID roleId = jdbc.queryForObject("SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS'",
+                        UUID.class);
+                jdbc.update("INSERT INTO spectra_core.sys_user (id, username, employee_no, real_name) "
+                        + "VALUES (?, ?, ?, ?)", userId, username, username, "synthetic OA callback user");
+                jdbc.update("INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id) VALUES (?, ?, ?)",
+                        assignmentId, userId, roleId);
+                jdbc.update("INSERT INTO spectra_oa.oa_application "
+                        + "(id, application_no, type_code, biz_id, applicant_id, title, status, created_at, updated_at) "
+                        + "VALUES (?, ?, 'reimbursement', ?, ?, ?, 'IN_REVIEW', statement_timestamp(), statement_timestamp())",
+                        applicationId, "B02-" + UUID.randomUUID(), businessId, userId, "synthetic reimbursement");
+                deploymentId = repository.createDeployment()
+                        .addClasspathResource("processes/oa-reimbursement-approval.bpmn20.xml")
+                        .deploy()
+                        .getId();
+                String processId = processService.start("oa_reimbursement_approval", applicationId.toString(),
+                        Map.of("approver", username));
+                jdbc.update("UPDATE spectra_oa.oa_application SET process_instance_id = ? WHERE id = ?",
+                        processId, applicationId);
+                var task = flowableTasks.createTaskQuery().processInstanceId(processId).singleResult();
+                assertNotNull(task);
+                taskId = task.getId();
+                assertEquals(userId, recipientFor(jdbc, "workflow:todo:" + taskId));
+                authenticate(userId, username);
+                workflowTasks.reject(taskId, "synthetic rejection", username);
+                assertEquals("REJECTED", jdbc.queryForObject("SELECT status FROM spectra_oa.oa_application WHERE id = ?",
+                        String.class, applicationId));
+                assertEquals("synthetic rejection", jdbc.queryForObject(
+                        "SELECT reject_reason FROM spectra_oa.oa_application WHERE id = ?", String.class, applicationId));
+                assertEquals(1L, requestCount(jdbc, noticeKey));
+                assertEquals(userId, recipientFor(jdbc, noticeKey));
+                String completedTaskId = taskId;
+                assertThrows(DataNotExistException.class,
+                        () -> workflowTasks.reject(completedTaskId, "replay", username));
+                assertEquals(1L, requestCount(jdbc, noticeKey));
+            } finally {
+                SecurityContextHolder.clearContext();
+                deleteNotification(jdbc, noticeKey);
+                deleteNotification(jdbc, taskId == null ? null : "workflow:result:" + taskId + ":false");
+                deleteNotification(jdbc, taskId == null ? null : "workflow:todo:" + taskId);
+                if (deploymentId != null) {
+                    repository.deleteDeployment(deploymentId, true);
+                }
+                jdbc.update("DELETE FROM spectra_oa.oa_application WHERE id = ?", applicationId);
+                jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", assignmentId);
+                jdbc.update("DELETE FROM spectra_core.sys_user WHERE id = ?", userId);
+            }
+        }
+    }
+
+    @Test
     void completingRealTwoStepInstanceSendsResultAndNextTodoOnlyOnce() throws Exception {
         requireIsolatedDependencies();
         try (var application = new SpringApplicationBuilder(LaunchApplication.class)

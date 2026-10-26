@@ -17,7 +17,14 @@
 package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.notification.NotificationAudience;
+import com.devops00.spectra.common.notification.NotificationAudienceDirectory;
+import com.devops00.spectra.common.port.security.SecurityPrincipal;
+import com.devops00.spectra.core.notification.javabean.from.NotificationControlledSendApplyFrom;
+import com.devops00.spectra.core.notification.service.NotificationControlledSendService;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
+import com.devops00.spectra.core.security.authorization.javabean.from.RoleAuthorizationApplyFrom;
+import com.devops00.spectra.core.security.authorization.service.RoleAuthorizationChangeService;
 import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.launch.LaunchApplication;
 import org.junit.jupiter.api.Test;
@@ -30,6 +37,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -41,16 +53,23 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * 使用正式 Flyway schema、Core HTTP 登录与角色变更服务验证缩权后的重新登录。
@@ -131,6 +150,134 @@ class RoleAuthorizationFullHttpTest {
     }
 
     @Test
+    void roleDefinitionShrinkSerializesWithControlledSendApply() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class, TestConfiguration.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
+                        "--spectra.test.role-http=true")) {
+            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
+                    application.getBean(PasswordEncoder.class));
+            String requestKey = "b02:controlled-send:role-shrink:" + UUID.randomUUID();
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                fixture.insert();
+                fixture.insertNotificationSendScenario();
+                int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+                ObjectMapper mapper = application.getBean(ObjectMapper.class);
+                String operatorToken = login(client, port, mapper, fixture.operatorUsername, fixture.password);
+                String targetToken = login(client, port, mapper, fixture.targetUsername, fixture.password);
+                UUID templateId = fixture.jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_template "
+                        + "WHERE template_group_code = 'system.notice' AND channel = 'IN_APP' "
+                        + "AND state = 'PUBLISHED' AND deleted IS NULL", UUID.class);
+                var notificationBody = mapper.writeValueAsString(Map.of("idempotency_key", requestKey,
+                        "purpose", "SYSTEM_NOTICE", "channels", List.of("IN_APP"),
+                        "template_version_ids", Map.of("IN_APP", templateId),
+                        "audience", Map.of("user_ids", List.of(fixture.target)), "parameters", Map.of()));
+                var sendPreview = post(client, port, "/api/notification/admin/send/preview", targetToken,
+                        notificationBody);
+                assertEquals(200, sendPreview.statusCode(), sendPreview.body());
+                var sendData = mapper.readTree(sendPreview.body()).path("data");
+                var sendApply = new NotificationControlledSendApplyFrom();
+                sendApply.setPreviewId(UUID.fromString(sendData.path("preview_id").asText()));
+                sendApply.setPreviewToken(sendData.path("preview_token").asText());
+                sendApply.setRequestHash(sendData.path("request_hash").asText());
+
+                var retainedPermissions = List.of("role:read", "role:grant", "user:read",
+                        "notification:send:preview");
+                var roleChange = Map.of("expected_version", 0, "authority_level", 100,
+                        "permission_codes", retainedPermissions,
+                        "grantable_permission_codes", List.of("role:read", "role:grant"));
+                String rolePath = "/api/security/authorization/roles/" + fixture.targetRole;
+                var rolePreview = post(client, port, rolePath + "/impact-preview", operatorToken,
+                        mapper.writeValueAsString(roleChange));
+                assertEquals(200, rolePreview.statusCode(), rolePreview.body());
+                String rolePreviewToken = mapper.readTree(rolePreview.body()).path("data").path("preview_token").asText();
+                var roleApply = new RoleAuthorizationApplyFrom();
+                roleApply.setExpectedVersion(0L);
+                roleApply.setAuthorityLevel(100);
+                roleApply.setPermissionCodes(Set.copyOf(retainedPermissions));
+                roleApply.setGrantablePermissionCodes(Set.of("role:read", "role:grant"));
+                roleApply.setPreviewToken(rolePreviewToken);
+                var operatorPrincipal = mock(SecurityPrincipal.class);
+                when(operatorPrincipal.getId()).thenReturn(fixture.operator);
+                var targetPrincipal = mock(SecurityPrincipal.class);
+                when(targetPrincipal.getId()).thenReturn(fixture.target);
+                var roleChangedInTransaction = new CountDownLatch(1);
+                var finishRoleChange = new CountDownLatch(1);
+                var transaction = new TransactionTemplate(application.getBean(PlatformTransactionManager.class));
+                var roleMutation = CompletableFuture.runAsync(() -> {
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(
+                                    new UsernamePasswordAuthenticationToken(operatorPrincipal, null, List.of()));
+                    try {
+                        transaction.executeWithoutResult(status -> {
+                            application.getBean(RoleAuthorizationChangeService.class)
+                                    .apply(fixture.targetRole,
+                                            roleApply);
+                            roleChangedInTransaction.countDown();
+                            try {
+                                if (!finishRoleChange.await(20, TimeUnit.SECONDS)) {
+                                    throw new IllegalStateException("角色缩权事务提交屏障超时");
+                                }
+                            } catch (InterruptedException exception) {
+                                Thread.currentThread().interrupt();
+                                throw new IllegalStateException("角色缩权事务等待中断", exception);
+                            }
+                        });
+                    } finally {
+                        SecurityContextHolder.clearContext();
+                    }
+                });
+                CompletableFuture<AccessDeniedException> racingApply;
+                try {
+                    assertTrue(roleChangedInTransaction.await(20, TimeUnit.SECONDS));
+                    var applyStarted = new CountDownLatch(1);
+                    racingApply = CompletableFuture.supplyAsync(() -> {
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(
+                                        new UsernamePasswordAuthenticationToken(targetPrincipal, null, List.of()));
+                        applyStarted.countDown();
+                        try {
+                            return assertThrows(AccessDeniedException.class,
+                                    () -> application.getBean(NotificationControlledSendService.class).apply(sendApply));
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    });
+                    assertTrue(applyStarted.await(5, TimeUnit.SECONDS));
+                    assertThrows(TimeoutException.class, () -> racingApply.get(500, TimeUnit.MILLISECONDS),
+                            "角色缩权事务提交前 Apply 不得越过用户行锁");
+                } finally {
+                    finishRoleChange.countDown();
+                }
+                roleMutation.get(20, TimeUnit.SECONDS);
+                assertTrue(racingApply.get(20, TimeUnit.SECONDS) instanceof AccessDeniedException);
+                assertEquals(1L, fixture.roleVersion());
+                assertEquals(1L, fixture.targetSecurityVersion());
+                assertEquals(0L, fixture.jdbc.queryForObject("SELECT count(*) FROM spectra_security.sec_role_permission "
+                        + "WHERE role_id = ? AND permission_id = (SELECT id FROM spectra_security.sec_permission "
+                        + "WHERE code = 'notification:send:apply') AND deleted IS NULL", Long.class,
+                        fixture.targetRole));
+                assertEquals("PREVIEWED", fixture.jdbc.queryForObject("SELECT status FROM spectra_notification.ntf_send_preview "
+                        + "WHERE id = ?", String.class, sendApply.getPreviewId()));
+                assertEquals(0L, fixture.jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_request "
+                        + "WHERE idempotency_key = ?", Long.class, requestKey));
+                assertEquals(401, get(client, port, "/api/security/context", targetToken).statusCode());
+                String renewedTargetToken = login(client, port, mapper, fixture.targetUsername, fixture.password);
+                assertFalse(hasPermission(context(client, port, mapper, renewedTargetToken),
+                        "notification:send:apply"));
+            } finally {
+                fixture.jdbc.update("DELETE FROM spectra_notification.ntf_send_preview WHERE operator_user_id = ?",
+                        fixture.target);
+                var revocation = application.getBean(SecuritySessionRevocationPort.class);
+                revocation.revokeUserSessions(fixture.operator);
+                revocation.revokeUserSessions(fixture.target);
+                fixture.clean();
+            }
+        }
+    }
+
+    @Test
     void roleChangeRevokesSessionAcrossProcesses() throws Exception {
         requireIsolatedDependencies();
         Path temporary = Files.createTempDirectory(Path.of("target"), "role-two-process-");
@@ -184,6 +331,128 @@ class RoleAuthorizationFullHttpTest {
                 stop(second);
             }
         }
+    }
+
+    @Test
+    void departmentMergeAndRoleShrinkReachAudienceOaAndWorkflow() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class, TestConfiguration.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
+                        "--spectra.test.role-http=true")) {
+            var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
+                    application.getBean(PasswordEncoder.class));
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+                ObjectMapper mapper = application.getBean(ObjectMapper.class);
+                var audience = application.getBean(NotificationAudienceDirectory.class);
+                try {
+                    fixture.insert();
+                    fixture.insertDepartmentScenario();
+                    String operatorToken = login(client, port, mapper, fixture.operatorUsername, fixture.password);
+                    String targetToken = login(client, port, mapper, fixture.targetUsername, fixture.password);
+                    assertModuleReads(client, port, targetToken, 200);
+                    assertEquals(List.of(fixture.target), audience.resolve(new NotificationAudience(
+                            List.of(), List.of(fixture.sourceDepartmentA), List.of())));
+                    assertEquals(List.of(fixture.target), audience.resolve(new NotificationAudience(
+                            List.of(), List.of(), List.of(fixture.targetRole))));
+
+                    long version = fixture.organizationVersion();
+                    String mergePath = "/api/security/authorization/departments/merge/impact-preview";
+                    var mergeBody = Map.of("source_department_ids", List.of(fixture.sourceDepartmentA,
+                            fixture.sourceDepartmentB), "expected_organization_version", version,
+                            "department", Map.of("name", "Synthetic merged department", "type", 1,
+                                    "region_id", fixture.region));
+                    var preview = post(client, port, mergePath, operatorToken, mapper.writeValueAsString(mergeBody));
+                    assertEquals(200, preview.statusCode(), preview.body());
+                    String previewToken = mapper.readTree(preview.body()).path("data").path("preview_token").asText();
+                    assertFalse(previewToken.isBlank());
+                    var applyBody = Map.of("source_department_ids", List.of(fixture.sourceDepartmentA,
+                            fixture.sourceDepartmentB), "expected_organization_version", version,
+                            "department", mergeBody.get("department"), "preview_token", previewToken);
+                    var applied = post(client, port,
+                            "/api/security/authorization/departments/merge/impact-apply", operatorToken,
+                            mapper.writeValueAsString(applyBody));
+                    assertEquals(200, applied.statusCode(), applied.body());
+                    fixture.mergedDepartment = UUID.fromString(mapper.readTree(applied.body())
+                            .path("data")
+                            .path("department_id")
+                            .asText());
+                    assertEquals(version + 1, fixture.organizationVersion());
+                    assertNotEquals(200, post(client, port,
+                            "/api/security/authorization/departments/merge/impact-apply", operatorToken,
+                            mapper.writeValueAsString(applyBody)).statusCode());
+                    assertEquals(version + 1, fixture.organizationVersion());
+                    assertEquals(401, get(client, port, "/api/security/context", targetToken).statusCode());
+                    targetToken = login(client, port, mapper, fixture.targetUsername, fixture.password);
+                    assertModuleReads(client, port, targetToken, 200);
+                    assertEquals(List.of(fixture.target), audience.resolve(new NotificationAudience(
+                            List.of(), List.of(fixture.mergedDepartment), List.of())));
+                    assertEquals(fixture.mergedDepartment, fixture.activeDepartmentRule());
+
+                    long splitVersion = fixture.organizationVersion();
+                    var splitBody = Map.of("source_department_id", fixture.mergedDepartment,
+                            "user_ids", List.of(fixture.target), "expected_organization_version", splitVersion,
+                            "department", Map.of("name", "Synthetic split department", "type", 1,
+                                    "region_id", fixture.region));
+                    var splitPreview = post(client, port,
+                            "/api/security/authorization/departments/split/impact-preview", operatorToken,
+                            mapper.writeValueAsString(splitBody));
+                    assertEquals(200, splitPreview.statusCode(), splitPreview.body());
+                    String splitToken = mapper.readTree(splitPreview.body()).path("data").path("preview_token").asText();
+                    var splitApply = Map.of("source_department_id", fixture.mergedDepartment,
+                            "user_ids", List.of(fixture.target), "expected_organization_version", splitVersion,
+                            "department", splitBody.get("department"), "preview_token", splitToken);
+                    var splitResult = post(client, port,
+                            "/api/security/authorization/departments/split/impact-apply", operatorToken,
+                            mapper.writeValueAsString(splitApply));
+                    assertEquals(200, splitResult.statusCode(), splitResult.body());
+                    fixture.splitDepartment = UUID.fromString(mapper.readTree(splitResult.body())
+                            .path("data")
+                            .path("department_id")
+                            .asText());
+                    assertEquals(splitVersion + 1, fixture.organizationVersion());
+                    assertEquals(401, get(client, port, "/api/security/context", targetToken).statusCode());
+                    targetToken = login(client, port, mapper, fixture.targetUsername, fixture.password);
+                    assertModuleReads(client, port, targetToken, 200);
+                    assertEquals(List.of(fixture.target), audience.resolve(new NotificationAudience(
+                            List.of(), List.of(fixture.splitDepartment), List.of())));
+                    assertEquals(List.of(), audience.resolve(new NotificationAudience(
+                            List.of(), List.of(fixture.mergedDepartment), List.of())));
+
+                    String rolePath = "/api/security/authorization/roles/" + fixture.targetRole + "/impact-preview";
+                    String requested = mapper.writeValueAsString(Map.of("expected_version", 0,
+                            "authority_level", 100, "permission_codes", List.of("role:read"),
+                            "grantable_permission_codes", List.of("role:read")));
+                    var rolePreview = post(client, port, rolePath, operatorToken, requested);
+                    assertEquals(200, rolePreview.statusCode(), rolePreview.body());
+                    String roleToken = mapper.readTree(rolePreview.body()).path("data").path("preview_token").asText();
+                    String change = mapper.writeValueAsString(Map.of("expected_version", 0,
+                            "authority_level", 100, "permission_codes", List.of("role:read"),
+                            "grantable_permission_codes", List.of("role:read"), "preview_token", roleToken));
+                    assertEquals(200, post(client, port,
+                            "/api/security/authorization/roles/" + fixture.targetRole + "/impact-apply",
+                            operatorToken, change).statusCode());
+                    assertModuleReads(client, port, targetToken, 401);
+                    String renewed = login(client, port, mapper, fixture.targetUsername, fixture.password);
+                    assertModuleReads(client, port, renewed, 403);
+                    assertFalse(hasPermission(context(client, port, mapper, renewed), "oa:contact:read"));
+                    assertFalse(hasPermission(context(client, port, mapper, renewed), "workflow:process:read"));
+                    assertEquals(List.of(fixture.target), audience.resolve(new NotificationAudience(
+                            List.of(), List.of(), List.of(fixture.targetRole))));
+                } finally {
+                    var revocation = application.getBean(SecuritySessionRevocationPort.class);
+                    revocation.revokeUserSessions(fixture.operator);
+                    revocation.revokeUserSessions(fixture.target);
+                    fixture.clean();
+                }
+            }
+        }
+    }
+
+    private static void assertModuleReads(HttpClient client, int port, String token, int expected) throws Exception {
+        assertEquals(expected, get(client, port, "/api/oa/contact/page?pageNum=1&pageSize=5", token).statusCode());
+        assertEquals(expected, get(client, port, "/api/workflow/process-definitions", token).statusCode());
     }
 
     private static Process startSecond(Path ready, Path log) throws Exception {
@@ -326,6 +595,14 @@ class RoleAuthorizationFullHttpTest {
         private final String password = UUID.randomUUID().toString() + UUID.randomUUID();
         private UUID readPermission;
         private UUID grantPermission;
+        private final UUID region = UUID.randomUUID();
+        private final UUID sourceDepartmentA = UUID.randomUUID();
+        private final UUID sourceDepartmentB = UUID.randomUUID();
+        private UUID mergedDepartment;
+        private UUID splitDepartment;
+        private UUID departmentRuleScope;
+        private boolean departmentScenario;
+        private final List<UUID> extraScopes = new ArrayList<>();
 
         private Fixture(JdbcTemplate jdbc, PasswordEncoder encoder) {
             this.jdbc = jdbc;
@@ -357,6 +634,12 @@ class RoleAuthorizationFullHttpTest {
             insertGrantBoundary(targetGrantGrantScope, targetAssignment, grantPermission);
         }
 
+        private void insertNotificationSendScenario() {
+            insertPermissionWithAllScope(targetRole, targetAssignment, "user:read");
+            insertPermissionWithAllScope(targetRole, targetAssignment, "notification:send:preview");
+            insertPermissionWithAllScope(targetRole, targetAssignment, "notification:send:apply");
+        }
+
         private void insertUser(UUID id, String username) {
             jdbc.update("INSERT INTO spectra_core.sys_user (id, username, employee_no, real_name) "
                     + "VALUES (?, ?, ?, ?)", id, username, username, "synthetic role user");
@@ -366,6 +649,71 @@ class RoleAuthorizationFullHttpTest {
             jdbc.update("INSERT INTO spectra_security.sec_password_credential "
                     + "(user_id, password_hash, changed_at) VALUES (?, ?, CURRENT_TIMESTAMP)",
                     id, encoder.encode(password));
+        }
+
+        private void insertDepartmentScenario() {
+            departmentScenario = true;
+            jdbc.update("INSERT INTO spectra_core.sys_region (id, name, code, created_at, updated_at) "
+                    + "VALUES (?, 'Synthetic region', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)", region,
+                    "B02" + region.toString().replace("-", ""));
+            insertDepartment(sourceDepartmentA, "A");
+            insertDepartment(sourceDepartmentB, "B");
+            jdbc.update("UPDATE spectra_core.sys_user SET primary_department_id = ? WHERE id = ?",
+                    sourceDepartmentA, target);
+            insertPermissionWithAllScope(operatorRole, operatorAssignment, "department:create");
+            insertPermissionWithAllScope(operatorRole, operatorAssignment, "department:update");
+            insertPermissionWithDepartmentScope(targetRole, targetAssignment, "oa:contact:read",
+                    sourceDepartmentA);
+            insertPermissionWithAllScope(targetRole, targetAssignment, "workflow:process:read");
+        }
+
+        private void insertPermissionWithDepartmentScope(UUID roleId, UUID assignmentId, String code,
+                                                         UUID departmentId) {
+            UUID permissionId = jdbc.queryForObject("SELECT id FROM spectra_security.sec_permission WHERE code = ?",
+                    UUID.class, code);
+            departmentRuleScope = UUID.randomUUID();
+            extraScopes.add(departmentRuleScope);
+            insertPermission(roleId, permissionId);
+            jdbc.update("INSERT INTO spectra_security.sec_authorization_scope "
+                    + "(id, scope_mode, resource_code) VALUES (?, 'RULES', 'oa:contact')", departmentRuleScope);
+            jdbc.update("INSERT INTO spectra_security.sec_scope_rule "
+                    + "(scope_id, rule_type, department_id) VALUES (?, 'DEPARTMENT', ?)",
+                    departmentRuleScope, departmentId);
+            jdbc.update("INSERT INTO spectra_security.sec_assignment_permission_boundary "
+                    + "(assignment_id, permission_id, scope_id) VALUES (?, ?, ?)",
+                    assignmentId, permissionId, departmentRuleScope);
+        }
+
+        private UUID activeDepartmentRule() {
+            return jdbc.queryForObject("SELECT department_id FROM spectra_security.sec_scope_rule "
+                    + "WHERE scope_id = ? AND deleted IS NULL", UUID.class, departmentRuleScope);
+        }
+
+        private void insertDepartment(UUID id, String suffix) {
+            jdbc.update("INSERT INTO spectra_core.sys_department "
+                    + "(id, name, code, type, region_id, created_at, updated_at) "
+                    + "VALUES (?, ?, ?, '1', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+                    id, "Synthetic department " + suffix, "B02" + id.toString().replace("-", ""), region);
+            jdbc.update("INSERT INTO spectra_core.sys_department_closure "
+                    + "(ancestor_id, descendant_id, depth) VALUES (?, ?, 0)", id, id);
+        }
+
+        private void insertPermissionWithAllScope(UUID roleId, UUID assignmentId, String code) {
+            UUID permissionId = jdbc.queryForObject("SELECT id FROM spectra_security.sec_permission WHERE code = ?",
+                    UUID.class, code);
+            UUID scopeId = UUID.randomUUID();
+            extraScopes.add(scopeId);
+            insertPermission(roleId, permissionId);
+            jdbc.update("INSERT INTO spectra_security.sec_authorization_scope "
+                    + "(id, scope_mode, resource_code) VALUES (?, 'ALL', ?)", scopeId, code.split(":")[0]);
+            jdbc.update("INSERT INTO spectra_security.sec_assignment_permission_boundary "
+                    + "(assignment_id, permission_id, scope_id) VALUES (?, ?, ?)",
+                    assignmentId, permissionId, scopeId);
+        }
+
+        private long organizationVersion() {
+            return jdbc.queryForObject("SELECT organization_version FROM spectra_core.sys_organization_version "
+                    + "WHERE singleton_key = 'SYSTEM' AND deleted IS NULL", Long.class);
         }
 
         private void insertRole(UUID roleId, String code) {
@@ -461,13 +809,39 @@ class RoleAuthorizationFullHttpTest {
         }
 
         private void clean() {
+            if (departmentScenario) {
+                jdbc.update("DELETE FROM spectra_core.sys_user_department_membership WHERE user_id = ?", target);
+                jdbc.update("UPDATE spectra_core.sys_user SET primary_department_id = NULL WHERE id = ?", target);
+                jdbc.update("DELETE FROM spectra_core.sys_department_closure WHERE ancestor_id IN (?, ?) "
+                        + "OR descendant_id IN (?, ?)", sourceDepartmentA, sourceDepartmentB,
+                        sourceDepartmentA, sourceDepartmentB);
+                if (splitDepartment != null) {
+                    jdbc.update("DELETE FROM spectra_core.sys_department_closure WHERE ancestor_id = ? "
+                            + "OR descendant_id = ?", splitDepartment, splitDepartment);
+                    jdbc.update("DELETE FROM spectra_core.sys_department WHERE id = ?", splitDepartment);
+                }
+                if (mergedDepartment != null) {
+                    jdbc.update("DELETE FROM spectra_core.sys_department_closure WHERE ancestor_id = ? "
+                            + "OR descendant_id = ?", mergedDepartment, mergedDepartment);
+                    jdbc.update("DELETE FROM spectra_core.sys_department WHERE id = ?", mergedDepartment);
+                }
+                jdbc.update("DELETE FROM spectra_core.sys_department WHERE id IN (?, ?)",
+                        sourceDepartmentA, sourceDepartmentB);
+                jdbc.update("DELETE FROM spectra_core.sys_region WHERE id = ?", region);
+            }
             jdbc.update("DELETE FROM spectra_security.sec_assignment_permission_boundary "
                     + "WHERE assignment_id IN (?, ?)", operatorAssignment, targetAssignment);
+            if (departmentScenario && departmentRuleScope != null) {
+                jdbc.update("DELETE FROM spectra_security.sec_scope_rule WHERE scope_id = ?", departmentRuleScope);
+            }
             jdbc.update("DELETE FROM spectra_security.sec_assignment_grant_boundary "
                     + "WHERE assignment_id = ?", targetAssignment);
             jdbc.update("DELETE FROM spectra_security.sec_authorization_scope WHERE id IN (?, ?, ?, ?, ?, ?)",
                     operatorReadScope, operatorGrantScope, targetReadScope, targetGrantScope,
                     targetReadGrantScope, targetGrantGrantScope);
+            for (UUID scopeId : extraScopes) {
+                jdbc.update("DELETE FROM spectra_security.sec_authorization_scope WHERE id = ?", scopeId);
+            }
             jdbc.update("DELETE FROM spectra_security.sec_role_permission WHERE role_id IN (?, ?)",
                     operatorRole, targetRole);
             jdbc.update("DELETE FROM spectra_security.sec_role_grantable_permission WHERE role_id = ?", targetRole);

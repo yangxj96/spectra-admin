@@ -25,6 +25,8 @@ import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotP
 import com.devops00.spectra.common.security.authorization.RootAuthorizationPolicy;
 import com.devops00.spectra.core.notification.javabean.from.NotificationControlledSendApplyFrom;
 import com.devops00.spectra.core.notification.mapper.NotificationSendPreviewMapper;
+import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +43,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 /**
  * 受控发送 Service 的操作权限必须使用调用时的有效授权快照。
@@ -61,6 +64,9 @@ class NotificationControlledSendAuthorizationTest {
     @Mock
     private NotificationSendPreviewMapper previewMapper;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private NotificationControlledSendServiceImpl service;
 
@@ -68,7 +74,7 @@ class NotificationControlledSendAuthorizationTest {
     void missingIdentityIsRejectedBeforeSnapshotOrPreviewRead() {
         assertThrows(AccessDeniedException.class, () -> service.preview(null));
         assertThrows(AccessDeniedException.class, () -> service.apply(applyFrom()));
-        verifyNoInteractions(authorizationSnapshotProvider, previewMapper);
+        verifyNoInteractions(authorizationSnapshotProvider, previewMapper, userMapper);
     }
 
     @Test
@@ -76,6 +82,7 @@ class NotificationControlledSendAuthorizationTest {
         UUID operatorId = UUID.randomUUID();
         when(securityContextAccessor.currentUserId()).thenReturn(operatorId);
         when(authorizationSnapshotProvider.load(operatorId)).thenReturn(AuthorizationSnapshot.of(List.of()));
+        when(userMapper.selectActiveByIdsForUpdate(List.of(operatorId))).thenReturn(List.of(mock(User.class)));
 
         assertThrows(AccessDeniedException.class, () -> service.preview(null));
         assertThrows(AccessDeniedException.class, () -> service.apply(applyFrom()));
@@ -88,6 +95,7 @@ class NotificationControlledSendAuthorizationTest {
         UUID operatorId = UUID.randomUUID();
         when(securityContextAccessor.currentUserId()).thenReturn(operatorId);
         when(authorizationSnapshotProvider.load(operatorId)).thenReturn(rootSnapshot(), AuthorizationSnapshot.of(List.of()));
+        when(userMapper.selectActiveByIdsForUpdate(List.of(operatorId))).thenReturn(List.of(mock(User.class)));
         var from = applyFrom();
 
         assertThrows(DataNotExistException.class, () -> service.apply(from),
@@ -116,10 +124,32 @@ class NotificationControlledSendAuthorizationTest {
     void snapshotReadFailureRejectsBeforePreviewLookup() {
         UUID operatorId = UUID.randomUUID();
         when(securityContextAccessor.currentUserId()).thenReturn(operatorId);
+        when(userMapper.selectActiveByIdsForUpdate(List.of(operatorId))).thenReturn(List.of(mock(User.class)));
         when(authorizationSnapshotProvider.load(operatorId)).thenThrow(new IllegalStateException("authorization unavailable"));
 
         assertThrows(IllegalStateException.class, () -> service.apply(applyFrom()));
         verifyNoInteractions(previewMapper);
+    }
+
+    @Test
+    void missingOrUnavailableOperatorRowRejectsBeforeAuthorizationRead() {
+        UUID operatorId = UUID.randomUUID();
+        when(securityContextAccessor.currentUserId()).thenReturn(operatorId);
+        when(userMapper.selectActiveByIdsForUpdate(List.of(operatorId))).thenReturn(List.of());
+
+        assertThrows(AccessDeniedException.class, () -> service.apply(applyFrom()));
+        verifyNoInteractions(authorizationSnapshotProvider, previewMapper);
+    }
+
+    @Test
+    void operatorLockFailureRejectsBeforeAuthorizationRead() {
+        UUID operatorId = UUID.randomUUID();
+        when(securityContextAccessor.currentUserId()).thenReturn(operatorId);
+        when(userMapper.selectActiveByIdsForUpdate(List.of(operatorId)))
+                .thenThrow(new IllegalStateException("operator row unavailable"));
+
+        assertThrows(IllegalStateException.class, () -> service.apply(applyFrom()));
+        verifyNoInteractions(authorizationSnapshotProvider, previewMapper);
     }
 
     private static AuthorizationSnapshot rootSnapshot() {

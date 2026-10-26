@@ -17,12 +17,15 @@
 package com.devops00.spectra.launch.security;
 
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.security.root.RootPolicyRepository;
+import com.devops00.spectra.framework.persistence.scope.context.DataScopeExecutor;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisKey;
 import com.devops00.spectra.framework.security.redis.token.TokenDigestService;
 import com.devops00.spectra.launch.LaunchApplication;
+import org.flowable.engine.RepositoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -57,6 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -250,9 +254,22 @@ class CoreTwoProcessHttpTest {
                 var fixture = new Fixture(first);
                 TestUser operator = TestUser.create("b02rootoper");
                 TestUser target = TestUser.create("b02rootexp");
+                var business = new RootBusinessFixture(jdbc, operator, target);
+                var repository = first.getBean(RepositoryService.class);
+                String deploymentId = null;
                 try {
                     fixture.insertWithRole(operator, "ROLE_DEV_OPS");
                     fixture.insertWithRole(target, "ROLE_DEV_OPS");
+                    business.insert();
+                    String processKey = "rootExpiry" + UUID.randomUUID().toString().replace("-", "");
+                    var deployment = repository.createDeployment()
+                            .addString(processKey + ".bpmn20.xml", simpleProcess(processKey))
+                            .deploy();
+                    deploymentId = deployment.getId();
+                    String processId = repository.createProcessDefinitionQuery()
+                            .deploymentId(deploymentId)
+                            .singleResult()
+                            .getId();
                     String operatorToken = login(client, firstPort, mapper, properties, operator.username(),
                             operator.password()).accessToken();
                     Session targetSession = login(client, secondPort, mapper, properties, target.username(),
@@ -261,15 +278,48 @@ class CoreTwoProcessHttpTest {
                     assertEquals(200, context(client, firstPort, targetSession.accessToken()));
                     assertEquals(200, context(client, secondPort, targetSession.accessToken()));
                     assertModuleReads(client, firstPort, secondPort, targetSession.accessToken(), 200);
+                    assertMeetingVisible(client, firstPort, secondPort, mapper, targetSession.accessToken(), business,
+                            true);
+                    assertEquals(200, businessWrite(client, firstPort, targetSession.accessToken(),
+                            "/api/oa/meeting/" + business.visibleMeeting + "/response",
+                            "{\"status\":\"accepted\"}").statusCode());
+                    assertEquals("accepted", business.participantStatus());
+                    String workflowWrite = "/api/workflow/process-definitions/" + processId + "/suspend";
+                    assertEquals(200, businessWrite(client, firstPort, targetSession.accessToken(),
+                            workflowWrite, null).statusCode());
+                    assertTrue(repository.createProcessDefinitionQuery()
+                            .processDefinitionId(processId)
+                            .singleResult()
+                            .isSuspended());
+                    assertEquals(200, businessWrite(client, firstPort, targetSession.accessToken(),
+                            "/api/workflow/process-definitions/" + processId + "/activate", null).statusCode());
 
                     assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
-                            + "SET valid_until = statement_timestamp() + INTERVAL '5 seconds' WHERE user_id = ?",
+                            + "SET valid_until = statement_timestamp() + INTERVAL '5 seconds' "
+                            + "WHERE user_id = ? AND role_id = "
+                            + "(SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS')",
                             target.id()));
                     assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
                     awaitEffectiveRoots(rootPolicy, 1L);
                     assertEquals(200, context(client, firstPort, targetSession.accessToken()));
                     assertEquals(200, context(client, secondPort, targetSession.accessToken()));
                     assertModuleReads(client, firstPort, secondPort, targetSession.accessToken(), 403);
+                    assertMeetingVisible(client, firstPort, secondPort, mapper, targetSession.accessToken(), business,
+                            false);
+                    for (int port : List.of(firstPort, secondPort)) {
+                        assertEquals(403, businessWrite(client, port, targetSession.accessToken(),
+                                "/api/oa/meeting/" + business.visibleMeeting + "/response",
+                                "{\"status\":\"declined\"}").statusCode());
+                        assertEquals(403, businessWrite(client, port, targetSession.accessToken(),
+                                workflowWrite, null).statusCode());
+                    }
+                    assertEquals("accepted", business.participantStatus());
+                    assertTrue(!repository.createProcessDefinitionQuery()
+                            .processDefinitionId(processId)
+                            .singleResult()
+                            .isSuspended());
+                    assertThrows(DataScopeViolationException.class,
+                            () -> first.getBean(DataScopeExecutor.class).withoutScope(() -> business.visibleMeeting));
                     assertModuleReads(client, firstPort, secondPort, operatorToken, 200);
                     assertEquals(403, disable(client, firstPort, targetSession.accessToken(),
                             operator.id()).statusCode());
@@ -278,7 +328,8 @@ class CoreTwoProcessHttpTest {
                     assertLastRootConflict(disable(client, firstPort, operatorToken, operator.id()), mapper);
 
                     assertEquals(1, jdbc.update("UPDATE spectra_security.sec_role_assignment "
-                            + "SET valid_until = NULL WHERE user_id = ?", target.id()));
+                            + "SET valid_until = NULL WHERE user_id = ? AND role_id = "
+                            + "(SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS')", target.id()));
                     assertEquals(2L, rootPolicy.countEffectiveDevOpsUsers());
                     assertEquals(1, jdbc.update("UPDATE spectra_security.sec_password_credential "
                             + "SET expires_at = statement_timestamp() + INTERVAL '5 seconds' WHERE user_id = ?",
@@ -288,6 +339,13 @@ class CoreTwoProcessHttpTest {
                     assertEquals(401, context(client, firstPort, targetSession.accessToken()));
                     assertEquals(401, context(client, secondPort, targetSession.accessToken()));
                     assertModuleReads(client, firstPort, secondPort, targetSession.accessToken(), 401);
+                    for (int port : List.of(firstPort, secondPort)) {
+                        assertEquals(401, businessWrite(client, port, targetSession.accessToken(),
+                                "/api/oa/meeting/" + business.visibleMeeting + "/response",
+                                "{\"status\":\"declined\"}").statusCode());
+                        assertEquals(401, businessWrite(client, port, targetSession.accessToken(),
+                                workflowWrite, null).statusCode());
+                    }
                     assertModuleReads(client, firstPort, secondPort, operatorToken, 200);
                     assertEquals(401, refresh(client, secondPort, targetSession.refreshToken(),
                             properties).statusCode());
@@ -295,6 +353,10 @@ class CoreTwoProcessHttpTest {
                     assertEquals("ACTIVE", jdbc.queryForObject(
                             "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, operator.id()));
                 } finally {
+                    if (deploymentId != null) {
+                        repository.deleteDeployment(deploymentId, true);
+                    }
+                    business.clean();
                     revocation.revokeUserSessions(operator.id());
                     revocation.revokeUserSessions(target.id());
                     fixture.clean();
@@ -979,6 +1041,52 @@ class CoreTwoProcessHttpTest {
                 "/api/workflow/process-definitions"));
     }
 
+    private static void assertMeetingVisible(HttpClient client, int firstPort, int secondPort,
+                                             ObjectMapper mapper, String token, RootBusinessFixture business,
+                                             boolean rootActive)
+            throws Exception {
+        for (int port : List.of(firstPort, secondPort)) {
+            var response = client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port
+                    + "/api/oa/meeting/page?pageNum=1&pageSize=100"))
+                    .header("Api-Version", "1.0.0")
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build(), HttpResponse.BodyHandlers.ofString());
+            assertEquals(200, response.statusCode());
+            String records = mapper.readTree(response.body()).path("data").path("records").toString();
+            assertTrue(records.contains(business.visibleMeeting.toString()));
+            assertEquals(rootActive, records.contains(business.hiddenMeeting.toString()));
+        }
+    }
+
+    private static HttpResponse<String> businessWrite(HttpClient client, int port, String token,
+                                                      String path, String body)
+            throws Exception {
+        var request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
+                .header("Api-Version", "1.0.0")
+                .header("Authorization", "Bearer " + token);
+        if (body != null) {
+            request.header("Content-Type", "application/json");
+        }
+        return client.send(request.POST(body == null
+                ? HttpRequest.BodyPublishers.noBody()
+                : HttpRequest.BodyPublishers.ofString(body)).build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static String simpleProcess(String key) {
+        return """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                             targetNamespace="http://spectra.dev/test">
+                  <process id="%s" isExecutable="true">
+                    <startEvent id="start"/>
+                    <endEvent id="end"/>
+                    <sequenceFlow id="flow" sourceRef="start" targetRef="end"/>
+                  </process>
+                </definitions>
+                """.formatted(key);
+    }
+
     private static HttpResponse<String> changePassword(HttpClient client, int port, ObjectMapper mapper, String token,
                                                        String oldPassword, String newPassword)
             throws Exception {
@@ -1076,6 +1184,67 @@ class CoreTwoProcessHttpTest {
                 jdbc.update("DELETE FROM spectra_security.sec_authentication_identity WHERE user_id = ?", user.id());
                 jdbc.update("DELETE FROM spectra_core.sys_user WHERE id = ?", user.id());
             }
+        }
+    }
+
+    private static final class RootBusinessFixture {
+        private final JdbcTemplate jdbc;
+        private final TestUser operator;
+        private final TestUser target;
+        private final UUID role = UUID.randomUUID();
+        private final UUID assignment = UUID.randomUUID();
+        private final UUID scope = UUID.randomUUID();
+        private final UUID visibleMeeting = UUID.randomUUID();
+        private final UUID hiddenMeeting = UUID.randomUUID();
+        private final UUID participant = UUID.randomUUID();
+
+        private RootBusinessFixture(JdbcTemplate jdbc, TestUser operator, TestUser target) {
+            this.jdbc = jdbc;
+            this.operator = operator;
+            this.target = target;
+        }
+
+        private void insert() {
+            UUID permission = jdbc.queryForObject("SELECT id FROM spectra_security.sec_permission WHERE code = ?",
+                    UUID.class, "oa:meeting:read");
+            String code = "ROLE_ROOT_SCOPE_" + role.toString().replace("-", "").toUpperCase();
+            jdbc.update("INSERT INTO spectra_security.sec_role (id, code, name, authority_level) "
+                    + "VALUES (?, ?, ?, 100)", role, code, code);
+            jdbc.update("INSERT INTO spectra_security.sec_role_permission (role_id, permission_id) VALUES (?, ?)",
+                    role, permission);
+            jdbc.update("INSERT INTO spectra_security.sec_authorization_scope "
+                    + "(id, scope_mode, resource_code) VALUES (?, 'SELF', 'oa:meeting')", scope);
+            jdbc.update("INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id) VALUES (?, ?, ?)",
+                    assignment, target.id(), role);
+            jdbc.update("INSERT INTO spectra_security.sec_assignment_permission_boundary "
+                    + "(assignment_id, permission_id, scope_id) VALUES (?, ?, ?)", assignment, permission, scope);
+            jdbc.update("INSERT INTO spectra_oa.oa_meeting "
+                    + "(id, title, initiator_id, start_time, end_time, created_by, created_at, updated_at) "
+                    + "VALUES (?, ?, ?, now(), now(), ?, now(), now())",
+                    visibleMeeting, "synthetic visible", operator.id(), operator.id());
+            jdbc.update("INSERT INTO spectra_oa.oa_meeting "
+                    + "(id, title, initiator_id, start_time, end_time, created_by, created_at, updated_at) "
+                    + "VALUES (?, ?, ?, now(), now(), ?, now(), now())",
+                    hiddenMeeting, "synthetic hidden", operator.id(), operator.id());
+            jdbc.update("INSERT INTO spectra_oa.oa_meeting_participant "
+                    + "(id, meeting_id, user_id, created_at, updated_at) VALUES (?, ?, ?, now(), now())",
+                    participant, visibleMeeting, target.id());
+        }
+
+        private String participantStatus() {
+            return jdbc.queryForObject("SELECT status FROM spectra_oa.oa_meeting_participant WHERE id = ?",
+                    String.class, participant);
+        }
+
+        private void clean() {
+            jdbc.update("DELETE FROM spectra_oa.oa_meeting_participant WHERE id = ?", participant);
+            jdbc.update("DELETE FROM spectra_oa.oa_meeting WHERE id IN (?, ?)", visibleMeeting, hiddenMeeting);
+            jdbc.update("DELETE FROM spectra_security.sec_assignment_permission_boundary WHERE assignment_id = ?",
+                    assignment);
+            jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", assignment);
+            jdbc.update("DELETE FROM spectra_security.sec_authorization_scope WHERE id = ?", scope);
+            jdbc.update("DELETE FROM spectra_security.sec_role_permission WHERE role_id = ?", role);
+            jdbc.update("DELETE FROM spectra_security.sec_role WHERE id = ?", role);
         }
     }
 

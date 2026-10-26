@@ -50,6 +50,7 @@ import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.core.notification.service.NotificationControlledSendService;
+import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.notification.policy.NotificationAddressMasker;
 import com.devops00.spectra.core.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.core.notification.strategy.NotificationPolicy;
@@ -107,6 +108,8 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
 
     private final NotificationSendPreviewMapper previewMapper;
 
+    private final UserMapper userMapper;
+
     private final NotificationTaskMapper taskMapper;
 
     private final NotificationTemplateMapper templateMapper;
@@ -161,7 +164,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     @Override
     @Transactional
     public NotificationControlledSendApplyVO apply(NotificationControlledSendApplyFrom params) {
-        var operatorId = requireOperator(APPLY_PERMISSION);
+        var operatorId = requireOperator(APPLY_PERMISSION, lockOperatorForApply());
         var entity = previewMapper.selectById(params.getPreviewId());
         if (entity == null || !operatorId.equals(entity.getOperatorUserId())) {
             throw new DataNotExistException("通知发送 Preview 不存在");
@@ -210,6 +213,19 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
         return new NotificationControlledSendApplyVO(receipt.requestId(), receipt.status(), receipt.taskCount(),
                 receipt.idempotentReplay());
+    }
+
+    private UUID lockOperatorForApply() {
+        var operatorId = securityContextAccessor.currentUserId();
+        if (operatorId == null) {
+            throw new AccessDeniedException("受控发送必须在登录用户上下文中执行");
+        }
+        // Assignment 撤销和用户安全版本更新也锁定该行；锁须保持到入队事务提交。
+        var users = userMapper.selectActiveByIdsForUpdate(List.of(operatorId));
+        if (users == null || users.size() != 1) {
+            throw new AccessDeniedException("受控发送操作人已失效");
+        }
+        return operatorId;
     }
 
     private NotificationControlledSendApplyVO replayReceipt(NotificationSendPreviewEntity entity) {
@@ -446,6 +462,10 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         if (operatorId == null) {
             throw new AccessDeniedException("受控发送必须在登录用户上下文中执行");
         }
+        return requireOperator(permission, operatorId);
+    }
+
+    private UUID requireOperator(String permission, UUID operatorId) {
         var authorization = authorizationSnapshotProvider.load(operatorId);
         if (authorization == null || !authorization.hasPermission(permission)) {
             throw new AccessDeniedException("当前用户没有受控发送权限");
