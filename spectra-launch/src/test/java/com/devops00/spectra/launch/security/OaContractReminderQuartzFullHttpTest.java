@@ -30,6 +30,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -37,6 +39,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
@@ -71,6 +74,7 @@ class OaContractReminderQuartzFullHttpTest {
             var contractId = UUID.randomUUID();
             var firstMilestone = UUID.randomUUID();
             var raceMilestone = UUID.randomUUID();
+            var crossProcessMilestone = UUID.randomUUID();
             var username = "b02contract" + UUID.randomUUID().toString().replace("-", "");
             var historyStart = Instant.now();
             assertTrue(scheduler.checkExists(jobKey));
@@ -116,7 +120,43 @@ class OaContractReminderQuartzFullHttpTest {
                 }
                 assertEquals(1L, requestCount(jdbc, raceMilestone), "并发扫描只允许一个通知请求");
                 assertEquals(1L, markedCount(jdbc, raceMilestone));
+
+                Path coordination = Files.createTempDirectory(Path.of("target"), "b02-contract-two-jvm-");
+                Path ready = coordination.resolve("ready");
+                Path release = coordination.resolve("release");
+                Process second = startSecond(ready, release, coordination.resolve("second.log"));
+                try {
+                    assertTrue(await(Duration.ofSeconds(90), () -> Files.exists(ready) || !second.isAlive()));
+                    assertTrue(second.isAlive(), "第二 JVM 必须成功启动 Quartz");
+                    insertMilestone(jdbc, crossProcessMilestone, contractId);
+                    long before = successCount(jdbc, historyStart);
+                    Files.writeString(release, "trigger");
+                    scheduler.triggerJob(jobKey);
+                    assertTrue(await(Duration.ofSeconds(60), () -> successCount(jdbc, historyStart) >= before + 2
+                            && markedCount(jdbc, crossProcessMilestone) == 1L));
+                    assertEquals(1L, requestCount(jdbc, crossProcessMilestone),
+                            "两个 JVM 同时触发 Quartz 只能领取一条合同提醒");
+                    UUID requestId = jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_request "
+                            + "WHERE idempotency_key = ?", UUID.class,
+                            "oa:contract-milestone:" + crossProcessMilestone);
+                    scheduler.resumeTrigger(workerTrigger);
+                    assertTrue(await(Duration.ofSeconds(30), () -> jdbc.queryForObject(
+                            "SELECT count(*) FROM spectra_notification.ntf_inbox_message "
+                                    + "WHERE notification_request_id = ?",
+                            Long.class, requestId) == 1L));
+                    assertEquals(1L, jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_delivery "
+                            + "WHERE notification_task_id IN (SELECT id FROM spectra_notification.ntf_task "
+                            + "WHERE notification_request_id = ?)", Long.class, requestId),
+                            "两个 JVM 共享 Worker 时每个任务仅生成一条投递记录");
+                } finally {
+                    second.destroy();
+                    if (!second.waitFor(10, TimeUnit.SECONDS)) {
+                        second.destroyForcibly();
+                        assertTrue(second.waitFor(10, TimeUnit.SECONDS));
+                    }
+                }
             } finally {
+                deleteNotification(jdbc, crossProcessMilestone);
                 deleteNotification(jdbc, raceMilestone);
                 deleteNotification(jdbc, firstMilestone);
                 jdbc.update("DELETE FROM spectra_oa.oa_contract_milestone WHERE contract_id = ?", contractId);
@@ -137,6 +177,42 @@ class OaContractReminderQuartzFullHttpTest {
                 + "(id, contract_id, name, due_date, status, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, 'PENDING', now(), now())",
                 milestoneId, contractId, "synthetic milestone", Timestamp.from(Instant.now().plus(Duration.ofDays(1))));
+    }
+
+    private static Process startSecond(Path ready, Path release, Path log) throws Exception {
+        String java = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
+        return new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp", System.getProperty("java.class.path"),
+                SecondQuartzApplication.class.getName(), ready.toString(), release.toString())
+                .redirectErrorStream(true)
+                .redirectOutput(log.toFile())
+                .start();
+    }
+
+    /** 第二个独立应用 JVM 共享隔离 PostgreSQL Quartz 与 Redis。 */
+    public static final class SecondQuartzApplication {
+        private SecondQuartzApplication() {
+        }
+
+        public static void main(String[] args) throws Exception {
+            Path ready = Path.of(args[0]);
+            Path release = Path.of(args[1]);
+            try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                    .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                            "--spectra.scheduler.quartz.enabled=true", "--flowable.async-executor-activate=false",
+                            "--spectra.security.secret.master-key=" + randomSecret())) {
+                var scheduler = application.getBean(QuartzSchedulerLifecycle.class).scheduler();
+                Files.writeString(ready, "ready");
+                long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(60);
+                while (!Files.exists(release) && System.nanoTime() < deadline) {
+                    Thread.sleep(50);
+                }
+                if (!Files.exists(release)) {
+                    throw new IllegalStateException("跨 JVM Quartz 触发屏障超时");
+                }
+                scheduler.triggerJob(new JobKey("oa.contract.milestone-reminder", "SPECTRA_BUILTIN"));
+                new CountDownLatch(1).await();
+            }
+        }
     }
 
     private static long requestCount(JdbcTemplate jdbc, UUID milestoneId) {

@@ -64,7 +64,7 @@ class FixedPaginationCallerTest {
         when(principal.getId()).thenReturn(UUID.randomUUID());
         when(principal.getUsername()).thenReturn("synthetic-user");
         when(security.currentUser()).thenReturn(principal);
-        var service = new TaskServiceImpl(tasks, history, null, null, null, null, null, null, null, security, null);
+        var service = new TaskServiceImpl(tasks, history, null, null, null, null, null, null, null, security, null, null);
         var request = new PageFrom(10L, 2L, null);
         assertTrue(service.todo(request, "synthetic-user", null).getRecords().isEmpty());
         request.setOrders(List.of());

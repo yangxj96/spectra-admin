@@ -21,6 +21,10 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.launch.LaunchApplication;
+import com.devops00.spectra.oa.leave.service.LeaveApprovalCallback;
+import com.devops00.spectra.oa.purchase.service.PurchaseApprovalCallback;
+import com.devops00.spectra.oa.reimbursement.service.ReimbursementApprovalCallback;
+import com.devops00.spectra.workflow.api.ApprovalCallback;
 import com.devops00.spectra.workflow.api.ProcessInstanceService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
@@ -31,11 +35,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
+import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +50,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -106,6 +114,75 @@ class WorkflowInstanceNotificationFullAppTest {
                 taskId = task.getId();
                 assertEquals(userId, recipientFor(jdbc, "workflow:todo:" + taskId));
                 authenticate(userId, username);
+                String pendingTaskId = taskId;
+                try (var roleChangeConnection = application.getBean(DataSource.class).getConnection()) {
+                    roleChangeConnection.setAutoCommit(false);
+                    try {
+                        try (var lock = roleChangeConnection.prepareStatement(
+                                "SELECT id FROM spectra_core.sys_user WHERE id = ? FOR UPDATE")) {
+                            lock.setObject(1, userId);
+                            try (var rows = lock.executeQuery()) {
+                                assertTrue(rows.next());
+                            }
+                        }
+                        try (var shrink = roleChangeConnection.prepareStatement(
+                                "UPDATE spectra_security.sec_role_assignment "
+                                        + "SET valid_until = statement_timestamp() - INTERVAL '1 second' WHERE id = ?")) {
+                            shrink.setObject(1, assignmentId);
+                            assertEquals(1, shrink.executeUpdate());
+                        }
+                        try (var executor = Executors.newSingleThreadExecutor()) {
+                            var started = new CountDownLatch(1);
+                            var racingAction = executor.submit(() -> {
+                                authenticate(userId, username);
+                                started.countDown();
+                                try {
+                                    return assertThrows(AccessDeniedException.class,
+                                            () -> workflowTasks.reject(pendingTaskId, "stale role", username));
+                                } finally {
+                                    SecurityContextHolder.clearContext();
+                                }
+                            });
+                            assertTrue(started.await(5, TimeUnit.SECONDS));
+                            assertThrows(TimeoutException.class, () -> racingAction.get(500, TimeUnit.MILLISECONDS),
+                                    "角色变更提交前 Workflow 写入必须等待用户行锁");
+                            roleChangeConnection.commit();
+                            assertNotNull(racingAction.get(20, TimeUnit.SECONDS));
+                        }
+                    } finally {
+                        roleChangeConnection.rollback();
+                    }
+                }
+                assertNotNull(flowableTasks.createTaskQuery().taskId(taskId).singleResult());
+                assertEquals(0L, requestCount(jdbc, noticeKey));
+                jdbc.update("UPDATE spectra_security.sec_role_assignment SET valid_until = NULL WHERE id = ?",
+                        assignmentId);
+                try (var blockingConnection = application.getBean(DataSource.class).getConnection()) {
+                    blockingConnection.setAutoCommit(false);
+                    try {
+                        try (var lock = blockingConnection.prepareStatement(
+                                "SELECT id FROM spectra_oa.oa_application WHERE id = ? FOR UPDATE")) {
+                            lock.setObject(1, applicationId);
+                            try (var rows = lock.executeQuery()) {
+                                assertTrue(rows.next());
+                            }
+                        }
+                        var transaction = new TransactionTemplate(application.getBean(PlatformTransactionManager.class));
+                        var failure = assertThrows(RuntimeException.class, () -> transaction.executeWithoutResult(
+                                status -> {
+                                    jdbc.execute("SET LOCAL lock_timeout = '500ms'");
+                                    workflowTasks.reject(pendingTaskId, "synthetic rejection", username);
+                                }));
+                        assertTrue(hasSqlState(failure, "55P03"), "OA 回调更新被数据库锁阻断时须失败并回滚");
+                    } finally {
+                        blockingConnection.rollback();
+                    }
+                }
+                assertEquals("IN_REVIEW", jdbc.queryForObject("SELECT status FROM spectra_oa.oa_application "
+                        + "WHERE id = ?", String.class, applicationId));
+                assertNotNull(flowableTasks.createTaskQuery().taskId(taskId).singleResult(), "失败后 Flowable 任务仍待办理");
+                assertEquals(0L, requestCount(jdbc, noticeKey));
+                assertEquals(0L, requestCount(jdbc, "workflow:result:" + taskId + ":false"));
                 workflowTasks.reject(taskId, "synthetic rejection", username);
                 assertEquals("REJECTED", jdbc.queryForObject("SELECT status FROM spectra_oa.oa_application WHERE id = ?",
                         String.class, applicationId));
@@ -129,6 +206,113 @@ class WorkflowInstanceNotificationFullAppTest {
                 jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", assignmentId);
                 jdbc.update("DELETE FROM spectra_core.sys_user WHERE id = ?", userId);
             }
+        }
+    }
+
+    @Test
+    void oaCallbackVariantsUseExplicitRecipientAndRemainIdempotent() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spectra.scheduler.quartz.enabled=false", "--flowable.async-executor-activate=false",
+                        "--spectra.security.secret.master-key=" + randomSecret())) {
+            var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
+            UUID userId = UUID.randomUUID();
+            UUID assignmentId = UUID.randomUUID();
+            String username = "b02oamatrix" + UUID.randomUUID().toString().replace("-", "");
+            jdbc.update("INSERT INTO spectra_core.sys_user (id, username, employee_no, real_name) "
+                    + "VALUES (?, ?, ?, ?)", userId, username, username, "synthetic OA matrix user");
+            UUID roleId = jdbc.queryForObject("SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS'",
+                    UUID.class);
+            jdbc.update("INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id) VALUES (?, ?, ?)",
+                    assignmentId, userId, roleId);
+            try {
+                authenticate(userId, username);
+                for (String type : List.of("leave", "purchase", "reimbursement")) {
+                    for (String decision : List.of("APPROVED", "REJECTED", "CANCELLED")) {
+                        UUID applicationId = UUID.randomUUID();
+                        UUID businessId = UUID.randomUUID();
+                        String title = switch (type + ":" + decision) {
+                            case "leave:APPROVED" -> "请假申请已通过";
+                            case "leave:REJECTED" -> "请假申请已驳回";
+                            case "purchase:APPROVED" -> "采购申请已通过";
+                            case "purchase:REJECTED" -> "采购申请已驳回";
+                            case "reimbursement:APPROVED" -> "报销申请已通过";
+                            case "reimbursement:REJECTED" -> "报销申请已驳回";
+                            default -> null;
+                        };
+                        String key = title == null ? null : "oa:" + type + ":" + businessId + ":" + title;
+                        try {
+                            jdbc.update("INSERT INTO spectra_oa.oa_application "
+                                    + "(id, application_no, type_code, biz_id, applicant_id, title, status, created_at, updated_at) "
+                                    + "VALUES (?, ?, ?, ?, ?, ?, 'IN_REVIEW', statement_timestamp(), statement_timestamp())",
+                                    applicationId, "B02-" + applicationId, type, businessId, userId,
+                                    "synthetic OA callback " + type);
+                            insertOaCallbackDetail(jdbc, type, applicationId, businessId);
+                            ApprovalCallback callback = switch (type) {
+                                case "leave" -> application.getBean(LeaveApprovalCallback.class);
+                                case "purchase" -> application.getBean(PurchaseApprovalCallback.class);
+                                default -> application.getBean(ReimbursementApprovalCallback.class);
+                            };
+                            switch (decision) {
+                                case "APPROVED" -> callback.onApproved(applicationId.toString(), Map.of());
+                                case "REJECTED" -> callback.onRejected(applicationId.toString(), "synthetic rejection");
+                                default -> callback.onTerminated(applicationId.toString(), "synthetic termination");
+                            }
+                            assertEquals(decision, jdbc.queryForObject(
+                                    "SELECT status FROM spectra_oa.oa_application WHERE id = ?", String.class,
+                                    applicationId));
+                            if (key != null) {
+                                assertEquals(1L, requestCount(jdbc, key));
+                                assertEquals(userId, recipientFor(jdbc, key));
+                            }
+                            switch (decision) {
+                                case "APPROVED" -> callback.onApproved(applicationId.toString(), Map.of());
+                                case "REJECTED" -> callback.onRejected(applicationId.toString(), "replay");
+                                default -> callback.onTerminated(applicationId.toString(), "replay");
+                            }
+                            if (key != null) {
+                                assertEquals(1L, requestCount(jdbc, key), "回调重放不得重复通知");
+                            }
+                        } finally {
+                            deleteNotification(jdbc, key);
+                            jdbc.update("DELETE FROM spectra_oa.oa_attendance_record WHERE application_id = ?",
+                                    applicationId);
+                            String detailTable = switch (type) {
+                                case "leave" -> "spectra_oa.oa_leave_application";
+                                case "purchase" -> "spectra_oa.oa_purchase";
+                                default -> "spectra_oa.oa_reimbursement";
+                            };
+                            jdbc.update("DELETE FROM " + detailTable + " WHERE application_id = ?", applicationId);
+                            jdbc.update("DELETE FROM spectra_oa.oa_application WHERE id = ?", applicationId);
+                        }
+                    }
+                }
+            } finally {
+                SecurityContextHolder.clearContext();
+                jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", assignmentId);
+                jdbc.update("DELETE FROM spectra_core.sys_user WHERE id = ?", userId);
+            }
+        }
+    }
+
+    private static void insertOaCallbackDetail(JdbcTemplate jdbc, String type, UUID applicationId, UUID businessId) {
+        switch (type) {
+            case "leave" -> jdbc.update("INSERT INTO spectra_oa.oa_leave_application "
+                    + "(id, application_id, leave_type_code, start_time, end_time, duration_hours, reason, "
+                    + "created_at, updated_at) VALUES (?, ?, 'ANNUAL', "
+                    + "TIMESTAMPTZ '2026-10-26 09:00:00+00', TIMESTAMPTZ '2026-10-26 17:00:00+00', "
+                    + "8, 'synthetic leave', statement_timestamp(), statement_timestamp())",
+                    businessId, applicationId);
+            case "purchase" -> jdbc.update("INSERT INTO spectra_oa.oa_purchase "
+                    + "(id, application_id, purpose, expected_date, budget_amount, created_at, updated_at) "
+                    + "VALUES (?, ?, 'synthetic purchase', statement_timestamp(), 100, "
+                    + "statement_timestamp(), statement_timestamp())", businessId, applicationId);
+            default -> jdbc.update("INSERT INTO spectra_oa.oa_reimbursement "
+                    + "(id, application_id, purpose, expense_start, expense_end, total_amount, payee_name, "
+                    + "created_at, updated_at) VALUES (?, ?, 'synthetic reimbursement', "
+                    + "statement_timestamp(), statement_timestamp(), 100, 'synthetic payee', "
+                    + "statement_timestamp(), statement_timestamp())", businessId, applicationId);
         }
     }
 
@@ -495,6 +679,15 @@ class WorkflowInstanceNotificationFullAppTest {
         byte[] bytes = new byte[32];
         new SecureRandom().nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    private static boolean hasSqlState(Throwable failure, String expected) {
+        for (Throwable cause = failure; cause != null; cause = cause.getCause()) {
+            if (cause instanceof SQLException sqlException && expected.equals(sqlException.getSQLState())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void requireIsolatedDependencies() {

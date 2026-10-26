@@ -28,6 +28,7 @@ import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.authorization.AuthorizationMutationFence;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import com.devops00.spectra.workflow.api.ApprovalCallback;
@@ -84,6 +85,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
     private final SecurityContextAccessor securityContextAccessor;
 
     private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    private final AuthorizationMutationFence authorizationMutationFence;
 
     @Override
     public IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey) {
@@ -209,6 +212,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
      */
     private org.flowable.task.api.Task requireOwnedTask(String taskId, String operator) {
         var userId = requireCurrentUserId(operator);
+        authorizationMutationFence.lockUser(userId);
         var authorization = authorizationSnapshotProvider.load(userId);
         if (authorization == null || !authorization.hasPermission(TASK_UPDATE_PERMISSION)) {
             throw new AccessDeniedException("当前用户没有流程任务处理权限");

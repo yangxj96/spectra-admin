@@ -46,6 +46,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.SQLException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
@@ -93,8 +94,11 @@ class NotificationControlledSendFullHttpTest {
             String password = "Bs!" + UUID.randomUUID();
             String idempotencyKey = "b02:controlled-send:" + UUID.randomUUID();
             String crossProcessKey = "b02:controlled-send:two-process:" + UUID.randomUUID();
+            String faultKey = "b02:controlled-send:db-fault:" + UUID.randomUUID();
             String revokeRaceKey = "b02:controlled-send:revoke-race:" + UUID.randomUUID();
+            String applyFirstKey = "b02:controlled-send:apply-first:" + UUID.randomUUID();
             UUID roleAssignmentId = UUID.randomUUID();
+            UUID restoredAssignmentId = UUID.randomUUID();
             UUID backupAssignmentId = UUID.randomUUID();
             UUID rootRoleId = jdbc.queryForObject(
                     "SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS'", UUID.class);
@@ -288,6 +292,50 @@ class NotificationControlledSendFullHttpTest {
                     stop(secondProcess);
                 }
 
+                var faultPreviewBody = Map.of("idempotency_key", faultKey, "purpose", "SYSTEM_NOTICE",
+                        "channels", List.of("IN_APP"), "template_version_ids", Map.of("IN_APP", templateId),
+                        "audience", Map.of("user_ids", List.of(recipientId)), "parameters", Map.of());
+                var faultPreviewResponse = post(client, port, mapper, "/preview", token, faultPreviewBody);
+                assertEquals(200, faultPreviewResponse.statusCode(), faultPreviewResponse.body());
+                var faultPreview = mapper.readTree(faultPreviewResponse.body()).path("data");
+                var faultApply = new NotificationControlledSendApplyFrom();
+                faultApply.setPreviewId(UUID.fromString(faultPreview.path("preview_id").asText()));
+                faultApply.setPreviewToken(faultPreview.path("preview_token").asText());
+                faultApply.setRequestHash(faultPreview.path("request_hash").asText());
+                try (var blockingConnection = application.getBean(DataSource.class).getConnection()) {
+                    blockingConnection.setAutoCommit(false);
+                    try {
+                        try (var lock = blockingConnection.createStatement()) {
+                            lock.execute("LOCK TABLE spectra_notification.ntf_task IN ACCESS EXCLUSIVE MODE");
+                        }
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(
+                                        new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+                        try {
+                            var transaction = new TransactionTemplate(application.getBean(PlatformTransactionManager.class));
+                            var failure = assertThrows(RuntimeException.class, () -> transaction.executeWithoutResult(
+                                    status -> {
+                                        jdbc.execute("SET LOCAL lock_timeout = '500ms'");
+                                        application.getBean(NotificationControlledSendService.class).apply(faultApply);
+                                    }));
+                            assertTrue(hasSqlState(failure, "55P03"), "入队中途必须因任务表锁超时失败");
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    } finally {
+                        blockingConnection.rollback();
+                    }
+                }
+                assertEquals("PREVIEWED", jdbc.queryForObject("SELECT status FROM spectra_notification.ntf_send_preview "
+                        + "WHERE id = ?", String.class, faultApply.getPreviewId()));
+                assertEquals(0L, requestCount(jdbc, faultKey), "数据库中途故障须回滚已插入的通知 Request");
+                var recoveredApply = post(client, port, mapper, "/apply", token,
+                        Map.of("preview_id", faultPreview.path("preview_id").asText(),
+                                "preview_token", faultPreview.path("preview_token").asText(),
+                                "request_hash", faultPreview.path("request_hash").asText()));
+                assertEquals(200, recoveredApply.statusCode(), recoveredApply.body());
+                assertEquals(1L, requestCount(jdbc, faultKey));
+
                 var revokePreviewBody = Map.of("idempotency_key", revokeRaceKey, "purpose", "SYSTEM_NOTICE",
                         "channels", List.of("IN_APP"), "template_version_ids", Map.of("IN_APP", templateId),
                         "audience", Map.of("user_ids", List.of(recipientId)), "parameters", Map.of());
@@ -362,12 +410,87 @@ class NotificationControlledSendFullHttpTest {
                                 "preview_token", revokePreview.path("preview_token").asText(),
                                 "request_hash", revokePreview.path("request_hash").asText()));
                 assertNotEquals(200, rejectedOldSession.statusCode(), "撤权后旧 Session 不得继续 Apply");
+
+                jdbc.update("INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id) VALUES (?, ?, ?)",
+                        restoredAssignmentId, operatorId, rootRoleId);
+                String restoredToken = login(client, port, mapper, username, password);
+                var applyFirstBody = Map.of("idempotency_key", applyFirstKey, "purpose", "SYSTEM_NOTICE",
+                        "channels", List.of("IN_APP"), "template_version_ids", Map.of("IN_APP", templateId),
+                        "audience", Map.of("user_ids", List.of(recipientId)), "parameters", Map.of());
+                var applyFirstPreviewResponse = post(client, port, mapper, "/preview", restoredToken, applyFirstBody);
+                assertEquals(200, applyFirstPreviewResponse.statusCode(), applyFirstPreviewResponse.body());
+                var applyFirstPreview = mapper.readTree(applyFirstPreviewResponse.body()).path("data");
+                var applyFirst = new NotificationControlledSendApplyFrom();
+                applyFirst.setPreviewId(UUID.fromString(applyFirstPreview.path("preview_id").asText()));
+                applyFirst.setPreviewToken(applyFirstPreview.path("preview_token").asText());
+                applyFirst.setRequestHash(applyFirstPreview.path("request_hash").asText());
+                var applyCommitted = new CountDownLatch(1);
+                var finishApply = new CountDownLatch(1);
+                var firstApply = CompletableFuture.runAsync(() -> {
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(
+                                    new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+                    try {
+                        transaction.executeWithoutResult(status -> {
+                            application.getBean(NotificationControlledSendService.class).apply(applyFirst);
+                            applyCommitted.countDown();
+                            try {
+                                if (!finishApply.await(20, TimeUnit.SECONDS)) {
+                                    throw new IllegalStateException("受控发送提交屏障超时");
+                                }
+                            } catch (InterruptedException exception) {
+                                Thread.currentThread().interrupt();
+                                throw new IllegalStateException("受控发送等待中断", exception);
+                            }
+                        });
+                    } finally {
+                        SecurityContextHolder.clearContext();
+                    }
+                });
+                CompletableFuture<Void> laterRevocation;
+                try {
+                    assertTrue(applyCommitted.await(20, TimeUnit.SECONDS));
+                    assertEquals(0L, requestCount(jdbc, applyFirstKey), "Apply 提交前其他事务不得看见请求");
+                    var laterRemoval = new AuthorizationAssignmentRemovalFrom();
+                    laterRemoval.setAssignmentId(restoredAssignmentId);
+                    laterRemoval.setExpectedVersion(0L);
+                    var revokeStarted = new CountDownLatch(1);
+                    laterRevocation = CompletableFuture.runAsync(() -> {
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(
+                                        new UsernamePasswordAuthenticationToken(backupPrincipal, null, List.of()));
+                        try {
+                            revokeStarted.countDown();
+                            application.getBean(AuthorizationAssignmentChangeService.class)
+                                    .revoke(operatorId, laterRemoval);
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    });
+                    assertTrue(revokeStarted.await(5, TimeUnit.SECONDS));
+                    assertThrows(TimeoutException.class, () -> laterRevocation.get(500, TimeUnit.MILLISECONDS),
+                            "Apply 提交前撤权不得越过用户行锁");
+                } finally {
+                    finishApply.countDown();
+                }
+                firstApply.get(20, TimeUnit.SECONDS);
+                laterRevocation.get(20, TimeUnit.SECONDS);
+                assertEquals(1L, requestCount(jdbc, applyFirstKey));
+                assertEquals("APPLIED", jdbc.queryForObject("SELECT status FROM spectra_notification.ntf_send_preview "
+                        + "WHERE id = ?", String.class, applyFirst.getPreviewId()));
+                assertEquals("REVOKED", jdbc.queryForObject("SELECT state FROM spectra_security.sec_role_assignment "
+                        + "WHERE id = ?", String.class, restoredAssignmentId));
+                assertNotEquals(200, post(client, port, mapper, "/apply", restoredToken,
+                        Map.of("preview_id", applyFirstPreview.path("preview_id").asText(),
+                                "preview_token", applyFirstPreview.path("preview_token").asText(),
+                                "request_hash", applyFirstPreview.path("request_hash").asText()))
+                        .statusCode());
             } finally {
                 SecurityContextHolder.clearContext();
                 application.getBean(SecuritySessionRevocationService.class).deleteByUserId(operatorId);
                 for (UUID requestId : jdbc.queryForList("SELECT id FROM spectra_notification.ntf_request "
-                        + "WHERE idempotency_key IN (?, ?, ?)", UUID.class, idempotencyKey, crossProcessKey,
-                        revokeRaceKey)) {
+                        + "WHERE idempotency_key IN (?, ?, ?, ?, ?)", UUID.class, idempotencyKey, crossProcessKey,
+                        faultKey, revokeRaceKey, applyFirstKey)) {
                     jdbc.update("DELETE FROM spectra_notification.ntf_inbox_message "
                             + "WHERE notification_request_id = ?", requestId);
                     jdbc.update("DELETE FROM spectra_notification.ntf_delivery WHERE notification_task_id IN "
@@ -377,6 +500,7 @@ class NotificationControlledSendFullHttpTest {
                 }
                 jdbc.update("DELETE FROM spectra_notification.ntf_send_preview WHERE operator_user_id = ?", operatorId);
                 jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", roleAssignmentId);
+                jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", restoredAssignmentId);
                 jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", backupAssignmentId);
                 jdbc.update("DELETE FROM spectra_security.sec_password_credential WHERE user_id = ?", operatorId);
                 jdbc.update("DELETE FROM spectra_security.sec_password_credential WHERE user_id = ?", backupRootId);
@@ -391,6 +515,15 @@ class NotificationControlledSendFullHttpTest {
     private static void insertUser(JdbcTemplate jdbc, UUID id, String username) {
         jdbc.update("INSERT INTO spectra_core.sys_user (id, username, employee_no, real_name) VALUES (?, ?, ?, ?)",
                 id, username, username, "synthetic controlled send user");
+    }
+
+    private static boolean hasSqlState(Throwable failure, String expected) {
+        for (Throwable cause = failure; cause != null; cause = cause.getCause()) {
+            if (cause instanceof SQLException sqlException && expected.equals(sqlException.getSQLState())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Process startSecond(Path ready, Path log) throws Exception {

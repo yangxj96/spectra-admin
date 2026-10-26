@@ -20,6 +20,7 @@ import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.port.security.SecurityPrincipal;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.common.security.authorization.AuthorizationMutationFence;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.workflow.service.impl.TaskServiceImpl;
 import org.flowable.engine.TaskService;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -56,13 +58,16 @@ class TaskServiceAuthorizationTest {
 
     private final AuthorizationSnapshotProvider snapshots = mock(AuthorizationSnapshotProvider.class);
 
+    private final AuthorizationMutationFence mutationFence = mock(AuthorizationMutationFence.class);
+
     private final UUID userId = UUID.randomUUID();
 
     private TaskServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        service = new TaskServiceImpl(flowableTasks, null, null, null, null, null, null, null, null, security, snapshots);
+        service = new TaskServiceImpl(flowableTasks, null, null, null, null, null, null, null, null, security, snapshots,
+                mutationFence);
     }
 
     @Test
@@ -70,7 +75,7 @@ class TaskServiceAuthorizationTest {
         assertAllWritesDenied("alice");
         authenticate("bob");
         assertAllWritesDenied("alice");
-        verifyNoInteractions(flowableTasks, snapshots);
+        verifyNoInteractions(flowableTasks, snapshots, mutationFence);
     }
 
     @Test
@@ -91,6 +96,16 @@ class TaskServiceAuthorizationTest {
         assertSame(failure, assertThrows(IllegalStateException.class,
                 () -> service.complete("task", "comment", "alice")));
         verifyNoInteractions(flowableTasks);
+    }
+
+    @Test
+    void authorizationFenceFailureRejectsBeforeSnapshotOrTaskMutation() {
+        authenticate("alice");
+        var failure = new IllegalStateException("synthetic authorization lock failure");
+        doThrow(failure).when(mutationFence).lockUser(userId);
+        assertSame(failure, assertThrows(IllegalStateException.class,
+                () -> service.complete("task", "comment", "alice")));
+        verifyNoInteractions(snapshots, flowableTasks);
     }
 
     @Test

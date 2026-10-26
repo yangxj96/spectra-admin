@@ -293,13 +293,31 @@ class RoleAuthorizationFullHttpTest {
                 assertNotEquals(ProcessHandle.current().pid(), second.pid());
                 var fixture = new Fixture(new JdbcTemplate(first.getBean(DataSource.class)),
                         first.getBean(PasswordEncoder.class));
+                String notificationKey = "b02:role-two-process-send:" + UUID.randomUUID();
                 try {
                     fixture.insert();
+                    fixture.insertNotificationSendScenario();
                     ObjectMapper mapper = first.getBean(ObjectMapper.class);
                     String operatorToken = login(client, firstPort, mapper, fixture.operatorUsername, fixture.password);
                     String targetToken = login(client, secondPort, mapper, fixture.targetUsername, fixture.password);
                     assertEquals(200, get(client, firstPort, "/api/security/context", targetToken).statusCode(),
                             "首进程应接受第二进程签署的目标用户 Access");
+
+                    UUID templateId = fixture.jdbc.queryForObject("SELECT id FROM spectra_notification.ntf_template "
+                            + "WHERE template_group_code = 'system.notice' AND channel = 'IN_APP' "
+                            + "AND state = 'PUBLISHED' AND deleted IS NULL", UUID.class);
+                    String notificationBody = mapper.writeValueAsString(Map.of("idempotency_key", notificationKey,
+                            "purpose", "SYSTEM_NOTICE", "channels", List.of("IN_APP"),
+                            "template_version_ids", Map.of("IN_APP", templateId),
+                            "audience", Map.of("user_ids", List.of(fixture.target)), "parameters", Map.of()));
+                    var sendPreview = post(client, secondPort, "/api/notification/admin/send/preview", targetToken,
+                            notificationBody);
+                    assertEquals(200, sendPreview.statusCode(), sendPreview.body());
+                    var sendData = mapper.readTree(sendPreview.body()).path("data");
+                    String sendApplyBody = mapper.writeValueAsString(Map.of(
+                            "preview_id", sendData.path("preview_id").asText(),
+                            "preview_token", sendData.path("preview_token").asText(),
+                            "request_hash", sendData.path("request_hash").asText()));
 
                     String path = "/api/security/authorization/roles/" + fixture.targetRole + "/impact-preview";
                     String requested = mapper.writeValueAsString(Map.of("expected_version", 0,
@@ -309,11 +327,69 @@ class RoleAuthorizationFullHttpTest {
                     assertEquals(200, preview.statusCode());
                     String previewToken = mapper.readTree(preview.body()).path("data").path("preview_token").asText();
                     assertFalse(previewToken.isBlank());
-                    String applied = mapper.writeValueAsString(Map.of("expected_version", 0,
-                            "authority_level", 100, "permission_codes", List.of("role:read"),
-                            "grantable_permission_codes", List.of("role:read"), "preview_token", previewToken));
-                    String applyPath = "/api/security/authorization/roles/" + fixture.targetRole + "/impact-apply";
-                    assertEquals(200, post(client, firstPort, applyPath, operatorToken, applied).statusCode());
+                    var roleApply = new RoleAuthorizationApplyFrom();
+                    roleApply.setExpectedVersion(0L);
+                    roleApply.setAuthorityLevel(100);
+                    roleApply.setPermissionCodes(Set.of("role:read"));
+                    roleApply.setGrantablePermissionCodes(Set.of("role:read"));
+                    roleApply.setPreviewToken(previewToken);
+                    var principal = mock(SecurityPrincipal.class);
+                    when(principal.getId()).thenReturn(fixture.operator);
+                    var changedInTransaction = new CountDownLatch(1);
+                    var finishChange = new CountDownLatch(1);
+                    var transaction = new TransactionTemplate(first.getBean(PlatformTransactionManager.class));
+                    var roleMutation = CompletableFuture.runAsync(() -> {
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(
+                                        new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+                        try {
+                            transaction.executeWithoutResult(status -> {
+                                first.getBean(RoleAuthorizationChangeService.class).apply(fixture.targetRole, roleApply);
+                                changedInTransaction.countDown();
+                                try {
+                                    if (!finishChange.await(20, TimeUnit.SECONDS)) {
+                                        throw new IllegalStateException("跨进程角色缩权提交屏障超时");
+                                    }
+                                } catch (InterruptedException exception) {
+                                    Thread.currentThread().interrupt();
+                                    throw new IllegalStateException("跨进程角色缩权等待中断", exception);
+                                }
+                            });
+                        } finally {
+                            SecurityContextHolder.clearContext();
+                        }
+                    });
+                    CompletableFuture<HttpResponse<String>> racingApply;
+                    try {
+                        assertTrue(changedInTransaction.await(20, TimeUnit.SECONDS));
+                        racingApply = CompletableFuture.supplyAsync(() -> {
+                            try {
+                                return post(client, secondPort, "/api/notification/admin/send/apply", targetToken,
+                                        sendApplyBody);
+                            } catch (Exception exception) {
+                                throw new IllegalStateException(exception);
+                            }
+                        });
+                        try {
+                            var earlyRejection = racingApply.get(500, TimeUnit.MILLISECONDS);
+                            assertNotEquals(200, earlyRejection.statusCode(),
+                                    "第二 JVM 可以提前失效会话，但不得在角色缩权提交前完成发送");
+                        } catch (TimeoutException waitingForCommittedRole) {
+                            assertFalse(racingApply.isDone(), "等待行锁时不得提前完成发送");
+                        }
+                        assertEquals(0L, fixture.jdbc.queryForObject(
+                                "SELECT count(*) FROM spectra_notification.ntf_request WHERE idempotency_key = ?",
+                                Long.class, notificationKey));
+                    } finally {
+                        finishChange.countDown();
+                    }
+                    roleMutation.get(20, TimeUnit.SECONDS);
+                    assertNotEquals(200, racingApply.get(20, TimeUnit.SECONDS).statusCode());
+                    assertEquals(0L, fixture.jdbc.queryForObject("SELECT count(*) FROM spectra_notification.ntf_request "
+                            + "WHERE idempotency_key = ?", Long.class, notificationKey));
+                    assertEquals("PREVIEWED", fixture.jdbc.queryForObject("SELECT status "
+                            + "FROM spectra_notification.ntf_send_preview WHERE id = ?", String.class,
+                            UUID.fromString(sendData.path("preview_id").asText())));
 
                     assertEquals(401, get(client, secondPort, "/api/security/context", targetToken).statusCode(),
                             "角色缩权后第二进程应拒绝旧 Access");
@@ -322,6 +398,8 @@ class RoleAuthorizationFullHttpTest {
                     assertTrue(hasPermission(reduced, "role:read"));
                     assertFalse(hasPermission(reduced, "role:grant"), "重新登录快照应反映收缩");
                 } finally {
+                    fixture.jdbc.update("DELETE FROM spectra_notification.ntf_send_preview WHERE operator_user_id = ?",
+                            fixture.target);
                     var revocation = first.getBean(SecuritySessionRevocationPort.class);
                     revocation.revokeUserSessions(fixture.operator);
                     revocation.revokeUserSessions(fixture.target);
