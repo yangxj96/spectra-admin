@@ -782,6 +782,7 @@ class RoleAuthorizationFullHttpTest {
             UUID scopeId = UUID.randomUUID();
             extraScopes.add(scopeId);
             insertPermission(roleId, permissionId);
+            insertGrantable(roleId, permissionId);
             jdbc.update("INSERT INTO spectra_security.sec_authorization_scope "
                     + "(id, scope_mode, resource_code) VALUES (?, 'ALL', ?)", scopeId, code.split(":")[0]);
             jdbc.update("INSERT INTO spectra_security.sec_assignment_permission_boundary "
@@ -931,7 +932,8 @@ class RoleAuthorizationFullHttpTest {
             }
             jdbc.update("DELETE FROM spectra_security.sec_role_permission WHERE role_id IN (?, ?)",
                     operatorRole, targetRole);
-            jdbc.update("DELETE FROM spectra_security.sec_role_grantable_permission WHERE role_id = ?", targetRole);
+            jdbc.update("DELETE FROM spectra_security.sec_role_grantable_permission WHERE role_id IN (?, ?)",
+                    operatorRole, targetRole);
             jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id IN (?, ?)",
                     operatorAssignment, targetAssignment);
             jdbc.update("DELETE FROM spectra_security.sec_password_credential WHERE user_id IN (?, ?)",
