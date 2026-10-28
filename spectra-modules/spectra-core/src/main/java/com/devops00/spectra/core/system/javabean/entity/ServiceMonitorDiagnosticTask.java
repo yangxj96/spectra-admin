@@ -44,6 +44,10 @@ public class ServiceMonitorDiagnosticTask extends BaseEntity {
     @TableField("status")
     private String status;
 
+    /** 生成诊断文件的运行实例标识；诊断目录按节点本地语义处理。 */
+    @TableField("instance_id")
+    private String instanceId;
+
     /** 系统生成的相对文件名，不保存绝对路径。 */
     @TableField("file_name")
     private String fileName;

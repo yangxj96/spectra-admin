@@ -80,6 +80,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     private static final String SUCCEEDED = ServiceMonitorDiagnosticTaskStatus.SUCCEEDED.name();
     private static final String FAILED = ServiceMonitorDiagnosticTaskStatus.FAILED.name();
     private static final String EXPIRED = ServiceMonitorDiagnosticTaskStatus.EXPIRED.name();
+    private static final String LEGACY_INSTANCE = "unknown";
 
     private final MeterRegistry meterRegistry;
     private final DataSource dataSource;
@@ -89,6 +90,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     private final ServiceMonitorDiagnosticTaskMapper taskMapper;
     private final TaskExecutor taskExecutor;
     private final Path diagnosticDirectory;
+    private final String instanceId;
     private final boolean enabled;
     private final boolean heapDumpEnabled;
     private final int retentionHours;
@@ -110,6 +112,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         var defaultDirectory = Path.of(System.getProperty("java.io.tmpdir"), "spectra-monitor-diagnostics");
         this.diagnosticDirectory = Path.of(environment.getProperty("spectra.monitor.diagnostics.directory",
                 defaultDirectory.toString())).toAbsolutePath().normalize();
+        this.instanceId = resolveInstanceId(environment);
         this.enabled = environment.getProperty("spectra.monitor.diagnostics.enabled", Boolean.class, true);
         this.heapDumpEnabled = environment.getProperty("spectra.monitor.diagnostics.heap-dump-enabled", Boolean.class, false);
         this.retentionHours = Math.max(environment.getProperty("spectra.monitor.diagnostics.retention-hours", Integer.class, 24), 1);
@@ -117,6 +120,29 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 5L * 1024 * 1024), 1024L);
         this.heapDumpMaxBytes = Math.max(environment.getProperty("spectra.monitor.diagnostics.heap-dump-max-bytes", Long.class,
                 512L * 1024 * 1024), 16L * 1024 * 1024);
+    }
+
+    private static String resolveInstanceId(Environment environment) {
+        var configured = environment.getProperty("spectra.monitor.diagnostics.instance-id");
+        if (configured != null && !configured.isBlank()) {
+            return normalizeInstanceId(configured.trim());
+        }
+        var host = environment.getProperty("HOSTNAME");
+        if (host == null || host.isBlank()) {
+            host = environment.getProperty("COMPUTERNAME");
+        }
+        if (host == null || host.isBlank()) {
+            host = "localhost";
+        }
+        var port = environment.getProperty("server.port", "0");
+        return normalizeInstanceId(host.trim() + ":" + port.trim());
+    }
+
+    private static String normalizeInstanceId(String value) {
+        if (value.length() <= 160) {
+            return value;
+        }
+        return value.substring(0, 120) + ":" + UUID.nameUUIDFromBytes(value.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
@@ -327,6 +353,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         var task = new ServiceMonitorDiagnosticTask();
         task.setTaskType(type.getCode());
         task.setStatus(PENDING);
+        task.setInstanceId(instanceId);
         task.setFileName(UUID.randomUUID() + type.getSuffix());
         task.setDisplayName("服务监控-" + type.getLabel() + "-" + now.toEpochMilli() + type.getSuffix());
         task.setRequestedAt(now);
@@ -392,9 +419,8 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         if (task == null) {
             return;
         }
-        var type = ServiceMonitorDiagnosticType.fromCode(task.getTaskType());
-        if (type == null) {
-            finishTask(id, FAILED, null, "诊断类型无效");
+        if (!managesInstance(task.getInstanceId())) {
+            log.warn("诊断任务不属于当前实例，跳过执行: taskId={}, owner={}", id, task.getInstanceId());
             return;
         }
         var claimedAt = Instant.now();
@@ -402,12 +428,21 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .eq(ServiceMonitorDiagnosticTask::getId, id)
                 .eq(ServiceMonitorDiagnosticTask::getStatus, PENDING)
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted)
+                .and(wrapper -> wrapper.eq(ServiceMonitorDiagnosticTask::getInstanceId, instanceId)
+                        .or()
+                        .eq(ServiceMonitorDiagnosticTask::getInstanceId, LEGACY_INSTANCE))
                 .and(wrapper -> wrapper.isNull(ServiceMonitorDiagnosticTask::getExpiresAt)
                         .or()
                         .gt(ServiceMonitorDiagnosticTask::getExpiresAt, claimedAt))
                 .set(ServiceMonitorDiagnosticTask::getStatus, RUNNING)
+                .set(ServiceMonitorDiagnosticTask::getInstanceId, instanceId)
                 .set(ServiceMonitorDiagnosticTask::getStartedAt, claimedAt));
         if (claimed != 1) {
+            return;
+        }
+        var type = ServiceMonitorDiagnosticType.fromCode(task.getTaskType());
+        if (type == null) {
+            finishTask(id, FAILED, null, "诊断类型无效");
             return;
         }
         var path = safePath(task.getFileName());
@@ -433,6 +468,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
                 .eq(ServiceMonitorDiagnosticTask::getId, id)
                 .eq(ServiceMonitorDiagnosticTask::getStatus, RUNNING)
+                .and(wrapper -> wrapper.eq(ServiceMonitorDiagnosticTask::getInstanceId, instanceId)
+                        .or()
+                        .eq(ServiceMonitorDiagnosticTask::getInstanceId, LEGACY_INSTANCE))
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted)
                 .set(ServiceMonitorDiagnosticTask::getStatus, status)
                 .set(ServiceMonitorDiagnosticTask::getFileSize, fileSize)
@@ -447,6 +485,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         var cutoff = Instant.now().minusSeconds(30);
         var pending = taskMapper.selectList(new LambdaQueryWrapper<ServiceMonitorDiagnosticTask>()
                 .eq(ServiceMonitorDiagnosticTask::getStatus, PENDING)
+                .and(wrapper -> wrapper.eq(ServiceMonitorDiagnosticTask::getInstanceId, instanceId)
+                        .or()
+                        .eq(ServiceMonitorDiagnosticTask::getInstanceId, LEGACY_INSTANCE))
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted)
                 .le(ServiceMonitorDiagnosticTask::getRequestedAt, cutoff)
                 .orderByAsc(ServiceMonitorDiagnosticTask::getRequestedAt)
@@ -456,6 +497,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         var runningCutoff = Instant.now().minus(Duration.ofHours(1));
         taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
                 .eq(ServiceMonitorDiagnosticTask::getStatus, RUNNING)
+                .and(wrapper -> wrapper.eq(ServiceMonitorDiagnosticTask::getInstanceId, instanceId)
+                        .or()
+                        .eq(ServiceMonitorDiagnosticTask::getInstanceId, LEGACY_INSTANCE))
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted)
                 .le(ServiceMonitorDiagnosticTask::getStartedAt, runningCutoff)
                 .set(ServiceMonitorDiagnosticTask::getStatus, FAILED)
@@ -527,6 +571,8 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted));
         if (task == null || !SUCCEEDED.equals(task.getStatus()))
             throw new DataException("诊断文件尚未生成");
+        if (!managesInstance(task.getInstanceId()))
+            throw new DataException("诊断文件仅可在生成实例下载");
         if (task.getExpiresAt() == null || !task.getExpiresAt().isAfter(Instant.now()))
             throw new DataException("诊断文件已过期");
         var path = safePath(task.getFileName());
@@ -544,7 +590,21 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted)
                 .le(ServiceMonitorDiagnosticTask::getExpiresAt, now));
         for (var task : tasks) {
-            if (deleteQuietly(safePath(task.getFileName()))) {
+            if (!managesInstance(task.getInstanceId())) {
+                continue;
+            }
+            if (task.getFileName() == null || task.getFileName().isBlank()) {
+                taskMapper.deleteById(task.getId());
+                continue;
+            }
+            var path = safePath(task.getFileName());
+            if (!Files.isRegularFile(path)) {
+                if (!LEGACY_INSTANCE.equals(task.getInstanceId()) || !SUCCEEDED.equals(task.getStatus())) {
+                    taskMapper.deleteById(task.getId());
+                }
+                continue;
+            }
+            if (deleteQuietly(path)) {
                 taskMapper.deleteById(task.getId());
             } else {
                 taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
@@ -552,6 +612,13 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                         .set(ServiceMonitorDiagnosticTask::getErrorMessage, "诊断文件清理失败"));
             }
         }
+    }
+
+    /**
+     * 判断诊断任务是否可在当前实例管理；历史任务由实际持有文件的节点处理。
+     */
+    private boolean managesInstance(String owner) {
+        return owner == null || owner.isBlank() || LEGACY_INSTANCE.equals(owner) || instanceId.equals(owner);
     }
 
     /**
