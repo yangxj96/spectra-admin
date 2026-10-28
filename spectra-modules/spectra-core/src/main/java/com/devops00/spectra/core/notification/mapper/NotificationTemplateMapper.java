@@ -67,5 +67,9 @@ public interface NotificationTemplateMapper extends BaseMapper<NotificationTempl
 
     List<NotificationTemplateEntity> selectVersions(@Param("groupCode") String groupCode,
                                                     @Param("channel") String channel,
-                                                    @Param("limit") int limit);
+                                                    @Param("limit") long limit,
+                                                    @Param("offset") long offset);
+
+    long countVersions(@Param("groupCode") String groupCode,
+                       @Param("channel") String channel);
 }

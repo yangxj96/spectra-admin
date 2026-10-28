@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -159,8 +158,8 @@ public class NotificationTemplateAdminController {
     @Audit("'查询通知模板版本历史'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
-    public List<NotificationTemplateVO> versions(@PathVariable UUID id) {
-        return service.versions(id);
+    public IPage<NotificationTemplateVO> versions(@PathVariable UUID id, PageFrom page) {
+        return service.versions(id, page);
     }
 
     /**

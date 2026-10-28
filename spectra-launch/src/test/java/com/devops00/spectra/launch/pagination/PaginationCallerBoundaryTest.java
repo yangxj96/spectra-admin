@@ -170,6 +170,8 @@ class PaginationCallerBoundaryTest {
                         Map.of()),
                 new Target(com.devops00.spectra.core.notification.service.impl.NotificationTemplateServiceImpl.class, "groupPage",
                         Map.of()),
+                new Target(com.devops00.spectra.core.notification.service.impl.NotificationTemplateServiceImpl.class, "versions",
+                        Map.of()),
                 new Target(com.devops00.spectra.core.audit.service.impl.AuditLogQueryServiceImpl.class, "page",
                         Map.of()),
                 new Target(com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementServiceImpl.class, "jobs",

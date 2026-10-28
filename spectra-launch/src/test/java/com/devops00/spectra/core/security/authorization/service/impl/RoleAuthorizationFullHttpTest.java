@@ -34,7 +34,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.server.context.WebServerApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.access.AccessDeniedException;
@@ -88,6 +90,7 @@ class RoleAuthorizationFullHttpTest {
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
                         "--spectra.test.role-http=true")) {
+            resetRedis(application);
             var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
                     application.getBean(PasswordEncoder.class));
             try (HttpClient client = HttpClient.newHttpClient()) {
@@ -156,6 +159,7 @@ class RoleAuthorizationFullHttpTest {
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
                         "--spectra.test.role-http=true")) {
+            resetRedis(application);
             var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
                     application.getBean(PasswordEncoder.class));
             String requestKey = "b02:controlled-send:role-shrink:" + UUID.randomUUID();
@@ -285,6 +289,7 @@ class RoleAuthorizationFullHttpTest {
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
                         "--spectra.test.role-http=true")) {
+            resetRedis(first);
             Path ready = temporary.resolve("second-port.txt");
             Process second = startSecond(ready, temporary.resolve("second.log"));
             try (HttpClient client = HttpClient.newHttpClient()) {
@@ -418,6 +423,7 @@ class RoleAuthorizationFullHttpTest {
                 .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
                         "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false",
                         "--spectra.test.role-http=true")) {
+            resetRedis(application);
             var fixture = new Fixture(new JdbcTemplate(application.getBean(DataSource.class)),
                     application.getBean(PasswordEncoder.class));
             try (HttpClient client = HttpClient.newHttpClient()) {
@@ -535,11 +541,22 @@ class RoleAuthorizationFullHttpTest {
 
     private static Process startSecond(Path ready, Path log) throws Exception {
         String java = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
-        return new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp", System.getProperty("java.class.path"),
-                SecondApplication.class.getName(), ready.toString())
+        Path arguments = log.resolveSibling(log.getFileName() + ".args");
+        String classpath = System.getProperty("java.class.path").replace('\\', '/');
+        String readyFile = ready.toAbsolutePath().toString().replace('\\', '/');
+        Files.writeString(arguments, "-Duser.timezone=UTC\n-cp\n" + classpath + "\n"
+                + SecondApplication.class.getName() + "\n" + readyFile + "\n");
+        return new ProcessBuilder(java, "@" + arguments.toAbsolutePath())
                 .redirectErrorStream(true)
                 .redirectOutput(log.toFile())
                 .start();
+    }
+
+    private static void resetRedis(ConfigurableApplicationContext application) {
+        var factory = application.getBean(RedisConnectionFactory.class);
+        try (var connection = factory.getConnection()) {
+            connection.serverCommands().flushDb();
+        }
     }
 
     private static int awaitPort(Process process, Path ready) throws Exception {

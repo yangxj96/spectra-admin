@@ -77,8 +77,6 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     private static final String ARCHIVED = NotificationTemplateState.ARCHIVED.name();
 
-    private static final int MAX_VERSION_HISTORY = 100;
-
     private static final Set<String> STATES = Set.of(DRAFT, PUBLISHED, DISABLED, ARCHIVED);
 
     private final NotificationTemplateMapper mapper;
@@ -241,12 +239,20 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     }
 
     @Override
-    public List<NotificationTemplateVO> versions(UUID id) {
+    public IPage<NotificationTemplateVO> versions(UUID id, PageFrom page) {
+        page.requireUnsorted();
         var source = getTemplate(id);
-        return mapper.selectVersions(source.getTemplateGroupCode(), source.getChannel(), MAX_VERSION_HISTORY)
+        long pageSize = page.getPageSize() == null ? 15L : Math.max(1L, Math.min(100L, page.getPageSize()));
+        long pageNum = page.getPageNum() == null ? 1L : Math.max(1L, page.getPageNum());
+        long offset = Math.max(0L, (pageNum - 1) * pageSize);
+        var total = mapper.countVersions(source.getTemplateGroupCode(), source.getChannel());
+        var records = mapper.selectVersions(source.getTemplateGroupCode(), source.getChannel(), pageSize, offset)
                 .stream()
                 .map(converter::toVO)
                 .toList();
+        var result = new Page<NotificationTemplateVO>(pageNum, pageSize, total);
+        result.setRecords(records);
+        return result;
     }
 
     @Override

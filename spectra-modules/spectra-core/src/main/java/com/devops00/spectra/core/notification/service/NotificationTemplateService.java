@@ -26,7 +26,6 @@ import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplatePr
 import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplateGroupVO;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplateVO;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -115,10 +114,11 @@ public interface NotificationTemplateService {
     /**
      * 处理内部业务逻辑（{@code versions}）。
      *
-     * @param id 要查询历史版本的通知模板唯一标识。
-     * @return 返回该模板从旧到新的版本列表；尚无版本时返回空列表，不返回 null。
+     * @param id   要查询历史版本的通知模板唯一标识。
+     * @param page 分页条件，包含页码和每页数量；固定按版本号倒序，不接受客户端排序。
+     * @return 返回该模板的版本分页，最新版本在前；尚无版本时返回空分页，不返回 null。
      */
-    List<NotificationTemplateVO> versions(UUID id);
+    IPage<NotificationTemplateVO> versions(UUID id, PageFrom page);
 
     /**
      * 处理内部业务逻辑（{@code preview}）。

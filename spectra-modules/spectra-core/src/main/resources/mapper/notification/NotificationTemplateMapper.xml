@@ -180,6 +180,14 @@
           AND template_group_code = #{groupCode}
           AND channel = #{channel}
         ORDER BY version_no DESC
-        LIMIT #{limit}
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countVersions" resultType="long">
+        SELECT COUNT(*)
+        FROM spectra_notification.ntf_template
+        WHERE deleted IS NULL
+          AND template_group_code = #{groupCode}
+          AND channel = #{channel}
     </select>
 </mapper>
