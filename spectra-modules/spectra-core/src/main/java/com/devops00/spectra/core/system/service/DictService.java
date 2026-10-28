@@ -22,6 +22,7 @@ import com.devops00.spectra.core.system.javabean.from.DictItemFrom;
 import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.DictItemVO;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +41,7 @@ public interface DictService {
      *
      * @param params 字典组编码、名称、显示状态和排序等字典组字段。
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:create')")
     void createGroup(DictGroupFrom params);
 
     /**
@@ -47,6 +49,7 @@ public interface DictService {
      *
      * @param id 待删除字典组的唯一标识；包含字典项的字典组不能删除。
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:disable')")
     void deleteGroup(UUID id);
 
     /**
@@ -54,6 +57,7 @@ public interface DictService {
      *
      * @param params 待修改字典组的唯一标识及编码、名称、状态和排序字段。
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
     void modifyGroup(DictGroupFrom params);
 
     /**
@@ -61,6 +65,7 @@ public interface DictService {
      *
      * @param params 字典组 ID、字典项编码、名称、值、排序和启用状态等字段。
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:create')")
     void createData(DictItemFrom params);
 
     /**
@@ -68,6 +73,7 @@ public interface DictService {
      *
      * @param params 待修改字典项的标签、排序和启用状态等字段；字典组和值创建后不可变。
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
     void modifyData(DictItemFrom params);
 
     /**
@@ -75,6 +81,7 @@ public interface DictService {
      *
      * @param id 对应字典项的唯一标识
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
     void enableData(UUID id);
 
     /**
@@ -82,6 +89,7 @@ public interface DictService {
      *
      * @param id 字典项唯一标识
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:disable')")
     void disableData(UUID id);
 
     /**
@@ -90,6 +98,7 @@ public interface DictService {
      * @param id     对应字典项的唯一标识
      * @param params 默认状态
      */
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
     void setDataDefault(UUID id, DictItemDefaultFrom params);
 
     /**

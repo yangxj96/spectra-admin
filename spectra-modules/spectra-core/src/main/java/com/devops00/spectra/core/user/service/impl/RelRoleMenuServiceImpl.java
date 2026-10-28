@@ -16,16 +16,10 @@
 
 package com.devops00.spectra.core.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.foundation.collection.CollUtils;
-import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
-import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
-import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRoleMenu;
-import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
-import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
+import com.devops00.spectra.core.security.authorization.service.SecurityRoleMenuGrantService;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
@@ -40,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,17 +51,15 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
     private final MenuConverter menuConverter;
 
-    private final SecurityRoleMenuMapper securityRoleMenuMapper;
-
-    private final SecurityRoleMapper securityRoleMapper;
+    private final SecurityRoleMenuGrantService securityRoleMenuGrantService;
 
     private final MenuService menuService;
 
-    public RelRoleMenuServiceImpl(MenuConverter menuConverter, SecurityRoleMenuMapper securityRoleMenuMapper,
-                                  SecurityRoleMapper securityRoleMapper, MenuService menuService) {
+    public RelRoleMenuServiceImpl(MenuConverter menuConverter,
+                                  SecurityRoleMenuGrantService securityRoleMenuGrantService,
+                                  MenuService menuService) {
         this.menuConverter = menuConverter;
-        this.securityRoleMenuMapper = securityRoleMenuMapper;
-        this.securityRoleMapper = securityRoleMapper;
+        this.securityRoleMenuGrantService = securityRoleMenuGrantService;
         this.menuService = menuService;
     }
 
@@ -76,20 +69,14 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         if (!Objects.equals(roleId, from.getRoleId())) {
             throw new DataException("路径角色ID与请求角色ID不一致");
         }
-        var role = securityRoleMapper.selectById(roleId);
-        if (role == null) {
-            throw new DataNotExistException("角色不存在");
-        }
-        if (!Objects.equals(SecurityAuthorizationState.ACTIVE.name(), role.getState())) {
-            throw new DataException("停用角色不能配置菜单");
-        }
-        ensureEditableRole(role);
-
         var requestedIds = new HashSet<>(from.getMenuIds());
-        var targetIds = new HashSet<UUID>();
+        Set<UUID> targetIds = new HashSet<>();
         if (CollUtils.isNotEmpty(requestedIds)) {
             var requestedMenus = menuService.listByIds(requestedIds);
-            var foundIds = requestedMenus.stream().filter(menu -> menu.getDeleted() == null).map(Menu::getId).collect(Collectors.toSet());
+            var foundIds = requestedMenus.stream()
+                    .filter(menu -> menu.getDeleted() == null)
+                    .map(Menu::getId)
+                    .collect(Collectors.toSet());
             if (!foundIds.containsAll(requestedIds)) {
                 throw new DataNotExistException("存在无效菜单");
             }
@@ -99,60 +86,18 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
                     .map(Menu::getId)
                     .forEach(targetIds::add);
         }
-
-        // 当前角色关联的菜单信息
-        var currentIds = securityRoleMenuMapper.selectList(new LambdaQueryWrapper<SecurityRoleMenu>()
-                .eq(SecurityRoleMenu::getRoleId, roleId))
-                .stream()
-                .map(SecurityRoleMenu::getMenuId)
-                .collect(Collectors.toSet());
-
-        // 计算删除且删除
-        var removeIds = new HashSet<>(currentIds);
-        removeIds.removeAll(targetIds); // current - target = 删除
-        if (CollUtils.isNotEmpty(removeIds)) {
-            var wrapper = new LambdaQueryWrapper<SecurityRoleMenu>().eq(SecurityRoleMenu::getRoleId, roleId)
-                    .in(SecurityRoleMenu::getMenuId, removeIds);
-            securityRoleMenuMapper.delete(wrapper);
-        }
-        // 计算新增且插入
-        var addIds = new HashSet<>(targetIds);
-        addIds.removeAll(currentIds); // target - current = 新增
-        if (CollUtils.isNotEmpty(addIds)) {
-            addIds.stream().map(addId -> {
-                var datum = new SecurityRoleMenu();
-                datum.setRoleId(roleId);
-                datum.setMenuId(addId);
-                return datum;
-            }).forEach(securityRoleMenuMapper::insert);
-        }
+        securityRoleMenuGrantService.replace(roleId, targetIds);
     }
 
     @Override
     @Transactional
     public void revoke(UUID roleId) {
-        var role = securityRoleMapper.selectById(roleId);
-        if (role == null) {
-            throw new DataNotExistException("角色不存在");
-        }
-        ensureEditableRole(role);
-        // 删除角色关联的菜单
-        var wrapper = new LambdaQueryWrapper<SecurityRoleMenu>().eq(SecurityRoleMenu::getRoleId, roleId);
-        securityRoleMenuMapper.delete(wrapper);
+        securityRoleMenuGrantService.revoke(roleId);
     }
 
     @Override
     public List<MenuVO> get(UUID roleId) {
         List<Menu> menus = menuService.getByRelRoleId(roleId);
         return menuConverter.toVOList(menus);
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code ensureEditableRole}）。
-     */
-    private void ensureEditableRole(SecurityRole role) {
-        if (Boolean.TRUE.equals(role.getSystemManaged()) || !Objects.equals("BUSINESS", role.getRoleKind())) {
-            throw new BuiltinDataException("内置角色不可配置菜单");
-        }
     }
 }

@@ -48,7 +48,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,6 +77,8 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     private static final String ARCHIVED = NotificationTemplateState.ARCHIVED.name();
 
+    private static final int MAX_VERSION_HISTORY = 100;
+
     private static final Set<String> STATES = Set.of(DRAFT, PUBLISHED, DISABLED, ARCHIVED);
 
     private final NotificationTemplateMapper mapper;
@@ -93,67 +94,36 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     @Override
     public IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params) {
         page.requireUnsorted();
-        var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
-                .isNull(NotificationTemplateEntity::getDeleted)
-                .orderByDesc(NotificationTemplateEntity::getUpdatedAt)
-                .orderByDesc(NotificationTemplateEntity::getVersionNo);
-        if (params != null) {
-            query.like(StringUtils.hasText(params.getTemplateGroupCode()),
-                    NotificationTemplateEntity::getTemplateGroupCode, params.getTemplateGroupCode())
-                    .eq(StringUtils.hasText(params.getChannel()), NotificationTemplateEntity::getChannel, params.getChannel())
-                    .eq(StringUtils.hasText(params.getPurpose()), NotificationTemplateEntity::getPurpose, params.getPurpose())
-                    .eq(StringUtils.hasText(params.getState()), NotificationTemplateEntity::getState, params.getState());
-            if (StringUtils.hasText(params.getState()) && !STATES.contains(params.getState())) {
-                throw new DataSaveException("模板状态不合法");
-            }
+        if (params != null && StringUtils.hasText(params.getState()) && !STATES.contains(params.getState())) {
+            throw new DataSaveException("模板状态不合法");
         }
-        var latestByTemplate = new LinkedHashMap<String, NotificationTemplateEntity>();
-        mapper.selectList(query).forEach(entity -> {
-            var key = templateKey(entity);
-            var current = latestByTemplate.get(key);
-            if (current == null || isPreferred(entity, current)) {
-                latestByTemplate.put(key, entity);
-            }
-        });
-        var latestTemplates = List.copyOf(latestByTemplate.values());
-        var pageSize = page.getPageSize();
-        var pageNum = page.getPageNum();
-        var offset = Math.max(0L, (pageNum - 1) * pageSize);
-        var fromIndex = Math.toIntExact(Math.min(offset, latestTemplates.size()));
-        var toIndex = Math.toIntExact(Math.min(offset + pageSize, latestTemplates.size()));
-        var result = new Page<NotificationTemplateEntity>(pageNum, pageSize, latestTemplates.size());
-        result.setRecords(latestTemplates.subList(fromIndex, toIndex));
-        return converter.toPage(result);
+        long pageSize = page.getPageSize();
+        long pageNum = page.getPageNum();
+        long offset = Math.max(0L, (pageNum - 1) * pageSize);
+        var total = mapper.countLatest(params);
+        var records = mapper.selectLatestPage(params, pageSize, offset).stream().map(converter::toVO).toList();
+        var result = new Page<NotificationTemplateVO>(pageNum, pageSize, total);
+        result.setRecords(records);
+        return result;
     }
 
     @Override
     public IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params) {
         page.requireUnsorted();
-        var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
-                .isNull(NotificationTemplateEntity::getDeleted)
-                .orderByDesc(NotificationTemplateEntity::getUpdatedAt)
-                .orderByDesc(NotificationTemplateEntity::getVersionNo);
         if (params != null) {
-            query.like(StringUtils.hasText(params.getTemplateGroupCode()),
-                    NotificationTemplateEntity::getTemplateGroupCode, params.getTemplateGroupCode())
-                    .eq(StringUtils.hasText(params.getChannel()), NotificationTemplateEntity::getChannel, params.getChannel())
-                    .eq(StringUtils.hasText(params.getPurpose()), NotificationTemplateEntity::getPurpose, params.getPurpose())
-                    .eq(StringUtils.hasText(params.getState()), NotificationTemplateEntity::getState, params.getState());
             validateState(params.getState());
         }
+        long pageSize = page.getPageSize() == null ? 15L : Math.max(1L, page.getPageSize());
+        long pageNum = page.getPageNum() == null ? 1L : Math.max(1L, page.getPageNum());
+        long offset = Math.max(0L, (pageNum - 1) * pageSize);
+        var total = mapper.countGroupPageCodes(params);
+        var codes = mapper.selectGroupPageCodes(params, pageSize, offset);
         var groups = new LinkedHashMap<String, NotificationTemplateGroupVO>();
-        mapper.selectList(query).forEach(entity -> appendGroupVersion(groups, entity));
-        var records = new ArrayList<>(groups.values());
-        records.sort(Comparator.comparing(NotificationTemplateGroupVO::getUpdatedAt,
-                Comparator.nullsLast(Comparator.naturalOrder())).reversed());
-
-        var pageSize = page.getPageSize() == null ? 15L : Math.max(1L, page.getPageSize());
-        var pageNum = page.getPageNum() == null ? 1L : Math.max(1L, page.getPageNum());
-        var offset = Math.max(0L, (pageNum - 1) * pageSize);
-        var fromIndex = Math.toIntExact(Math.min(offset, records.size()));
-        var toIndex = Math.toIntExact(Math.min(offset + pageSize, records.size()));
-        var result = new Page<NotificationTemplateGroupVO>(pageNum, pageSize, records.size());
-        result.setRecords(records.subList(fromIndex, toIndex));
+        if (!codes.isEmpty()) {
+            mapper.selectRowsByGroupCodes(codes, params).forEach(entity -> appendGroupVersion(groups, entity));
+        }
+        var result = new Page<NotificationTemplateGroupVO>(pageNum, pageSize, total);
+        result.setRecords(new ArrayList<>(groups.values()));
         return result;
     }
 
@@ -273,11 +243,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     @Override
     public List<NotificationTemplateVO> versions(UUID id) {
         var source = getTemplate(id);
-        return mapper.selectList(new LambdaQueryWrapper<NotificationTemplateEntity>()
-                .eq(NotificationTemplateEntity::getTemplateGroupCode, source.getTemplateGroupCode())
-                .eq(NotificationTemplateEntity::getChannel, source.getChannel())
-                .isNull(NotificationTemplateEntity::getDeleted)
-                .orderByDesc(NotificationTemplateEntity::getVersionNo))
+        return mapper.selectVersions(source.getTemplateGroupCode(), source.getChannel(), MAX_VERSION_HISTORY)
                 .stream()
                 .map(converter::toVO)
                 .toList();
@@ -432,31 +398,6 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             throw new DataNotExistException("通知模板不存在");
         }
         return entity;
-    }
-
-    /**
-     * 生成模板组和渠道的稳定键。
-     */
-    private String templateKey(NotificationTemplateEntity entity) {
-        return entity.getTemplateGroupCode() + "\u0000" + entity.getChannel();
-    }
-
-    /**
-     * 按模板展示规则选择候选版本：已发布版本优先，同一状态下版本号高的优先。
-     */
-    private boolean isPreferred(NotificationTemplateEntity candidate, NotificationTemplateEntity current) {
-        var candidatePublished = PUBLISHED.equals(candidate.getState());
-        var currentPublished = PUBLISHED.equals(current.getState());
-        if (candidatePublished != currentPublished) {
-            return candidatePublished;
-        }
-        var candidateVersion = candidate.getVersionNo() == null ? 0 : candidate.getVersionNo();
-        var currentVersion = current.getVersionNo() == null ? 0 : current.getVersionNo();
-        if (candidateVersion != currentVersion) {
-            return candidateVersion > currentVersion;
-        }
-        return candidate.getUpdatedAt() != null
-                && (current.getUpdatedAt() == null || candidate.getUpdatedAt().isAfter(current.getUpdatedAt()));
     }
 
     /**

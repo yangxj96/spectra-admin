@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.secret.migration;
 
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 
 import java.util.List;
 import java.util.Map;
@@ -33,9 +33,9 @@ public final class BusinessSecretMigrationCommand {
     private static final List<String> CODES = List.of(
             "notification.provider.sms.secret", "notification.provider.email.secret");
 
-    private final SecretManagementService service;
+    private final SecretProvisioningService service;
 
-    public BusinessSecretMigrationCommand(SecretManagementService service) {
+    public BusinessSecretMigrationCommand(SecretProvisioningService service) {
         this.service = service;
     }
 

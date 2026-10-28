@@ -18,6 +18,7 @@ package com.devops00.spectra.core.notification.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
+import com.devops00.spectra.core.notification.javabean.from.NotificationTemplatePageFrom;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -48,4 +49,23 @@ public interface NotificationTemplateMapper extends BaseMapper<NotificationTempl
                                                               @Param("purpose") String purpose,
                                                               @Param("channels") List<String> channels,
                                                               @Param("templateVersionIds") List<UUID> templateVersionIds);
+
+    List<NotificationTemplateEntity> selectLatestPage(@Param("filter") NotificationTemplatePageFrom filter,
+                                                      @Param("limit") long limit,
+                                                      @Param("offset") long offset);
+
+    long countLatest(@Param("filter") NotificationTemplatePageFrom filter);
+
+    List<String> selectGroupPageCodes(@Param("filter") NotificationTemplatePageFrom filter,
+                                      @Param("limit") long limit,
+                                      @Param("offset") long offset);
+
+    long countGroupPageCodes(@Param("filter") NotificationTemplatePageFrom filter);
+
+    List<NotificationTemplateEntity> selectRowsByGroupCodes(@Param("codes") List<String> codes,
+                                                            @Param("filter") NotificationTemplatePageFrom filter);
+
+    List<NotificationTemplateEntity> selectVersions(@Param("groupCode") String groupCode,
+                                                    @Param("channel") String channel,
+                                                    @Param("limit") int limit);
 }

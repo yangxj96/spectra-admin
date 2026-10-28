@@ -34,6 +34,7 @@ import com.devops00.spectra.core.upload.mapper.FileUploadPartMapper;
 import com.devops00.spectra.core.upload.mapper.FileUploadSessionMapper;
 import com.devops00.spectra.core.upload.properties.FileUploadProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -63,6 +64,7 @@ public class FileUploadAdminService {
 
     /** 分页查询上传任务，不返回存储容器、对象键或供应商上传 ID。 */
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileUploadAdminVO> page(Page<FileUploadSession> page, FileUploadAdminPageRequest request) {
         var query = new LambdaQueryWrapper<FileUploadSession>()
                 .like(request != null && StringUtils.hasText(request.getOriginalName()),
@@ -81,6 +83,7 @@ public class FileUploadAdminService {
 
     /** 查询上传任务及其分片状态。 */
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public FileUploadAdminDetailVO detail(UUID uploadId) {
         FileUploadSession session = requireSession(uploadId);
         var detail = fileUploadConverter.toUploadAdminDetailVO(session);
@@ -90,6 +93,7 @@ public class FileUploadAdminService {
 
     /** 管理员取消任务；状态变更后由统一清理任务负责外部存储清理。 */
     @Transactional
+    @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public void cancel(UUID uploadId, FileAdminOperationFrom operation) {
         FileUploadSession session = sessionMapper.selectForUpdate(uploadId);
         if (session == null) {

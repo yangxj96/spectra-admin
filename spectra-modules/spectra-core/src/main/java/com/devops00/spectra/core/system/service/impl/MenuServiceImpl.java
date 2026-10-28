@@ -19,18 +19,16 @@ package com.devops00.spectra.core.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.common.constant.Common;
+import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.foundation.collection.CollUtils;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.common.foundation.tree.TreeBuilder;
-import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRoleMenu;
-import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
-import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
-import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
-import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.core.security.authorization.service.SecurityMenuGrantQuery;
+import com.devops00.spectra.core.security.authorization.service.SecurityRoleMenuStore;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
@@ -68,18 +66,19 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
-    private final SecurityRoleMapper securityRoleMapper;
+    private final SecurityMenuGrantQuery securityMenuGrantQuery;
 
-    private final SecurityRoleMenuMapper securityRoleMenuMapper;
+    private final SecurityRoleMenuStore securityRoleMenuStore;
 
     public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter,
                            AuthorizationSnapshotProvider authorizationSnapshotProvider,
-                           SecurityRoleMapper securityRoleMapper, SecurityRoleMenuMapper securityRoleMenuMapper) {
+                           SecurityMenuGrantQuery securityMenuGrantQuery,
+                           SecurityRoleMenuStore securityRoleMenuStore) {
         this.menuMapper = menuMapper;
         this.menuConverter = menuConverter;
         this.authorizationSnapshotProvider = authorizationSnapshotProvider;
-        this.securityRoleMapper = securityRoleMapper;
-        this.securityRoleMenuMapper = securityRoleMenuMapper;
+        this.securityMenuGrantQuery = securityMenuGrantQuery;
+        this.securityRoleMenuStore = securityRoleMenuStore;
     }
 
     @Override
@@ -131,7 +130,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             if (parentId.equals(params.getId()) || !visited.add(parentId)) {
                 throw new DataException("上级菜单不能是自身或后代");
             }
-            var parent = getActiveMenu(parentId);
+            var parent = getActiveMenuForUpdate(parentId);
             if (parent == null) {
                 throw new DataNotExistException("上级菜单不存在");
             }
@@ -182,19 +181,11 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             return Collections.emptyList();
         }
 
-        var roles = securityRoleMapper.selectList(new QueryWrapper<SecurityRole>()
-                .select("id", "code")
-                .in("code", roleCodes)
-                .eq("state", SecurityAuthorizationState.ACTIVE.name()));
-        if (CollUtils.isEmpty(roles)) {
+        var menuIds = securityMenuGrantQuery.findActiveMenuIdsByRoleCodes(roleCodes);
+        if (CollUtils.isEmpty(menuIds)) {
             return Collections.emptyList();
         }
-        var roleIds = roles.stream().map(role -> role.getId()).toList();
-        var relations = securityRoleMenuMapper.selectList(new QueryWrapper<SecurityRoleMenu>().in("role_id", roleIds));
-        if (CollUtils.isEmpty(relations)) {
-            return Collections.emptyList();
-        }
-        return buildCurrentTree(relations.stream().map(SecurityRoleMenu::getMenuId).collect(Collectors.toSet()));
+        return buildCurrentTree(new HashSet<>(menuIds));
     }
 
     /**
@@ -252,24 +243,32 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     @Override
     public List<Menu> getByRelRoleId(UUID id) {
-        var relRoleMenus = securityRoleMenuMapper.selectList(new QueryWrapper<SecurityRoleMenu>().eq("role_id", id));
-        if (CollUtils.isEmpty(relRoleMenus)) {
+        var menuIds = securityMenuGrantQuery.findMenuIdsByRoleId(id);
+        if (CollUtils.isEmpty(menuIds)) {
             return Collections.emptyList();
         }
         return menuMapper
-                .selectList(new QueryWrapper<Menu>().in("id", relRoleMenus.stream().map(SecurityRoleMenu::getMenuId).toList()).isNull("deleted"))
+                .selectList(new QueryWrapper<Menu>().in("id", menuIds).isNull("deleted"))
                 .stream()
                 .filter(menu -> menu.getMenuType() == MenuType.MENU)
                 .toList();
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
-        var menu = getActiveMenu(id);
+        var menu = getActiveMenuForUpdate(id);
         if (menu == null) {
             throw new DataNotExistException("[" + id + "]不存在");
         }
-        this.removeById(menu);
+        var childCount = menuMapper.selectCount(new QueryWrapper<Menu>().eq("pid", id).isNull("deleted"));
+        if (childCount > 0) {
+            throw new BusinessConflictException("菜单存在活动子节点，无法删除");
+        }
+        securityRoleMenuStore.deleteByMenuId(id);
+        if (!removeById(menu)) {
+            throw new DataException("删除菜单失败");
+        }
     }
 
     /**
@@ -277,5 +276,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
      */
     private @Nullable Menu getActiveMenu(UUID id) {
         return menuMapper.selectOne(new QueryWrapper<Menu>().eq("id", id).isNull("deleted"));
+    }
+
+    private @Nullable Menu getActiveMenuForUpdate(UUID id) {
+        return menuMapper.selectOne(new QueryWrapper<Menu>().eq("id", id).isNull("deleted").last("FOR UPDATE"));
     }
 }

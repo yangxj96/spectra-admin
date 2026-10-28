@@ -26,6 +26,7 @@ import com.devops00.spectra.core.security.authorization.javabean.from.Department
 import com.devops00.spectra.core.security.authorization.javabean.from.DepartmentRestructureDepartmentFrom;
 import com.devops00.spectra.core.security.authorization.service.DepartmentAuthorizationReferenceImpact;
 import com.devops00.spectra.core.security.authorization.service.DepartmentAuthorizationReferenceService;
+import com.devops00.spectra.core.security.authorization.service.OrganizationChangeAuthorization;
 import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.core.security.change.AuthorizationEpochGuard;
 import com.devops00.spectra.core.security.change.AuthorizationChangeToken;
@@ -149,7 +150,7 @@ class DepartmentRestructureServiceImplTest {
                 mock(UserDepartmentMembershipMapper.class), tokenService, securityContextAccessor,
                 mock(SecurityChangeExecutor.class), mock(AuthorizationEpochGuard.class),
                 mock(SecuritySessionRevocationPort.class), mock(ObjectProvider.class), mock(AuditService.class),
-                mock(AuditRecordFactory.class), mock(TimeMapper.class));
+                mock(AuditRecordFactory.class), mock(TimeMapper.class), mock(OrganizationChangeAuthorization.class));
         var from = new DepartmentMergePreviewFrom();
         from.setSourceDepartmentIds(List.of(secondId, firstId));
         from.setExpectedOrganizationVersion(11L);
@@ -214,7 +215,7 @@ class DepartmentRestructureServiceImplTest {
                 mock(UserDepartmentMembershipMapper.class), tokenService,
                 securityContextAccessor, mock(SecurityChangeExecutor.class), mock(AuthorizationEpochGuard.class),
                 mock(SecuritySessionRevocationPort.class), mock(ObjectProvider.class), mock(AuditService.class),
-                mock(AuditRecordFactory.class), mock(TimeMapper.class));
+                mock(AuditRecordFactory.class), mock(TimeMapper.class), mock(OrganizationChangeAuthorization.class));
     }
 
     private Department department(UUID id, UUID parentId) {

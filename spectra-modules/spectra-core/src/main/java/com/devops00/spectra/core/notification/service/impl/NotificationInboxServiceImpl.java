@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -175,10 +176,25 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         if (ids == null || ids.isEmpty()) {
             return;
         }
-        mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().in(NotificationInboxEntity::getId, ids)
+        var targetIds = ids.stream().filter(Objects::nonNull).distinct().toList();
+        if (targetIds.isEmpty()) {
+            return;
+        }
+        var ownedCount = mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>()
+                .in(NotificationInboxEntity::getId, targetIds)
+                .eq(NotificationInboxEntity::getReceiverUserId, userId)
+                .isNull(NotificationInboxEntity::getDeleted));
+        if (ownedCount != targetIds.size()) {
+            throw new DataNotExistException("消息不存在");
+        }
+        var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>()
+                .in(NotificationInboxEntity::getId, targetIds)
                 .eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .set(NotificationInboxEntity::getDeleted, Instant.now()));
+        if (updated != targetIds.size()) {
+            throw new DataSaveException("批量删除消息失败");
+        }
     }
 
     /**

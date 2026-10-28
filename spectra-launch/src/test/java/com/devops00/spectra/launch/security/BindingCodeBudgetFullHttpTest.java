@@ -20,7 +20,7 @@ import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.notification.dispatch.NotificationTaskWorker;
 import com.devops00.spectra.core.notification.javabean.from.NotificationProviderSaveFrom;
@@ -88,7 +88,7 @@ class BindingCodeBudgetFullHttpTest {
             var providers = application.getBean(NotificationProviderAdminService.class);
             var providerRuntime = application.getBean(NotificationProviderRuntime.class);
             var worker = application.getBean(NotificationTaskWorker.class);
-            var secretManagement = application.getBean(SecretManagementService.class);
+            var secretManagement = application.getBean(SecretProvisioningService.class);
             var fixture = new Fixture(application);
             TestUser user = TestUser.create();
             String failedEmail = uniqueEmail();
@@ -166,7 +166,7 @@ class BindingCodeBudgetFullHttpTest {
             var redis = securityRedisTemplate(application);
             var providers = application.getBean(NotificationProviderAdminService.class);
             var providerRuntime = application.getBean(NotificationProviderRuntime.class);
-            var secretManagement = application.getBean(SecretManagementService.class);
+            var secretManagement = application.getBean(SecretProvisioningService.class);
             var schedulerLifecycle = application.getBean(QuartzSchedulerLifecycle.class);
             var scheduler = schedulerLifecycle.scheduler();
             var jobKey = new JobKey("notification.task-worker", "SPECTRA_BUILTIN");
@@ -338,7 +338,7 @@ class BindingCodeBudgetFullHttpTest {
             var jdbc = new JdbcTemplate(application.getBean(DataSource.class));
             var codes = application.getBean(SecurityVerificationCodeStore.class);
             var secrets = application.getBean(SecretRuntimeService.class);
-            var secretManagement = application.getBean(SecretManagementService.class);
+            var secretManagement = application.getBean(SecretProvisioningService.class);
             var properties = application.getBean(SecurityProperties.class);
             var redis = securityRedisTemplate(application);
             var fixture = new Fixture(application);

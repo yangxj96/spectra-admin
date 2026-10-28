@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.secret.service;
 
 import com.devops00.spectra.core.security.secret.javabean.entity.SecretDefinitionEntity;
 import com.devops00.spectra.core.security.secret.javabean.entity.SecretVersionEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,65 +34,22 @@ public interface SecretManagementService {
 
     /**
      * 定义活动状态密钥相关的应用服务契约。
-     *
-     * @param code        业务对象的唯一编码
-     * @param category    业务类别
-     * @param version     当前对象或配置的版本号
-     * @param fingerprint 密钥材料的指纹值
-     * @param value       配置项或密钥对应的实际值
-     * @author yangxj96
-     * @version 1.0
-     * @since 2026/09/13
      */
     record ActiveSecret(String code, String category, int version, String fingerprint, String value) {
     }
 
-    /**
-     * 查询全部已注册密钥定义。
-     *
-     * @return 按定义编码排序的密钥定义元数据列表，不包含任何密文载荷。
-     */
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     List<SecretDefinitionEntity> listDefinitions();
 
-    /**
-     * 查询指定密钥的版本元数据。
-     *
-     * @param code 已注册密钥编码。
-     * @return 按版本号倒序排列的版本元数据列表，不包含任何密文载荷。
-     */
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     List<SecretVersionEntity> listVersions(String code);
 
-    /**
-     * 查询可导出的当前 ACTIVE 版本；category 为空表示全部分类。
-     *
-     * @param category 密钥分类；为空时查询全部可导出分类。
-     * @return 当前 ACTIVE 版本的受控内部记录，仅供加密传输服务使用。
-     */
-    List<ActiveSecret> currentActiveSecrets(String category);
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    SecretVersionEntity createPendingAsAdmin(String code, String plaintext, String source);
 
-    /**
-     * 创建待启用密钥版本；不会把明文放入返回对象。
-     *
-     * @param code      已注册密钥编码。
-     * @param plaintext 待加密保存的密钥明文。
-     * @param source    版本来源，例如 MANUAL、IMPORT、MIGRATION 或 GENERATED。
-     * @return 新创建的待启用版本元数据，不包含明文。
-     */
-    SecretVersionEntity createPending(String code, String plaintext, String source);
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    void publishAsAdmin(String code, UUID versionId);
 
-    /**
-     * 校验版本属于路径中的密钥编码后发布，并在同一事务中退役原 ACTIVE 版本。
-     *
-     * @param code      路径中的已注册密钥编码。
-     * @param versionId 要发布的密钥版本 ID。
-     */
-    void publish(String code, UUID versionId);
-
-    /**
-     * 校验版本属于路径中的密钥编码后退役，不删除历史元数据。
-     *
-     * @param code      路径中的已注册密钥编码。
-     * @param versionId 要退役的密钥版本 ID。
-     */
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     void retire(String code, UUID versionId);
 }

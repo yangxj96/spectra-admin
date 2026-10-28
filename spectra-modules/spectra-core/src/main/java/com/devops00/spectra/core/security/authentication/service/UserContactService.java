@@ -80,4 +80,13 @@ public interface UserContactService {
      * @param contactType 联系方式类型，用于选择手机号或邮箱校验规则。
      */
     void revokeByUserIdAndType(UUID userId, String contactType);
+
+    /**
+     * 撤销用户指定类型且值匹配的当前有效联系方式。
+     *
+     * @param userId      目标用户的唯一标识，用于限定查询或变更范围。
+     * @param contactType 联系方式类型，用于选择手机号或邮箱校验规则。
+     * @param value       待匹配的联系方式值。
+     */
+    void revokeByUserIdAndTypeAndValue(UUID userId, String contactType, String value);
 }

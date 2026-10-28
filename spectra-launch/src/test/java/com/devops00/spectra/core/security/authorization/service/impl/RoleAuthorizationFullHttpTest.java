@@ -787,6 +787,9 @@ class RoleAuthorizationFullHttpTest {
             jdbc.update("INSERT INTO spectra_security.sec_assignment_permission_boundary "
                     + "(assignment_id, permission_id, scope_id) VALUES (?, ?, ?)",
                     assignmentId, permissionId, scopeId);
+            jdbc.update("INSERT INTO spectra_security.sec_assignment_grant_boundary "
+                    + "(assignment_id, permission_id, scope_id) VALUES (?, ?, ?)",
+                    assignmentId, permissionId, scopeId);
         }
 
         private long organizationVersion() {
@@ -894,15 +897,21 @@ class RoleAuthorizationFullHttpTest {
                         + "OR descendant_id IN (?, ?)", sourceDepartmentA, sourceDepartmentB,
                         sourceDepartmentA, sourceDepartmentB);
                 if (splitDepartment != null) {
+                    jdbc.update("DELETE FROM spectra_security.sec_scope_rule WHERE department_id = ?",
+                            splitDepartment);
                     jdbc.update("DELETE FROM spectra_core.sys_department_closure WHERE ancestor_id = ? "
                             + "OR descendant_id = ?", splitDepartment, splitDepartment);
                     jdbc.update("DELETE FROM spectra_core.sys_department WHERE id = ?", splitDepartment);
                 }
                 if (mergedDepartment != null) {
+                    jdbc.update("DELETE FROM spectra_security.sec_scope_rule WHERE department_id = ?",
+                            mergedDepartment);
                     jdbc.update("DELETE FROM spectra_core.sys_department_closure WHERE ancestor_id = ? "
                             + "OR descendant_id = ?", mergedDepartment, mergedDepartment);
                     jdbc.update("DELETE FROM spectra_core.sys_department WHERE id = ?", mergedDepartment);
                 }
+                jdbc.update("DELETE FROM spectra_security.sec_scope_rule WHERE department_id IN (?, ?)",
+                        sourceDepartmentA, sourceDepartmentB);
                 jdbc.update("DELETE FROM spectra_core.sys_department WHERE id IN (?, ?)",
                         sourceDepartmentA, sourceDepartmentB);
                 jdbc.update("DELETE FROM spectra_core.sys_region WHERE id = ?", region);
@@ -913,7 +922,7 @@ class RoleAuthorizationFullHttpTest {
                 jdbc.update("DELETE FROM spectra_security.sec_scope_rule WHERE scope_id = ?", departmentRuleScope);
             }
             jdbc.update("DELETE FROM spectra_security.sec_assignment_grant_boundary "
-                    + "WHERE assignment_id = ?", targetAssignment);
+                    + "WHERE assignment_id IN (?, ?)", operatorAssignment, targetAssignment);
             jdbc.update("DELETE FROM spectra_security.sec_authorization_scope WHERE id IN (?, ?, ?, ?, ?, ?)",
                     operatorReadScope, operatorGrantScope, targetReadScope, targetGrantScope,
                     targetReadGrantScope, targetGrantGrantScope);

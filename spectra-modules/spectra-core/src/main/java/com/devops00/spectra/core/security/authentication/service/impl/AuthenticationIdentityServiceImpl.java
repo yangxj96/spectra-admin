@@ -197,6 +197,24 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
     }
 
+    @Override
+    @Transactional
+    public void revokeOtherActiveByUserIdAndMethod(UUID userId, String methodCode, UUID keepIdentityId) {
+        var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
+        var identities = mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
+                .eq(AuthenticationIdentity::getUserId, userId)
+                .eq(AuthenticationIdentity::getMethodCode, methodCode)
+                .eq(AuthenticationIdentity::getState, STATE_ACTIVE)
+                .ne(keepIdentityId != null, AuthenticationIdentity::getId, keepIdentityId));
+        for (AuthenticationIdentity identity : identities) {
+            identity.setState(STATE_REVOKED);
+            if (mapper.updateById(identity) != 1) {
+                throw new EntityUpdateException("撤销认证身份失败");
+            }
+        }
+        lastEffectiveDevOpsGuard.assertWithinLimits(rootBefore);
+    }
+
     /**
      * 查询或获取目标数据（{@code findByUserId}）。
      */

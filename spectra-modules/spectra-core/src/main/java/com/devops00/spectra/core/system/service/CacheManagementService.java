@@ -29,6 +29,7 @@ import com.devops00.spectra.core.system.javabean.vo.CacheMonitorOverviewVO;
 import com.devops00.spectra.core.system.javabean.vo.CacheOperationVO;
 import com.devops00.spectra.core.system.javabean.vo.CacheRegionVO;
 import com.devops00.spectra.core.system.javabean.vo.SecurityRuntimeVO;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -85,6 +86,7 @@ public interface CacheManagementService {
      * @param from 普通缓存区域、实例范围、理由和确认信息。
      * @return 返回本实例清理结果及普通 Redis 广播接受状态。
      */
+    @PreAuthorize("hasPermission(null, 'system:cache:clear')")
     CacheOperationVO clearBusiness(CacheBusinessClearFrom from);
 
     /**
@@ -141,5 +143,6 @@ public interface CacheManagementService {
      * @param from 操作理由和固定确认短语。
      * @return 返回全局 cutoff 和旧 nonce 记录清理结果。
      */
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     CacheOperationVO invalidateAllNonces(SecurityNonceGlobalInvalidateFrom from);
 }

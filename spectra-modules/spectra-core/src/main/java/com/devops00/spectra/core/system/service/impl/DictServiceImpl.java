@@ -99,13 +99,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void modifyGroup(DictGroupFrom params) {
-        var group = groupService.getById(params.getId());
-        if (group == null) {
-            throw new DataNotExistException("字典组不存在");
-        }
-        if (group.getBuiltin()) {
-            throw new BuiltinDataException("内置字典,无法修改");
-        }
+        var group = requireEditableGroup(params.getId());
         if (params.getVersion() == null || !params.getVersion().equals(group.getVersion())) {
             throw new EntityUpdateException("字典组已被其他操作修改，请刷新后重新处理");
         }

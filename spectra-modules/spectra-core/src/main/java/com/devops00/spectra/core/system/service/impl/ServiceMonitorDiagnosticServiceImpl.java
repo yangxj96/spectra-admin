@@ -36,6 +36,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -340,6 +341,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
 
     @Override
     @Transactional
+    @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
     public ServiceMonitorDiagnosticTaskVO createTask(ServiceMonitorDiagnosticFrom from) {
         var type = validateTaskRequest(from);
         taskMapper.acquireAdmissionLock();

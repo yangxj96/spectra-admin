@@ -36,6 +36,7 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.DepartmentRe
 import com.devops00.spectra.core.security.authorization.service.DepartmentAuthorizationReferenceImpact;
 import com.devops00.spectra.core.security.authorization.service.DepartmentAuthorizationReferenceService;
 import com.devops00.spectra.core.security.authorization.service.DepartmentRestructureService;
+import com.devops00.spectra.core.security.authorization.service.OrganizationChangeAuthorization;
 import com.devops00.spectra.core.security.change.AuthorizationChangeToken;
 import com.devops00.spectra.core.security.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.core.security.change.AuthorizationEpochGuard;
@@ -102,6 +103,7 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
     private final AuditService auditService;
     private final AuditRecordFactory auditRecordFactory;
     private final TimeMapper timeMapper;
+    private final OrganizationChangeAuthorization organizationChangeAuthorization;
 
     @SuppressWarnings("PMD.ExcessiveParameterList") // EX-B02-PMD-010: 部门重构协作者逐项注入。
     public DepartmentRestructureServiceImpl(DepartmentMapper departmentMapper,
@@ -120,7 +122,8 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
                                             ObjectProvider<HighRiskApprovalGate> approvalGateProvider,
                                             AuditService auditService,
                                             AuditRecordFactory auditRecordFactory,
-                                            TimeMapper timeMapper) {
+                                            TimeMapper timeMapper,
+                                            OrganizationChangeAuthorization organizationChangeAuthorization) {
         this.departmentMapper = departmentMapper;
         this.departmentClosureMapper = departmentClosureMapper;
         this.organizationVersionMapper = organizationVersionMapper;
@@ -138,6 +141,7 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
         this.auditService = auditService;
         this.auditRecordFactory = auditRecordFactory;
         this.timeMapper = timeMapper;
+        this.organizationChangeAuthorization = organizationChangeAuthorization;
     }
 
     @Override
@@ -218,6 +222,12 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
             throw new DataException("只能合并同一父部门下的同级部门");
         }
         validateActiveParent(parentId);
+        var scopeIds = new ArrayList<UUID>(sourceIds);
+        if (parentId != null) {
+            scopeIds.add(parentId);
+        }
+        organizationChangeAuthorization.evaluate(operatorId, List.of("department:create", "department:update"),
+                scopeIds);
         var requestDepartment = departmentFrom(from.getDepartment(), parentId);
         var businessHash = requestHash(Operation.MERGE, sourceIds, List.of(), requestDepartment,
                 from.getExpectedOrganizationVersion());
@@ -259,6 +269,13 @@ public class DepartmentRestructureServiceImpl implements DepartmentRestructureSe
                 .findFirst()
                 .orElseThrow(() -> new DataNotExistException("源部门不存在或已删除"));
         validateActiveParent(source.getPid());
+        var scopeIds = new ArrayList<UUID>();
+        scopeIds.add(source.getId());
+        if (source.getPid() != null) {
+            scopeIds.add(source.getPid());
+        }
+        organizationChangeAuthorization.evaluate(operatorId, List.of("department:create", "department:update"),
+                scopeIds);
         var requestedDepartment = departmentFrom(from.getDepartment(), source.getPid());
         var businessHash = requestHash(Operation.SPLIT, List.of(source.getId()), selectedUserIds,
                 requestedDepartment, from.getExpectedOrganizationVersion());

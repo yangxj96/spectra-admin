@@ -62,10 +62,10 @@ public class SecretTransferService {
     /** 生成密钥传输包盐值、随机数和一次性口令时使用的安全随机源。 */
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final SecretManagementService managementService;
+    private final SecretProvisioningService managementService;
     private final ObjectMapper objectMapper;
 
-    public SecretTransferService(SecretManagementService managementService,
+    public SecretTransferService(SecretProvisioningService managementService,
                                  ObjectMapper objectMapper) {
         this.managementService = managementService;
         this.objectMapper = objectMapper;

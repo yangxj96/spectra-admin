@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.secret.migration;
 
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +34,9 @@ public final class SecuritySecretMigrationCommand {
             "security.verification-code-hmac", "security.authorization-change-token-hmac",
             "security.request-integrity-hmac", "security.csrf-signing-key");
 
-    private final SecretManagementService service;
+    private final SecretProvisioningService service;
 
-    public SecuritySecretMigrationCommand(SecretManagementService service) {
+    public SecuritySecretMigrationCommand(SecretProvisioningService service) {
         this.service = service;
     }
 

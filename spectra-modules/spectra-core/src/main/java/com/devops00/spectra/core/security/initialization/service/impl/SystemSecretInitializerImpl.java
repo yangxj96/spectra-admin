@@ -18,7 +18,7 @@ package com.devops00.spectra.core.security.initialization.service.impl;
 
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.security.initialization.service.SystemSecretInitializer;
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
@@ -53,7 +53,7 @@ public class SystemSecretInitializerImpl implements SystemSecretInitializer {
             "security.verification-code-hmac", "security.authorization-change-token-hmac",
             "security.request-integrity-hmac", "security.csrf-signing-key");
 
-    private final SecretManagementService secretManagementService;
+    private final SecretProvisioningService secretManagementService;
     private final SecretRuntimeService secretRuntimeService;
     private final ConfiguredService configuredService;
 

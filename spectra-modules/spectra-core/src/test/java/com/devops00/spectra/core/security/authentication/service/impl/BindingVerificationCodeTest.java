@@ -20,6 +20,7 @@ import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
+import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
@@ -131,6 +132,9 @@ class BindingVerificationCodeTest {
         when(secrets.requireActiveValue("security.verification-code-hmac")).thenReturn(SECRET);
         when(codes.consumeWithinAttemptBudget(anyString(), anyString(), anyString(), eq(5)))
                 .thenReturn(SecurityVerificationCodeStore.VerificationResult.MATCHED);
+        var identity = new AuthenticationIdentity();
+        identity.setId(UUID.randomUUID());
+        when(identities.createIdentity(userId, "EMAIL", address)).thenReturn(identity);
 
         bindingService().bindEmail(userId, address, code);
 

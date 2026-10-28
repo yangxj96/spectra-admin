@@ -22,8 +22,7 @@ import com.devops00.spectra.core.system.javabean.from.SecurityVerificationType;
 import com.devops00.spectra.core.system.javabean.vo.SecurityUserCandidateVO;
 import com.devops00.spectra.core.system.javabean.vo.SecurityVerificationCandidateVO;
 import com.devops00.spectra.core.system.service.SecurityTargetCandidateService;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.user.service.UserDirectoryReadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,16 +46,16 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
     private static final int CANDIDATE_LIMIT = 20;
     private static final int MAX_KEYWORD_LENGTH = 64;
 
-    private final UserService userService;
+    private final UserDirectoryReadService userDirectoryReadService;
     private final UserContactService contactService;
 
     @Override
     public List<SecurityUserCandidateVO> searchUserCandidates(String keyword) {
         String normalizedKeyword = normalizeKeyword(keyword);
-        return userService.searchSecurityCandidates(normalizedKeyword, CANDIDATE_LIMIT)
+        return userDirectoryReadService.searchSecurityCandidates(normalizedKeyword, CANDIDATE_LIMIT)
                 .stream()
                 .map(user -> new SecurityUserCandidateVO(
-                        user.getId(), user.getUsername(), user.getRealName(), user.getEmployeeNo()))
+                        user.id(), user.username(), user.realName(), user.employeeNo()))
                 .toList();
     }
 
@@ -73,9 +72,10 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
             return List.of();
         }
         List<UUID> userIds = contacts.stream().map(UserContact::getUserId).filter(id -> id != null).distinct().toList();
-        Map<UUID, User> users = userService.listByIds(userIds)
+        Map<UUID, UserDirectoryReadService.UserDirectoryRow> users = userDirectoryReadService.findByIds(userIds)
                 .stream()
-                .collect(Collectors.toMap(User::getId, Function.identity(), (first, ignored) -> first));
+                .collect(Collectors.toMap(UserDirectoryReadService.UserDirectoryRow::id, Function.identity(),
+                        (first, ignored) -> first));
         return contacts.stream()
                 .map(contact -> toVerificationCandidate(contact, users.get(contact.getUserId())))
                 .filter(candidate -> candidate != null)
@@ -85,7 +85,8 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
     /**
      * 转换候选项。
      */
-    private static SecurityVerificationCandidateVO toVerificationCandidate(UserContact contact, User user) {
+    private static SecurityVerificationCandidateVO toVerificationCandidate(UserContact contact,
+                                                                           UserDirectoryReadService.UserDirectoryRow user) {
         if (user == null
                 || contact.getUserId() == null
                 || contact.getContactValue() == null
@@ -93,8 +94,8 @@ public class SecurityTargetCandidateServiceImpl implements SecurityTargetCandida
             return null;
         }
         String target = contact.getContactValue();
-        return new SecurityVerificationCandidateVO(target, maskTarget(contact.getContactType(), target), user.getId(),
-                user.getUsername(), user.getRealName(), user.getEmployeeNo());
+        return new SecurityVerificationCandidateVO(target, maskTarget(contact.getContactType(), target), user.id(),
+                user.username(), user.realName(), user.employeeNo());
     }
 
     /**

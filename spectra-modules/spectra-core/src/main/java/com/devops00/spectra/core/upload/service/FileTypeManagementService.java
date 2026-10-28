@@ -29,6 +29,7 @@ import com.devops00.spectra.core.upload.javabean.vo.FileTypePolicyVO;
 import com.devops00.spectra.core.upload.mapper.FileTypeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -55,6 +56,7 @@ public class FileTypeManagementService extends BaseServiceImpl<FileTypeMapper, F
 
     /** 查询全部未删除策略，包含停用策略。 */
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public IPage<FileTypePolicyVO> page(Page<FileType> page) {
         var query = new LambdaQueryWrapper<FileType>()
                 .orderByAsc(FileType::getCode);
@@ -63,12 +65,14 @@ public class FileTypeManagementService extends BaseServiceImpl<FileTypeMapper, F
 
     /** 查询单个策略。 */
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(null, 'file:admin:read')")
     public FileTypePolicyVO get(UUID id) {
         return fileUploadConverter.toTypePolicyVO(requirePolicy(id));
     }
 
     /** 新建策略。 */
     @Transactional
+    @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO create(FileTypePolicySaveFrom from) {
         validate(from);
         String code = normalizeCode(from.getCode());
@@ -86,6 +90,7 @@ public class FileTypeManagementService extends BaseServiceImpl<FileTypeMapper, F
 
     /** 修改策略。 */
     @Transactional
+    @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO modify(UUID id, FileTypePolicySaveFrom from) {
         validate(from);
         FileType entity = requirePolicy(id);
@@ -107,12 +112,14 @@ public class FileTypeManagementService extends BaseServiceImpl<FileTypeMapper, F
 
     /** 启用策略。 */
     @Transactional
+    @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO enable(UUID id) {
         return changeEnabled(id, true);
     }
 
     /** 停用策略。 */
     @Transactional
+    @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO disable(UUID id) {
         return changeEnabled(id, false);
     }

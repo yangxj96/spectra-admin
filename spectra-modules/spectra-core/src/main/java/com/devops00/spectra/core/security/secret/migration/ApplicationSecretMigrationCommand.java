@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.secret.migration;
 
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +34,9 @@ public final class ApplicationSecretMigrationCommand {
             "crypto.server.public-key", "crypto.server.private-key", "crypto.client.public-key",
             "crypto.client.private-key", "notification.address-encryption-key", "notification.sensitive-payload-key");
 
-    private final SecretManagementService service;
+    private final SecretProvisioningService service;
 
-    public ApplicationSecretMigrationCommand(SecretManagementService service) {
+    public ApplicationSecretMigrationCommand(SecretProvisioningService service) {
         this.service = service;
     }
 

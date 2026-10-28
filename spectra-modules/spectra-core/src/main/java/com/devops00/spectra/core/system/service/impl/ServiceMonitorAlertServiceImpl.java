@@ -24,10 +24,7 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
-import com.devops00.spectra.core.security.authorization.javabean.entity.RoleAssignment;
-import com.devops00.spectra.core.security.authorization.javabean.entity.SecurityRole;
-import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
-import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.authorization.service.DevOpsRecipientQuery;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertEvent;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertRule;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
@@ -44,12 +41,10 @@ import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertEventMapper;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorAlertRuleMapper;
 import com.devops00.spectra.core.system.service.ServiceMonitorAlertService;
 import com.devops00.spectra.core.system.service.ServiceMonitorRuleEvaluationResult;
-import com.devops00.spectra.core.user.javabean.constant.UserStatus;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,9 +76,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
 
     private final ServiceMonitorAlertRuleMapper ruleMapper;
     private final ServiceMonitorAlertEventMapper eventMapper;
-    private final SecurityRoleMapper securityRoleMapper;
-    private final RoleAssignmentMapper roleAssignmentMapper;
-    private final UserMapper userMapper;
+    private final DevOpsRecipientQuery devOpsRecipientQuery;
     private final TimeMapper timeMapper;
     private final NotificationService notificationService;
 
@@ -360,36 +353,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
             log.warn("服务监控告警通知不可用：告警事件尚未生成 ID");
             return false;
         }
-        var role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
-                .eq(SecurityRole::getCode, ROLE_DEV_OPS)
-                .eq(SecurityRole::getState, ACTIVE)
-                .isNull(SecurityRole::getDeleted));
-        if (role == null) {
-            return false;
-        }
-        var now = Instant.now();
-        var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
-                .eq(RoleAssignment::getRoleId, role.getId())
-                .eq(RoleAssignment::getState, ACTIVE)
-                .isNull(RoleAssignment::getDeleted)
-                .and(wrapper -> wrapper.isNull(RoleAssignment::getValidFrom)
-                        .or()
-                        .le(RoleAssignment::getValidFrom, now))
-                .and(wrapper -> wrapper.isNull(RoleAssignment::getValidUntil)
-                        .or()
-                        .gt(RoleAssignment::getValidUntil, now)));
-        var userIds = assignments.stream().map(RoleAssignment::getUserId).distinct().toList();
-        if (userIds.isEmpty()) {
-            return false;
-        }
-        var recipients = userMapper.selectList(new LambdaQueryWrapper<User>()
-                .select(User::getId)
-                .in(User::getId, userIds)
-                .eq(User::getStatus, UserStatus.ACTIVE)
-                .isNull(User::getDeleted))
-                .stream()
-                .map(User::getId)
-                .toList();
+        var recipients = devOpsRecipientQuery.findActiveUserIds();
         if (recipients.isEmpty()) {
             return false;
         }
@@ -417,6 +381,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
 
     @Override
     @Transactional
+    @PreAuthorize("hasPermission(null, 'system:monitor:configure')")
     public void modifyRule(UUID id, ServiceMonitorAlertRuleFrom from) {
         var rule = ruleMapper.selectOne(new LambdaQueryWrapper<ServiceMonitorAlertRule>()
                 .eq(ServiceMonitorAlertRule::getId, id)

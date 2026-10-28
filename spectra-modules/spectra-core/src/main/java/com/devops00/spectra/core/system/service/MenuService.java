@@ -21,6 +21,7 @@ import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public interface MenuService extends BaseService<Menu> {
      *
      * @param params 待创建菜单的名称、路由、父菜单、权限编码和显示状态。
      */
+    @PreAuthorize("hasPermission(null, 'menu:create')")
     void created(MenuSaveFrom params);
 
     /**
@@ -46,6 +48,7 @@ public interface MenuService extends BaseService<Menu> {
      *
      * @param params 待修改菜单的唯一标识及需要更新的路由、权限和显示字段。
      */
+    @PreAuthorize("hasPermission(null, 'menu:update')")
     void modify(MenuSaveFrom params);
 
     /**
@@ -54,6 +57,7 @@ public interface MenuService extends BaseService<Menu> {
      * @return 返回全部已启用菜单组装的树形菜单；没有可用菜单时按当前实现返回 null，调用方需要先判空。
      */
     @Nullable
+    @PreAuthorize("hasPermission(null, 'menu:read')")
     List<MenuTreeVO> tree();
 
     /**
@@ -62,6 +66,7 @@ public interface MenuService extends BaseService<Menu> {
      * @param userId 用于解析授权菜单的用户唯一标识。
      * @return 返回用户当前拥有权限的菜单树；没有授权菜单时返回空列表，不返回 null。
      */
+    @PreAuthorize("isAuthenticated()")
     List<MenuTreeVO> current(UUID userId);
 
     /**
@@ -77,5 +82,6 @@ public interface MenuService extends BaseService<Menu> {
      *
      * @param id 菜单ID
      */
+    @PreAuthorize("hasPermission(null, 'menu:disable')")
     void deleteById(UUID id);
 }

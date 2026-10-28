@@ -19,6 +19,7 @@ package com.devops00.spectra.core.system.service;
 import com.devops00.spectra.core.system.javabean.from.SecurityVerificationType;
 import com.devops00.spectra.core.system.javabean.vo.SecurityUserCandidateVO;
 import com.devops00.spectra.core.system.javabean.vo.SecurityVerificationCandidateVO;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ public interface SecurityTargetCandidateService {
      * @param keyword 用户编号、用户名或显示名称关键字。
      * @return 脱敏后的用户候选列表。
      */
+    @PreAuthorize("hasPermission(null, 'session:revoke') or hasPermission(null, 'security:login-failure:manage')")
     List<SecurityUserCandidateVO> searchUserCandidates(String keyword);
 
     /**
@@ -46,5 +48,6 @@ public interface SecurityTargetCandidateService {
      * @param keyword 账号、会话句柄或联系方式关键字。
      * @return 脱敏后的验证码定位候选列表。
      */
+    @PreAuthorize("hasPermission(null, 'security:verification:manage')")
     List<SecurityVerificationCandidateVO> searchVerificationCandidates(SecurityVerificationType type, String keyword);
 }

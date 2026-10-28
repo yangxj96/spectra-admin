@@ -24,6 +24,7 @@ import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +45,7 @@ public interface RegionService extends BaseService<Region> {
      * @param id    父级区域 ID；为空时从顶级区域开始查询。
      * @return 返回指定层级和父级下的行政区划列表；没有下级区域时返回空列表，不返回 null。
      */
+    @PreAuthorize("hasPermission(null, 'region:read')")
     List<RegionVO> lazyTree(Integer level, String id);
 
     /**
@@ -53,6 +55,7 @@ public interface RegionService extends BaseService<Region> {
      * @param params 区域名称、编码、层级和父级等分页筛选条件。
      * @return 返回按行政区划条件分页查询的区域结果；无匹配时 records 为空、total 为 0，结果对象不返回 null。
      */
+    @PreAuthorize("hasPermission(null, 'region:read')")
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
     /**
@@ -61,9 +64,11 @@ public interface RegionService extends BaseService<Region> {
      * @param id 要查询组织路径的行政区划唯一标识。
      * @return 返回从指定行政区划到根节点的编码、名称和层级路径；区域不存在时抛出业务异常，不返回 null。
      */
+    @PreAuthorize("hasPermission(null, 'region:read')")
     RegionPathVO getPath(UUID id);
 
     /** 按 ID 读取当前区域及编辑版本；不存在时抛出业务异常。 */
+    @PreAuthorize("hasPermission(null, 'region:read')")
     RegionVO detail(UUID id);
 
     /**
@@ -72,6 +77,7 @@ public interface RegionService extends BaseService<Region> {
      * @param params 行政区划编码、名称、层级、父级和排序等新建字段。
      * @return 返回新增行政区划的视图，包含区域标识、名称和层级；校验或写入失败时抛出业务异常，不返回 null。
      */
+    @PreAuthorize("hasPermission(null, 'region:create')")
     RegionVO created(RegionFrom params);
 
     /**
@@ -80,6 +86,7 @@ public interface RegionService extends BaseService<Region> {
      * @param params 待修改行政区划的唯一标识及编码、名称、层级、父级和排序字段。
      * @return 返回修改后的行政区划视图；区域不存在、层级冲突或写入失败时抛出业务异常，不返回 null。
      */
+    @PreAuthorize("hasPermission(null, 'region:update')")
     RegionVO modify(RegionFrom params);
 
     /**
@@ -87,5 +94,6 @@ public interface RegionService extends BaseService<Region> {
      *
      * @param id 行政区划ID
      */
+    @PreAuthorize("hasPermission(null, 'region:disable')")
     void deleteById(UUID id);
 }

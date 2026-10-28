@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.web.advice.exception;
 
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.exception.AuthorizationDeniedException;
 import com.devops00.spectra.common.exception.BusinessRuleViolationException;
 import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataExistException;
@@ -126,6 +127,12 @@ public class ExceptionResponseResolver {
         var dataScope = findCause(exception, DataScopeViolationException.class);
         if (dataScope != null) {
             return known(HttpStatus.FORBIDDEN, "数据范围不足", WebErrorCode.DATA_SCOPE_VIOLATION);
+        }
+
+        var authorizationDenied = findCause(exception, AuthorizationDeniedException.class);
+        if (authorizationDenied != null) {
+            return known(HttpStatus.FORBIDDEN, messageOr(authorizationDenied.getMessage(), "权限不足"),
+                    WebErrorCode.ACCESS_DENIED);
         }
 
         var notImplemented = findCause(exception, NotImplementedException.class);

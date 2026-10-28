@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.devops00.spectra.common.exception.BusinessConflictException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.javabean.entity.AssignmentGrantBoundary;
@@ -49,8 +50,7 @@ import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMappe
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
-import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.service.UserSecurityStateService;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
@@ -71,6 +71,7 @@ import com.devops00.spectra.core.security.root.LastEffectiveDevOpsGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,7 +114,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
     private final AssignmentGrantBoundaryMapper grantBoundaryMapper;
     private final AuthorizationScopeMapper authorizationScopeMapper;
     private final ScopeRuleMapper scopeRuleMapper;
-    private final UserMapper userMapper;
+    private final UserSecurityStateService userSecurityStateService;
     private final AuthorizationSnapshotLoader snapshotLoader;
     private final GrantBoundaryService grantBoundaryService;
     private final AuthorizationChangeTokenService tokenService;
@@ -194,9 +195,22 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         var rootBefore = lastEffectiveDevOpsGuard.lockForChange();
         var target = loadRevokeTarget(targetUserId);
         var assignment = loadRevokeAssignment(targetUserId, from);
-        long targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
+        var role = requireActiveRole(assignment.getRoleId(), false);
+        long targetSecurityVersion = target.securityVersion();
         epochGuard.assertCurrent(targetUserId, targetSecurityVersion);
         var operatorId = currentOperatorId();
+        var rootPolicy = rootAuthorizationPolicy.getIfAvailable();
+        boolean root = rootPolicy != null && rootPolicy.isRoot(securityContextAccessor.currentUser());
+        if (!root && operatorId.equals(targetUserId)) {
+            throw new AccessDeniedException("普通管理员不能撤销自己的授权");
+        }
+        if (!root && (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind()))) {
+            throw new BusinessConflictException("内置角色授权不能由普通管理员撤销");
+        }
+        var revokeRequests = toExistingGrantRequests(assignment.getId(), role);
+        if (!revokeRequests.isEmpty()) {
+            grantBoundaryService.evaluate(snapshotLoader.load(operatorId), operatorId, targetUserId, revokeRequests, root);
+        }
         var approvalGate = approvalGateProvider.getIfAvailable();
         if (approvalGate != null) {
             approvalGate.assertAllowed("ROLE_ASSIGNMENT_REVOKE",
@@ -237,15 +251,8 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         }
     }
 
-    private User loadRevokeTarget(UUID targetUserId) {
-        var target = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, targetUserId).last("FOR UPDATE"));
-        if (target == null) {
-            throw new DataNotExistException("目标用户不存在");
-        }
-        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
-            throw new DataException("只有 ACTIVE 用户可以移除授权 Assignment");
-        }
-        return target;
+    private UserSecurityStateService.UserSecuritySnapshot loadRevokeTarget(UUID targetUserId) {
+        return userSecurityStateService.lockActive(targetUserId);
     }
 
     private RoleAssignment loadRevokeAssignment(UUID targetUserId, AuthorizationAssignmentRemovalFrom from) {
@@ -267,18 +274,74 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         return assignment;
     }
 
+    private List<AuthorizationGrantRequest> toExistingGrantRequests(UUID assignmentId, SecurityRole role) {
+        var accessRows = permissionBoundaryMapper.selectList(new LambdaQueryWrapper<AssignmentPermissionBoundary>()
+                .eq(AssignmentPermissionBoundary::getAssignmentId, assignmentId));
+        if (accessRows.isEmpty()) {
+            return List.of();
+        }
+        var grantRows = grantBoundaryMapper.selectList(new LambdaQueryWrapper<AssignmentGrantBoundary>()
+                .eq(AssignmentGrantBoundary::getAssignmentId, assignmentId));
+        var permissionIds = accessRows.stream()
+                .map(AssignmentPermissionBoundary::getPermissionId)
+                .collect(Collectors.toSet());
+        var permissions = permissionMapper.selectBatchIds(permissionIds)
+                .stream()
+                .collect(Collectors.toMap(Permission::getId, Permission::getCode));
+        var scopeIds = new HashSet<UUID>();
+        accessRows.forEach(row -> scopeIds.add(row.getScopeId()));
+        grantRows.forEach(row -> scopeIds.add(row.getScopeId()));
+        var scopes = authorizationScopeMapper.selectBatchIds(scopeIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        com.devops00.spectra.core.security.authorization.javabean.entity.AuthorizationScope::getId,
+                        value -> value));
+        var rules = scopeRuleMapper.selectList(new LambdaQueryWrapper<ScopeRule>()
+                .in(ScopeRule::getScopeId, scopeIds))
+                .stream()
+                .collect(Collectors.groupingBy(ScopeRule::getScopeId));
+        var grantByPermission = grantRows.stream()
+                .collect(Collectors.toMap(AssignmentGrantBoundary::getPermissionId, value -> value));
+        var result = new ArrayList<AuthorizationGrantRequest>();
+        for (var access : accessRows) {
+            var permission = permissions.get(access.getPermissionId());
+            if (permission == null) {
+                continue;
+            }
+            var accessScope = toDomainScope(scopes.get(access.getScopeId()), rules.get(access.getScopeId()));
+            var grantRow = grantByPermission.get(access.getPermissionId());
+            var grantScope = grantRow == null
+                    ? null
+                    : toDomainScope(scopes.get(grantRow.getScopeId()), rules.get(grantRow.getScopeId()));
+            result.add(new AuthorizationGrantRequest(permission, accessScope, grantScope, role.getAuthorityLevel()));
+        }
+        return List.copyOf(result);
+    }
+
+    private AuthorizationScope toDomainScope(
+                                             com.devops00.spectra.core.security.authorization.javabean.entity.AuthorizationScope scope,
+                                             List<ScopeRule> rules) {
+        if (scope == null) {
+            throw new DataException("授权范围数据缺失");
+        }
+        var departments = rules == null
+                ? Set.<UUID>of()
+                : rules.stream()
+                        .map(ScopeRule::getDepartmentId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+        boolean includeDescendants = rules != null
+                && rules.stream().anyMatch(rule -> Boolean.TRUE.equals(rule.getIncludeDescendants()));
+        return new AuthorizationScope(ScopeMode.valueOf(scope.getScopeMode()), departments, includeDescendants);
+    }
+
     @Override
     @Transactional
     public void ensureDefaultUserRole(UUID targetUserId) {
         if (targetUserId == null) {
             throw new DataException("目标用户不能为空");
         }
-        var target = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getId, targetUserId)
-                .last("FOR UPDATE"));
-        if (target == null) {
-            throw new DataNotExistException("目标用户不存在");
-        }
+        var target = userSecurityStateService.lockActive(targetUserId);
         var role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, SecurityRoleCodes.DEFAULT_USER)
                 .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()));
@@ -315,7 +378,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
                             role.getAuthorityLevel());
                 })
                 .toList();
-        var targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
+        var targetSecurityVersion = target.securityVersion();
         var prepared = new PreparedChange(securityContextAccessor.currentUserId(), role, null, null, requests, 0L,
                 targetSecurityVersion, "SYSTEM_DEFAULT_USER_ROLE");
         var assignmentId = persist(prepared, targetUserId);
@@ -340,7 +403,7 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         if (assignmentVersion != from.getExpectedVersion()) {
             throw new DataException("Assignment version 已变化，请重新生成授权变更预览");
         }
-        long targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
+        long targetSecurityVersion = target.securityVersion();
         epochGuard.assertCurrent(targetUserId, targetSecurityVersion);
         var role = requireActiveRole(from.getRoleId(), lockRole);
         var requests = toGrantRequests(role, from.getBoundaries());
@@ -367,15 +430,8 @@ public class AuthorizationAssignmentChangeServiceSupport implements Authorizatio
         }
     }
 
-    private User loadTarget(UUID targetUserId) {
-        var target = userMapper.selectById(targetUserId);
-        if (target == null) {
-            throw new DataNotExistException("目标用户不存在");
-        }
-        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
-            throw new DataException("只有 ACTIVE 用户可以建立授权 Assignment");
-        }
-        return target;
+    private UserSecurityStateService.UserSecuritySnapshot loadTarget(UUID targetUserId) {
+        return userSecurityStateService.load(targetUserId);
     }
 
     private RoleAssignment loadAssignment(UUID targetUserId, UUID assignmentId) {

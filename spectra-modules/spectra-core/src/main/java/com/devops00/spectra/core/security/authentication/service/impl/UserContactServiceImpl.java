@@ -154,6 +154,30 @@ public class UserContactServiceImpl implements UserContactService {
         }
     }
 
+    @Override
+    @Transactional
+    public void revokeByUserIdAndTypeAndValue(UUID userId, String contactType, String value) {
+        if (userId == null || !StringUtils.hasText(value)) {
+            return;
+        }
+        String normalizedType = normalizeType(contactType);
+        String normalizedValue = normalizeValue(normalizedType, value);
+        var contact = mapper.selectOne(new LambdaQueryWrapper<UserContact>()
+                .eq(UserContact::getUserId, userId)
+                .eq(UserContact::getContactType, normalizedType)
+                .eq(UserContact::getContactValue, normalizedValue)
+                .eq(UserContact::getState, ACTIVE)
+                .isNull(UserContact::getDeleted)
+                .last("LIMIT 1"));
+        if (contact == null) {
+            return;
+        }
+        contact.setState("REVOKED");
+        if (mapper.updateById(contact) != 1) {
+            throw new EntityUpdateException("撤销用户联系方式失败");
+        }
+    }
+
     /**
      * 规范化类型。
      */

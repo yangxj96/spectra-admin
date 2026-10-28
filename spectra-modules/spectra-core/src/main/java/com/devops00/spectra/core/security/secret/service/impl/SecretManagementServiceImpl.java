@@ -29,6 +29,7 @@ import com.devops00.spectra.core.security.secret.javabean.enums.SecretVersionSta
 import com.devops00.spectra.core.security.secret.mapper.SecretDefinitionMapper;
 import com.devops00.spectra.core.security.secret.mapper.SecretVersionMapper;
 import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +52,11 @@ import java.util.UUID;
  * @since 2026/09/13
  */
 @Service
-public class SecretManagementServiceImpl implements SecretManagementService, SecretRuntimeService {
+public class SecretManagementServiceImpl
+        implements
+            SecretManagementService,
+            SecretRuntimeService,
+            SecretProvisioningService {
 
     private final SecretDefinitionMapper definitionMapper;
     private final SecretVersionMapper versionMapper;
@@ -91,6 +96,16 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
                                 secret.fingerprint(), secret.value())))
                 .flatMap(Optional::stream)
                 .toList();
+    }
+
+    @Override
+    public SecretVersionEntity createPendingAsAdmin(String code, String plaintext, String source) {
+        return createPending(code, plaintext, source);
+    }
+
+    @Override
+    public void publishAsAdmin(String code, UUID versionId) {
+        publish(code, versionId);
     }
 
     @Override

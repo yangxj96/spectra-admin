@@ -20,7 +20,7 @@ import com.devops00.spectra.common.port.security.SecurityVerificationCodeStore;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.core.security.authentication.crypto.VerificationCodeDigest;
 import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.framework.security.properties.SecurityProperties;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisNamespace;
@@ -83,7 +83,7 @@ class CoreSharedStateTwoProcessHttpTest {
                 var properties = first.getBean(SecurityProperties.class);
                 var codes = first.getBean(SecurityVerificationCodeStore.class);
                 var secrets = first.getBean(SecretRuntimeService.class);
-                var secretManagement = first.getBean(SecretManagementService.class);
+                var secretManagement = first.getBean(SecretProvisioningService.class);
                 var redis = securityRedisTemplate(first);
                 var fixture = new Fixture(first);
                 TestUser locked = TestUser.create("b02lk");

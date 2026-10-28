@@ -53,6 +53,7 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +80,7 @@ import java.util.UUID;
  * @since 2026/09/13
  */
 @Service
+@PreAuthorize("hasRole('ROLE_DEV_OPS')")
 public class QuartzJobManagementServiceImpl implements QuartzJobManagementService {
 
     /** 内置 Job 使用的 Quartz 分组。 */

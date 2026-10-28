@@ -25,7 +25,7 @@ import com.devops00.spectra.core.security.authentication.crypto.VerificationCode
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.framework.security.redis.key.SecurityRedisNamespace;
@@ -682,7 +682,7 @@ class RootGovernanceFullHttpTest {
             var revocation = application.getBean(SecuritySessionRevocationPort.class);
             var verificationCodes = application.getBean(SecurityVerificationCodeStore.class);
             var secrets = application.getBean(SecretRuntimeService.class);
-            var secretManagement = application.getBean(SecretManagementService.class);
+            var secretManagement = application.getBean(SecretProvisioningService.class);
             int port = ((WebServerApplicationContext) application).getWebServer().getPort();
             ObjectMapper mapper = application.getBean(ObjectMapper.class);
             try (HttpClient client = HttpClient.newHttpClient()) {

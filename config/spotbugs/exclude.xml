@@ -133,7 +133,11 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.core.upload.service.UploadApplicationService"/>
+        <Class name="com.devops00.spectra.core.upload.service.UploadApplicationServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.service.impl.MenuServiceImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>

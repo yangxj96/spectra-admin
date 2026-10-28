@@ -107,4 +107,13 @@ public interface AuthenticationIdentityService {
      * @param identityId 目标认证身份的唯一标识。
      */
     void revokeByUserIdAndId(UUID userId, UUID identityId);
+
+    /**
+     * 撤销同一用户指定认证方式下除保留身份外的其他活动身份。
+     *
+     * @param userId         目标用户的唯一标识，用于限定查询或变更范围。
+     * @param methodCode     认证方式编码，用于选择身份校验策略。
+     * @param keepIdentityId 需要保留的活动身份标识。
+     */
+    void revokeOtherActiveByUserIdAndMethod(UUID userId, String methodCode, UUID keepIdentityId);
 }

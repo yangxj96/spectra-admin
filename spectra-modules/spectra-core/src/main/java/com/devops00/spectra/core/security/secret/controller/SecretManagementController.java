@@ -109,7 +109,7 @@ public class SecretManagementController {
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public SecretVersionVO createVersion(@PathVariable @NotBlank(message = "密钥编码不能为空") String code,
                                          @Valid @RequestBody SecretVersionCreateFrom from) {
-        return toVersion(managementService.createPending(code, from.getValue(), from.getSource()));
+        return toVersion(managementService.createPendingAsAdmin(code, from.getValue(), from.getSource()));
     }
 
     /** 发布待启用版本。 */
@@ -119,7 +119,7 @@ public class SecretManagementController {
     public void publish(@PathVariable @NotBlank(message = "密钥编码不能为空") String code,
                         @PathVariable java.util.UUID versionId,
                         @Valid @RequestBody SecretPublishFrom from) {
-        managementService.publish(code, versionId);
+        managementService.publishAsAdmin(code, versionId);
     }
 
     /** 退役当前版本，保留版本审计元数据。 */

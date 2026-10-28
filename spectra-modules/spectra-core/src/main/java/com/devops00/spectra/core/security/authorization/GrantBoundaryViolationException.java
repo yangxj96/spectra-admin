@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization;
 
-import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.exception.AuthorizationDeniedException;
 
 /**
  * Grant Boundary、authorityLevel 或自授权检查失败。
@@ -25,7 +25,7 @@ import com.devops00.spectra.common.exception.SpectraException;
  * @version 1.0
  * @since 2026/8/14
  */
-public class GrantBoundaryViolationException extends SpectraException {
+public class GrantBoundaryViolationException extends AuthorizationDeniedException {
 
     public GrantBoundaryViolationException(String message) {
         super(message);

@@ -30,7 +30,7 @@ import com.devops00.spectra.core.notification.javabean.from.NotificationProvider
 import com.devops00.spectra.core.notification.javabean.vo.NotificationProviderVO;
 import com.devops00.spectra.core.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.core.notification.service.NotificationProviderAdminService;
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 import com.devops00.spectra.core.security.secret.service.SecretRuntimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +110,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     private final SecretRuntimeService secretRuntimeService;
 
     /** 统一密钥版本管理端口。 */
-    private final SecretManagementService secretManagementService;
+    private final SecretProvisioningService secretManagementService;
 
     /**
      * JSON 序列化器。

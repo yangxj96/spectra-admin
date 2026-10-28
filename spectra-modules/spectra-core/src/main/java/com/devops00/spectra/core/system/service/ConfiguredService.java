@@ -21,6 +21,7 @@ import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredBatchFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.Optional;
 import java.util.List;
@@ -39,6 +40,7 @@ public interface ConfiguredService extends BaseService<Configured> {
      *
      * @return 配置表单项。
      */
+    @PreAuthorize("hasPermission(null, 'security:config:read')")
     List<ConfiguredVO> settings();
 
     /**
@@ -46,6 +48,7 @@ public interface ConfiguredService extends BaseService<Configured> {
      *
      * @param params 分类及完整配置项。
      */
+    @PreAuthorize("hasPermission(null, 'security:config:update')")
     void modifyBatch(ConfiguredBatchFrom params);
 
     /**

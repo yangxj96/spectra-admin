@@ -22,6 +22,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.port.security.SecuritySessionRevocationPort;
+import com.devops00.spectra.core.security.authentication.identity.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
@@ -37,7 +38,10 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -82,7 +86,8 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     @Transactional
     public void bindPhone(UUID userId, String phone, String code) {
         consumeBindingCode(userId, RedisCacheKey.BIND_PHONE_CODE, phone, code);
-        identityService.createIdentity(userId, LoginType.SMS.name(), phone);
+        var identity = identityService.createIdentity(userId, LoginType.SMS.name(), phone);
+        identityService.revokeOtherActiveByUserIdAndMethod(userId, LoginType.SMS.name(), identity.getId());
         userContactService.upsertVerified(userId, UserContactService.PHONE, phone);
     }
 
@@ -90,7 +95,8 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     @Transactional
     public void bindEmail(UUID userId, String email, String code) {
         consumeBindingCode(userId, RedisCacheKey.BIND_EMAIL_CODE, email, code);
-        identityService.createIdentity(userId, LoginType.EMAIL.name(), email);
+        var identity = identityService.createIdentity(userId, LoginType.EMAIL.name(), email);
+        identityService.revokeOtherActiveByUserIdAndMethod(userId, LoginType.EMAIL.name(), identity.getId());
         userContactService.upsertVerified(userId, UserContactService.EMAIL, email);
     }
 
@@ -110,12 +116,39 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
             throw new BusinessConflictException("至少需要保留一个认证身份");
         }
         identityService.revokeByUserIdAndId(userId, identityId);
-        if (LoginType.SMS.name().equals(identity.getMethodCode())) {
-            userContactService.revokeByUserIdAndType(userId, UserContactService.PHONE);
-        } else if (LoginType.EMAIL.name().equals(identity.getMethodCode())) {
-            userContactService.revokeByUserIdAndType(userId, UserContactService.EMAIL);
-        }
+        revokeMatchingContact(userId, identity);
         sessionRevocationPort.revokeUserSessions(userId);
+    }
+
+    private void revokeMatchingContact(UUID userId, AuthenticationIdentity identity) {
+        String contactType = null;
+        if (LoginType.SMS.name().equals(identity.getMethodCode())) {
+            contactType = UserContactService.PHONE;
+        } else if (LoginType.EMAIL.name().equals(identity.getMethodCode())) {
+            contactType = UserContactService.EMAIL;
+        }
+        if (contactType == null) {
+            return;
+        }
+        String expectedHash = identity.getIdentifierHash();
+        String type = contactType;
+        userContactService.listActiveByUserId(userId)
+                .stream()
+                .filter(contact -> type.equals(contact.getContactType()))
+                .filter(contact -> StringUtils.hasText(contact.getContactValue()))
+                .filter(contact -> matchesIdentifier(contact.getContactValue(), expectedHash))
+                .findFirst()
+                .ifPresent(contact -> userContactService.revokeByUserIdAndTypeAndValue(
+                        userId, type, contact.getContactValue()));
+    }
+
+    private static boolean matchesIdentifier(String contactValue, String expectedHash) {
+        if (expectedHash == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(
+                AuthenticationIdentifierHash.digest(contactValue).getBytes(StandardCharsets.UTF_8),
+                expectedHash.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.security.secret.migration;
 
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.security.secret.service.SecretManagementService;
+import com.devops00.spectra.core.security.secret.service.SecretProvisioningService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ final class SecretMigrationCommands {
     private SecretMigrationCommands() {
     }
 
-    static SecretMigrationResult migrate(SecretManagementService service, List<String> codes,
+    static SecretMigrationResult migrate(SecretProvisioningService service, List<String> codes,
                                          Map<String, String> legacyValues) {
         if (legacyValues == null) {
             throw new DataSaveException("旧密钥快照不能为空");

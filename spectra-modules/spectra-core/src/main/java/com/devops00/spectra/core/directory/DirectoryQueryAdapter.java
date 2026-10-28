@@ -22,12 +22,9 @@ import com.devops00.spectra.common.port.directory.DirectoryQueryPort;
 import com.devops00.spectra.common.port.directory.DirectoryUserSnapshot;
 import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
 import com.devops00.spectra.core.security.authentication.service.UserContactService;
-import com.devops00.spectra.core.system.javabean.entity.Department;
-import com.devops00.spectra.core.system.mapper.DepartmentMapper;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.javabean.entity.UserDepartmentMembership;
-import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
-import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.system.service.DepartmentDirectoryReadService;
+import com.devops00.spectra.core.user.service.UserDirectoryReadService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -35,7 +32,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Core 对目录端口的实现，将核心实体转换为不可变快照。
@@ -45,79 +44,54 @@ import java.util.UUID;
  * @since 2026/9/7
  */
 @Component
+@RequiredArgsConstructor
 public class DirectoryQueryAdapter implements DirectoryQueryPort {
 
-    private final UserMapper userMapper;
+    private final UserDirectoryReadService userDirectoryReadService;
 
-    private final DepartmentMapper departmentMapper;
+    private final DepartmentDirectoryReadService departmentDirectoryReadService;
 
     private final UserContactService userContactService;
 
-    private final UserDepartmentMembershipMapper membershipMapper;
-
-    /**
-     * 创建目录查询适配器。
-     *
-     * @param userMapper         用户 Mapper
-     * @param departmentMapper   部门 Mapper
-     * @param userContactService 联系方式服务
-     */
-    public DirectoryQueryAdapter(UserMapper userMapper,
-                                 DepartmentMapper departmentMapper,
-                                 UserContactService userContactService,
-                                 UserDepartmentMembershipMapper membershipMapper) {
-        this.userMapper = userMapper;
-        this.departmentMapper = departmentMapper;
-        this.userContactService = userContactService;
-        this.membershipMapper = membershipMapper;
-    }
-
     @Override
     public List<DirectoryUserSnapshot> listUsers() {
-        return toUserSnapshots(userMapper.selectList(null));
+        return toUserSnapshots(userDirectoryReadService.listAll());
     }
 
     @Override
     public List<DirectoryUserSnapshot> findUsersByDepartmentId(UUID departmentId) {
-        if (departmentId == null) {
-            return List.of();
-        }
-        return toUserSnapshots(userMapper.selectByIds(
-                membershipMapper.selectUserIdsByDepartmentIds(List.of(departmentId), null)));
+        var userIds = userDirectoryReadService.findUserIdsByDepartmentId(departmentId);
+        return toUserSnapshots(userDirectoryReadService.findByIds(userIds));
     }
 
     @Override
     public List<UUID> findDepartmentIdsByUserId(UUID userId) {
-        return userId == null ? List.of() : membershipMapper.selectDepartmentIdsForAuthorization(userId);
+        if (userId == null) {
+            return List.of();
+        }
+        return userDirectoryReadService.findDepartmentIdsByUserIds(List.of(userId))
+                .getOrDefault(userId, Set.of())
+                .stream()
+                .toList();
     }
 
     @Override
     public List<DirectoryUserSnapshot> findUsersByIds(Collection<UUID> userIds) {
-        var distinctIds = distinctIds(userIds);
-        if (distinctIds.isEmpty()) {
-            return List.of();
-        }
-        return toUserSnapshots(userMapper.selectByIds(distinctIds));
+        return toUserSnapshots(userDirectoryReadService.findByIds(userIds));
     }
 
     @Override
     public List<DirectoryDepartmentSnapshot> findDepartmentsByIds(Collection<UUID> departmentIds) {
-        var distinctIds = distinctIds(departmentIds);
-        if (distinctIds.isEmpty()) {
-            return List.of();
-        }
-        return departmentMapper.selectByIds(distinctIds)
+        return departmentDirectoryReadService.findActiveByIds(departmentIds)
                 .stream()
-                .filter(Objects::nonNull)
                 .map(DirectoryQueryAdapter::toDepartmentSnapshot)
                 .toList();
     }
 
     @Override
     public List<DirectoryDepartmentSnapshot> listDepartments() {
-        return departmentMapper.selectList(null)
+        return departmentDirectoryReadService.listAll()
                 .stream()
-                .filter(Objects::nonNull)
                 .map(DirectoryQueryAdapter::toDepartmentSnapshot)
                 .toList();
     }
@@ -132,7 +106,6 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         if (contactsByUserId == null || contactsByUserId.isEmpty()) {
             return Map.of();
         }
-
         var result = new LinkedHashMap<UUID, List<DirectoryContactSnapshot>>();
         contactsByUserId.forEach((userId, contacts) -> {
             if (userId == null || contacts == null || contacts.isEmpty()) {
@@ -149,9 +122,43 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         return result.isEmpty() ? Map.of() : Map.copyOf(result);
     }
 
-    /**
-     * 处理查询相关数据。
-     */
+    private List<DirectoryUserSnapshot> toUserSnapshots(List<UserDirectoryReadService.UserDirectoryRow> users) {
+        var records = users == null ? List.<UserDirectoryReadService.UserDirectoryRow>of() : users;
+        if (records.isEmpty()) {
+            return List.of();
+        }
+        var userIds = records.stream()
+                .map(UserDirectoryReadService.UserDirectoryRow::id)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        var departmentIdsByUser = userDirectoryReadService.findDepartmentIdsByUserIds(userIds);
+        var allDepartmentIds = departmentIdsByUser.values()
+                .stream()
+                .flatMap(Set::stream)
+                .distinct()
+                .toList();
+        var departmentsById = departmentDirectoryReadService.findActiveByIds(allDepartmentIds)
+                .stream()
+                .collect(Collectors.toMap(DepartmentDirectoryReadService.DepartmentDirectoryRow::id,
+                        DirectoryQueryAdapter::toDepartmentSnapshot, (left, right) -> left));
+        return records.stream()
+                .map(user -> new DirectoryUserSnapshot(
+                        user.id(),
+                        user.employeeNo(),
+                        user.realName(),
+                        user.username(),
+                        user.avatar(),
+                        user.status(),
+                        user.primaryDepartmentId(),
+                        departmentIdsByUser.getOrDefault(user.id(), Set.of())
+                                .stream()
+                                .map(departmentsById::get)
+                                .filter(Objects::nonNull)
+                                .toList()))
+                .toList();
+    }
+
     private static List<UUID> distinctIds(Collection<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
@@ -159,59 +166,12 @@ public class DirectoryQueryAdapter implements DirectoryQueryPort {
         return ids.stream().filter(Objects::nonNull).distinct().toList();
     }
 
-    /**
-     * 转换用户快照。
-     */
-    private List<DirectoryUserSnapshot> toUserSnapshots(List<User> users) {
-        var records = users == null ? List.<User>of() : users.stream().filter(Objects::nonNull).toList();
-        if (records.isEmpty()) {
-            return List.of();
-        }
-        var userIds = records.stream().map(User::getId).filter(Objects::nonNull).distinct().toList();
-        var memberships = userIds.isEmpty()
-                ? List.<UserDepartmentMembership>of()
-                : membershipMapper.selectActiveByUserIds(userIds);
-        var departmentIds = memberships.stream()
-                .map(UserDepartmentMembership::getDepartmentId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-        var departments = departmentIds.isEmpty()
-                ? List.<Department>of()
-                : departmentMapper.selectActiveByIds(departmentIds);
-        var departmentsById = departments.stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        Department::getId, DirectoryQueryAdapter::toDepartmentSnapshot, (left, right) -> left));
-        var membershipsByUser = memberships.stream()
-                .filter(membership -> membership.getUserId() != null
-                        && departmentsById.containsKey(membership.getDepartmentId()))
-                .map(membership -> Map.entry(membership.getUserId(), departmentsById.get(membership.getDepartmentId())))
-                .collect(java.util.stream.Collectors.groupingBy(Map.Entry::getKey,
-                        java.util.stream.Collectors.mapping(Map.Entry::getValue, java.util.stream.Collectors.toList())));
-        return records.stream()
-                .map(user -> new DirectoryUserSnapshot(
-                        user.getId(),
-                        user.getEmployeeNo(),
-                        user.getRealName(),
-                        user.getUsername(),
-                        user.getAvatar(),
-                        user.getStatus() == null ? null : user.getStatus().name(),
-                        user.getPrimaryDepartmentId(),
-                        membershipsByUser.getOrDefault(user.getId(), List.of())))
-                .toList();
-    }
-
-    /**
-     * 转换部门快照。
-     */
-    private static DirectoryDepartmentSnapshot toDepartmentSnapshot(Department department) {
+    private static DirectoryDepartmentSnapshot toDepartmentSnapshot(
+                                                                    DepartmentDirectoryReadService.DepartmentDirectoryRow department) {
         return new DirectoryDepartmentSnapshot(
-                department.getId(), department.getPid(), department.getName(), department.getPath());
+                department.id(), department.pid(), department.name(), department.path());
     }
 
-    /**
-     * 转换快照。
-     */
     private static DirectoryContactSnapshot toContactSnapshot(UserContact contact) {
         return new DirectoryContactSnapshot(contact.getContactType(), contact.getContactValue());
     }
