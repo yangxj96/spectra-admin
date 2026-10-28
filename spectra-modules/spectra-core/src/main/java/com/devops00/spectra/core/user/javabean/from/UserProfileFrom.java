@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -33,6 +34,10 @@ import jakarta.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileFrom {
+
+    /** 编辑时读取的用户行版本。 */
+    @NotNull(message = "用户版本不能为空")
+    private Long version;
 
     /**
      * 姓名。

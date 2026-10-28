@@ -45,6 +45,11 @@ public class RegionFrom {
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;
 
+    /** 编辑时读取的行政区划行版本。 */
+    @Null(message = "新增时不能指定版本", groups = Verify.Insert.class)
+    @NotNull(message = "行政区划版本不能为空", groups = Verify.Update.class)
+    private Long version;
+
     /**
      * 区域名称
      */

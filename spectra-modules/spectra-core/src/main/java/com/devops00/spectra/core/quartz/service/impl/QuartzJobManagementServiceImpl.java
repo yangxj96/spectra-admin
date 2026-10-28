@@ -22,6 +22,7 @@ import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.SchedulerDatabaseUnavailableException;
 import com.devops00.spectra.core.quartz.javabean.entity.QuartzJobExecutionHistoryEntity;
 import com.devops00.spectra.core.quartz.service.QuartzJobExecutionHistoryService;
@@ -41,7 +42,6 @@ import com.devops00.spectra.core.quartz.parameter.QuartzJobParameterValidator;
 import com.devops00.spectra.core.quartz.parameter.VersionedJsonJobParameters;
 import com.devops00.spectra.core.quartz.service.QuartzJobManagementService;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
-import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -54,6 +54,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -95,8 +96,7 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
     private final QuartzSchedulerLifecycle lifecycle;
     private final QuartzJobCatalog catalog;
     private final QuartzJobParameterValidator parameterValidator;
-    private final QuartzJobExecutionHistoryService historyService;
-    private final TimeMapper timeMapper;
+    private final QuartzJobManagementSupport support;
 
     /**
      * 创建 Quartz 管理服务。
@@ -104,19 +104,16 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
      * @param lifecycle          Quartz 生命周期门面
      * @param catalog            代码白名单 Job 目录
      * @param parameterValidator 版本化 JSON 参数校验器
-     * @param historyService     执行历史查询服务
-     * @param timeMapper         按当前用户时区转换 API 时间字段
+     * @param support            编辑版本、API 时间和执行历史查询协作者
      */
     public QuartzJobManagementServiceImpl(QuartzSchedulerLifecycle lifecycle,
                                           QuartzJobCatalog catalog,
                                           QuartzJobParameterValidator parameterValidator,
-                                          QuartzJobExecutionHistoryService historyService,
-                                          TimeMapper timeMapper) {
+                                          QuartzJobManagementSupport support) {
         this.lifecycle = lifecycle;
         this.catalog = catalog;
         this.parameterValidator = parameterValidator;
-        this.historyService = historyService;
-        this.timeMapper = timeMapper;
+        this.support = support;
     }
 
     /** {@inheritDoc} */
@@ -191,6 +188,7 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
 
     /** {@inheritDoc} */
     @Override
+    @Transactional
     public QuartzJobVO update(String jobKey, QuartzJobUpdateFrom from) {
         Objects.requireNonNull(from, "from");
         return withScheduler(scheduler -> {
@@ -207,6 +205,11 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
             List<? extends Trigger> triggers = getTriggers(scheduler, existingKey);
             if (triggers.size() != 1) {
                 throw new DataException("Quartz Job 必须绑定且只能绑定一个 Trigger");
+            }
+            int changed = support.incrementEditVersion(callScheduler(scheduler::getSchedulerName),
+                    existingKey.getName(), existingKey.getGroup(), from.getVersion());
+            if (changed != 1) {
+                throw new EntityUpdateException("定时任务已被其他操作修改，请读取最新版本后重新处理");
             }
             JobDetail replacement = jobDetail(definition, existingKey, from.getDisplayName(), parameters,
                     expectedBuiltIn);
@@ -295,7 +298,7 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         QuartzHistoryQueryFrom query = from == null ? new QuartzHistoryQueryFrom() : from;
         long current = page == null || page.getPageNum() == null ? 1L : page.getPageNum();
         long size = page == null || page.getPageSize() == null ? 15L : page.getPageSize();
-        IPage<QuartzJobExecutionHistoryEntity> source = historyService.page(
+        IPage<QuartzJobExecutionHistoryEntity> source = support.pageHistory(
                 new QuartzJobExecutionHistoryService.HistoryPageRequest(current, size,
                         normalize(query.getJobKey()), normalize(query.getTriggerKey()), query.getStatus(),
                         parseTime(query.getFrom(), "历史开始时间"), parseTime(query.getTo(), "历史结束时间")));
@@ -306,7 +309,7 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
     /** {@inheritDoc} */
     @Override
     public QuartzExecutionHistoryVO executionHistory(UUID id) {
-        return historyService.find(id)
+        return support.findHistory(id)
                 .map(this::toHistory)
                 .orElseThrow(() -> new DataNotExistException("Quartz 执行历史不存在"));
     }
@@ -500,7 +503,9 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
         }
         String type = normalize(detail.getJobDataMap().getString(JOB_TYPE));
         QuartzTriggerVO trigger = triggers.isEmpty() ? null : toTrigger(scheduler, triggers.getFirst());
-        return new QuartzJobVO(jobKey.toString(), jobKey.getGroup(), detail.getDescription(), type,
+        Long version = support.editVersion(callScheduler(scheduler::getSchedulerName),
+                jobKey.getName(), jobKey.getGroup());
+        return new QuartzJobVO(jobKey.toString(), version, jobKey.getGroup(), detail.getDescription(), type,
                 isBuiltIn(jobKey, detail), detail.getJobClass().getSimpleName(),
                 detail.getJobDataMap().getString(PARAMETER_VERSION),
                 detail.getJobDataMap().getString(PARAMETER_JSON), trigger);
@@ -584,14 +589,14 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
      * 处理本地相关数据。
      */
     private OffsetDateTime local(Date value) {
-        return timeMapper.toOffsetDateTime(value);
+        return support.toOffsetDateTime(value);
     }
 
     /**
      * 处理本地相关数据。
      */
     private OffsetDateTime local(Instant value) {
-        return timeMapper.toOffsetDateTime(value);
+        return support.toOffsetDateTime(value);
     }
 
     /**
@@ -603,7 +608,7 @@ public class QuartzJobManagementServiceImpl implements QuartzJobManagementServic
             return null;
         }
         try {
-            return Instant.parse(normalized);
+            return OffsetDateTime.parse(normalized).toInstant();
         } catch (RuntimeException exception) {
             throw new DataSaveException(label + "必须是合法 ISO-8601 时间", exception);
         }

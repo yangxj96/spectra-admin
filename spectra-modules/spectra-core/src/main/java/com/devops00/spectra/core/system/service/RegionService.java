@@ -63,6 +63,9 @@ public interface RegionService extends BaseService<Region> {
      */
     RegionPathVO getPath(UUID id);
 
+    /** 按 ID 读取当前区域及编辑版本；不存在时抛出业务异常。 */
+    RegionVO detail(UUID id);
+
     /**
      * 新增行政区划
      *

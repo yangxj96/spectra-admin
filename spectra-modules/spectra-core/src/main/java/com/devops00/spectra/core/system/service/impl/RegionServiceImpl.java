@@ -105,6 +105,15 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
     }
 
     @Override
+    public RegionVO detail(UUID id) {
+        Region region = this.getById(id);
+        if (region == null) {
+            throw new DataNotExistException("行政区划不存在");
+        }
+        return converter.toVO(region);
+    }
+
+    @Override
     public RegionVO created(RegionFrom params) {
         Region region = converter.toEntity(params);
         this.save(region);
@@ -116,6 +125,9 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
         Region region = this.getById(params.getId());
         if (region == null) {
             throw new DataNotExistException("行政区划不存在");
+        }
+        if (params.getVersion() == null || !params.getVersion().equals(region.getVersion())) {
+            throw new EntityUpdateException("行政区划已被其他操作修改，请刷新后重新处理");
         }
         converter.toEntity(params, region);
         if (!this.updateById(region)) {

@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.framework.persistence.base.BaseEntity;
@@ -50,7 +51,7 @@ public class DictGroup extends BaseEntity {
      * 父级ID
      */
     @Nullable
-    @TableField(value = "pid")
+    @TableField(value = "pid", updateStrategy = FieldStrategy.ALWAYS)
     private UUID pid;
 
     /**
@@ -74,7 +75,7 @@ public class DictGroup extends BaseEntity {
     /**
      * 备注
      */
-    @TableField(value = "remark")
+    @TableField(value = "remark", updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
     /**

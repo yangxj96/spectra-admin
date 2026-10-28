@@ -212,7 +212,8 @@ class UserImportDepartmentValidationTest {
     }
 
     private static DictItemVO dictItem(String value) {
-        return new DictItemVO(UUID.randomUUID(), UUID.randomUUID(), value, value, (short) 1, (short) 1, false, null);
+        return new DictItemVO(UUID.randomUUID(), 0L, UUID.randomUUID(), value, value,
+                (short) 1, (short) 1, false, null);
     }
 
     private static AuthorizationProfileVO profile() {

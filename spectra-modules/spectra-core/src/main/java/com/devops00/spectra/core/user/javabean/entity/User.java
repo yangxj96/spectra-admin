@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.framework.persistence.base.BaseEntity;
@@ -69,7 +70,7 @@ public class User extends BaseEntity {
     /**
      * 离职时间。
      */
-    @TableField(value = "departed_at")
+    @TableField(value = "departed_at", updateStrategy = FieldStrategy.ALWAYS)
     private Instant departedAt;
 
     /**
@@ -85,13 +86,13 @@ public class User extends BaseEntity {
     /**
      * 语言
      */
-    @TableField(value = "\"language\"")
+    @TableField(value = "\"language\"", updateStrategy = FieldStrategy.ALWAYS)
     private String language;
 
     /**
      * 时区
      */
-    @TableField(value = "timezone")
+    @TableField(value = "timezone", updateStrategy = FieldStrategy.ALWAYS)
     private String timezone;
 
     /**

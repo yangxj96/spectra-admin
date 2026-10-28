@@ -21,6 +21,7 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.enums.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.foundation.lang.StrUtils;
 import com.devops00.spectra.common.security.policy.SecurityPasswordPolicyProvider;
 import com.devops00.spectra.core.system.javabean.converter.ConfiguredConverter;
@@ -101,7 +102,11 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     }
 
     private void validateBatchItem(ConfiguredBatchItemFrom item, Set<java.util.UUID> ids) {
-        if (item == null || item.getId() == null || item.getValue() == null || !ids.add(item.getId())) {
+        if (item == null
+                || item.getId() == null
+                || item.getVersion() == null
+                || item.getValue() == null
+                || !ids.add(item.getId())) {
             throw new DataException("系统配置表单项无效或重复");
         }
     }
@@ -130,6 +135,9 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
         for (int index = 0; index < settings.size(); index++) {
             var setting = settings.get(index);
             var item = params.getItems().get(index);
+            if (!item.getVersion().equals(setting.getVersion())) {
+                throw new EntityUpdateException("系统配置已被其他操作修改，请刷新后重新处理");
+            }
             if (setting.getType() != ConfiguredValueType.SECRET || StrUtils.isNotBlank(item.getValue())) {
                 setting.setValue(setting.getType() == ConfiguredValueType.SECRET
                         ? passwordEncoder.encode(item.getValue())
@@ -137,7 +145,7 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
             }
             setting.setRemarks(item.getRemarks());
             if (!this.updateById(setting)) {
-                throw new DataException("系统配置保存失败");
+                throw new EntityUpdateException("系统配置保存发生版本冲突");
             }
         }
     }

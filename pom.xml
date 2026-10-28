@@ -49,6 +49,7 @@
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <!-- 工具包 -->
         <mapstruct.version>1.6.3</mapstruct.version>
+        <springdoc.version>3.1.0</springdoc.version>
         <apache.tika.version>3.2.3</apache.tika.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <bitwalker.version>1.21</bitwalker.version>

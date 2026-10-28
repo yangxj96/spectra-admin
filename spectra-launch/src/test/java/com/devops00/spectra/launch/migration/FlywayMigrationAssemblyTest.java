@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * 在隔离的一次性数据库上验证 Flyway V1–V8 空库装配与 V7→V8 升级。
+ * 在隔离的一次性数据库上验证 Flyway V1–V9 空库装配与 V7→V9 升级。
  *
  * <p>只用专用测试库凭据创建并删除临时库 {@code devops00_spectra_db_migration_check}，不触碰业务库或其他数据库。</p>
  *
@@ -57,10 +57,10 @@ class FlywayMigrationAssemblyTest {
                     .dataSource(throwawayUrl, user, password)
                     .locations("classpath:db/migration")
                     .load();
-            assertEquals(8, emptyToLatest.migrate().migrationsExecuted,
-                    "空库应应用 V1–V8 共 8 个迁移");
+            assertEquals(9, emptyToLatest.migrate().migrationsExecuted,
+                    "空库应应用 V1–V9 共 9 个迁移");
             emptyToLatest.validate();
-            assertEquals(8, emptyToLatest.info().applied().length);
+            assertEquals(9, emptyToLatest.info().applied().length);
             emptyToLatest.validate();
 
             recreateDatabase(maintenanceUrl, user, password);
@@ -74,11 +74,11 @@ class FlywayMigrationAssemblyTest {
                     .dataSource(throwawayUrl, user, password)
                     .locations("classpath:db/migration")
                     .load();
-            assertEquals(1, toV8.migrate().migrationsExecuted, "V7→V8 升级只应用 V8");
+            assertEquals(2, toV8.migrate().migrationsExecuted, "V7→V9 升级只应用 V8–V9");
             toV8.validate();
-            assertEquals(8, toV8.info().applied().length);
-            assertTrue(toV8.info().applied()[7].getVersion().getVersion().equals("8"),
-                    "最后一个迁移应为 V8");
+            assertEquals(9, toV8.info().applied().length);
+            assertTrue(toV8.info().applied()[8].getVersion().getVersion().equals("9"),
+                    "最后一个迁移应为 V9");
         } finally {
             dropDatabase(maintenanceUrl, user, password);
         }

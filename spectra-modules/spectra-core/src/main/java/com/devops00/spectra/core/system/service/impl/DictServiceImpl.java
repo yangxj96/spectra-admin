@@ -21,6 +21,7 @@ import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.foundation.tree.TreeBuilder;
 import com.devops00.spectra.core.system.javabean.converter.DictGroupConverter;
 import com.devops00.spectra.core.system.javabean.converter.DictItemConverter;
@@ -99,11 +100,19 @@ public class DictServiceImpl implements DictService {
     @Transactional
     public void modifyGroup(DictGroupFrom params) {
         var group = groupService.getById(params.getId());
+        if (group == null) {
+            throw new DataNotExistException("字典组不存在");
+        }
         if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
+        if (params.getVersion() == null || !params.getVersion().equals(group.getVersion())) {
+            throw new EntityUpdateException("字典组已被其他操作修改，请刷新后重新处理");
+        }
         var entity = dictGroupConverter.toEntity(params);
-        groupService.updateById(entity);
+        if (!groupService.updateById(entity)) {
+            throw new EntityUpdateException("更新字典组发生版本冲突");
+        }
     }
 
     @Override
@@ -119,6 +128,9 @@ public class DictServiceImpl implements DictService {
     @Transactional
     public void modifyData(DictItemFrom params) {
         var current = requireDictItem(params.getId());
+        if (params.getVersion() == null || !params.getVersion().equals(current.getVersion())) {
+            throw new EntityUpdateException("字典项已被其他操作修改，请刷新后重新处理");
+        }
         if (!Objects.equals(current.getGid(), params.getGid()) || !Objects.equals(current.getValue(), params.getValue())) {
             throw new DataSaveException("字典项所属字典组和值创建后不能修改，请禁用原项并新增字典项");
         }
@@ -128,7 +140,9 @@ public class DictServiceImpl implements DictService {
         if (targetState == DictItemState.DISABLED) {
             entity.setDefaultFlag(false);
         }
-        dataService.updateById(entity);
+        if (!dataService.updateById(entity)) {
+            throw new EntityUpdateException("更新字典项发生版本冲突");
+        }
     }
 
     @Override

@@ -39,6 +39,10 @@ public class ConfiguredBatchItemFrom {
     @NotNull(message = "配置项ID不能为空")
     private UUID id;
 
+    /** 编辑时读取的配置项行版本。 */
+    @NotNull(message = "配置项版本不能为空")
+    private Long version;
+
     /** 配置值。 */
     @NotNull(message = "配置值不能为空")
     private String value;

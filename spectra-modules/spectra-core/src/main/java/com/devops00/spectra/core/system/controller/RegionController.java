@@ -92,6 +92,13 @@ public class RegionController {
         return bindService.getPath(id);
     }
 
+    /** 读取编辑时使用的当前区域及版本。 */
+    @GetMapping(value = "/{id}", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'region:read')")
+    public RegionVO detail(@PathVariable UUID id) {
+        return bindService.detail(id);
+    }
+
     /**
      * 新增行政区划
      *

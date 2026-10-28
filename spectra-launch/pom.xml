@@ -40,6 +40,12 @@
     </properties>
 
     <dependencies>
+        <!-- 以运行中的 MVC 映射和 Jackson 配置导出 API 1.0.0 契约。 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

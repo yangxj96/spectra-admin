@@ -288,4 +288,6 @@
     <Match><Class name="com.devops00.spectra.core.audit.JacksonAuditSanitizer"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
     <!-- EX-B02-SPOTBUGS-002: Quartz parameter validator is a Spring-owned collaborator. -->
     <Match><Class name="com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <!-- EX-B04-SPOTBUGS-001: Quartz edit-version and history collaborators are Spring-injected. -->
+    <Match><Class name="com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementSupport"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
 </FindBugsFilter>

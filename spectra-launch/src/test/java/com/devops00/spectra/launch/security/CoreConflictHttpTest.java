@@ -84,6 +84,80 @@ class CoreConflictHttpTest {
         }
     }
 
+    @Test
+    void profileClearPersistsAndStaleVersionReturns409() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class)
+                .run("--server.port=0", "--server.address=127.0.0.1", "--server.ssl.enabled=false",
+                        "--spring.quartz.auto-startup=false", "--flowable.async-executor-activate=false")) {
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            var mapper = application.getBean(ObjectMapper.class);
+            var fixture = new Fixture(application);
+            var user = new TestUser(UUID.randomUUID(),
+                    "b04profile" + UUID.randomUUID().toString().replace("-", ""),
+                    "Pf!" + UUID.randomUUID());
+            try (HttpClient client = HttpClient.newHttpClient()) {
+                fixture.insert(user);
+                String token = login(client, port, mapper, user.username(), user.password());
+                var uri = URI.create("http://127.0.0.1:" + port + "/api/user/profile");
+                var initial = client.send(HttpRequest.newBuilder(uri)
+                        .header("Api-Version", "1.0.0")
+                        .header("Authorization", "Bearer " + token)
+                        .GET()
+                        .build(), HttpResponse.BodyHandlers.ofString());
+                assertEquals(200, initial.statusCode(), initial.body());
+                var initialData = mapper.readTree(initial.body()).path("data");
+                long version = initialData.path("version").asLong();
+                assertEquals("Asia/Shanghai", initialData.path("timezone").asText());
+
+                var edit = mapper.createObjectNode()
+                        .put("version", version)
+                        .put("real_name", "synthetic cleared profile")
+                        .putNull("language")
+                        .putNull("timezone");
+                var saved = client.send(HttpRequest.newBuilder(uri)
+                        .header("Api-Version", "1.0.0")
+                        .header("Authorization", "Bearer " + token)
+                        .header("Content-Type", "application/json")
+                        .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(edit)))
+                        .build(), HttpResponse.BodyHandlers.ofString());
+                assertEquals(200, saved.statusCode(), saved.body());
+                assertEquals(1, fixture.jdbc.queryForObject("""
+                        SELECT count(*) FROM spectra_core.sys_user
+                        WHERE id = ? AND language IS NULL AND timezone IS NULL AND version = ?
+                        """, Integer.class, user.id(), version + 1));
+
+                var reread = client.send(HttpRequest.newBuilder(uri)
+                        .header("Api-Version", "1.0.0")
+                        .header("Authorization", "Bearer " + token)
+                        .GET()
+                        .build(), HttpResponse.BodyHandlers.ofString());
+                assertEquals(200, reread.statusCode(), reread.body());
+                var data = mapper.readTree(reread.body()).path("data");
+                assertEquals(version + 1, data.path("version").asLong());
+                assertEquals("synthetic cleared profile", data.path("real_name").asText());
+                assertEquals(false, data.has("language"));
+                assertEquals(false, data.has("timezone"));
+
+                var stale = client.send(HttpRequest.newBuilder(uri)
+                        .header("Api-Version", "1.0.0")
+                        .header("Authorization", "Bearer " + token)
+                        .header("Content-Type", "application/json")
+                        .PUT(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(edit)))
+                        .build(), HttpResponse.BodyHandlers.ofString());
+                assertEquals(409, stale.statusCode(), stale.body());
+                assertEquals("ENTITY_UPDATE_CONFLICT",
+                        mapper.readTree(stale.body()).path("error_code").asText());
+                assertEquals(1, fixture.jdbc.queryForObject("""
+                        SELECT count(*) FROM spectra_core.sys_user
+                        WHERE id = ? AND real_name = ? AND version = ?
+                        """, Integer.class, user.id(), "synthetic cleared profile", version + 1));
+            } finally {
+                fixture.clean();
+            }
+        }
+    }
+
     private static String login(HttpClient client, int port, ObjectMapper mapper, String username, String password)
             throws Exception {
         var response = client.send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port

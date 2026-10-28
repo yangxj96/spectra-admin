@@ -47,6 +47,9 @@ public class DictGroupTreeVO implements Tree<DictGroupTreeVO>, Serializable {
      */
     private UUID id;
 
+    /** 字典组行的读取版本。 */
+    private Long version;
+
     /**
      * 父级ID
      */

@@ -35,6 +35,10 @@ server:
         http-only: true
 
 # ==================== Spring 配置 ====================
+springdoc:
+  api-docs:
+    enabled: false
+
 spring:
   quartz:
     job-store-type: jdbc

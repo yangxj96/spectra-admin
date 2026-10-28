@@ -99,6 +99,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         if (existing == null) {
             throw new DataNotExistException("[" + params.getId() + "]不存在");
         }
+        if (params.getVersion() == null || !params.getVersion().equals(existing.getVersion())) {
+            throw new EntityUpdateException("菜单已被其他操作修改，请刷新后重新处理");
+        }
         validateTreeStructure(params);
         var menu = menuConverter.toEntity(params);
         if (menuMapper.updateById(menu) == 0) {

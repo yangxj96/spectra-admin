@@ -40,6 +40,9 @@ public class MenuVO {
      */
     private UUID id;
 
+    /** 菜单行的读取版本。 */
+    private Long version;
+
     /**
      * 父级ID
      */

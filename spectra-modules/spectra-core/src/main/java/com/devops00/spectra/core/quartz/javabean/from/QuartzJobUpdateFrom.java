@@ -36,6 +36,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuartzJobUpdateFrom {
 
+    /** 读取 Job 时获得的编辑版本，不是参数 JSON 的 schema version。 */
+    @NotNull(message = "任务编辑版本不能为空")
+    private Long version;
+
     /** 更新后的管理端展示名称。 */
     @NotBlank(message = "任务名称不能为空")
     @Size(max = 120, message = "任务名称不能超过 120 个字符")

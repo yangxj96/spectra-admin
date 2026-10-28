@@ -41,6 +41,9 @@ public class RegionVO implements Serializable {
      */
     private UUID id;
 
+    /** 行政区划行的读取版本。 */
+    private Long version;
+
     /**
      * 区域名称
      */

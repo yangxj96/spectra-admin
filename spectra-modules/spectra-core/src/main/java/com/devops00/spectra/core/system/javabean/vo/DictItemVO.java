@@ -44,6 +44,9 @@ public class DictItemVO implements Serializable {
      */
     private UUID id;
 
+    /** 字典项行的读取版本。 */
+    private Long version;
+
     /**
      * 字典类型ID
      */

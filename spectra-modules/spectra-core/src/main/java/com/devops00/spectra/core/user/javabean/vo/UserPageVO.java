@@ -27,7 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,6 +52,9 @@ public class UserPageVO implements Serializable {
      */
     private UUID id;
 
+    /** 用户行的读取版本。 */
+    private Long version;
+
     /**
      * 工号/员工编号。
      */
@@ -75,7 +78,7 @@ public class UserPageVO implements Serializable {
     /**
      * 离职时间。
      */
-    private LocalDateTime departedAt;
+    private OffsetDateTime departedAt;
 
     /**
      * 当前授权状态。
@@ -118,5 +121,5 @@ public class UserPageVO implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }

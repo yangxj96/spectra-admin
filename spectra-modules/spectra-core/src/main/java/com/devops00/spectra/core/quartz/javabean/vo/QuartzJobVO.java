@@ -32,7 +32,7 @@ package com.devops00.spectra.core.quartz.javabean.vo;
  * @version 1.0
  * @since 2026/09/13
  */
-public record QuartzJobVO(String jobKey, String group, String displayName, String typeKey,
+public record QuartzJobVO(String jobKey, Long version, String group, String displayName, String typeKey,
                           boolean protectedJob, String jobClassName, String parameterVersion,
                           String parametersJson, QuartzTriggerVO trigger) {
 }

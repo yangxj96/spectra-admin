@@ -80,7 +80,7 @@ class OaMeetingFullHttpFlywayTest {
                     try (var result = statement.executeQuery("SELECT count(*) FROM public.flyway_schema_history "
                             + "WHERE success = true")) {
                         assertTrue(result.next());
-                        assertEquals(8L, result.getLong(1));
+                        assertEquals(9L, result.getLong(1));
                     }
                 }
             }

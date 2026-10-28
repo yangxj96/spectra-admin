@@ -252,6 +252,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
         }
+        if (params.getVersion() == null || !params.getVersion().equals(entity.getVersion())) {
+            throw new EntityUpdateException("用户已被其他操作修改，请刷新后重新处理");
+        }
         assertUserWithinPermission(entity, "user:update");
         // 联系方式与验证码登录身份需要独立的安全验证/撤销契约，编辑入口明确拒绝而非静默忽略。
         if (StrUtils.isNotBlank(params.getPhone()) || StrUtils.isNotBlank(params.getEmail())) {
@@ -496,6 +499,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var user = this.getById(userId);
         if (user == null) {
             throw new DataNotExistException("用户不存在");
+        }
+        if (params.getVersion() == null || !params.getVersion().equals(user.getVersion())) {
+            throw new EntityUpdateException("用户信息已被其他操作修改，请刷新后重新处理");
         }
         userConverter.updateProfile(params, user);
         if (this.baseMapper.updateById(user) == 0) {

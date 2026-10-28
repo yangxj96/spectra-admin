@@ -49,6 +49,11 @@ public class UserSaveFrom {
     @NotNull(message = "用户 ID 不能为空", groups = Verify.Update.class)
     private UUID id;
 
+    /** 编辑时读取的用户行版本。 */
+    @Null(message = "新增用户时不能指定版本", groups = Verify.Insert.class)
+    @NotNull(message = "用户版本不能为空", groups = Verify.Update.class)
+    private Long version;
+
     /**
      * 工号/员工编号。
      */

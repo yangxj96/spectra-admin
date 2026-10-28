@@ -46,6 +46,9 @@ public class ConfiguredVO implements Serializable {
      */
     private UUID id;
 
+    /** 配置项行的读取版本。 */
+    private Long version;
+
     /**
      * 配置key
      */
