@@ -19,6 +19,7 @@ package com.devops00.spectra.core.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorDiagnosticTask;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 服务监控诊断任务 Mapper。
@@ -29,4 +30,8 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ServiceMonitorDiagnosticTaskMapper extends BaseMapper<ServiceMonitorDiagnosticTask> {
+
+    /** 在事务内串行化诊断任务准入检查，避免多实例并发绕过全局预算。 */
+    @Select("SELECT 1 FROM (SELECT pg_advisory_xact_lock(824736501) AS locked) AS admission")
+    int acquireAdmissionLock();
 }

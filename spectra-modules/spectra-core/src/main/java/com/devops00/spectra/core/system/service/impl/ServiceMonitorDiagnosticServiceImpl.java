@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorDiagnosticTask;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDiagnosticType;
@@ -36,6 +37,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import javax.sql.DataSource;
 
 import java.io.BufferedWriter;
@@ -309,8 +313,10 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     }
 
     @Override
+    @Transactional
     public ServiceMonitorDiagnosticTaskVO createTask(ServiceMonitorDiagnosticFrom from) {
         var type = validateTaskRequest(from);
+        taskMapper.acquireAdmissionLock();
         var running = taskMapper.selectCount(new LambdaQueryWrapper<ServiceMonitorDiagnosticTask>()
                 .in(ServiceMonitorDiagnosticTask::getStatus, PENDING, RUNNING)
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted));
@@ -326,16 +332,29 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         task.setRequestedAt(now);
         task.setExpiresAt(now.plus(Duration.ofHours(retentionHours)));
         taskMapper.insert(task);
-        try {
-            taskExecutor.execute(() -> runTask(task.getId(), type));
-        } catch (RuntimeException exception) {
-            task.setStatus(FAILED);
-            task.setErrorMessage("诊断任务未能启动");
-            task.setCompletedAt(Instant.now());
-            taskMapper.updateById(task);
-            throw new DataException("诊断任务未能启动", exception);
-        }
+        dispatchAfterCommit(task.getId());
         return toVO(task);
+    }
+
+    private void dispatchAfterCommit(UUID taskId) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    dispatch(taskId);
+                }
+            });
+            return;
+        }
+        dispatch(taskId);
+    }
+
+    private void dispatch(UUID taskId) {
+        try {
+            taskExecutor.execute(() -> runTask(taskId));
+        } catch (RuntimeException exception) {
+            log.warn("服务监控诊断任务未能进入执行队列，等待恢复扫描: taskId={}", taskId, exception);
+        }
     }
 
     private ServiceMonitorDiagnosticType validateTaskRequest(ServiceMonitorDiagnosticFrom from) {
@@ -368,13 +387,29 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     /**
      * 执行内部处理逻辑（{@code runTask}）。
      */
-    private void runTask(UUID id, ServiceMonitorDiagnosticType type) {
+    private void runTask(UUID id) {
         var task = taskMapper.selectById(id);
-        if (task == null)
+        if (task == null) {
             return;
-        task.setStatus(RUNNING);
-        task.setStartedAt(Instant.now());
-        taskMapper.updateById(task);
+        }
+        var type = ServiceMonitorDiagnosticType.fromCode(task.getTaskType());
+        if (type == null) {
+            finishTask(id, FAILED, null, "诊断类型无效");
+            return;
+        }
+        var claimedAt = Instant.now();
+        var claimed = taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
+                .eq(ServiceMonitorDiagnosticTask::getId, id)
+                .eq(ServiceMonitorDiagnosticTask::getStatus, PENDING)
+                .isNull(ServiceMonitorDiagnosticTask::getDeleted)
+                .and(wrapper -> wrapper.isNull(ServiceMonitorDiagnosticTask::getExpiresAt)
+                        .or()
+                        .gt(ServiceMonitorDiagnosticTask::getExpiresAt, claimedAt))
+                .set(ServiceMonitorDiagnosticTask::getStatus, RUNNING)
+                .set(ServiceMonitorDiagnosticTask::getStartedAt, claimedAt));
+        if (claimed != 1) {
+            return;
+        }
         var path = safePath(task.getFileName());
         try {
             if (type == ServiceMonitorDiagnosticType.THREAD_DUMP)
@@ -385,18 +420,47 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
             var limit = type == ServiceMonitorDiagnosticType.THREAD_DUMP ? threadDumpMaxBytes : heapDumpMaxBytes;
             if (size > limit)
                 throw new DataException("诊断文件超过大小限制");
-            task.setStatus(SUCCEEDED);
-            task.setFileSize(size);
-            task.setCompletedAt(Instant.now());
-            taskMapper.updateById(task);
+            finishTask(id, SUCCEEDED, size, null);
         } catch (Exception exception) {
             deleteQuietly(path);
-            task.setStatus(FAILED);
-            task.setErrorMessage(exception instanceof DataException ? exception.getMessage() : "诊断文件生成失败");
-            task.setCompletedAt(Instant.now());
-            taskMapper.updateById(task);
+            finishTask(id, FAILED, null,
+                    exception instanceof DataException ? exception.getMessage() : "诊断文件生成失败");
             log.warn("服务监控诊断任务失败: taskId={}, type={}", id, type.getCode(), exception);
         }
+    }
+
+    private void finishTask(UUID id, String status, Long fileSize, String errorMessage) {
+        taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
+                .eq(ServiceMonitorDiagnosticTask::getId, id)
+                .eq(ServiceMonitorDiagnosticTask::getStatus, RUNNING)
+                .isNull(ServiceMonitorDiagnosticTask::getDeleted)
+                .set(ServiceMonitorDiagnosticTask::getStatus, status)
+                .set(ServiceMonitorDiagnosticTask::getFileSize, fileSize)
+                .set(ServiceMonitorDiagnosticTask::getErrorMessage, errorMessage)
+                .set(ServiceMonitorDiagnosticTask::getCompletedAt, Instant.now()));
+    }
+
+    /**
+     * 恢复因提交前派发、执行器拒绝或实例中断而遗留的诊断任务。
+     */
+    public void recoverPendingTasks() {
+        var cutoff = Instant.now().minusSeconds(30);
+        var pending = taskMapper.selectList(new LambdaQueryWrapper<ServiceMonitorDiagnosticTask>()
+                .eq(ServiceMonitorDiagnosticTask::getStatus, PENDING)
+                .isNull(ServiceMonitorDiagnosticTask::getDeleted)
+                .le(ServiceMonitorDiagnosticTask::getRequestedAt, cutoff)
+                .orderByAsc(ServiceMonitorDiagnosticTask::getRequestedAt)
+                .last("LIMIT 10"));
+        pending.forEach(task -> dispatch(task.getId()));
+
+        var runningCutoff = Instant.now().minus(Duration.ofHours(1));
+        taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
+                .eq(ServiceMonitorDiagnosticTask::getStatus, RUNNING)
+                .isNull(ServiceMonitorDiagnosticTask::getDeleted)
+                .le(ServiceMonitorDiagnosticTask::getStartedAt, runningCutoff)
+                .set(ServiceMonitorDiagnosticTask::getStatus, FAILED)
+                .set(ServiceMonitorDiagnosticTask::getErrorMessage, "诊断任务执行中断")
+                .set(ServiceMonitorDiagnosticTask::getCompletedAt, Instant.now()));
     }
 
     /**
@@ -480,8 +544,13 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .isNull(ServiceMonitorDiagnosticTask::getDeleted)
                 .le(ServiceMonitorDiagnosticTask::getExpiresAt, now));
         for (var task : tasks) {
-            deleteQuietly(safePath(task.getFileName()));
-            taskMapper.deleteById(task.getId());
+            if (deleteQuietly(safePath(task.getFileName()))) {
+                taskMapper.deleteById(task.getId());
+            } else {
+                taskMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorDiagnosticTask>()
+                        .eq(ServiceMonitorDiagnosticTask::getId, task.getId())
+                        .set(ServiceMonitorDiagnosticTask::getErrorMessage, "诊断文件清理失败"));
+            }
         }
     }
 
@@ -501,12 +570,14 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     /**
      * 更新或推进目标状态（{@code deleteQuietly}）。
      */
-    private void deleteQuietly(Path path) {
+    private boolean deleteQuietly(Path path) {
         try {
             if (path != null)
                 Files.deleteIfExists(path);
+            return true;
         } catch (IOException exception) {
             log.warn("服务监控诊断文件清理失败");
+            return false;
         }
     }
 

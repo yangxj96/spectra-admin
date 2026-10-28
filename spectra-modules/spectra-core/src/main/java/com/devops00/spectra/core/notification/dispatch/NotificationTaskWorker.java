@@ -18,27 +18,22 @@ package com.devops00.spectra.core.notification.dispatch;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
-import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendResult;
-import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
-import com.devops00.spectra.core.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.core.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.core.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.core.notification.observability.NotificationMetrics;
 import com.devops00.spectra.core.notification.sender.NotificationSenderRegistry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
 
 /**
  * PostgreSQL Outbox 任务 Worker；支持并发领取、租约恢复和指数退避。
@@ -47,42 +42,24 @@ import java.util.Set;
  * @version 1.0
  * @since 2026/8/11
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationTaskWorker {
 
-    /**
-     * 单个任务允许的最大重试次数。
-     */
-    private static final int MAX_RETRY_COUNT = 3;
-    /**
-     * 指数退避的最大等待时间。
-     */
-    private static final long MAX_RETRY_DELAY_SECONDS = 3_600L;
     /**
      * Worker 锁定标识。
      */
     private static final String DEFAULT_WORKER_ID = "notification-worker";
 
     /**
-     * Provider 适配器允许写入投递摘要的固定编码；未知文本仍使用通用失败摘要，避免敏感内容落库。
-     */
-    private static final Set<String> SAFE_PROVIDER_SUMMARIES = Set.of(
-            "ACCEPTED", "CHANNEL_NOT_CONFIGURED", "MOCK_ACCEPTED", "PROVIDER_ACCEPTED",
-            "PROVIDER_CONFIGURATION_INVALID", "PROVIDER_FAILURE", "PROVIDER_HEALTH_CHECK_FAILED",
-            "PROVIDER_HTTP_REJECTED", "PROVIDER_NOT_CONFIGURED", "PROVIDER_NOT_REGISTERED",
-            "PROVIDER_RATE_LIMITED", "PROVIDER_REJECTED", "PROVIDER_REQUEST_INTERRUPTED",
-            "PROVIDER_REQUEST_UNAVAILABLE", "PROVIDER_SERVER_ERROR", "PROVIDER_UNKNOWN_RESULT",
-            "RECIPIENT_ADDRESS_UNAVAILABLE", "站内信已写入收件箱");
-
-    /**
      * 通知任务 Mapper。
      */
     private final NotificationTaskMapper taskMapper;
     /**
-     * 投递记录 Mapper。
+     * 通知结果记录器；Delivery 插入和 Task 迁移在同一事务内完成。
      */
-    private final NotificationDeliveryMapper deliveryMapper;
+    private final NotificationTaskResultRecorder resultRecorder;
     /**
      * 逻辑请求状态汇总器。
      */
@@ -112,12 +89,6 @@ public class NotificationTaskWorker {
     private long processingTimeoutSeconds;
 
     /**
-     * 通知投递失败后首次重试的基础延迟，单位为秒；后续重试在此基础上按尝试次数执行指数退避。
-     */
-    @Value("${spectra.notification.worker.retry-base-delay-seconds:5}")
-    private long retryBaseDelaySeconds;
-
-    /**
      * 处理一批待投递任务，供周期调度器、测试和运维手工触发调用。
      * Worker 停用时不会影响消息中心读取。
      *
@@ -134,6 +105,7 @@ public class NotificationTaskWorker {
     public int processPending(int limit, String workerId, boolean recoverLeases) {
         var safeLimit = Math.max(1, Math.min(limit, 100));
         var now = Instant.now();
+        refreshRequests(taskMapper.expireOverdueTasks(now, safeLimit));
         if (recoverLeases) {
             recoverExpiredLeases(now);
         }
@@ -143,19 +115,18 @@ public class NotificationTaskWorker {
     }
 
     /**
-     * 将超时的处理中任务恢复为可重试状态。
+     * 将租约超时任务收敛为 UNKNOWN；外部发送结果未知时不允许自动重发。
      */
     private void recoverExpiredLeases(Instant now) {
         var leaseDeadline = now.minusSeconds(Math.max(1L, processingTimeoutSeconds));
-        taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getStatus, NotificationTaskStatus.PROCESSING.name())
-                .lt(NotificationTaskEntity::getLockedAt, leaseDeadline)
-                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.RETRYING.name())
-                .set(NotificationTaskEntity::getScheduledAt, now)
-                .set(NotificationTaskEntity::getNextRetryAt, now)
-                .set(NotificationTaskEntity::getLastErrorCode, "WORKER_LEASE_EXPIRED")
-                .set(NotificationTaskEntity::getLockedBy, null)
-                .set(NotificationTaskEntity::getLockedAt, null));
+        refreshRequests(taskMapper.expireLeases(leaseDeadline, 100));
+    }
+
+    private void refreshRequests(List<UUID> requestIds) {
+        if (requestIds == null || requestIds.isEmpty()) {
+            return;
+        }
+        requestIds.stream().distinct().forEach(requestStatusUpdater::refresh);
     }
 
     /**
@@ -172,11 +143,6 @@ public class NotificationTaskWorker {
      */
     private void processOneWithContext(NotificationTaskEntity task, String workerId) {
         var now = Instant.now();
-        if (isExpired(task, now)) {
-            markExpired(task, now);
-            requestStatusUpdater.refresh(task.getNotificationRequestId());
-            return;
-        }
         var claimed = taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
                 .in(NotificationTaskEntity::getStatus,
@@ -188,134 +154,31 @@ public class NotificationTaskWorker {
         if (claimed != 1) {
             return;
         }
+        task.setStatus(NotificationTaskStatus.PROCESSING.name());
+        task.setLockedBy(workerId);
+        task.setLockedAt(now);
+
         var sender = senderRegistry.find(parseChannel(task.getChannel())).orElse(null);
+        ChannelSendResult result;
         if (sender == null) {
-            finish(task, ChannelSendResult.blocked("NONE", null, "CHANNEL_NOT_CONFIGURED"));
-            requestStatusUpdater.refresh(task.getNotificationRequestId());
-            return;
+            result = ChannelSendResult.blocked("NONE", null, "CHANNEL_NOT_CONFIGURED");
+        } else {
+            try {
+                result = sender.send(task);
+            } catch (RuntimeException exception) {
+                log.warn("通知 Provider 发送异常，结果按 UNKNOWN 记录: taskId={}", task.getId(), exception);
+                result = ChannelSendResult.unknown("NONE", null, "PROVIDER_UNKNOWN_RESULT");
+            }
         }
         try {
-            var result = sender.send(task);
-            finish(task, result);
+            resultRecorder.record(task, result);
             if (metrics != null) {
                 metrics.recordTask(task.getChannel(), result.status().name(), task.getPurpose());
             }
+            requestStatusUpdater.refresh(task.getNotificationRequestId());
         } catch (RuntimeException exception) {
-            finish(task, ChannelSendResult.unknown("NONE", null, "PROVIDER_FAILURE"));
-            if (metrics != null) {
-                metrics.recordTask(task.getChannel(), NotificationTaskStatus.UNKNOWN.name(), task.getPurpose());
-            }
+            log.error("通知结果持久化失败，任务保留租约等待收敛: taskId={}", task.getId(), exception);
         }
-        requestStatusUpdater.refresh(task.getNotificationRequestId());
-    }
-
-    /**
-     * 记录渠道结果；只有明确的限流结果允许按任务最大尝试次数退避重试。
-     */
-    private void finish(NotificationTaskEntity task, ChannelSendResult result) {
-        var completedAt = Instant.now();
-        var attemptCount = (task.getAttemptCount() == null ? 0 : task.getAttemptCount()) + 1;
-        var safeSummary = sanitizeProviderSummary(result.summary());
-        var delivery = buildDelivery(task, result, completedAt, attemptCount, safeSummary);
-        if (deliveryMapper.insert(delivery) != 1) {
-            throw new DataSaveException("记录通知投递结果失败");
-        }
-        updateTask(task, result, attemptCount, safeSummary);
-    }
-
-    private NotificationDeliveryEntity buildDelivery(NotificationTaskEntity task, ChannelSendResult result,
-                                                     Instant completedAt, int attemptCount, String safeSummary) {
-        var delivery = new NotificationDeliveryEntity();
-        delivery.setNotificationTaskId(task.getId());
-        delivery.setTemplateId(task.getTemplateId());
-        delivery.setTemplateVersionNo(task.getTemplateVersionNo());
-        delivery.setTemplateVersionDigest(task.getTemplateVersionDigest());
-        delivery.setRenderedTitle(task.getTitle());
-        delivery.setRenderedContent(task.getContent());
-        delivery.setAttemptNo(attemptCount);
-        delivery.setProvider(result.providerCode());
-        delivery.setProviderMessageId(result.providerMessageId());
-        delivery.setStartedAt(completedAt);
-        delivery.setCompletedAt(completedAt);
-        delivery.setResultStatus(result.status().name());
-        delivery.setErrorCode(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
-        delivery.setErrorMessageSanitized(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
-        delivery.setResponseSummary(safeSummary == null ? Map.of() : Map.of("summary", safeSummary));
-        return delivery;
-    }
-
-    private void updateTask(NotificationTaskEntity task, ChannelSendResult result, int attemptCount,
-                            String safeSummary) {
-        var retryable = isRetryable(result, attemptCount, task.getMaxAttempts());
-        var nextAttempt = Instant.now().plusSeconds(retryDelaySeconds(attemptCount));
-        taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getId, task.getId())
-                .eq(NotificationTaskEntity::getStatus, NotificationTaskStatus.PROCESSING.name())
-                .set(NotificationTaskEntity::getAttemptCount, attemptCount)
-                .set(NotificationTaskEntity::getLastErrorCode, result.status() == ChannelSendStatus.SENT ? null : safeSummary)
-                .set(NotificationTaskEntity::getStatus,
-                        retryable ? NotificationTaskStatus.RETRYING.name() : result.status().name())
-                .set(NotificationTaskEntity::getScheduledAt, retryable ? nextAttempt : task.getScheduledAt())
-                .set(NotificationTaskEntity::getNextRetryAt, retryable ? nextAttempt : task.getNextRetryAt())
-                .set(NotificationTaskEntity::getLockedBy, null)
-                .set(NotificationTaskEntity::getLockedAt, null));
-    }
-
-    /**
-     * 仅对供应商明确返回的限流结果执行自动重试；UNKNOWN 不做无条件重试。
-     */
-    private boolean isRetryable(ChannelSendResult result, int attemptCount, Integer maxAttempts) {
-        var allowedAttempts = maxAttempts == null || maxAttempts < 1 ? MAX_RETRY_COUNT : maxAttempts;
-        return result.status() == ChannelSendStatus.FAILED
-                && "PROVIDER_RATE_LIMITED".equals(result.summary())
-                && attemptCount < allowedAttempts;
-    }
-
-    /**
-     * 仅保留可用于重试分类的脱敏错误摘要，避免 Provider 异常携带验证码或其他敏感值落库。
-     */
-    private String sanitizeProviderSummary(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        var safe = value.trim()
-                .replaceAll("(?i)(code|captcha|token|secret|password)\\s*[:=]\\s*[^,; ]+", "$1=[REDACTED]")
-                .replaceAll("(?<!\\d)\\d{6}(?!\\d)", "[REDACTED]");
-        safe = safe.length() > 200 ? safe.substring(0, 200) : safe;
-        if (safe.toUpperCase(Locale.ROOT).contains("REDACTED")) {
-            return safe;
-        }
-        return SAFE_PROVIDER_SUMMARIES.contains(safe.toUpperCase(Locale.ROOT))
-                || SAFE_PROVIDER_SUMMARIES.contains(safe) ? safe : "PROVIDER_FAILURE";
-    }
-
-    /**
-     * 根据重试次数计算指数退避时间。
-     */
-    private long retryDelaySeconds(int retryCount) {
-        var base = Math.max(1L, retryBaseDelaySeconds);
-        var multiplier = 1L << Math.min(Math.max(0, retryCount - 1), 10);
-        return Math.min(MAX_RETRY_DELAY_SECONDS, base * multiplier);
-    }
-
-    /**
-     * 判断任务是否已超过过期时间。
-     */
-    private boolean isExpired(NotificationTaskEntity task, Instant now) {
-        return task.getExpiresAt() != null && !task.getExpiresAt().isAfter(now);
-    }
-
-    /**
-     * 将尚未领取的过期任务标记为过期。
-     */
-    private void markExpired(NotificationTaskEntity task, Instant now) {
-        taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getId, task.getId())
-                .in(NotificationTaskEntity::getStatus,
-                        List.of(NotificationTaskStatus.PENDING.name(), NotificationTaskStatus.RETRYING.name()))
-                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.EXPIRED.name())
-                .set(NotificationTaskEntity::getLockedBy, null)
-                .set(NotificationTaskEntity::getLockedAt, null));
     }
 
     /**

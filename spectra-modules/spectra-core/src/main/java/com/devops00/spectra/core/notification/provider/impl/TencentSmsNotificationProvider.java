@@ -92,7 +92,7 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         if (!(body.get("Response") instanceof Map<?, ?>)) {
             return NotificationProviderHealth.unhealthy("HEALTH_CHECK_INVALID_RESPONSE", checkedAt);
         }
-        return body.containsKey("Error")
+        return nestedResponse(body).containsKey("Error")
                 ? NotificationProviderHealth.unhealthy("HEALTH_CHECK_PROVIDER_REJECTED", checkedAt)
                 : NotificationProviderHealth.healthy("HEALTH_CHECK_OK", checkedAt);
     }
@@ -181,7 +181,6 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
                     .timeout(Duration.ofMillis(configuration.timeoutMs()))
                     .header("Authorization", authorization)
                     .header("Content-Type", "application/json; charset=utf-8")
-                    .header("Host", host)
                     .header("X-TC-Action", action)
                     .header("X-TC-Version", VERSION)
                     .header("X-TC-Timestamp", String.valueOf(timestamp))

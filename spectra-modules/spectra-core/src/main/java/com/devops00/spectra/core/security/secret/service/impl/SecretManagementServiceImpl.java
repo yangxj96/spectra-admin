@@ -194,13 +194,47 @@ public class SecretManagementServiceImpl implements SecretManagementService, Sec
         } catch (RuntimeException exception) {
             throw unavailable(code, exception);
         }
-        if (version == null) {
-            return Optional.empty();
+        return Optional.ofNullable(version).map(item -> runtimeSecret(code, item));
+    }
+
+    @Override
+    public Optional<RuntimeSecret> findVersion(String code, int version) {
+        SecretDefinitionEntity definition = requireDefinition(code);
+        SecretVersionEntity entity;
+        try {
+            entity = versionMapper.selectOne(new QueryWrapper<SecretVersionEntity>()
+                    .eq("secret_definition_id", definition.getId())
+                    .eq("version_no", version)
+                    .in("state", SecretVersionState.ACTIVE.name(), SecretVersionState.RETIRED.name())
+                    .isNull("deleted")
+                    .last("LIMIT 1"));
+        } catch (RuntimeException exception) {
+            throw unavailable(code, exception);
         }
+        return Optional.ofNullable(entity).map(item -> runtimeSecret(code, item));
+    }
+
+    @Override
+    public List<RuntimeSecret> findVersions(String code) {
+        SecretDefinitionEntity definition = requireDefinition(code);
+        List<SecretVersionEntity> versions;
+        try {
+            versions = versionMapper.selectList(new QueryWrapper<SecretVersionEntity>()
+                    .eq("secret_definition_id", definition.getId())
+                    .in("state", SecretVersionState.ACTIVE.name(), SecretVersionState.RETIRED.name())
+                    .isNull("deleted")
+                    .orderByDesc("version_no"));
+        } catch (RuntimeException exception) {
+            throw unavailable(code, exception);
+        }
+        return versions.stream().map(item -> runtimeSecret(code, item)).toList();
+    }
+
+    private RuntimeSecret runtimeSecret(String code, SecretVersionEntity version) {
         try {
             String value = cipher.decrypt(code, new SecretValueCipher.EncryptedValue(
                     version.getCipherAlgorithm(), version.getNonce(), version.getCiphertext()));
-            return Optional.of(new RuntimeSecret(code, version.getVersionNo(), value, version.getFingerprint()));
+            return new RuntimeSecret(code, version.getVersionNo(), value, version.getFingerprint());
         } catch (RuntimeException exception) {
             throw unavailable(code, exception);
         }

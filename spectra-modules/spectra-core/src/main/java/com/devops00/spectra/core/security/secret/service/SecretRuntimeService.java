@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.secret.service;
 import com.devops00.spectra.common.exception.SecuritySecretUnavailableException;
 import com.devops00.spectra.common.port.security.RuntimeSecret;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -37,6 +38,23 @@ public interface SecretRuntimeService {
      * @return 当前 ACTIVE 的运行时密钥；没有启用版本时返回空 Optional。
      */
     Optional<RuntimeSecret> findActive(String code);
+
+    /**
+     * 按业务版本号读取历史密钥；仅用于解密带版本号的历史密文。
+     *
+     * @param code    已注册密钥编码
+     * @param version 业务版本号
+     * @return 指定版本的运行时密钥；版本不存在时返回空 Optional
+     */
+    Optional<RuntimeSecret> findVersion(String code, int version);
+
+    /**
+     * 读取全部未删除版本，供无法识别版本的旧密文做受限兼容解密。
+     *
+     * @param code 已注册密钥编码
+     * @return 按版本号倒序排列的运行时密钥
+     */
+    List<RuntimeSecret> findVersions(String code);
 
     /**
      * 要求当前 ACTIVE 版本存在并可解密。

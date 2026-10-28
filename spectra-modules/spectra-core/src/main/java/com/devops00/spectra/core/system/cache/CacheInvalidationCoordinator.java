@@ -21,6 +21,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -44,8 +46,12 @@ public class CacheInvalidationCoordinator {
 
     private final CacheRegionRegistry registry;
     private final RedisTemplate<String, Object> redis;
+    private static final Duration RETENTION = Duration.ofHours(1);
+    private static final int MAX_OPERATIONS = 512;
+
     private final Set<UUID> applied = ConcurrentHashMap.newKeySet();
-    private final Map<UUID, CacheManagementResult> operations = new ConcurrentHashMap<>();
+    private final Map<UUID, OperationEntry> operations = new ConcurrentHashMap<>();
+    private final Map<UUID, String> intents = new ConcurrentHashMap<>();
 
     public CacheInvalidationCoordinator(CacheRegionRegistry registry,
                                         @Qualifier("redisTemplate") RedisTemplate<String, Object> redis) {
@@ -59,14 +65,25 @@ public class CacheInvalidationCoordinator {
         if (operationId == null) {
             throw new IllegalArgumentException("缓存清理操作 ID 不能为空");
         }
-        CacheManagementResult existing = operations.get(operationId);
+        prune();
+        Collection<String> normalizedRegions;
+        if (allRegions) {
+            normalizedRegions = Set.of();
+        } else {
+            normalizedRegions = registry.validate(regionCodes)
+                    .stream()
+                    .map(CacheRegionDescriptor::code)
+                    .sorted()
+                    .toList();
+        }
+        var intent = allRegions + "|" + allInstances + "|" + String.join(",", normalizedRegions);
+        var previousIntent = intents.putIfAbsent(operationId, intent);
+        if (previousIntent != null && !previousIntent.equals(intent)) {
+            throw new IllegalArgumentException("同一操作 ID 不能用于不同清理范围");
+        }
+        CacheManagementResult existing = existing(operationId);
         if (existing != null) {
             return existing;
-        }
-        if (allRegions) {
-            registry.validate(null);
-        } else {
-            registry.validate(regionCodes);
         }
 
         CacheManagementResult result;
@@ -86,13 +103,14 @@ public class CacheInvalidationCoordinator {
             applied.remove(operationId);
             result = new CacheManagementResult(operationId, "FAILED", 0L, false, "普通缓存清理失败");
         }
-        operations.put(operationId, result);
+        operations.put(operationId, new OperationEntry(result, Instant.now()));
         return result;
     }
 
     /** 返回当前实例已知的操作状态；未知操作不伪造成功。 */
     public CacheManagementResult status(UUID operationId) {
-        return operations.get(operationId);
+        prune();
+        return existing(operationId);
     }
 
     /** 供 Redis 订阅适配器调用的本地幂等应用入口。 */
@@ -125,5 +143,48 @@ public class CacheInvalidationCoordinator {
                         .toList());
         redis.convertAndSend(CHANNEL, operationId + ";" + allRegions + ";" + regions);
         return true;
+    }
+
+    private CacheManagementResult existing(UUID operationId) {
+        var entry = operations.get(operationId);
+        if (entry == null) {
+            return null;
+        }
+        if (entry.completedAt().plus(RETENTION).isBefore(Instant.now())) {
+            operations.remove(operationId, entry);
+            intents.remove(operationId);
+            applied.remove(operationId);
+            return null;
+        }
+        if ("SUCCEEDED".equals(entry.result().status())) {
+            return entry.result();
+        }
+        operations.remove(operationId, entry);
+        applied.remove(operationId);
+        return null;
+    }
+
+    private void prune() {
+        if (operations.size() <= MAX_OPERATIONS) {
+            return;
+        }
+        var cutoff = Instant.now().minus(RETENTION);
+        operations.entrySet().removeIf(entry -> {
+            if (entry.getValue().completedAt().isBefore(cutoff)) {
+                intents.remove(entry.getKey());
+                applied.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 已完成操作及其保留时间。
+     *
+     * @param result      清理回执
+     * @param completedAt 完成时间
+     */
+    private record OperationEntry(CacheManagementResult result, Instant completedAt) {
     }
 }

@@ -25,6 +25,7 @@ import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEn
 import com.devops00.spectra.core.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.core.notification.service.NotificationProviderAdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -63,6 +64,10 @@ public class NotificationProviderRuntime {
      */
     private final ConcurrentHashMap<NotificationChannel, HealthSnapshot> healthSnapshots = new ConcurrentHashMap<>();
 
+    /** 健康快照有效期；过期后发送前重新检查，避免重启或长时间故障后沿用旧状态。 */
+    @Value("${spectra.notification.provider.health-ttl-seconds:300}")
+    private long healthTtlSeconds;
+
     /**
      * 立即执行指定渠道健康检查并刷新缓存。
      */
@@ -95,16 +100,13 @@ public class NotificationProviderRuntime {
     public NotificationProviderHealth snapshot(NotificationChannel channel) {
         var configuration = configurationService.resolve(channel);
         var cached = healthSnapshots.get(channel);
-        if (cached != null && Objects.equals(cached.configurationUpdatedAt(), configuration.updatedAt())) {
+        if (cached != null
+                && Objects.equals(cached.configurationUpdatedAt(), configuration.updatedAt())
+                && cached.health().checkedAt() != null
+                && cached.health().checkedAt().plusSeconds(Math.max(1L, healthTtlSeconds)).isAfter(Instant.now())) {
             return cached.health();
         }
-        if (configuration.providerType() == null || configuration.providerType().isBlank()) {
-            return NotificationProviderHealth.notConfigured("PROVIDER_NOT_CONFIGURED", null);
-        }
-        if (!configuration.enabled()) {
-            return NotificationProviderHealth.disabled("DISABLED_BY_CONFIGURATION", null);
-        }
-        return NotificationProviderHealth.unhealthy("HEALTH_CHECK_REQUIRED", null);
+        return check(channel);
     }
 
     /**

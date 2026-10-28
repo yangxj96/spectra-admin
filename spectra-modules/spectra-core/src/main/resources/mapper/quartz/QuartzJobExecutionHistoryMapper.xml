@@ -169,6 +169,7 @@
                updated_at = CURRENT_TIMESTAMP,
                version = version + 1
          WHERE target.id IN (SELECT id FROM candidates)
+           AND target.status = 'RUNNING'
     </update>
 
     <delete id="deleteExpired">

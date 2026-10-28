@@ -101,6 +101,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
             NotificationTaskStatus.FAILED.name(),
             NotificationTaskStatus.BLOCKED.name(),
             NotificationTaskStatus.UNKNOWN.name());
+
+    /** 人工重试追加的最大外部尝试次数；历史投递编号保持连续。 */
+    private static final int MANUAL_RETRY_ATTEMPTS = 3;
     /**
      * 允许取消的处理中状态。
      */
@@ -442,11 +445,15 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         if (!RETRYABLE_STATUSES.contains(task.getStatus())) {
             throw new DataSaveException("当前通知任务不可重试");
         }
+        var attemptCount = task.getAttemptCount() == null ? 0 : task.getAttemptCount();
+        var currentMaxAttempts = task.getMaxAttempts() == null ? MANUAL_RETRY_ATTEMPTS : task.getMaxAttempts();
         var updated = taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, taskId)
                 .in(NotificationTaskEntity::getStatus, RETRYABLE_STATUSES)
+                .eq(NotificationTaskEntity::getAttemptCount, attemptCount)
                 .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.RETRYING.name())
-                .set(NotificationTaskEntity::getAttemptCount, 0)
+                .set(NotificationTaskEntity::getMaxAttempts,
+                        Math.max(currentMaxAttempts, attemptCount) + MANUAL_RETRY_ATTEMPTS)
                 .set(NotificationTaskEntity::getLastErrorCode, null)
                 .set(NotificationTaskEntity::getScheduledAt, Instant.now())
                 .set(NotificationTaskEntity::getNextRetryAt, Instant.now())

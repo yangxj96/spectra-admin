@@ -187,6 +187,51 @@
         FOR UPDATE SKIP LOCKED
     </select>
 
+    <!-- 未领取任务跨过有效期后独立收敛，避免因 selectPendingTasks 排除过期行而永久停留。 -->
+    <select id="expireOverdueTasks" resultType="java.util.UUID">
+        WITH candidates AS (
+            SELECT id
+            FROM spectra_notification.ntf_task
+            WHERE deleted IS NULL
+              AND status IN ('PENDING', 'RETRYING')
+              AND expires_at IS NOT NULL
+              AND expires_at &lt;= #{now}
+            ORDER BY expires_at ASC
+            LIMIT #{limit}
+            FOR UPDATE SKIP LOCKED
+        )
+        UPDATE spectra_notification.ntf_task target
+           SET status = 'EXPIRED',
+               locked_by = NULL,
+               locked_at = NULL,
+               updated_at = CURRENT_TIMESTAMP
+         WHERE target.id IN (SELECT id FROM candidates)
+        RETURNING notification_request_id
+    </select>
+
+    <!-- 租约超时说明外部结果未知；收敛为 UNKNOWN，禁止自动重发。 -->
+    <select id="expireLeases" resultType="java.util.UUID">
+        WITH candidates AS (
+            SELECT id
+            FROM spectra_notification.ntf_task
+            WHERE deleted IS NULL
+              AND status = 'PROCESSING'
+              AND locked_at IS NOT NULL
+              AND locked_at &lt; #{deadline}
+            ORDER BY locked_at ASC
+            LIMIT #{limit}
+            FOR UPDATE SKIP LOCKED
+        )
+        UPDATE spectra_notification.ntf_task target
+           SET status = 'UNKNOWN',
+               last_error_code = 'WORKER_LEASE_EXPIRED',
+               locked_by = NULL,
+               locked_at = NULL,
+               updated_at = CURRENT_TIMESTAMP
+         WHERE target.id IN (SELECT id FROM candidates)
+        RETURNING notification_request_id
+    </select>
+
     <!-- 清理终态或过期任务中的敏感渲染载荷；批量处理避免长事务。 -->
     <update id="clearSensitivePayloads">
         WITH candidates AS (

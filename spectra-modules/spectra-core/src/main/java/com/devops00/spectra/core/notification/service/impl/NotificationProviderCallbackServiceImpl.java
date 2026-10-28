@@ -23,7 +23,6 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.core.notification.security.NotificationDigest;
 import com.devops00.spectra.core.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationCallbackStatus;
-import com.devops00.spectra.core.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.core.notification.dispatch.NotificationRequestStatusUpdater;
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationDeliveryEntity;
@@ -47,7 +46,6 @@ import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -95,6 +93,36 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
     @Override
     @Transactional
     public NotificationProviderCallbackVO handle(NotificationChannel channel, String signature, String body) {
+        var command = verifyAndParse(channel, signature, body);
+        var delivery = requireDelivery(channel, command);
+        var task = taskMapper.selectById(delivery.getNotificationTaskId());
+        if (task == null
+                || !isCurrentAttempt(delivery, task)
+                || !allowsTransition(task.getStatus(), command.resultStatus())) {
+            return stale(delivery);
+        }
+
+        var summary = responseSummary(delivery);
+        var eventDigest = digest(body);
+        if (isDuplicate(summary, eventDigest)) {
+            return new NotificationProviderCallbackVO(
+                    NotificationCallbackStatus.DUPLICATE.name(), delivery.getResultStatus());
+        }
+
+        var receivedAt = Instant.now();
+        applyCallback(delivery, summary, command.callback(), eventDigest, receivedAt);
+        if (deliveryMapper.updateById(delivery) != 1) {
+            throw new DataSaveException("更新 Provider 回执失败");
+        }
+
+        if (!updateTask(task, delivery, command.resultStatus(), safeErrorCode(command.callback().getErrorCode()))) {
+            throw new DataSaveException("Provider 回执与当前任务状态不一致");
+        }
+        return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(),
+                command.resultStatus().name());
+    }
+
+    private CallbackCommand verifyAndParse(NotificationChannel channel, String signature, String body) {
         if (channel == null || channel == NotificationChannel.IN_APP) {
             throw new DataSaveException("外部 Provider 回执渠道不合法");
         }
@@ -104,32 +132,29 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         var configuration = providerAdminService.resolve(channel);
         verifySignature(signature, body, configuration);
         var callback = parse(body);
-        var providerMessageId = normalizeMessageId(callback.getMessageId());
-        var resultStatus = normalizeStatus(callback.getStatus());
-        var delivery = deliveryMapper.selectByProviderMessageId(configuration.providerType(), providerMessageId,
+        return new CallbackCommand(configuration.providerType(), callback,
+                normalizeMessageId(callback.getMessageId()), normalizeStatus(callback.getStatus()));
+    }
+
+    private NotificationDeliveryEntity requireDelivery(NotificationChannel channel, CallbackCommand command) {
+        var delivery = deliveryMapper.selectByProviderMessageId(command.providerType(), command.providerMessageId(),
                 channel.name());
         if (delivery == null) {
             throw new DataNotExistException("Provider 回执对应的投递不存在");
         }
+        return delivery;
+    }
 
+    private NotificationProviderCallbackVO stale(NotificationDeliveryEntity delivery) {
+        return new NotificationProviderCallbackVO(NotificationCallbackStatus.STALE.name(), delivery.getResultStatus());
+    }
+
+    private Map<String, Object> responseSummary(NotificationDeliveryEntity delivery) {
         var summary = new LinkedHashMap<String, Object>();
         if (delivery.getResponseSummary() != null) {
             summary.putAll(delivery.getResponseSummary());
         }
-        var eventDigest = digest(body);
-        if (isDuplicate(summary, eventDigest)) {
-            return new NotificationProviderCallbackVO(
-                    NotificationCallbackStatus.DUPLICATE.name(), delivery.getResultStatus());
-        }
-
-        var receivedAt = Instant.now();
-        applyCallback(delivery, summary, callback, eventDigest, receivedAt);
-        if (deliveryMapper.updateById(delivery) != 1) {
-            throw new DataSaveException("更新 Provider 回执失败");
-        }
-
-        updateTask(delivery, resultStatus, safeErrorCode(callback.getErrorCode()));
-        return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(), resultStatus.name());
+        return summary;
     }
 
     private boolean isDuplicate(Map<String, Object> summary, String eventDigest) {
@@ -271,22 +296,50 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
     /**
      * 更新或推进目标状态（{@code updateTask}）。
      */
-    private void updateTask(NotificationDeliveryEntity delivery, ChannelSendStatus resultStatus, String errorCode) {
-        var task = taskMapper.selectById(delivery.getNotificationTaskId());
-        if (task == null
-                || List.of(NotificationTaskStatus.CANCELLED.name(), NotificationTaskStatus.EXPIRED.name())
-                        .contains(task.getStatus())) {
-            return;
+    private boolean isCurrentAttempt(NotificationDeliveryEntity delivery, NotificationTaskEntity task) {
+        var currentAttempt = task.getAttemptCount() == null ? 0 : task.getAttemptCount();
+        return delivery.getAttemptNo() != null && delivery.getAttemptNo() == currentAttempt;
+    }
+
+    private boolean allowsTransition(String taskStatus, ChannelSendStatus resultStatus) {
+        if (taskStatus == null) {
+            return false;
         }
-        taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
+        return switch (taskStatus) {
+            case "PROCESSING", "UNKNOWN" -> true;
+            case "SENT" -> resultStatus == ChannelSendStatus.SENT || resultStatus == ChannelSendStatus.FAILED;
+            case "FAILED" -> resultStatus == ChannelSendStatus.FAILED;
+            default -> false;
+        };
+    }
+
+    private boolean updateTask(NotificationTaskEntity task, NotificationDeliveryEntity delivery,
+                               ChannelSendStatus resultStatus, String errorCode) {
+        int updated = taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
-                .notIn(NotificationTaskEntity::getStatus,
-                        List.of(NotificationTaskStatus.CANCELLED.name(), NotificationTaskStatus.EXPIRED.name()))
+                .eq(NotificationTaskEntity::getStatus, task.getStatus())
+                .eq(NotificationTaskEntity::getAttemptCount, delivery.getAttemptNo())
                 .set(NotificationTaskEntity::getStatus, resultStatus.name())
                 .set(NotificationTaskEntity::getLastErrorCode,
                         resultStatus == ChannelSendStatus.SENT ? null : errorCode)
                 .set(NotificationTaskEntity::getLockedBy, null)
                 .set(NotificationTaskEntity::getLockedAt, null));
+        if (updated != 1) {
+            return false;
+        }
         requestStatusUpdater.refresh(task.getNotificationRequestId());
+        return true;
+    }
+
+    /**
+     * 已验签并标准化的回执命令。
+     *
+     * @param providerType      Provider 类型
+     * @param callback          标准化回执
+     * @param providerMessageId 规范化消息 ID
+     * @param resultStatus      标准化结果状态
+     */
+    private record CallbackCommand(String providerType, NotificationProviderCallbackFrom callback,
+                                   String providerMessageId, ChannelSendStatus resultStatus) {
     }
 }

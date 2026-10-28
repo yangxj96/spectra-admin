@@ -25,5 +25,6 @@ package com.devops00.spectra.core.notification.javabean.domain;
  */
 public enum NotificationCallbackStatus {
     APPLIED,
-    DUPLICATE
+    DUPLICATE,
+    STALE
 }

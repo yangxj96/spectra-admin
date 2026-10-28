@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
@@ -50,6 +51,7 @@ import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -57,6 +59,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -120,13 +123,27 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (observation == null) {
             return;
         }
+        var current = ruleMapper.selectById(rule.getId());
+        if (current == null
+                || current.getDeleted() != null
+                || !Boolean.TRUE.equals(current.getEnabled())
+                || !Objects.equals(current.getVersion(), rule.getVersion())) {
+            return;
+        }
         var active = findActiveEvent(rule.getId());
         if (observation.violated()) {
-            var event = active == null ? createEvent(rule, observation) : updateActiveEvent(active, observation);
-            if (shouldNotify(event, rule)) {
-                if (notifyOperators(event)) {
-                    event.setLastNotifiedAt(Instant.now());
-                    eventMapper.updateById(event);
+            final ServiceMonitorAlertEvent event;
+            if (active == null) {
+                event = createEvent(rule, observation);
+            } else if (updateActiveEvent(active, observation)) {
+                event = active;
+            } else {
+                return;
+            }
+            if (shouldNotify(event, rule) && notifyOperators(event)) {
+                event.setLastNotifiedAt(Instant.now());
+                if (eventMapper.updateById(event) != 1) {
+                    log.warn("服务监控告警已受理通知，但回执时间更新失败: eventId={}", event.getId());
                 }
             }
             return;
@@ -313,13 +330,12 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     /**
      * 更新或推进目标状态（{@code updateActiveEvent}）。
      */
-    private ServiceMonitorAlertEvent updateActiveEvent(ServiceMonitorAlertEvent event, Observation observation) {
+    private boolean updateActiveEvent(ServiceMonitorAlertEvent event, Observation observation) {
         event.setCurrentValue(observation.currentValue());
         event.setMessage(observation.message());
         event.setLastOccurredAt(Instant.now());
         event.setOccurrenceCount((event.getOccurrenceCount() == null ? 0 : event.getOccurrenceCount()) + 1);
-        eventMapper.updateById(event);
-        return event;
+        return eventMapper.updateById(event) == 1;
     }
 
     /**
@@ -400,6 +416,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     }
 
     @Override
+    @Transactional
     public void modifyRule(UUID id, ServiceMonitorAlertRuleFrom from) {
         var rule = ruleMapper.selectOne(new LambdaQueryWrapper<ServiceMonitorAlertRule>()
                 .eq(ServiceMonitorAlertRule::getId, id)
@@ -448,10 +465,12 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (event == null) {
             return;
         }
-        event.setState(RECOVERED);
-        event.setRecoveredAt(Instant.now());
-        event.setMessage("告警规则已停用");
-        eventMapper.updateById(event);
+        eventMapper.update(null, new LambdaUpdateWrapper<ServiceMonitorAlertEvent>()
+                .eq(ServiceMonitorAlertEvent::getId, event.getId())
+                .eq(ServiceMonitorAlertEvent::getState, ACTIVE)
+                .set(ServiceMonitorAlertEvent::getState, RECOVERED)
+                .set(ServiceMonitorAlertEvent::getRecoveredAt, Instant.now())
+                .set(ServiceMonitorAlertEvent::getMessage, "告警规则已停用"));
     }
 
     /**

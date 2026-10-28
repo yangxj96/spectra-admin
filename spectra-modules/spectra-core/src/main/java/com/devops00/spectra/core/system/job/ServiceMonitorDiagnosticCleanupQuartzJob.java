@@ -44,6 +44,7 @@ public class ServiceMonitorDiagnosticCleanupQuartzJob implements Job {
      */
     @Override
     public void execute(JobExecutionContext context) {
+        diagnosticService.recoverPendingTasks();
         diagnosticService.cleanupExpiredTasks();
         context.setResult(Map.of("cleanup", "completed"));
     }

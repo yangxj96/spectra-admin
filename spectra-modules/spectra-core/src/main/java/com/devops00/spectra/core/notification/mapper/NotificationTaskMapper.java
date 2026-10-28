@@ -61,6 +61,26 @@ public interface NotificationTaskMapper extends BaseMapper<NotificationTaskEntit
     List<NotificationTaskEntity> selectPendingTasks(@Param("now") Instant now, @Param("limit") int limit);
 
     /**
+     * 将已超过过期时间的待领取/重试任务直接收敛为 EXPIRED。
+     *
+     * @param now   当前时间
+     * @param limit 单次最多处理行数
+     * @return 受影响请求 ID
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    List<UUID> expireOverdueTasks(@Param("now") Instant now, @Param("limit") int limit);
+
+    /**
+     * 将租约超时的 PROCESSING 任务收敛为 UNKNOWN；外部发送结果未知时不得盲目重发。
+     *
+     * @param deadline 租约截止时间
+     * @param limit    单次最多处理行数
+     * @return 受影响请求 ID
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    List<UUID> expireLeases(@Param("deadline") Instant deadline, @Param("limit") int limit);
+
+    /**
      * 批量清理已过期或已超过保留窗口的敏感任务载荷。
      */
     @InterceptorIgnore(dataPermission = "true")

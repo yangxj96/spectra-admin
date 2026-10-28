@@ -26,6 +26,7 @@ import com.devops00.spectra.core.system.job.ServiceMonitorDiagnosticCleanupQuart
 import com.devops00.spectra.core.system.job.ServiceMonitorSnapshotQuartzJob;
 import com.devops00.spectra.core.upload.job.FileUploadCleanupQuartzJob;
 import com.devops00.spectra.core.upload.job.FileUploadVerificationRecoveryQuartzJob;
+import com.devops00.spectra.core.user.job.UserImportRecoveryQuartzJob;
 import org.quartz.Job;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,6 +70,17 @@ public class CoreQuartzJobDefinitionConfiguration {
     }
 
     /**
+     * 定义恢复用户导入 Apply 任务的内置 Quartz 作业。
+     *
+     * @return Quartz 作业定义。
+     */
+    @Bean
+    public QuartzBuiltInJobDefinition userImportRecoveryQuartzJobDefinition() {
+        return definition("user.import.apply-recovery", "用户导入恢复", UserImportRecoveryQuartzJob.class,
+                QuartzTriggerTemplate.fixedInterval(Duration.ofMinutes(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
+    }
+
+    /**
      * 定义定期清理过期文件上传数据的内置 Quartz 作业。
      *
      * @return Quartz作业数据。
@@ -109,8 +121,8 @@ public class CoreQuartzJobDefinitionConfiguration {
      */
     @Bean
     public QuartzBuiltInJobDefinition serviceMonitorDiagnosticCleanupQuartzJobDefinition() {
-        return definition("system.monitor.diagnostic-cleanup", "监控诊断清理", ServiceMonitorDiagnosticCleanupQuartzJob.class,
-                QuartzTriggerTemplate.fixedInterval(Duration.ofHours(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
+        return definition("system.monitor.diagnostic-cleanup", "监控诊断恢复与清理", ServiceMonitorDiagnosticCleanupQuartzJob.class,
+                QuartzTriggerTemplate.fixedInterval(Duration.ofMinutes(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
     }
 
     /**

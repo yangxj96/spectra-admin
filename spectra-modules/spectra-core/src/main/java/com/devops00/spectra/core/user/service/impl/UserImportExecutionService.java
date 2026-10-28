@@ -37,6 +37,8 @@ import org.springframework.security.concurrent.DelegatingSecurityContextRunnable
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -126,14 +128,31 @@ public class UserImportExecutionService {
         task.setAppliedRows(0);
 
         var securityContext = SecurityContextHolder.getContext();
-        try {
-            userImportTaskExecutor.execute(new DelegatingSecurityContextRunnable(
-                    () -> processApply(task.getId(), operatorId, encodedDefaultPasswordHash), securityContext));
-        } catch (RuntimeException exception) {
-            markApplyFailed(task.getId(), operatorId, exception);
-            throw new DataException("无法启动用户导入任务: " + safeMessage(exception), exception);
-        }
+        dispatchAfterCommit(task.getId(), operatorId, encodedDefaultPasswordHash, securityContext);
         return resultService.toVO(task);
+    }
+
+    private void dispatchAfterCommit(UUID taskId, UUID operatorId, String encodedDefaultPasswordHash,
+                                     org.springframework.security.core.context.SecurityContext securityContext) {
+        Runnable dispatch = () -> {
+            try {
+                userImportTaskExecutor.execute(new DelegatingSecurityContextRunnable(
+                        () -> processApply(taskId, operatorId, encodedDefaultPasswordHash), securityContext));
+            } catch (RuntimeException exception) {
+                markApplyFailed(taskId, operatorId, exception);
+                log.error("无法启动用户导入任务: taskId={}", taskId, exception);
+            }
+        };
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    dispatch.run();
+                }
+            });
+            return;
+        }
+        dispatch.run();
     }
 
     /**
@@ -169,17 +188,52 @@ public class UserImportExecutionService {
                 skipped = chunk.skippedRows();
                 failed = chunk.errorRows();
             }
-            task.setAppliedRows(applied);
-            task.setSkippedRows(skipped);
-            task.setErrorRows(failed);
-            task.setStatus(failed == 0 ? STATUS_SUCCEEDED : processed == 0 ? STATUS_FAILED : STATUS_PARTIAL_FAILED);
-            if (taskMapper.updateById(task) != 1) {
+            var finalStatus = failed == 0
+                    ? STATUS_SUCCEEDED
+                    : processed == 0 ? STATUS_FAILED : STATUS_PARTIAL_FAILED;
+            var updated = taskMapper.update(null, new LambdaUpdateWrapper<UserImportTask>()
+                    .eq(UserImportTask::getId, taskId)
+                    .eq(UserImportTask::getOperatorId, operatorId)
+                    .eq(UserImportTask::getStatus, STATUS_APPLYING)
+                    .set(UserImportTask::getAppliedRows, applied)
+                    .set(UserImportTask::getSkippedRows, skipped)
+                    .set(UserImportTask::getErrorRows, failed)
+                    .set(UserImportTask::getStatus, finalStatus));
+            if (updated != 1) {
                 throw new DataException("更新用户导入最终状态失败");
             }
             log.info("用户批量导入完成: taskId={}, status={}, applied={}, skipped={}, failed={}", task.getId(),
-                    task.getStatus(), applied, skipped, failed);
+                    finalStatus, applied, skipped, failed);
         } catch (RuntimeException exception) {
             markApplyFailed(taskId, operatorId, exception);
+        }
+    }
+
+    /**
+     * 恢复长时间无进展的 APPLYING 任务；以 updated_at 作为心跳租约，成功抢占后才重新入队。
+     */
+    public void recoverApplyingTasks() {
+        var cutoff = Instant.now().minusSeconds(600);
+        var tasks = taskMapper.selectList(new LambdaQueryWrapper<UserImportTask>()
+                .eq(UserImportTask::getStatus, STATUS_APPLYING)
+                .le(UserImportTask::getUpdatedAt, cutoff)
+                .last("LIMIT 5"));
+        for (var task : tasks) {
+            var claimed = taskMapper.update(null, new LambdaUpdateWrapper<UserImportTask>()
+                    .eq(UserImportTask::getId, task.getId())
+                    .eq(UserImportTask::getOperatorId, task.getOperatorId())
+                    .eq(UserImportTask::getStatus, STATUS_APPLYING)
+                    .le(UserImportTask::getUpdatedAt, cutoff)
+                    .set(UserImportTask::getUpdatedAt, Instant.now()));
+            if (claimed != 1) {
+                continue;
+            }
+            try {
+                var hash = defaultUserPasswordProvider.requireEncodedPassword();
+                userImportTaskExecutor.execute(() -> processApply(task.getId(), task.getOperatorId(), hash));
+            } catch (RuntimeException exception) {
+                markApplyFailed(task.getId(), task.getOperatorId(), exception);
+            }
         }
     }
 
@@ -206,14 +260,4 @@ public class UserImportExecutionService {
         return operatorId;
     }
 
-    /**
-     * 处理安全消息相关数据。
-     */
-    private String safeMessage(RuntimeException exception) {
-        var message = exception.getMessage();
-        if (message == null || message.isBlank()) {
-            return "导入行处理失败";
-        }
-        return message.length() > 500 ? message.substring(0, 500) : message;
-    }
 }

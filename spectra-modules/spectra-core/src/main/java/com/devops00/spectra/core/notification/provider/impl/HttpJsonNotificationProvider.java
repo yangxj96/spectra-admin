@@ -24,6 +24,7 @@ import com.devops00.spectra.core.notification.javabean.domain.NotificationProvid
 import com.devops00.spectra.core.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.core.notification.provider.NotificationProvider;
+import com.devops00.spectra.core.notification.provider.NotificationTaskMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -127,13 +128,17 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
         } catch (RuntimeException exception) {
             return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
+        var message = NotificationTaskMessage.resolve(task, payloadProtector);
         var body = new LinkedHashMap<String, Object>();
         body.put("channel", task.getChannel());
         body.put("recipient", recipient);
-        body.put("title", task.getTitle());
-        body.put("content", task.getContent());
+        body.put("title", message.title());
+        body.put("content", message.content());
+        body.put("parameters", message.parameters());
         body.put("taskId", task.getId() == null ? null : task.getId().toString());
-        body.put("templateCode", configuration.templateCode());
+        body.put("templateCode", message.providerTemplateCode() == null
+                ? configuration.templateCode()
+                : message.providerTemplateCode());
         try {
             var request = authorizedRequest(configuration)
                     .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body)))

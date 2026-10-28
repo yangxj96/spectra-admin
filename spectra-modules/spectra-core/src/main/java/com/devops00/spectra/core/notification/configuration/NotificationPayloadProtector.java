@@ -19,6 +19,7 @@ package com.devops00.spectra.core.notification.configuration;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.exception.SecuritySecretUnavailableException;
+import com.devops00.spectra.common.port.security.RuntimeSecret;
 import com.devops00.spectra.core.notification.security.NotificationPayloadCipher;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,11 @@ public class NotificationPayloadProtector {
     private static final String VERSION = "v1";
 
     /**
+     * 带密钥版本号的载荷保护格式版本。
+     */
+    private static final String VERSIONED = "v2";
+
+    /**
      * 通知模块密钥配置。
      */
     private final com.devops00.spectra.core.security.secret.service.SecretRuntimeService runtimeService;
@@ -71,14 +77,14 @@ public class NotificationPayloadProtector {
         if (address == null || address.isBlank()) {
             throw new DataSaveException("通知收件地址不能为空");
         }
-        return protect(address, activeKey("notification.address-encryption-key"), "通知地址");
+        return protect(address, "notification.address-encryption-key", "通知地址");
     }
 
     /**
      * 解密外部渠道地址；解密失败时直接阻断当前投递。
      */
     public String unprotectAddress(String ciphertext) {
-        return unprotect(ciphertext, activeKey("notification.address-encryption-key"), "通知地址");
+        return unprotect(ciphertext, "notification.address-encryption-key", "通知地址");
     }
 
     /**
@@ -89,7 +95,7 @@ public class NotificationPayloadProtector {
             return null;
         }
         try {
-            return protect(objectMapper.writeValueAsString(parameters), activeKey("notification.sensitive-payload-key"), "通知敏感载荷");
+            return protect(objectMapper.writeValueAsString(parameters), "notification.sensitive-payload-key", "通知敏感载荷");
         } catch (JacksonException exception) {
             throw new EncryptException("通知敏感载荷序列化失败", exception);
         }
@@ -103,7 +109,7 @@ public class NotificationPayloadProtector {
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> unprotectParameters(String ciphertext) {
-        var plainText = unprotect(ciphertext, activeKey("notification.sensitive-payload-key"), "通知敏感载荷");
+        var plainText = unprotect(ciphertext, "notification.sensitive-payload-key", "通知敏感载荷");
         try {
             Map<?, ?> map = objectMapper.readValue(plainText, Map.class);
             if (map == null) {
@@ -122,28 +128,56 @@ public class NotificationPayloadProtector {
     }
 
     /** 读取当前 ACTIVE 应用密钥，缺失时保持安全阻断。 */
-    private String activeKey(String code) {
+    private RuntimeSecret activeSecret(String code) {
         try {
-            return runtimeService.requireActiveValue(code);
+            return runtimeService.findActive(code)
+                    .orElseThrow(() -> new SecuritySecretUnavailableException("密钥当前未启用: " + code, null));
         } catch (SecuritySecretUnavailableException exception) {
             throw new DataSaveException("通知加密密钥不可用", exception);
         }
     }
 
     /**
-     * 使用指定配置密钥解密载荷。
+     * 解密载荷；v2 精确使用密文携带的版本，v1 先尝试 ACTIVE 再兼容历史版本。
      */
-    private String unprotect(String ciphertext, String encodedKey, String name) {
+    private String unprotect(String ciphertext, String code, String name) {
         if (ciphertext == null || ciphertext.isBlank()) {
             throw new DataSaveException(name + "未配置");
         }
-        try {
-            var parts = ciphertext.split(":", 3);
-            if (parts.length != 3 || !VERSION.equals(parts[0])) {
-                throw new DataSaveException(name + "密文格式不正确");
+        var parts = ciphertext.split(":", 4);
+        if (parts.length == 4 && VERSIONED.equals(parts[0])) {
+            final int version;
+            try {
+                version = Integer.parseInt(parts[1]);
+            } catch (NumberFormatException exception) {
+                throw new DataSaveException(name + "密文版本不正确", exception);
             }
+            var secret = runtimeService.findVersion(code, version)
+                    .orElseThrow(() -> new DataSaveException(name + "密文密钥版本不存在"));
+            return decrypt(parts[3], parts[2], secret.value(), name);
+        }
+        if (parts.length == 3 && VERSION.equals(parts[0])) {
+            try {
+                return decrypt(parts[2], parts[1], activeSecret(code).value(), name);
+            } catch (RuntimeException activeFailure) {
+                for (var secret : runtimeService.findVersions(code)) {
+                    try {
+                        return decrypt(parts[2], parts[1], secret.value(), name);
+                    } catch (RuntimeException ignored) {
+                        // 继续尝试历史版本，只有全部失败才向上抛出。
+                    }
+                }
+                throw activeFailure;
+            }
+        }
+        throw new DataSaveException(name + "密文格式不正确");
+    }
+
+    private String decrypt(String cipherText, String ivHex, String encodedKey, String name) {
+        try {
             var keyBytes = decodeKey(encodedKey, name);
-            return NotificationPayloadCipher.decrypt(parts[2], new SecretKeySpec(keyBytes, "AES"), NotificationPayloadCipher.hexToIv(parts[1]));
+            return NotificationPayloadCipher.decrypt(cipherText, new SecretKeySpec(keyBytes, "AES"),
+                    NotificationPayloadCipher.hexToIv(ivHex));
         } catch (DataSaveException | EncryptException exception) {
             throw exception;
         } catch (Exception exception) {
@@ -152,14 +186,16 @@ public class NotificationPayloadProtector {
     }
 
     /**
-     * 使用配置密钥对文本执行 AES-GCM 加密。
+     * 使用当前 ACTIVE 密钥对文本执行 AES-GCM 加密，并把密钥版本写入密文。
      */
-    private String protect(String plainText, String encodedKey, String name) {
+    private String protect(String plainText, String code, String name) {
         try {
-            var keyBytes = decodeKey(encodedKey, name);
+            var secret = activeSecret(code);
+            var keyBytes = decodeKey(secret.value(), name);
             var iv = NotificationPayloadCipher.generateIv();
             var cipherText = NotificationPayloadCipher.encrypt(plainText, new SecretKeySpec(keyBytes, "AES"), iv);
-            return VERSION + ":" + NotificationPayloadCipher.getIvHex(iv) + ":" + cipherText;
+            return VERSIONED + ":" + secret.version() + ":" + NotificationPayloadCipher.getIvHex(iv) + ":"
+                    + cipherText;
         } catch (RuntimeException exception) {
             if (exception instanceof DataSaveException || exception instanceof EncryptException) {
                 throw exception;
