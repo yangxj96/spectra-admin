@@ -21,6 +21,7 @@ import com.devops00.spectra.core.security.authentication.javabean.entity.Passwor
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authentication.application.SecurityUserAssembler;
+import com.devops00.spectra.core.security.authentication.exception.LoginException;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
@@ -91,7 +92,7 @@ public class DatabaseSecurityUserLoader implements SecurityUserLoader {
                 if ("LOCAL".equals(identity.getProviderCode()) && type.name().equals(identity.getMethodCode())) {
                     try {
                         return securityUserAssembler.toSecurityUser(type, identity, credential, user);
-                    } catch (RuntimeException exception) {
+                    } catch (LoginException exception) {
                         return null;
                     }
                 }

@@ -854,6 +854,28 @@ class SecuritySessionLifecycleRedisTest {
                 () -> reader.getCurrentUser(first.getAccessToken()));
     }
 
+    @Test
+    void legacyAccessWithoutOriginalDeadlineIsRejected() {
+        SecurityToken issued = issuer.createToken(user, ClientType.WEB);
+        String sessionKey = SecurityRedisKey.SESSION.format(TokenDigestService.digest(issued.getAccessToken()));
+        redis.opsForHash().delete(sessionKey, "accessExpiresAt");
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> reader.getCurrentUser(issued.getAccessToken()));
+    }
+
+    @Test
+    void legacyRefreshWithoutOriginalDeadlineCannotRotate() {
+        SecurityToken issued = issuer.createToken(user, ClientType.WEB);
+        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(TokenDigestService.digest(issued.getRefreshToken()));
+        redis.opsForHash().delete(refreshKey, "refreshExpiresAt");
+
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> refresher.refreshByRefreshToken(issued.getRefreshToken()));
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> reader.getCurrentUser(issued.getAccessToken()));
+    }
+
     private static final class MutableClock extends Clock {
         private final AtomicLong now;
 

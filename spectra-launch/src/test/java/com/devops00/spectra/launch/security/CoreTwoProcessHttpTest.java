@@ -34,6 +34,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.sql.DataSource;
@@ -78,6 +80,44 @@ class CoreTwoProcessHttpTest {
             SET concurrency_mode = ?, max_sessions = ?
             WHERE client_id = (SELECT id FROM spectra_security.sec_security_client WHERE code = 'web')
             """;
+
+    @Test
+    void databaseRollbackAfterRedisRevocationKeepsAccountButRequiresNewLogin() throws Exception {
+        requireIsolatedDependencies();
+        try (var application = new SpringApplicationBuilder(LaunchApplication.class).run(coreArgs());
+                HttpClient client = HttpClient.newHttpClient()) {
+            int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+            var mapper = application.getBean(ObjectMapper.class);
+            var properties = application.getBean(SecurityProperties.class);
+            var jdbc = application.getBean(JdbcTemplate.class);
+            var revocation = application.getBean(SecuritySessionRevocationPort.class);
+            var transactions = new TransactionTemplate(application.getBean(PlatformTransactionManager.class));
+            var fixture = new Fixture(application);
+            TestUser target = TestUser.create("b02rollback");
+            try {
+                fixture.insert(target);
+                Session old = login(client, port, mapper, properties, target.username(), target.password());
+                assertEquals(200, context(client, port, old.accessToken()));
+
+                transactions.executeWithoutResult(status -> {
+                    assertEquals(1, jdbc.update("UPDATE spectra_core.sys_user SET status = 'LOCKED' WHERE id = ?",
+                            target.id()));
+                    revocation.revokeUserSessions(target.id());
+                    status.setRollbackOnly();
+                });
+
+                assertEquals("ACTIVE", jdbc.queryForObject(
+                        "SELECT status FROM spectra_core.sys_user WHERE id = ?", String.class, target.id()));
+                assertEquals(401, context(client, port, old.accessToken()));
+                assertEquals(401, refresh(client, port, old.refreshToken(), properties).statusCode());
+                Session fresh = login(client, port, mapper, properties, target.username(), target.password());
+                assertEquals(200, context(client, port, fresh.accessToken()));
+            } finally {
+                revocation.revokeUserSessions(target.id());
+                fixture.clean();
+            }
+        }
+    }
 
     @Test
     void lastRootSurvivesOneApplicationRedisNetworkIsolation() throws Exception {

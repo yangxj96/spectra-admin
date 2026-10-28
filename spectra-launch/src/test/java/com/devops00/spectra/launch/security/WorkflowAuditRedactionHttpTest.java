@@ -85,6 +85,10 @@ class WorkflowAuditRedactionHttpTest {
                         """, Integer.class, user.id(), "%" + marker + "%", "%" + marker + "%",
                         "%" + marker + "%", "%" + marker + "%");
                 assertEquals(0, leaked, "Workflow 审计记录不得包含敏感明文");
+                Integer audited = fixture.jdbc.queryForObject(
+                        "SELECT count(*) FROM spectra_core.sys_audit_event WHERE operator_id = ?",
+                        Integer.class, user.id());
+                assertTrue(audited >= 1, "失败的 Workflow 写操作也应产生审计记录");
             } finally {
                 fixture.clean();
             }

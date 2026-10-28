@@ -14,6 +14,7 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.core.security.authentication.application.SecurityUserAssembler;
 import com.devops00.spectra.core.security.authentication.constant.LoginType;
+import com.devops00.spectra.core.security.authentication.exception.LoginException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.security.authentication.javabean.entity.SecurityUser;
@@ -28,9 +29,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 /**
@@ -79,6 +82,39 @@ class DatabaseSecurityUserLoaderTest {
 
         assertNull(loader.load(userId));
         verifyNoInteractions(assembler);
+    }
+
+    @Test
+    void rejectsUnavailableIdentityWithoutTryingAnotherMethod() {
+        UUID userId = UUID.randomUUID();
+        User user = mock(User.class);
+        PasswordCredential credential = mock(PasswordCredential.class);
+        AuthenticationIdentity password = identity("PASSWORD", "LOCAL");
+        AuthenticationIdentity sms = identity("SMS", "LOCAL");
+        when(users.getById(userId)).thenReturn(user);
+        when(user.getUsername()).thenReturn("synthetic-user");
+        when(credentials.getByUserId(userId)).thenReturn(credential);
+        when(identities.listByUserId(userId)).thenReturn(List.of(password, sms));
+        when(assembler.toSecurityUser(LoginType.PASSWORD, password, credential, user))
+                .thenThrow(new LoginException("synthetic identity unavailable"));
+        assertNull(loader.load(userId));
+        verify(assembler, never()).toSecurityUser(LoginType.SMS, sms, credential, user);
+    }
+
+    @Test
+    void authorizationSnapshotFailureIsPropagated() {
+        UUID userId = UUID.randomUUID();
+        User user = mock(User.class);
+        PasswordCredential credential = mock(PasswordCredential.class);
+        AuthenticationIdentity password = identity("PASSWORD", "LOCAL");
+        when(users.getById(userId)).thenReturn(user);
+        when(user.getUsername()).thenReturn("synthetic-user");
+        when(credentials.getByUserId(userId)).thenReturn(credential);
+        when(identities.listByUserId(userId)).thenReturn(List.of(password));
+        IllegalStateException unavailable = new IllegalStateException("synthetic authorization store failure");
+        when(assembler.toSecurityUser(LoginType.PASSWORD, password, credential, user)).thenThrow(unavailable);
+
+        assertSame(unavailable, assertThrows(IllegalStateException.class, () -> loader.load(userId)));
     }
 
     private AuthenticationIdentity identity(String method, String provider) {
