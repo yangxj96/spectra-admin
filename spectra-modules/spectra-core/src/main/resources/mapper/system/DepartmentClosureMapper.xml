@@ -44,11 +44,13 @@
         WITH RECURSIVE department_tree AS (
             SELECT id AS ancestor_id, id AS descendant_id, 0 AS depth, ARRAY[id] AS path
             FROM spectra_core.sys_department
+            WHERE deleted IS NULL
             UNION ALL
             SELECT tree.ancestor_id, child.id, tree.depth + 1, tree.path || child.id
             FROM department_tree tree
             JOIN spectra_core.sys_department child ON child.pid = tree.descendant_id
-            WHERE NOT child.id = ANY(tree.path)
+            WHERE child.deleted IS NULL
+              AND NOT child.id = ANY(tree.path)
         )
         INSERT INTO spectra_core.sys_department_closure (ancestor_id, descendant_id, depth)
         SELECT ancestor_id, descendant_id, depth

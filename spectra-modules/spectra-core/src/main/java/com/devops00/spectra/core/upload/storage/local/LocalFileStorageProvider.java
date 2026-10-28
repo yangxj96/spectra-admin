@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
@@ -163,25 +164,31 @@ public class LocalFileStorageProvider implements FileStorageProvider {
     public StorageObject open(String container, String key, Long rangeStart, Long rangeEnd) {
         Path path = StoragePaths.resolve(storageRoot, key);
         try {
-            long size = Files.size(path);
-            if (size == 0 && rangeStart == null && rangeEnd == null) {
-                return new StorageObject(Files.newInputStream(path),
-                        new StorageObjectMetadata(0, "application/octet-stream", null, null));
-            }
-            long start = rangeStart == null ? 0 : rangeStart;
-            long end = rangeEnd == null ? size - 1 : Math.min(rangeEnd, size - 1);
-            if (start < 0 || start >= size || end < start) {
-                throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "requested range is invalid");
-            }
-            InputStream input = Files.newInputStream(path);
-            input.skipNBytes(start);
-            return new StorageObject(new BoundedInputStream(input, end - start + 1),
-                    new StorageObjectMetadata(end - start + 1, "application/octet-stream", null, null));
+            return openPath(path, rangeStart, rangeEnd);
         } catch (FileUploadException e) {
             throw e;
+        } catch (NoSuchFileException e) {
+            throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "local file does not exist", e);
         } catch (Exception e) {
-            throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "local file is unavailable", e);
+            throw storageFailure("local file is unavailable", e);
         }
+    }
+
+    private StorageObject openPath(Path path, Long rangeStart, Long rangeEnd) throws IOException {
+        long size = Files.size(path);
+        if (size == 0 && rangeStart == null && rangeEnd == null) {
+            return new StorageObject(Files.newInputStream(path),
+                    new StorageObjectMetadata(0, "application/octet-stream", null, null));
+        }
+        long start = rangeStart == null ? 0 : rangeStart;
+        long end = rangeEnd == null ? size - 1 : Math.min(rangeEnd, size - 1);
+        if (start < 0 || start >= size || end < start) {
+            throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "requested range is invalid");
+        }
+        InputStream input = Files.newInputStream(path);
+        input.skipNBytes(start);
+        return new StorageObject(new BoundedInputStream(input, end - start + 1),
+                new StorageObjectMetadata(end - start + 1, "application/octet-stream", null, null));
     }
 
     @Override

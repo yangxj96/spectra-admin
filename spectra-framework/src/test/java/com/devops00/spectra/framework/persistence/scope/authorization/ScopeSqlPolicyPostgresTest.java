@@ -47,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ScopeSqlPolicyPostgresTest {
 
     private static final DataScope DATA_SCOPE = RelationScopedRecord.class.getAnnotation(DataScope.class);
+    private static final DataScope DEPARTMENT_SCOPE = DepartmentScopedRecord.class.getAnnotation(DataScope.class);
 
     private JdbcTemplate jdbc;
 
@@ -86,8 +87,60 @@ class ScopeSqlPolicyPostgresTest {
         assertEquals(List.of(1), jdbc.query(sql, (rs, row) -> rs.getInt(1)));
     }
 
+    @Test
+    void deletedDepartmentsAreExcludedFromActiveDescendantScope() {
+        UUID activeRoot = UUID.randomUUID();
+        UUID deletedChild = UUID.randomUUID();
+        UUID activeChild = UUID.randomUUID();
+        try {
+            insertDepartment(activeRoot, null, false);
+            insertDepartment(deletedChild, activeRoot, true);
+            insertDepartment(activeChild, activeRoot, false);
+            jdbc.update("INSERT INTO spectra_core.sys_department_closure (ancestor_id, descendant_id, depth) "
+                    + "VALUES (?, ?, 0), (?, ?, 1), (?, ?, 1)", activeRoot, activeRoot, activeRoot, deletedChild,
+                    activeRoot, activeChild);
+
+            var descendant = ScopeSqlPolicy.build(new Table("record"), DEPARTMENT_SCOPE,
+                    List.of(new PermissionBoundary("department:read",
+                            new AuthorizationScope(ScopeMode.RULES, Set.of(activeRoot), true))),
+                    null, Set.of(activeRoot));
+            var directDeleted = ScopeSqlPolicy.build(new Table("record"), DEPARTMENT_SCOPE,
+                    List.of(new PermissionBoundary("department:read",
+                            new AuthorizationScope(ScopeMode.RULES, Set.of(deletedChild), false))),
+                    null, Set.of(deletedChild));
+
+            String sql = """
+                    WITH record(department_id) AS (VALUES (?::uuid), (?::uuid), (?::uuid))
+                    SELECT department_id FROM record WHERE %s ORDER BY department_id
+                    """.formatted(descendant);
+            assertEquals(Set.of(activeRoot, activeChild),
+                    new java.util.HashSet<>(jdbc.query(sql, (rs, row) -> rs.getObject(1, UUID.class),
+                            activeRoot, deletedChild, activeChild)));
+            assertEquals(0, jdbc.queryForObject("WITH record(department_id) AS (VALUES (?::uuid)) "
+                    + "SELECT count(*) FROM record WHERE " + directDeleted, Integer.class, deletedChild));
+        } finally {
+            jdbc.update("DELETE FROM spectra_core.sys_department_closure WHERE ancestor_id IN (?, ?, ?) "
+                    + "OR descendant_id IN (?, ?, ?)", activeRoot, deletedChild, activeChild, activeRoot, deletedChild,
+                    activeChild);
+            jdbc.update("DELETE FROM spectra_core.sys_department WHERE id IN (?, ?, ?)", activeRoot, deletedChild,
+                    activeChild);
+        }
+    }
+
+    private void insertDepartment(UUID id, UUID pid, boolean deleted) {
+        jdbc.update("INSERT INTO spectra_core.sys_department "
+                + "(id, pid, name, code, created_at, updated_at, deleted) "
+                + "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, "
+                + (deleted ? "CURRENT_TIMESTAMP" : "NULL") + ")",
+                id, pid, "test-" + id, "TEST" + id.toString().replace("-", ""));
+    }
+
     @DataScope(readPermission = "record:read", column = "", ownerColumn = "", relations = {
             @DataScope.Relation(table = "bc_base008_rel", joinColumn = "record_id")})
     private static class RelationScopedRecord {
+    }
+
+    @DataScope(readPermission = "department:read")
+    private static class DepartmentScopedRecord {
     }
 }

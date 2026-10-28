@@ -41,6 +41,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListPartsRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.UploadPartPresignRequest;
@@ -199,8 +201,15 @@ public class S3FileStorageProvider implements FileStorageProvider {
             var response = stream.response();
             return new StorageObject(stream, new StorageObjectMetadata(response.contentLength(), response.contentType(),
                     response.metadata().get("sha256"), response.eTag()));
+        } catch (NoSuchKeyException e) {
+            throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "S3 object does not exist", e);
+        } catch (S3Exception e) {
+            if (e.statusCode() == 404) {
+                throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "S3 object does not exist", e);
+            }
+            throw unavailable("S3 object is unavailable", e);
         } catch (RuntimeException e) {
-            throw new FileUploadException(FileErrorCode.FILE_ASSET_NOT_READY, "S3 object is unavailable", e);
+            throw unavailable("S3 object is unavailable", e);
         }
     }
 

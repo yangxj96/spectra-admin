@@ -27,6 +27,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.IsNullExpression;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -217,11 +218,7 @@ public final class ScopeSqlPolicy {
             return falsePredicate();
         }
         Column left = new Column(table, column);
-        ParenthesedExpressionList<Expression> ids = new ParenthesedExpressionList<>(departmentIds
-                .stream()
-                .map(id -> (Expression) new StringValue(id.toString()))
-                .collect(Collectors.toList()));
-        InExpression direct = new InExpression(left, ids);
+        InExpression direct = new InExpression(left, activeDepartments(departmentIds));
         if (!includeDescendants) {
             return direct;
         }
@@ -230,10 +227,34 @@ public final class ScopeSqlPolicy {
         PlainSelect select = new PlainSelect();
         select.addSelectItems(new Column(closure, "descendant_id"));
         select.setFromItem(closure);
-        select.setWhere(new InExpression(new Column(closure, "ancestor_id"), ids));
+        select.setWhere(combineWithAnd(
+                new InExpression(new Column(closure, "ancestor_id"), activeDepartments(departmentIds)),
+                new InExpression(new Column(closure, "descendant_id"), activeDepartments(null))));
         ParenthesedSelect descendants = new ParenthesedSelect();
         descendants.setSelect(select);
         return new InExpression(left, descendants);
+    }
+
+    /**
+     * 构造活动部门 ID 子查询；授权范围只覆盖未软删除的组织节点。
+     */
+    private static ParenthesedSelect activeDepartments(Set<UUID> departmentIds) {
+        Table department = new Table(CLOSURE_SCHEMA, "sys_department");
+        PlainSelect select = new PlainSelect();
+        select.addSelectItems(new Column(department, "id"));
+        select.setFromItem(department);
+        Expression where = new IsNullExpression(new Column(department, "deleted"));
+        if (departmentIds != null && !departmentIds.isEmpty()) {
+            ParenthesedExpressionList<Expression> ids = new ParenthesedExpressionList<>(departmentIds
+                    .stream()
+                    .map(id -> (Expression) new StringValue(id.toString()))
+                    .collect(Collectors.toList()));
+            where = new AndExpression(new InExpression(new Column(department, "id"), ids), where);
+        }
+        select.setWhere(where);
+        ParenthesedSelect result = new ParenthesedSelect();
+        result.setSelect(select);
+        return result;
     }
 
     /**
