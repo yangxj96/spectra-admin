@@ -64,6 +64,7 @@ public class DependencyReadinessProbe implements SmartLifecycle {
 
     private volatile ScheduledExecutorService executor;
     private volatile boolean running;
+    private volatile boolean standbyFallback;
     private final AtomicLong currentIntervalMs = new AtomicLong();
 
     public DependencyReadinessProbe(ObjectProvider<DataSource> dataSourceProvider,
@@ -188,8 +189,15 @@ public class DependencyReadinessProbe implements SmartLifecycle {
         }
         try {
             scheduler.pauseAll();
+            return;
         } catch (Exception exception) {
-            log.warn(LogPrefix.WEB.f("暂停后台调度失败: {}"), exception.getClass().getSimpleName());
+            log.warn(LogPrefix.WEB.f("暂停后台调度失败，改用待机模式: {}"), exception.getClass().getSimpleName());
+        }
+        try {
+            scheduler.standby();
+            standbyFallback = true;
+        } catch (Exception exception) {
+            log.warn(LogPrefix.WEB.f("后台调度待机切换失败: {}"), exception.getClass().getSimpleName());
         }
     }
 
@@ -199,6 +207,10 @@ public class DependencyReadinessProbe implements SmartLifecycle {
             return;
         }
         try {
+            if (standbyFallback) {
+                scheduler.start();
+                standbyFallback = false;
+            }
             scheduler.resumeAll();
         } catch (Exception exception) {
             log.warn(LogPrefix.WEB.f("恢复后台调度失败: {}"), exception.getClass().getSimpleName());

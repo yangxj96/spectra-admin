@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.health.readiness;
 
 import org.junit.jupiter.api.Test;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -130,6 +132,31 @@ class DependencyReadinessProbeTest {
 
         assertFalse(state.isReady());
         verify(scheduler, times(1)).pauseAll();
+    }
+
+    @Test
+    void pauseFailureFallsBackToStandbyAndResumesOnRecovery() throws Exception {
+        Scheduler scheduler = mock(Scheduler.class);
+        doThrow(new SchedulerException("db down")).when(scheduler).pauseAll();
+        DependencyReadinessState state = new DependencyReadinessState();
+        DataSource dataSource = dataSource(false);
+        var probe = new DependencyReadinessProbe(
+                provider(dataSource), redisTemplate(), provider(scheduler),
+                state, new ReadinessProperties(5000L, 30000L));
+
+        probe.probe();
+
+        assertFalse(state.isReady());
+        verify(scheduler, times(1)).pauseAll();
+        verify(scheduler, times(1)).standby();
+        verify(scheduler, never()).resumeAll();
+
+        doReturn(dataSource(true).getConnection()).when(dataSource).getConnection();
+        probe.probe();
+
+        assertTrue(state.isReady());
+        verify(scheduler, times(1)).start();
+        verify(scheduler, times(1)).resumeAll();
     }
 
     @Test

@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.launch.security;
 
+import com.devops00.spectra.framework.health.readiness.ReadinessVerifier;
 import com.devops00.spectra.launch.LaunchApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -34,6 +35,7 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 验证运行期依赖故障下进程保留、业务未就绪返回 503、依赖恢复后重新服务。
@@ -65,6 +67,8 @@ class ReadinessGateHttpTest {
                             "--spectra.readiness.probe-interval-ms=1000",
                             "--spectra.readiness.max-interval-ms=2000")) {
                 int port = ((WebServerApplicationContext) application).getWebServer().getPort();
+                assertTrue(application.getBeansOfType(ReadinessVerifier.class)
+                        .containsKey("cacheConsistencyVerifier"), "缓存一致性校验器必须参与恢复门");
                 try (HttpClient client = HttpClient.newHttpClient()) {
                     assertEquals(401, businessStatus(client, port), "依赖正常时业务请求进入认证流程");
 

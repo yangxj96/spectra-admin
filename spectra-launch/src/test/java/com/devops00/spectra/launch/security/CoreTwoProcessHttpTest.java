@@ -842,15 +842,11 @@ class CoreTwoProcessHttpTest {
     }
 
     private static Process startSecond(Path ready, Path log, String redisUrl) throws Exception {
-        String java = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
-        ProcessBuilder builder = new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp",
-                System.getProperty("java.class.path"), SecondApplication.class.getName(), ready.toString())
-                .redirectErrorStream(true)
-                .redirectOutput(log.toFile());
-        if (redisUrl != null) {
-            builder.environment().put("SPRING_DATA_REDIS_URL", redisUrl);
-        }
-        return builder.start();
+        Map<String, String> environment = redisUrl == null
+                ? Map.of()
+                : Map.of("SPRING_DATA_REDIS_URL", redisUrl);
+        return SecondProcessStarter.start(log, SecondApplication.class,
+                List.of(ready.toString()), environment);
     }
 
     private static Process startRedis(String redisServer, Path home, int port) throws Exception {

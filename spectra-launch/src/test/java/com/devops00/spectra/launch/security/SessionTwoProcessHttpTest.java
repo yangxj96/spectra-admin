@@ -51,6 +51,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -489,12 +490,8 @@ class SessionTwoProcessHttpTest {
     }
 
     private static Process startSecond(UUID userId, Path ready, Path log) throws Exception {
-        String java = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
-        return new ProcessBuilder(java, "-Duser.timezone=UTC", "-cp", System.getProperty("java.class.path"),
-                SecondApplication.class.getName(), userId.toString(), ready.toString())
-                .redirectErrorStream(true)
-                .redirectOutput(log.toFile())
-                .start();
+        return SecondProcessStarter.start(log, SecondApplication.class,
+                List.of(userId.toString(), ready.toString()), Map.of());
     }
 
     private static int awaitPort(Process process, Path ready) throws Exception {
