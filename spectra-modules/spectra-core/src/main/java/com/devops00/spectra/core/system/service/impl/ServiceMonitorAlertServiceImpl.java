@@ -19,10 +19,8 @@ package com.devops00.spectra.core.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.security.authorization.service.DevOpsRecipientQuery;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertEvent;
@@ -358,14 +356,14 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
             return false;
         }
         notificationService
-                .sendAsSystem(NotificationSendRequest.inApp(
-                        "service-monitor-alert:" + event.getId() + ":" + event.getOccurrenceCount(),
-                        NotificationPurpose.SYSTEM_NOTICE, recipients, NotificationTemplateCode.SYSTEM_SERVICE_MONITOR_ALERT)
+                .send(NotificationSendRequest.inApp(
+                        NotificationTemplateCode.SYSTEM_SERVICE_MONITOR_ALERT,
+                        recipients)
                         .parameter("rule_name", event.getRuleName())
                         .parameter("message", event.getMessage())
                         .businessReference("SERVICE_MONITOR_ALERT", event.getId().toString())
                         .sourceModule("spectra-core")
-                        .build(), NotificationSystemActor.SERVICE_MONITOR_ALERT);
+                        .build());
         return true;
     }
 

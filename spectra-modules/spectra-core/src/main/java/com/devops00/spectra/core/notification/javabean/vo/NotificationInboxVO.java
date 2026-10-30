@@ -19,7 +19,6 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -27,7 +26,7 @@ import java.util.UUID;
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @Data
 public class NotificationInboxVO {
@@ -45,19 +44,11 @@ public class NotificationInboxVO {
      */
     private String content;
     /**
-     * 通知用途。
+     * 模板编码。
      */
-    private String purpose;
+    private String templateCode;
     /**
-     * 发件用户 ID。
-     */
-    private UUID senderUserId;
-    /**
-     * 发件人名称。
-     */
-    private String senderName;
-    /**
-     * 客户端跳转链接。
+     * 站内跳转链接。
      */
     private String link;
     /**
@@ -72,10 +63,6 @@ public class NotificationInboxVO {
      * 收件用户 ID。
      */
     private UUID receiverUserId;
-    /**
-     * 非敏感扩展参数。
-     */
-    private Map<String, Object> extra;
     /**
      * 创建时间。
      */

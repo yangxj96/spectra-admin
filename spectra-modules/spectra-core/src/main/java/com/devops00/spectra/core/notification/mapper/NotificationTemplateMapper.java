@@ -18,58 +18,15 @@ package com.devops00.spectra.core.notification.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
-import com.devops00.spectra.core.notification.javabean.from.NotificationTemplatePageFrom;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * 通知模板 Mapper。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @Mapper
 public interface NotificationTemplateMapper extends BaseMapper<NotificationTemplateEntity> {
-
-    /**
-     * 按通知批次一次加载各渠道当前可用的已发布模板。
-     *
-     * @param templateGroupCode  逻辑模板组编码
-     * @param purpose            通知用途
-     * @param channels           批次实际使用的渠道
-     * @param templateVersionIds 受控发送锁定的模板版本 ID；为空时按模板组查询
-     * @return 各渠道已发布模板
-     */
-    List<NotificationTemplateEntity> selectPublishedTemplates(
-                                                              @Param("templateGroupCode") String templateGroupCode,
-                                                              @Param("purpose") String purpose,
-                                                              @Param("channels") List<String> channels,
-                                                              @Param("templateVersionIds") List<UUID> templateVersionIds);
-
-    List<NotificationTemplateEntity> selectLatestPage(@Param("filter") NotificationTemplatePageFrom filter,
-                                                      @Param("limit") long limit,
-                                                      @Param("offset") long offset);
-
-    long countLatest(@Param("filter") NotificationTemplatePageFrom filter);
-
-    List<String> selectGroupPageCodes(@Param("filter") NotificationTemplatePageFrom filter,
-                                      @Param("limit") long limit,
-                                      @Param("offset") long offset);
-
-    long countGroupPageCodes(@Param("filter") NotificationTemplatePageFrom filter);
-
-    List<NotificationTemplateEntity> selectRowsByGroupCodes(@Param("codes") List<String> codes,
-                                                            @Param("filter") NotificationTemplatePageFrom filter);
-
-    List<NotificationTemplateEntity> selectVersions(@Param("groupCode") String groupCode,
-                                                    @Param("channel") String channel,
-                                                    @Param("limit") long limit,
-                                                    @Param("offset") long offset);
-
-    long countVersions(@Param("groupCode") String groupCode,
-                       @Param("channel") String channel);
 }

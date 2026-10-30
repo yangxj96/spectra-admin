@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.common.notification;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ import java.util.UUID;
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 public interface NotificationRecipientDirectory {
 
@@ -32,23 +33,15 @@ public interface NotificationRecipientDirectory {
      * 按用户 ID 解析通知所需的最小收件人快照。
      *
      * @param userIds 用户 ID
-     * @return 与输入 ID 一一对应的快照；未知用户返回 inactive 快照
+     * @return 与输入 ID 对应的快照；未知用户返回 inactive 快照
      */
-    List<NotificationRecipient> resolve(List<UUID> userIds);
+    List<NotificationRecipient> resolve(Collection<UUID> userIds);
 
     /**
-     * 按明确用户 ID 解析内部任务的收件人；调用方必须提供已登记的系统运行身份。
-     */
-    List<NotificationRecipient> resolveAsSystem(List<UUID> userIds, NotificationSystemActor actor);
-
-    /**
-     * 按登录名解析流程任务等内部调用方使用的收件人快照。
+     * 按登录名解析内部任务使用的收件人快照。
      *
-     * @param loginNames 用户登录名；空值和重复值由实现过滤
+     * @param loginNames 用户登录名
      * @return 可解析登录名对应的收件人快照
      */
-    List<NotificationRecipient> resolveByLoginNames(List<String> loginNames);
-
-    /** 按工作流任务明确的处理人登录名解析收件人。 */
-    List<NotificationRecipient> resolveByLoginNamesAsSystem(List<String> loginNames, NotificationSystemActor actor);
+    List<NotificationRecipient> resolveByLoginNames(Collection<String> loginNames);
 }

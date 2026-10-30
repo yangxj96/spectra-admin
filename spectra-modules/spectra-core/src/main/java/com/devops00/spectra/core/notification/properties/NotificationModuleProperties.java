@@ -16,106 +16,41 @@
 
 package com.devops00.spectra.core.notification.properties;
 
-import com.devops00.spectra.common.config.SystemConfigValueProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * 通知模块基础配置。
+ * 通知模块配置。
  *
- * @param enabled             是否启用统一通知模块
- * @param allowedLinkPrefixes 允许写入消息中心的前端站内路由前缀
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "spectra.notification")
 public class NotificationModuleProperties {
 
-    private static final List<String> DEFAULT_ALLOWED_LINK_PREFIXES = List.of(
-            "/login", "/security/authentication/", "/oa/", "/workflow/", "/notification/", "/notification-center/", "/system/", "/file/");
-
+    /**
+     * 是否启用通知发送。
+     */
     private boolean enabled = true;
 
-    private List<String> allowedLinkPrefixes = DEFAULT_ALLOWED_LINK_PREFIXES;
-
-    private SystemConfigValueProvider systemConfigValueProvider;
+    /**
+     * 是否强制所有外部渠道使用模拟发送。
+     */
+    private boolean forceMock = false;
 
     /**
-     * 保留显式构造器，方便模块单元测试使用固定配置。
+     * 外部 HTTP/SMTP 发送超时时间，单位毫秒。
      */
-    public NotificationModuleProperties(boolean enabled, String ignoredLegacyAddressKey, String ignoredLegacyPayloadKey,
-                                        List<String> allowedLinkPrefixes) {
-        this.enabled = enabled;
-        this.allowedLinkPrefixes = normalizePrefixes(allowedLinkPrefixes);
-    }
-
-    /** Spring Boot 配置绑定使用的默认构造器。 */
-    public NotificationModuleProperties() {
-    }
+    private int timeoutMs = 5000;
 
     /**
-     * 更新或推进目标状态（{@code setSystemConfigValueProvider}）。
+     * 站内跳转链接允许的前缀；为空时不限制。
      */
-    @Autowired(required = false)
-    public void setSystemConfigValueProvider(SystemConfigValueProvider systemConfigValueProvider) {
-        this.systemConfigValueProvider = systemConfigValueProvider;
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code enabled}）。
-     */
-    public boolean enabled() {
-        return systemValue("notification.enabled").map(Boolean::parseBoolean).orElse(enabled);
-    }
-
-    /**
-     * 查询或获取目标数据（{@code allowedLinkPrefixes}）。
-     */
-    public List<String> allowedLinkPrefixes() {
-        return systemValue("notification.allowed-link-prefixes")
-                .map(value -> normalizePrefixes(Arrays.asList(value.split(","))))
-                .orElseGet(() -> normalizePrefixes(allowedLinkPrefixes));
-    }
-
-    /**
-     * 更新或推进目标状态（{@code setEnabled}）。
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    /**
-     * 更新或推进目标状态（{@code setAllowedLinkPrefixes}）。
-     */
-    public void setAllowedLinkPrefixes(List<String> allowedLinkPrefixes) {
-        this.allowedLinkPrefixes = normalizePrefixes(allowedLinkPrefixes);
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code systemValue}）。
-     */
-    private Optional<String> systemValue(String key) {
-        return systemConfigValueProvider == null ? Optional.empty() : systemConfigValueProvider.find(key);
-    }
-
-    /**
-     * 转换、解析或规范化数据（{@code normalizePrefixes}）。
-     */
-    private static List<String> normalizePrefixes(List<String> values) {
-        if (values == null || values.isEmpty()) {
-            return DEFAULT_ALLOWED_LINK_PREFIXES;
-        }
-        var normalized = values.stream()
-                .filter(item -> item != null && !item.isBlank())
-                .map(String::trim)
-                .filter(item -> item.startsWith("/"))
-                .distinct()
-                .toList();
-        return normalized.isEmpty() ? DEFAULT_ALLOWED_LINK_PREFIXES : normalized;
-    }
+    private List<String> allowedLinkPrefixes = List.of();
 }

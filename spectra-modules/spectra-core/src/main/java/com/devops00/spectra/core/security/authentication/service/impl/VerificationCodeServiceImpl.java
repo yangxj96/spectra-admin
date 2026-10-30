@@ -19,8 +19,6 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.notification.NotificationDirectAddress;
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -72,27 +69,27 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Override
     public void sendSmsCode(String phone) {
         sendCode(phone, new CodeDelivery(NotificationChannel.SMS, RedisCacheKey.LOGIN_SMS_CODE,
-                NotificationPurpose.LOGIN_CODE, NotificationTemplateCode.SECURITY_LOGIN_CODE, null));
+                NotificationTemplateCode.SECURITY_LOGIN_CODE, null));
     }
 
     @Override
     public void sendEmailCode(String email) {
         sendCode(email, new CodeDelivery(NotificationChannel.EMAIL, RedisCacheKey.LOGIN_EMAIL_CODE,
-                NotificationPurpose.LOGIN_CODE, NotificationTemplateCode.SECURITY_LOGIN_CODE, null));
+                NotificationTemplateCode.SECURITY_LOGIN_CODE, null));
     }
 
     @Override
     public void sendBindingSmsCode(UUID userId, String phone) {
         Objects.requireNonNull(userId, "绑定用户不能为空");
         sendCode(phone, new CodeDelivery(NotificationChannel.SMS, RedisCacheKey.BIND_PHONE_CODE,
-                NotificationPurpose.BIND_PHONE_CODE, NotificationTemplateCode.SECURITY_BIND_PHONE_CODE, userId));
+                NotificationTemplateCode.SECURITY_BIND_PHONE_CODE, userId));
     }
 
     @Override
     public void sendBindingEmailCode(UUID userId, String email) {
         Objects.requireNonNull(userId, "绑定用户不能为空");
         sendCode(email, new CodeDelivery(NotificationChannel.EMAIL, RedisCacheKey.BIND_EMAIL_CODE,
-                NotificationPurpose.BIND_EMAIL_CODE, NotificationTemplateCode.SECURITY_BIND_EMAIL_CODE, userId));
+                NotificationTemplateCode.SECURITY_BIND_EMAIL_CODE, userId));
     }
 
     /**
@@ -101,7 +98,6 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private void sendCode(String address, CodeDelivery delivery) {
         var redisKey = delivery.redisPrefix() + address;
         var channel = delivery.channel();
-        var purpose = delivery.purpose();
         var userId = delivery.userId();
         requireHmacKey();
         var code = generateCode();
@@ -114,26 +110,16 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
             if (!stored) {
                 return;
             }
-            var purposeKey = purpose == NotificationPurpose.LOGIN_CODE
-                    ? "login-code"
-                    : purpose.name().toLowerCase().replace('_', '-');
             var requestScope = userId == null ? address + ":" + requestWindow : userId + ":" + UUID.randomUUID();
-            var businessReference = userId == null
-                    ? channel.name() + ":" + requestScope
-                    : purposeKey + ":" + channel.name() + ":" + requestScope;
-            var now = Instant.now();
+            var businessReference = delivery.templateCode() + ":" + channel.name() + ":" + requestScope;
             NotificationReceipt receipt = notificationService.send(NotificationSendRequest.direct(
-                    "security:" + purposeKey + ":" + channel.name() + ":" + requestScope,
-                    purpose, List.of(new NotificationDirectAddress(channel, address)), delivery.templateCode())
+                    delivery.templateCode(), channel, address)
                     .sensitiveParameter("code", code)
                     .businessReference("SECURITY", businessReference)
                     .sourceModule("SECURITY")
-                    .scheduledAt(now)
-                    .expiresAt(now.plusSeconds(securityProperties.getVerificationCodeExpire()))
-                    .priority(100)
                     .build());
-            if (receipt.taskCount() == 0) {
-                throw new SpectraException("验证码通知未生成投递任务");
+            if (receipt.failureCount() > 0 || receipt.results().isEmpty()) {
+                throw new SpectraException("验证码通知发送失败");
             }
         } catch (SecurityRedisUnavailableException exception) {
             throw exception;
@@ -169,8 +155,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         secretRuntimeService.requireActiveValue("security.verification-code-hmac");
     }
 
-    private record CodeDelivery(NotificationChannel channel, String redisPrefix, NotificationPurpose purpose,
-                                String templateCode, UUID userId) {
+    private record CodeDelivery(NotificationChannel channel, String redisPrefix, String templateCode, UUID userId) {
     }
 
 }

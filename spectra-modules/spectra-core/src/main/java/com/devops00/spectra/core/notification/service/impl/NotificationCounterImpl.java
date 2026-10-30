@@ -24,26 +24,20 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 /**
- * 消息中心未读数公共端口实现。
+ * 未读通知数量适配器。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @Service
 @RequiredArgsConstructor
 public class NotificationCounterImpl implements NotificationCounter {
 
-    /**
-     * 消息中心服务。
-     */
     private final NotificationInboxService inboxService;
 
-    /**
-     * 查询指定用户未读消息数；匿名用户返回零。
-     */
     @Override
     public long unreadCount(UUID userId) {
-        return userId == null ? 0 : inboxService.unreadCount(userId);
+        return userId == null ? 0L : inboxService.unreadCount(userId);
     }
 }

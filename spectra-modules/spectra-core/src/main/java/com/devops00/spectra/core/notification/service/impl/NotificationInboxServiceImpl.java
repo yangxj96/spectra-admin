@@ -19,18 +19,17 @@ package com.devops00.spectra.core.notification.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.framework.persistence.pagination.PageFrom;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
-import com.devops00.spectra.core.notification.javabean.converter.NotificationInboxConverter;
-import com.devops00.spectra.core.notification.javabean.entity.NotificationInboxEntity;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.core.notification.javabean.entity.NotificationMessageEntity;
 import com.devops00.spectra.core.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationInboxVO;
-import com.devops00.spectra.core.notification.mapper.NotificationInboxMapper;
+import com.devops00.spectra.core.notification.mapper.NotificationMessageMapper;
 import com.devops00.spectra.core.notification.service.NotificationInboxService;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
+import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -46,164 +45,132 @@ import java.util.UUID;
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationInboxServiceImpl implements NotificationInboxService {
 
-    /**
-     * 消息收件箱 Mapper。
-     */
-    private final NotificationInboxMapper mapper;
-    /**
-     * 实体与响应对象转换器。
-     */
-    private final NotificationInboxConverter converter;
-    /**
-     * 时间格式转换器。
-     */
+    private final NotificationMessageMapper mapper;
     private final TimeMapper timeMapper;
 
-    /**
-     * 分页查询指定用户仍可见的消息。
-     */
     @Override
-    public IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom params) {
-        var queryPage = page.<NotificationInboxEntity>toPage(Map.of("id", "id", "created_at", "created_at"));
-        var query = new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted)
-                .orderByDesc(NotificationInboxEntity::getCreatedAt);
-        if (params != null) {
-            applyPurpose(query, params.getPurpose());
-            if (params.getIsRead() != null) {
-                if (params.getIsRead()) {
-                    query.eq(NotificationInboxEntity::getIsRead, true);
+    public IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom query) {
+        var queryPage = page.<NotificationMessageEntity>toPage(Map.of("id", "id", "created_at", "created_at"));
+        var wrapper = ownedQuery(userId).orderByDesc(NotificationMessageEntity::getCreatedAt);
+        if (query != null) {
+            if (query.getIsRead() != null) {
+                if (query.getIsRead()) {
+                    wrapper.isNotNull(NotificationMessageEntity::getReadAt);
                 } else {
-                    query.eq(NotificationInboxEntity::getIsRead, false);
+                    wrapper.isNull(NotificationMessageEntity::getReadAt);
                 }
             }
-            if (StringUtils.hasText(params.getKeyword())) {
-                query.and(item -> item.like(NotificationInboxEntity::getTitle, params.getKeyword())
+            if (StringUtils.hasText(query.getKeyword())) {
+                wrapper.and(item -> item.like(NotificationMessageEntity::getTitle, query.getKeyword())
                         .or()
-                        .like(NotificationInboxEntity::getContent, params.getKeyword()));
+                        .like(NotificationMessageEntity::getContent, query.getKeyword()));
             }
-            if (StringUtils.hasText(params.getStartTime())) {
-                query.ge(NotificationInboxEntity::getCreatedAt, parseTime(params.getStartTime()));
+            if (StringUtils.hasText(query.getStartTime())) {
+                wrapper.ge(NotificationMessageEntity::getCreatedAt, timeMapper.toInstant(query.getStartTime()));
             }
-            if (StringUtils.hasText(params.getEndTime())) {
-                query.le(NotificationInboxEntity::getCreatedAt, parseTime(params.getEndTime()));
+            if (StringUtils.hasText(query.getEndTime())) {
+                wrapper.le(NotificationMessageEntity::getCreatedAt, timeMapper.toInstant(query.getEndTime()));
             }
         }
-        return converter.toVOPage(mapper.selectPage(queryPage, query));
+        var result = mapper.selectPage(queryPage, wrapper);
+        var voPage = new Page<NotificationInboxVO>(result.getCurrent(), result.getSize(), result.getTotal());
+        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        return voPage;
     }
 
-    /**
-     * 统计指定用户的未读消息数量。
-     */
     @Override
     public long unreadCount(UUID userId) {
-        return mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .eq(NotificationInboxEntity::getIsRead, false)
-                .isNull(NotificationInboxEntity::getDeleted));
+        return mapper.selectCount(ownedQuery(userId).isNull(NotificationMessageEntity::getReadAt));
     }
 
-    /**
-     * 查询指定用户拥有的消息详情。
-     */
     @Override
     public NotificationInboxVO detail(UUID id, UUID userId) {
-        return converter.toVO(owned(id, userId));
+        return toVO(owned(id, userId));
     }
 
-    /**
-     * 将指定用户的一条消息标记为已读。
-     */
     @Override
     @Transactional
     public void markAsRead(UUID id, UUID userId) {
-        var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>()
-                .eq(NotificationInboxEntity::getId, id)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted)
-                .eq(NotificationInboxEntity::getIsRead, false)
-                .set(NotificationInboxEntity::getIsRead, true)
-                .set(NotificationInboxEntity::getReadAt, Instant.now()));
-        if (updated == 0
-                && mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>()
-                        .eq(NotificationInboxEntity::getId, id)
-                        .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                        .isNull(NotificationInboxEntity::getDeleted)) == 0) {
-            throw new DataNotExistException("消息不存在");
+        var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationMessageEntity>()
+                .eq(NotificationMessageEntity::getId, id)
+                .eq(NotificationMessageEntity::getRecipientUserId, userId)
+                .eq(NotificationMessageEntity::getChannel, NotificationChannel.IN_APP.name())
+                .isNull(NotificationMessageEntity::getDeleted)
+                .isNull(NotificationMessageEntity::getReadAt)
+                .set(NotificationMessageEntity::getReadAt, Instant.now()));
+        if (updated == 0) {
+            owned(id, userId);
         }
     }
 
-    /**
-     * 将指定用户的全部可见消息标记为已读。
-     */
     @Override
     @Transactional
     public void markAllAsRead(UUID userId) {
-        mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted)
-                .eq(NotificationInboxEntity::getIsRead, false)
-                .set(NotificationInboxEntity::getIsRead, true)
-                .set(NotificationInboxEntity::getReadAt, Instant.now()));
+        mapper.update(null, new LambdaUpdateWrapper<NotificationMessageEntity>()
+                .eq(NotificationMessageEntity::getRecipientUserId, userId)
+                .eq(NotificationMessageEntity::getChannel, NotificationChannel.IN_APP.name())
+                .isNull(NotificationMessageEntity::getDeleted)
+                .isNull(NotificationMessageEntity::getReadAt)
+                .set(NotificationMessageEntity::getReadAt, Instant.now()));
     }
 
-    /**
-     * 软删除指定用户拥有的一条消息。
-     */
     @Override
     @Transactional
     public void deleteById(UUID id, UUID userId) {
-        var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getId, id)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted)
-                .set(NotificationInboxEntity::getDeleted, Instant.now()));
+        var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationMessageEntity>()
+                .eq(NotificationMessageEntity::getId, id)
+                .eq(NotificationMessageEntity::getRecipientUserId, userId)
+                .eq(NotificationMessageEntity::getChannel, NotificationChannel.IN_APP.name())
+                .isNull(NotificationMessageEntity::getDeleted)
+                .set(NotificationMessageEntity::getDeleted, Instant.now()));
         if (updated == 0) {
             throw new DataNotExistException("消息不存在");
         }
     }
 
-    /**
-     * 批量软删除指定用户拥有的消息。
-     */
     @Override
     @Transactional
     public void batchDelete(List<UUID> ids, UUID userId) {
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-        var targetIds = ids.stream().filter(Objects::nonNull).distinct().toList();
+        var targetIds = ids == null ? List.<UUID>of() : ids.stream().filter(Objects::nonNull).distinct().toList();
         if (targetIds.isEmpty()) {
             return;
         }
-        var ownedCount = mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>()
-                .in(NotificationInboxEntity::getId, targetIds)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted));
-        if (ownedCount != targetIds.size()) {
-            throw new DataNotExistException("消息不存在");
-        }
-        var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>()
-                .in(NotificationInboxEntity::getId, targetIds)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted)
-                .set(NotificationInboxEntity::getDeleted, Instant.now()));
-        if (updated != targetIds.size()) {
-            throw new DataSaveException("批量删除消息失败");
-        }
+        mapper.update(null, new LambdaUpdateWrapper<NotificationMessageEntity>()
+                .in(NotificationMessageEntity::getId, targetIds)
+                .eq(NotificationMessageEntity::getRecipientUserId, userId)
+                .eq(NotificationMessageEntity::getChannel, NotificationChannel.IN_APP.name())
+                .isNull(NotificationMessageEntity::getDeleted)
+                .set(NotificationMessageEntity::getDeleted, Instant.now()));
     }
 
     /**
-     * 按收件人约束查询消息，避免越权读取。
+     * 构造当前用户站内信查询条件。
+     *
+     * @param userId 当前用户 ID
+     * @return 查询条件
      */
-    private NotificationInboxEntity owned(UUID id, UUID userId) {
-        var entity = mapper.selectOne(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getId, id)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                .isNull(NotificationInboxEntity::getDeleted));
+    private LambdaQueryWrapper<NotificationMessageEntity> ownedQuery(UUID userId) {
+        return new LambdaQueryWrapper<NotificationMessageEntity>()
+                .eq(NotificationMessageEntity::getRecipientUserId, userId)
+                .eq(NotificationMessageEntity::getChannel, NotificationChannel.IN_APP.name())
+                .isNull(NotificationMessageEntity::getDeleted);
+    }
+
+    /**
+     * 查询当前用户拥有的消息。
+     *
+     * @param id     消息 ID
+     * @param userId 当前用户 ID
+     * @return 消息实体
+     */
+    private NotificationMessageEntity owned(UUID id, UUID userId) {
+        var entity = mapper.selectOne(ownedQuery(userId).eq(NotificationMessageEntity::getId, id));
         if (entity == null) {
             throw new DataNotExistException("消息不存在");
         }
@@ -211,23 +178,22 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
     }
 
     /**
-     * 按通知用途筛选消息。
+     * 转换为响应对象。
+     *
+     * @param entity 消息实体
+     * @return 响应对象
      */
-    private void applyPurpose(LambdaQueryWrapper<NotificationInboxEntity> query, String purpose) {
-        if (!StringUtils.hasText(purpose) || "all".equalsIgnoreCase(purpose)) {
-            return;
-        }
-        query.eq(NotificationInboxEntity::getPurpose, purpose.trim().toUpperCase());
-    }
-
-    /**
-     * 解析查询时间，统一转换为无时区时间点。
-     */
-    private Instant parseTime(String value) {
-        try {
-            return timeMapper.toInstant(value);
-        } catch (RuntimeException exception) {
-            throw new DataSaveException("消息时间格式不正确", exception);
-        }
+    private NotificationInboxVO toVO(NotificationMessageEntity entity) {
+        var vo = new NotificationInboxVO();
+        vo.setId(entity.getId());
+        vo.setTitle(entity.getTitle());
+        vo.setContent(entity.getContent());
+        vo.setTemplateCode(entity.getTemplateCode());
+        vo.setLink(entity.getLink());
+        vo.setIsRead(entity.getReadAt() != null);
+        vo.setReadAt(timeMapper.toOffsetDateTime(entity.getReadAt()));
+        vo.setReceiverUserId(entity.getRecipientUserId());
+        vo.setCreatedAt(timeMapper.toOffsetDateTime(entity.getCreatedAt()));
+        return vo;
     }
 }

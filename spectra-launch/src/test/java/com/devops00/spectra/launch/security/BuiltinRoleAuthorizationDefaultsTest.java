@@ -56,7 +56,7 @@ class BuiltinRoleAuthorizationDefaultsTest {
                 grants.get("ROLE_AUDIT"));
 
         assertEquals(Set.of(
-                "account:read", "account:update", "notification-setting:read", "notification-setting:update",
+                "account:read", "account:update",
                 "notification:read", "notification:update", "notification:delete", "oa:calendar:create",
                 "oa:calendar:read", "oa:calendar:update", "oa:calendar:delete", "oa:workbench:read",
                 "workflow:instance:create"), grants.get("ROLE_USER"));
@@ -76,8 +76,9 @@ class BuiltinRoleAuthorizationDefaultsTest {
                 "OAApprovalLeave"), menus.get("ROLE_ADMIN_SYSTEM"));
         assertEquals(Set.of(
                 "Dashboard", "SystemUser", "SystemRoleManagement", "SystemDept", "SystemDict", "SystemMenu",
-                "SystemWorkflow", "SystemRegion", "DevopsAuditLog", "DevopsNotificationTemplate",
-                "DevopsNotificationProvider", "OAAsset", "OASupply", "OALeave", "OAApplicationTypes", "OAContact",
+                "SystemWorkflow", "SystemRegion", "DevopsAuditLog", "DevopsNotificationHistory",
+                "DevopsNotificationTemplate", "DevopsNotificationSmsConfig", "DevopsNotificationEmailConfig",
+                "OAAsset", "OASupply", "OALeave", "OAApplicationTypes", "OAContact",
                 "OAContract", "OADocument", "OAMeeting", "OANotice", "OAPurchase", "OAReimbursement", "OAReport",
                 "OAApproval", "OAApprovalReimbursement", "OAApprovalPurchase", "OAApprovalLeave"),
                 menus.get("ROLE_AUDIT"));

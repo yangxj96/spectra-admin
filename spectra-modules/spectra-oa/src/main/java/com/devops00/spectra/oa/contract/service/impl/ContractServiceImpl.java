@@ -24,10 +24,8 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.framework.serialization.mapper.TimeMapper;
@@ -395,10 +393,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
 
     @Override
     @Transactional
-    public int sendDueMilestoneRemindersAsSystem(NotificationSystemActor actor) {
-        if (actor != NotificationSystemActor.OA_CONTRACT_REMINDER) {
-            throw new AccessDeniedException("合同提醒扫描缺少已登记的系统身份");
-        }
+    public int sendDueMilestoneRemindersAsSystem() {
         return scanDueMilestones(true);
     }
 
@@ -429,15 +424,16 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                 continue;
             }
             try {
-                notificationService.sendAsSystem(NotificationSendRequest.inApp("oa:contract-milestone:" + milestone.getId(),
-                        NotificationPurpose.OA_REMINDER, List.of(receiverId), NotificationTemplateCode.OA_CONTRACT_MILESTONE_REMINDER)
+                notificationService.send(NotificationSendRequest.inApp(
+                        NotificationTemplateCode.OA_CONTRACT_MILESTONE_REMINDER,
+                        List.of(receiverId))
                         .parameter("contract_title", Objects.toString(contract.getTitle(), ""))
                         .parameter("milestone_name", Objects.toString(milestone.getName(), ""))
                         .parameter("due_date", Objects.toString(milestone.getDueDate(), ""))
                         .businessReference("OA_CONTRACT_MILESTONE", milestone.getId().toString())
                         .sourceModule("OA")
                         .link("/oa/contract/" + contract.getId())
-                        .build(), NotificationSystemActor.OA_CONTRACT_REMINDER);
+                        .build());
                 sent++;
             } catch (RuntimeException exception) {
                 milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())

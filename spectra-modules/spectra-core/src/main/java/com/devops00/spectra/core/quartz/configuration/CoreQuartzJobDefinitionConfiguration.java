@@ -16,8 +16,6 @@
 
 package com.devops00.spectra.core.quartz.configuration;
 
-import com.devops00.spectra.core.notification.job.NotificationCleanupQuartzJob;
-import com.devops00.spectra.core.notification.job.NotificationTaskQuartzJob;
 import com.devops00.spectra.common.port.quartz.QuartzBuiltInJobDefinition;
 import com.devops00.spectra.common.port.quartz.QuartzTriggerTemplate;
 import com.devops00.spectra.core.quartz.job.QuartzExecutionHistoryCleanupJob;
@@ -46,28 +44,6 @@ import java.util.Optional;
 public class CoreQuartzJobDefinitionConfiguration {
 
     private static final QuartzParameterSchema EMPTY_PARAMETERS = QuartzParameterSchema.empty();
-
-    /**
-     * 定义每 5 秒批量处理通知任务的内置 Quartz 作业。
-     *
-     * @return Quartz作业数据。
-     */
-    @Bean
-    public QuartzBuiltInJobDefinition notificationTaskQuartzJobDefinition() {
-        return definition("notification.task-worker", "通知任务批处理", NotificationTaskQuartzJob.class,
-                QuartzTriggerTemplate.fixedInterval(Duration.ofSeconds(5), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
-    }
-
-    /**
-     * 定义定期清理通知敏感载荷的内置 Quartz 作业。
-     *
-     * @return Quartz作业数据。
-     */
-    @Bean
-    public QuartzBuiltInJobDefinition notificationCleanupQuartzJobDefinition() {
-        return definition("notification.cleanup-sensitive-payload", "通知敏感载荷清理", NotificationCleanupQuartzJob.class,
-                QuartzTriggerTemplate.fixedInterval(Duration.ofHours(1), QuartzTriggerTemplate.MisfirePolicy.FIRE_ONCE_NOW));
-    }
 
     /**
      * 定义恢复用户导入 Apply 任务的内置 Quartz 作业。

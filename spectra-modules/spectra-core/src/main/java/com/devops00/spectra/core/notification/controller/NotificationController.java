@@ -17,14 +17,14 @@
 package com.devops00.spectra.core.notification.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.framework.persistence.pagination.PageFrom;
-import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.audit.Audit;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.core.notification.javabean.from.NotificationBatchDeleteFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationInboxVO;
 import com.devops00.spectra.core.notification.service.NotificationInboxService;
-import com.devops00.spectra.common.port.security.SecurityContextAccessor;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,11 +41,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 /**
- * 当前用户消息中心接口；所有查询和写操作均由服务层强制绑定当前收件人。
+ * 当前用户消息中心接口。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @RestController
 @RequiredArgsConstructor
@@ -53,15 +53,16 @@ import java.util.UUID;
 @RequestMapping("/notification")
 public class NotificationController {
 
-    /**
-     * 当前用户消息中心服务。
-     */
     private final NotificationInboxService service;
 
     private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 查询当前用户消息列表。
+     *
+     * @param page   分页参数
+     * @param params 查询条件
+     * @return 消息分页
      */
     @Audit("'查询消息列表'")
     @GetMapping(value = "/list", version = "1.0.0")
@@ -72,6 +73,9 @@ public class NotificationController {
 
     /**
      * 查询当前用户消息详情。
+     *
+     * @param id 消息 ID
+     * @return 消息详情
      */
     @Audit("'查询消息详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
@@ -82,6 +86,8 @@ public class NotificationController {
 
     /**
      * 查询当前用户未读数量。
+     *
+     * @return 未读数量
      */
     @Audit("'获取未读消息数'")
     @GetMapping(value = "/unread-count", version = "1.0.0")
@@ -92,6 +98,8 @@ public class NotificationController {
 
     /**
      * 标记单条消息已读。
+     *
+     * @param id 消息 ID
      */
     @Audit("'标记消息已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0")
@@ -112,6 +120,8 @@ public class NotificationController {
 
     /**
      * 删除当前用户的一条消息。
+     *
+     * @param id 消息 ID
      */
     @Audit("'删除消息'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
@@ -121,7 +131,9 @@ public class NotificationController {
     }
 
     /**
-     * 仅删除当前用户拥有的消息，混合用户 ID 不会影响其他收件人。
+     * 批量删除当前用户消息。
+     *
+     * @param from 批量删除参数
      */
     @Audit("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0")
@@ -131,7 +143,9 @@ public class NotificationController {
     }
 
     /**
-     * 获取当前登录用户 ID，拒绝匿名访问消息数据。
+     * 获取当前登录用户 ID。
+     *
+     * @return 当前用户 ID
      */
     private UUID currentUserId() {
         var userId = securityContextAccessor.currentUserId();

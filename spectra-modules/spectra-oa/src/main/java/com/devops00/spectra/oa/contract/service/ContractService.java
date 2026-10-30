@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.contract.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.framework.persistence.base.BaseService;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
@@ -161,11 +160,10 @@ public interface ContractService extends BaseService<Contract> {
     int sendDueMilestoneReminders();
 
     /**
-     * 使用已登记的 OA 合同提醒运行身份扫描到期节点。
+     * 使用后台任务身份扫描到期节点。
      *
-     * @param actor 仅接受 OA 合同提醒运行身份
-     * @return 本次成功入队的节点数量
+     * @return 本次成功发送的节点数量
      */
-    int sendDueMilestoneRemindersAsSystem(NotificationSystemActor actor);
+    int sendDueMilestoneRemindersAsSystem();
 
 }

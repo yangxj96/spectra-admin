@@ -16,59 +16,45 @@
 
 package com.devops00.spectra.core.notification.javabean.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.framework.persistence.base.BaseEntity;
-import com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Map;
 
 /**
  * 通知模板实体。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "ntf_template", schema = "spectra_notification", autoResultMap = true)
+@TableName(value = "ntf_template", schema = "spectra_core")
 public class NotificationTemplateEntity extends BaseEntity {
 
     /**
-     * 逻辑模板组编码。
+     * 模板编码；同一渠道内唯一。
      */
-    @TableField("template_group_code")
-    private String templateGroupCode;
+    @TableField("code")
+    private String code;
     /**
      * 模板名称。
      */
-    @TableField("template_name")
-    private String templateName;
+    @TableField("name")
+    private String name;
     /**
-     * 适用渠道。
+     * 适用渠道：IN_APP、SMS 或 EMAIL。
      */
     @TableField("channel")
     private String channel;
     /**
-     * 适用通知用途。
-     */
-    @TableField("purpose")
-    private String purpose;
-    /**
-     * 模板业务版本号。
-     */
-    @TableField("version_no")
-    private Integer versionNo;
-    /**
-     * 标题模板。
+     * 标题模板；短信和站内信可空。
      */
     @TableField("title_template")
     private String titleTemplate;
@@ -78,28 +64,23 @@ public class NotificationTemplateEntity extends BaseEntity {
     @TableField("content_template")
     private String contentTemplate;
     /**
-     * HTML 正文模板。
+     * HTML 正文模板；仅邮件使用。
      */
     @TableField("html_template")
     private String htmlTemplate;
     /**
-     * 模板参数白名单。
-     */
-    @TableField(value = "parameter_schema", typeHandler = PgJsonbTypeHandler.class, updateStrategy = FieldStrategy.ALWAYS)
-    private Map<String, Object> parameterSchema;
-    /**
-     * 外部供应商模板编码。
+     * 外部供应商模板编码；短信使用。
      */
     @TableField("provider_template_code")
     private String providerTemplateCode;
     /**
-     * 模板生命周期状态：DRAFT、PUBLISHED、DISABLED 或 ARCHIVED。
+     * 是否内置模板。
      */
-    @TableField("state")
-    private String state;
+    @TableField("builtin")
+    private Boolean builtin;
     /**
-     * 模板内容不可变摘要，使用 SHA-256 十六进制编码。
+     * 是否启用。
      */
-    @TableField("version_digest")
-    private String versionDigest;
+    @TableField("enabled")
+    private Boolean enabled;
 }

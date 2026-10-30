@@ -17,114 +17,78 @@
 package com.devops00.spectra.core.notification.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.framework.persistence.pagination.PageFrom;
-import com.devops00.spectra.core.notification.javabean.from.NotificationTemplateActionFrom;
-import com.devops00.spectra.core.notification.javabean.from.NotificationTemplatePageFrom;
-import com.devops00.spectra.core.notification.javabean.from.NotificationTemplatePreviewFrom;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity;
+import com.devops00.spectra.core.notification.javabean.from.NotificationTemplateQueryFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationTemplateSaveFrom;
-import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplatePreviewVO;
-import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplateGroupVO;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationTemplateVO;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 
 import java.util.UUID;
 
 /**
- * 通知模板生命周期服务。
+ * 通知模板管理服务。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/10/30
  */
 public interface NotificationTemplateService {
 
     /**
-     * 查询或获取目标数据（{@code page}）。
+     * 分页查询模板。
      *
-     * @param page   分页条件，包含页码、页大小和排序字段。
-     * @param params 模板组、渠道、用途和状态等模板分页筛选条件。
-     * @return 返回按分页条件查询的通知模板分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
+     * @param page  分页参数
+     * @param query 查询条件
+     * @return 模板分页
      */
-    IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params);
+    IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplateQueryFrom query);
 
     /**
-     * 查询或获取目标数据（{@code groupPage}）。
+     * 查询模板详情。
      *
-     * @param page   分页条件，包含页码、页大小和排序字段。
-     * @param params 模板组、渠道、用途和状态等模板分组分页筛选条件。
-     * @return 返回按分页条件查询的通知模板分组分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
-     */
-    IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params);
-
-    /**
-     * 查询或获取目标数据（{@code detail}）。
-     *
-     * @param id 要读取详情的通知模板唯一标识。
-     * @return 返回符合条件的通知模板详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
+     * @param id 模板 ID
+     * @return 模板详情
      */
     NotificationTemplateVO detail(UUID id);
 
     /**
-     * 创建或构建目标数据（{@code create}）。
+     * 创建模板。
      *
-     * @param params 模板组编码、名称、渠道、用途、标题/正文模板、参数规则和版本等创建字段。
-     * @return 返回已保存的通知模板，包含模板标识、版本和当前状态；校验或写入失败时抛出业务异常，不返回 null。
+     * @param from 保存参数
+     * @return 新模板 ID
      */
-    NotificationTemplateVO create(NotificationTemplateSaveFrom params);
+    UUID created(NotificationTemplateSaveFrom from);
 
     /**
-     * 更新或推进目标状态（{@code update}）。
+     * 修改模板。
      *
-     * @param params 已有模板标识及要更新的模板名称、内容、参数规则和版本字段。
-     * @return 返回已保存的通知模板，包含模板标识、版本和当前状态；版本冲突或写入失败时抛出业务异常，不返回 null。
+     * @param id   模板 ID
+     * @param from 保存参数
      */
-    NotificationTemplateVO update(NotificationTemplateSaveFrom params);
+    void modify(UUID id, NotificationTemplateSaveFrom from);
 
     /**
-     * 更新或推进目标状态（{@code publish}）。
+     * 删除模板。
      *
-     * @param id     待发布通知模板的唯一标识。
-     * @param params 要发布的模板版本号。
+     * @param id 模板 ID
      */
-    void publish(UUID id, NotificationTemplateActionFrom params);
+    void deleteById(UUID id);
 
     /**
-     * 更新或推进目标状态（{@code disable}）。
+     * 启用或停用模板。
      *
-     * @param id     待停用通知模板的唯一标识。
-     * @param params 要停用的模板版本号。
+     * @param id      模板 ID
+     * @param enabled 是否启用
      */
-    void disable(UUID id, NotificationTemplateActionFrom params);
+    void changeEnabled(UUID id, boolean enabled);
 
     /**
-     * 更新或推进目标状态（{@code enable}）。
+     * 按编码和渠道获取启用中的模板。
      *
-     * @param id     待启用通知模板的唯一标识。
-     * @param params 要启用的模板版本号。
+     * @param code    模板编码
+     * @param channel 发送渠道
+     * @return 模板实体
      */
-    void enable(UUID id, NotificationTemplateActionFrom params);
-
-    /**
-     * 更新或推进目标状态（{@code archive}）。
-     *
-     * @param id     待归档通知模板的唯一标识。
-     * @param params 要归档的模板版本号。
-     */
-    void archive(UUID id, NotificationTemplateActionFrom params);
-
-    /**
-     * 处理内部业务逻辑（{@code versions}）。
-     *
-     * @param id   要查询历史版本的通知模板唯一标识。
-     * @param page 分页条件，包含页码和每页数量；固定按版本号倒序，不接受客户端排序。
-     * @return 返回该模板的版本分页，最新版本在前；尚无版本时返回空分页，不返回 null。
-     */
-    IPage<NotificationTemplateVO> versions(UUID id, PageFrom page);
-
-    /**
-     * 处理内部业务逻辑（{@code preview}）。
-     *
-     * @param params 模板标识、渠道、用途、模板文本、参数规则及普通/敏感预览参数。
-     * @return 返回模板预览的请求标识和渲染后的渠道内容；模板不存在、参数缺失或渲染失败时抛出异常，不返回 null。
-     */
-    NotificationTemplatePreviewVO preview(NotificationTemplatePreviewFrom params);
+    NotificationTemplateEntity require(String code, NotificationChannel channel);
 }

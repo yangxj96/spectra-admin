@@ -19,19 +19,19 @@ package com.devops00.spectra.common.notification;
 import java.util.UUID;
 
 /**
- * 消息中心只读计数端口，供工作台等业务模块查询通知摘要，不暴露收件箱持久化实现。
+ * 跨模块读取当前用户未读通知数量。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 public interface NotificationCounter {
 
     /**
-     * 查询指定用户当前可见的未读站内信数量。
+     * 统计指定用户的未读站内信数量。
      *
-     * @param userId 待查询的用户 ID
-     * @return 未读且未删除的站内信数量
+     * @param userId 用户 ID
+     * @return 未读数量
      */
     long unreadCount(UUID userId);
 }

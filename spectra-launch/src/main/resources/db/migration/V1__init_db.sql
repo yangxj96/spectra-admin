@@ -34,13 +34,6 @@ CREATE SCHEMA spectra_core;
 
 
 --
--- Name: spectra_notification; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA spectra_notification;
-
-
---
 -- Name: spectra_oa; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -2261,1335 +2254,205 @@ COMMENT ON COLUMN spectra_core.sys_user_import_task.profile_version_hash IS '导
 
 
 --
--- Name: ntf_delivery; Type: TABLE; Schema: spectra_notification; Owner: -
+-- Name: ntf_template; Type: TABLE; Schema: spectra_core; Owner: -
 --
 
-CREATE TABLE spectra_notification.ntf_delivery (
+CREATE TABLE spectra_core.ntf_template (
     id uuid NOT NULL,
-    notification_task_id uuid NOT NULL,
-    attempt_no integer NOT NULL,
-    provider character varying(50) NOT NULL,
-    provider_message_id character varying(200),
-    started_at timestamp(6) with time zone,
-    completed_at timestamp(6) with time zone,
-    result_status character varying(20) NOT NULL,
-    error_code character varying(100),
-    error_message_sanitized text,
-    duration_ms bigint,
-    response_summary jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_by uuid,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_by uuid,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0 NOT NULL,
-    template_id uuid,
-    template_version_no integer,
-    template_version_digest character varying(64),
-    rendered_title text,
-    rendered_content text,
-    CONSTRAINT "CK_NTF_DELIVERY_ATTEMPT" CHECK ((attempt_no > 0)),
-    CONSTRAINT "CK_NTF_DELIVERY_STATUS" CHECK (((result_status)::text = ANY (ARRAY[('ACCEPTED'::character varying)::text, ('SENT'::character varying)::text, ('FAILED'::character varying)::text, ('BLOCKED'::character varying)::text, ('UNKNOWN'::character varying)::text]))),
-    CONSTRAINT "CK_NTF_DELIVERY_TEMPLATE_DIGEST" CHECK (((template_version_digest IS NULL) OR ((template_version_digest)::text ~ '^[0-9a-f]{64}$'::text)))
-);
-
-
---
--- Name: TABLE ntf_delivery; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON TABLE spectra_notification.ntf_delivery IS '通知渠道单次投递尝试审计表';
-
-
---
--- Name: COLUMN ntf_delivery.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_delivery.notification_task_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.notification_task_id IS '所属通知任务ID';
-
-
---
--- Name: COLUMN ntf_delivery.attempt_no; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.attempt_no IS '当前任务的投递尝试序号';
-
-
---
--- Name: COLUMN ntf_delivery.provider; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.provider IS '执行投递的渠道供应商编码';
-
-
---
--- Name: COLUMN ntf_delivery.provider_message_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.provider_message_id IS '供应商返回的消息ID';
-
-
---
--- Name: COLUMN ntf_delivery.started_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.started_at IS '本次投递开始时间';
-
-
---
--- Name: COLUMN ntf_delivery.completed_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.completed_at IS '本次投递完成时间';
-
-
---
--- Name: COLUMN ntf_delivery.result_status; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.result_status IS '标准化投递结果状态';
-
-
---
--- Name: COLUMN ntf_delivery.error_code; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.error_code IS '供应商或模块返回的错误码';
-
-
---
--- Name: COLUMN ntf_delivery.error_message_sanitized; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.error_message_sanitized IS '脱敏后的错误信息';
-
-
---
--- Name: COLUMN ntf_delivery.duration_ms; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.duration_ms IS '本次投递耗时；单位为毫秒';
-
-
---
--- Name: COLUMN ntf_delivery.response_summary; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.response_summary IS '可安全持久化的脱敏响应摘要';
-
-
---
--- Name: COLUMN ntf_delivery.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_delivery.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_delivery.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.updated_by IS '最后更新人ID';
-
-
---
--- Name: COLUMN ntf_delivery.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.updated_at IS '最后更新时间';
-
-
---
--- Name: COLUMN ntf_delivery.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.deleted IS '删除时间；NULL表示未删除';
-
-
---
--- Name: COLUMN ntf_delivery.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.version IS '乐观锁版本号';
-
-
---
--- Name: COLUMN ntf_delivery.template_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.template_id IS '投递时锁定的模板版本 ID';
-
-
---
--- Name: COLUMN ntf_delivery.template_version_no; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.template_version_no IS '投递时锁定的模板业务版本号';
-
-
---
--- Name: COLUMN ntf_delivery.template_version_digest; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.template_version_digest IS '投递时锁定的模板内容 SHA-256 摘要';
-
-
---
--- Name: COLUMN ntf_delivery.rendered_title; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.rendered_title IS '投递时使用的渲染标题快照';
-
-
---
--- Name: COLUMN ntf_delivery.rendered_content; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_delivery.rendered_content IS '投递时使用的渲染正文快照';
-
-
---
--- Name: ntf_inbox_message; Type: TABLE; Schema: spectra_notification; Owner: -
---
-
-CREATE TABLE spectra_notification.ntf_inbox_message (
-    id uuid NOT NULL,
-    notification_task_id uuid,
-    notification_request_id uuid,
-    receiver_user_id uuid NOT NULL,
-    purpose character varying(50) NOT NULL,
-    title character varying(255) NOT NULL,
-    content text NOT NULL,
-    sender_user_id uuid,
-    sender_name character varying(100),
-    link character varying(500),
-    is_read boolean DEFAULT false NOT NULL,
-    read_at timestamp(6) with time zone,
-    extra jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_by uuid,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_by uuid,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0 NOT NULL,
-    CONSTRAINT "CK_NTF_INBOX_READ" CHECK (((is_read AND (read_at IS NOT NULL)) OR ((NOT is_read) AND (read_at IS NULL))))
-);
-
-
---
--- Name: TABLE ntf_inbox_message; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON TABLE spectra_notification.ntf_inbox_message IS '当前用户站内信收件箱表';
-
-
---
--- Name: COLUMN ntf_inbox_message.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_inbox_message.notification_task_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.notification_task_id IS '对应的站内信通知任务ID';
-
-
---
--- Name: COLUMN ntf_inbox_message.notification_request_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.notification_request_id IS '对应的逻辑通知请求ID';
-
-
---
--- Name: COLUMN ntf_inbox_message.receiver_user_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.receiver_user_id IS '消息接收用户ID';
-
-
---
--- Name: COLUMN ntf_inbox_message.purpose; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.purpose IS '通知用途';
-
-
---
--- Name: COLUMN ntf_inbox_message.title; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.title IS '消息标题';
-
-
---
--- Name: COLUMN ntf_inbox_message.content; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.content IS '消息正文';
-
-
---
--- Name: COLUMN ntf_inbox_message.sender_user_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.sender_user_id IS '消息发送用户ID；系统发送时可为空';
-
-
---
--- Name: COLUMN ntf_inbox_message.sender_name; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.sender_name IS '消息发送人名称快照';
-
-
---
--- Name: COLUMN ntf_inbox_message.link; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.link IS '客户端站内跳转路径';
-
-
---
--- Name: COLUMN ntf_inbox_message.is_read; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.is_read IS '是否已读';
-
-
---
--- Name: COLUMN ntf_inbox_message.read_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.read_at IS '阅读时间；未读时为空';
-
-
---
--- Name: COLUMN ntf_inbox_message.extra; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.extra IS '白名单扩展信息';
-
-
---
--- Name: COLUMN ntf_inbox_message.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_inbox_message.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_inbox_message.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.updated_by IS '最后更新人ID';
-
-
---
--- Name: COLUMN ntf_inbox_message.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.updated_at IS '最后更新时间';
-
-
---
--- Name: COLUMN ntf_inbox_message.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.deleted IS '删除时间；NULL表示未删除';
-
-
---
--- Name: COLUMN ntf_inbox_message.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_inbox_message.version IS '乐观锁版本号';
-
-
---
--- Name: ntf_request; Type: TABLE; Schema: spectra_notification; Owner: -
---
-
-CREATE TABLE spectra_notification.ntf_request (
-    id uuid NOT NULL,
-    external_request_id character varying(100) NOT NULL,
-    idempotency_key character varying(200) NOT NULL,
-    purpose character varying(50) NOT NULL,
-    template_group_code character varying(100) NOT NULL,
-    source_module character varying(50) NOT NULL,
-    business_type character varying(100) NOT NULL,
-    business_id character varying(100) NOT NULL,
-    initiator_type character varying(20) NOT NULL,
-    initiator_user_id uuid,
-    source_department_id uuid,
-    parameters jsonb DEFAULT '{}'::jsonb NOT NULL,
-    sensitive_parameters_ciphertext text,
-    encryption_key_id character varying(50),
-    status character varying(20) DEFAULT 'ACCEPTED'::character varying NOT NULL,
-    recipient_count integer DEFAULT 0 NOT NULL,
-    task_count integer DEFAULT 0 NOT NULL,
-    scheduled_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    expires_at timestamp(6) with time zone,
-    priority smallint DEFAULT 0 NOT NULL,
-    trace_id character varying(100),
-    created_by uuid,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_by uuid,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0 NOT NULL,
-    template_snapshot jsonb DEFAULT '{}'::jsonb NOT NULL,
-    CONSTRAINT "CK_NTF_REQUEST_COUNTS" CHECK (((recipient_count >= 0) AND (task_count >= 0))),
-    CONSTRAINT "CK_NTF_REQUEST_STATUS" CHECK (((status)::text = ANY (ARRAY[('ACCEPTED'::character varying)::text, ('DISPATCHING'::character varying)::text, ('SUCCEEDED'::character varying)::text, ('PARTIAL'::character varying)::text, ('FAILED'::character varying)::text, ('CANCELLED'::character varying)::text, ('EXPIRED'::character varying)::text])))
-);
-
-
---
--- Name: TABLE ntf_request; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON TABLE spectra_notification.ntf_request IS '逻辑通知请求表';
-
-
---
--- Name: COLUMN ntf_request.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_request.external_request_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.external_request_id IS '调用方生成的外部请求ID';
-
-
---
--- Name: COLUMN ntf_request.idempotency_key; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.idempotency_key IS '业务幂等键；通知域内唯一';
-
-
---
--- Name: COLUMN ntf_request.purpose; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.purpose IS '通知用途';
-
-
---
--- Name: COLUMN ntf_request.template_group_code; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.template_group_code IS '逻辑模板组编码';
-
-
---
--- Name: COLUMN ntf_request.source_module; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.source_module IS '发起请求的业务模块编码';
-
-
---
--- Name: COLUMN ntf_request.business_type; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.business_type IS '业务对象类型；与business_id构成弱引用';
-
-
---
--- Name: COLUMN ntf_request.business_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.business_id IS '业务对象ID；不建立跨模块外键';
-
-
---
--- Name: COLUMN ntf_request.initiator_type; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.initiator_type IS '发起方类型：用户或系统';
-
-
---
--- Name: COLUMN ntf_request.initiator_user_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.initiator_user_id IS '发起用户ID；系统发起时可为空';
-
-
---
--- Name: COLUMN ntf_request.source_department_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.source_department_id IS '发起请求时的来源部门ID';
-
-
---
--- Name: COLUMN ntf_request.parameters; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.parameters IS '可记录和持久化的非敏感模板参数';
-
-
---
--- Name: COLUMN ntf_request.sensitive_parameters_ciphertext; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.sensitive_parameters_ciphertext IS '加密后的敏感模板参数';
-
-
---
--- Name: COLUMN ntf_request.encryption_key_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.encryption_key_id IS '敏感参数使用的加密密钥标识';
-
-
---
--- Name: COLUMN ntf_request.status; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.status IS '逻辑通知请求状态';
-
-
---
--- Name: COLUMN ntf_request.recipient_count; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.recipient_count IS '请求展开后的接收人数';
-
-
---
--- Name: COLUMN ntf_request.task_count; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.task_count IS '请求展开后的投递任务数';
-
-
---
--- Name: COLUMN ntf_request.scheduled_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.scheduled_at IS '计划开始投递时间';
-
-
---
--- Name: COLUMN ntf_request.expires_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.expires_at IS '投递截止时间；为空表示不过期';
-
-
---
--- Name: COLUMN ntf_request.priority; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.priority IS '任务优先级；数值越大越优先';
-
-
---
--- Name: COLUMN ntf_request.trace_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.trace_id IS '调用链追踪ID';
-
-
---
--- Name: COLUMN ntf_request.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_request.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_request.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.updated_by IS '最后更新人ID';
-
-
---
--- Name: COLUMN ntf_request.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.updated_at IS '最后更新时间';
-
-
---
--- Name: COLUMN ntf_request.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.deleted IS '删除时间；NULL表示未删除';
-
-
---
--- Name: COLUMN ntf_request.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.version IS '乐观锁版本号';
-
-
---
--- Name: COLUMN ntf_request.template_snapshot; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_request.template_snapshot IS '各渠道实际模板版本元数据，不包含渲染正文和敏感参数';
-
-
---
--- Name: ntf_send_preview; Type: TABLE; Schema: spectra_notification; Owner: -
---
-
-CREATE TABLE spectra_notification.ntf_send_preview (
-    id uuid NOT NULL,
-    operator_user_id uuid NOT NULL,
-    request_hash character varying(64) NOT NULL,
-    preview_token_hash character varying(64) NOT NULL,
-    resolution_hash character varying(64) NOT NULL,
-    request_snapshot jsonb DEFAULT '{}'::jsonb NOT NULL,
-    expires_at timestamp(6) with time zone NOT NULL,
-    consumed_at timestamp(6) with time zone,
-    applied_request_id uuid,
-    status character varying(20) DEFAULT 'PREVIEWED'::character varying NOT NULL,
-    created_by uuid,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_by uuid,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0 NOT NULL,
-    CONSTRAINT "CK_NTF_SEND_PREVIEW_HASH" CHECK ((((request_hash)::text ~ '^[0-9a-f]{64}$'::text) AND ((preview_token_hash)::text ~ '^[0-9a-f]{64}$'::text) AND ((resolution_hash)::text ~ '^[0-9a-f]{64}$'::text))),
-    CONSTRAINT "CK_NTF_SEND_PREVIEW_STATUS" CHECK (((status)::text = ANY ((ARRAY['PREVIEWED'::character varying, 'APPLYING'::character varying, 'APPLIED'::character varying, 'EXPIRED'::character varying])::text[])))
-);
-
-
---
--- Name: TABLE ntf_send_preview; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON TABLE spectra_notification.ntf_send_preview IS '受控发送短时 Preview 快照，不保存完整用户清单、地址或敏感参数';
-
-
---
--- Name: COLUMN ntf_send_preview.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_send_preview.operator_user_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.operator_user_id IS '受控发送操作人ID';
-
-
---
--- Name: COLUMN ntf_send_preview.request_hash; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.request_hash IS 'Preview 请求 SHA-256 摘要';
-
-
---
--- Name: COLUMN ntf_send_preview.preview_token_hash; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.preview_token_hash IS '一次性 Preview token 的 SHA-256 摘要';
-
-
---
--- Name: COLUMN ntf_send_preview.resolution_hash; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.resolution_hash IS '受众、数据范围和渠道状态解析摘要';
-
-
---
--- Name: COLUMN ntf_send_preview.request_snapshot; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.request_snapshot IS '非敏感受控发送请求快照，过期后物理删除';
-
-
---
--- Name: COLUMN ntf_send_preview.expires_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.expires_at IS 'Preview 过期时间';
-
-
---
--- Name: COLUMN ntf_send_preview.consumed_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.consumed_at IS 'Apply 消费时间';
-
-
---
--- Name: COLUMN ntf_send_preview.applied_request_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.applied_request_id IS 'Apply 创建的逻辑通知请求ID';
-
-
---
--- Name: COLUMN ntf_send_preview.status; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.status IS 'Preview 状态：PREVIEWED、APPLYING、APPLIED 或 EXPIRED';
-
-
---
--- Name: COLUMN ntf_send_preview.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_send_preview.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_send_preview.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.updated_by IS '最后更新人ID';
-
-
---
--- Name: COLUMN ntf_send_preview.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.updated_at IS '最后更新时间';
-
-
---
--- Name: COLUMN ntf_send_preview.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.deleted IS '删除时间；NULL表示未删除';
-
-
---
--- Name: COLUMN ntf_send_preview.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_send_preview.version IS '乐观锁版本号';
-
-
---
--- Name: ntf_task; Type: TABLE; Schema: spectra_notification; Owner: -
---
-
-CREATE TABLE spectra_notification.ntf_task (
-    id uuid NOT NULL,
-    notification_request_id uuid NOT NULL,
+    code character varying(100) NOT NULL,
+    name character varying(200) NOT NULL,
     channel character varying(16) NOT NULL,
-    receiver_user_id uuid,
-    recipient_key_hash character varying(128) NOT NULL,
-    recipient_masked character varying(200),
-    recipient_ciphertext text,
-    template_id uuid,
-    purpose character varying(50) NOT NULL,
-    title text NOT NULL,
-    content text NOT NULL,
-    link character varying(500),
-    extra jsonb DEFAULT '{}'::jsonb NOT NULL,
-    sensitive_parameters_ciphertext text,
-    priority smallint DEFAULT 0 NOT NULL,
-    attempt_count integer DEFAULT 0 NOT NULL,
-    max_attempts integer DEFAULT 3 NOT NULL,
-    scheduled_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    next_retry_at timestamp(6) with time zone,
-    expires_at timestamp(6) with time zone,
-    locked_by character varying(100),
-    locked_at timestamp(6) with time zone,
-    status character varying(20) DEFAULT 'PENDING'::character varying NOT NULL,
-    last_error_code character varying(100),
-    created_by uuid,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_by uuid,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0 NOT NULL,
-    template_version_no integer,
-    template_version_digest character varying(64),
-    CONSTRAINT "CK_NTF_TASK_ADDRESS" CHECK ((((channel)::text = 'IN_APP'::text) OR ((recipient_masked IS NOT NULL) AND (recipient_ciphertext IS NOT NULL)))),
-    CONSTRAINT "CK_NTF_TASK_ATTEMPTS" CHECK (((attempt_count >= 0) AND (max_attempts > 0))),
-    CONSTRAINT "CK_NTF_TASK_CHANNEL" CHECK (((channel)::text = ANY (ARRAY[('IN_APP'::character varying)::text, ('SMS'::character varying)::text, ('EMAIL'::character varying)::text]))),
-    CONSTRAINT "CK_NTF_TASK_RECEIVER" CHECK ((((channel)::text <> 'IN_APP'::text) OR (receiver_user_id IS NOT NULL))),
-    CONSTRAINT "CK_NTF_TASK_STATUS" CHECK (((status)::text = ANY (ARRAY[('PENDING'::character varying)::text, ('PROCESSING'::character varying)::text, ('RETRYING'::character varying)::text, ('SENT'::character varying)::text, ('FAILED'::character varying)::text, ('BLOCKED'::character varying)::text, ('UNKNOWN'::character varying)::text, ('EXPIRED'::character varying)::text, ('CANCELLED'::character varying)::text]))),
-    CONSTRAINT "CK_NTF_TASK_TEMPLATE_DIGEST" CHECK (((template_version_digest IS NULL) OR ((template_version_digest)::text ~ '^[0-9a-f]{64}$'::text)))
-);
-
-
---
--- Name: TABLE ntf_task; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON TABLE spectra_notification.ntf_task IS '接收人和渠道维度的通知任务表';
-
-
---
--- Name: COLUMN ntf_task.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_task.notification_request_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.notification_request_id IS '所属逻辑通知请求ID';
-
-
---
--- Name: COLUMN ntf_task.channel; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.channel IS '投递渠道：IN_APP、SMS或EMAIL';
-
-
---
--- Name: COLUMN ntf_task.receiver_user_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.receiver_user_id IS '接收用户ID；直接地址投递时可为空';
-
-
---
--- Name: COLUMN ntf_task.recipient_key_hash; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.recipient_key_hash IS '接收人稳定哈希；用于任务幂等';
-
-
---
--- Name: COLUMN ntf_task.recipient_masked; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.recipient_masked IS '脱敏后的外部接收地址';
-
-
---
--- Name: COLUMN ntf_task.recipient_ciphertext; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.recipient_ciphertext IS '加密后的外部接收地址';
-
-
---
--- Name: COLUMN ntf_task.template_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.template_id IS '锁定的通知模板版本ID';
-
-
---
--- Name: COLUMN ntf_task.purpose; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.purpose IS '通知用途';
-
-
---
--- Name: COLUMN ntf_task.title; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.title IS '渲染后的通知标题快照';
-
-
---
--- Name: COLUMN ntf_task.content; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.content IS '渲染后的通知正文快照';
-
-
---
--- Name: COLUMN ntf_task.link; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.link IS '客户端站内跳转路径';
-
-
---
--- Name: COLUMN ntf_task.extra; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.extra IS '非敏感扩展参数';
-
-
---
--- Name: COLUMN ntf_task.sensitive_parameters_ciphertext; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.sensitive_parameters_ciphertext IS '加密后的敏感渲染载荷';
-
-
---
--- Name: COLUMN ntf_task.priority; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.priority IS '任务优先级；数值越大越优先';
-
-
---
--- Name: COLUMN ntf_task.attempt_count; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.attempt_count IS '已尝试投递次数';
-
-
---
--- Name: COLUMN ntf_task.max_attempts; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.max_attempts IS '最大允许投递次数';
-
-
---
--- Name: COLUMN ntf_task.scheduled_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.scheduled_at IS '计划投递时间';
-
-
---
--- Name: COLUMN ntf_task.next_retry_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.next_retry_at IS '下次重试时间';
-
-
---
--- Name: COLUMN ntf_task.expires_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.expires_at IS '任务过期时间；为空表示不过期';
-
-
---
--- Name: COLUMN ntf_task.locked_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.locked_by IS '领取任务的Worker标识';
-
-
---
--- Name: COLUMN ntf_task.locked_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.locked_at IS 'Worker领取任务的时间';
-
-
---
--- Name: COLUMN ntf_task.status; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.status IS '通知任务状态';
-
-
---
--- Name: COLUMN ntf_task.last_error_code; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.last_error_code IS '最后一次投递错误码';
-
-
---
--- Name: COLUMN ntf_task.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_task.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_task.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.updated_by IS '最后更新人ID';
-
-
---
--- Name: COLUMN ntf_task.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.updated_at IS '最后更新时间';
-
-
---
--- Name: COLUMN ntf_task.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.deleted IS '删除时间；NULL表示未删除';
-
-
---
--- Name: COLUMN ntf_task.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.version IS '乐观锁版本号';
-
-
---
--- Name: COLUMN ntf_task.template_version_no; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.template_version_no IS '任务锁定的模板业务版本号';
-
-
---
--- Name: COLUMN ntf_task.template_version_digest; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_task.template_version_digest IS '任务锁定的模板内容 SHA-256 摘要';
-
-
---
--- Name: ntf_template; Type: TABLE; Schema: spectra_notification; Owner: -
---
-
-CREATE TABLE spectra_notification.ntf_template (
-    id uuid NOT NULL,
-    template_group_code character varying(100) NOT NULL,
-    channel character varying(16) NOT NULL,
-    purpose character varying(50) NOT NULL,
-    version_no integer NOT NULL,
     title_template text,
     content_template text NOT NULL,
     html_template text,
-    parameter_schema jsonb DEFAULT '{}'::jsonb NOT NULL,
     provider_template_code character varying(200),
-    created_by uuid,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_by uuid,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0 NOT NULL,
-    state character varying(16) DEFAULT 'DRAFT'::character varying NOT NULL,
-    version_digest character varying(64) NOT NULL,
-    template_name character varying(200) NOT NULL,
-    CONSTRAINT "CK_NTF_TEMPLATE_CHANNEL" CHECK (((channel)::text = ANY (ARRAY[('IN_APP'::character varying)::text, ('SMS'::character varying)::text, ('EMAIL'::character varying)::text]))),
-    CONSTRAINT "CK_NTF_TEMPLATE_STATE" CHECK (((state)::text = ANY ((ARRAY['DRAFT'::character varying, 'PUBLISHED'::character varying, 'DISABLED'::character varying, 'ARCHIVED'::character varying])::text[]))),
-    CONSTRAINT "CK_NTF_TEMPLATE_VERSION_DIGEST" CHECK (((version_digest)::text ~ '^[0-9a-f]{64}$'::text))
-);
-
-
---
--- Name: TABLE ntf_template; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON TABLE spectra_notification.ntf_template IS '通知模板版本表';
-
-
---
--- Name: COLUMN ntf_template.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_template.template_group_code; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.template_group_code IS '逻辑模板组编码';
-
-
---
--- Name: COLUMN ntf_template.channel; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.channel IS '投递渠道：IN_APP、SMS或EMAIL';
-
-
---
--- Name: COLUMN ntf_template.purpose; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.purpose IS '通知用途';
-
-
---
--- Name: COLUMN ntf_template.version_no; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.version_no IS '模板版本号';
-
-
---
--- Name: COLUMN ntf_template.title_template; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.title_template IS '标题模板；无需标题时可为空';
-
-
---
--- Name: COLUMN ntf_template.content_template; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.content_template IS '正文模板';
-
-
---
--- Name: COLUMN ntf_template.html_template; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.html_template IS 'HTML正文模板；非HTML渠道可为空';
-
-
---
--- Name: COLUMN ntf_template.parameter_schema; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.parameter_schema IS '模板参数JSON Schema';
-
-
---
--- Name: COLUMN ntf_template.provider_template_code; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.provider_template_code IS '渠道供应商模板编码';
-
-
---
--- Name: COLUMN ntf_template.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_template.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_template.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.updated_by IS '最后更新人ID';
-
-
---
--- Name: COLUMN ntf_template.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.updated_at IS '最后更新时间';
-
-
---
--- Name: COLUMN ntf_template.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.deleted IS '删除时间；NULL表示未删除';
-
-
---
--- Name: COLUMN ntf_template.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.version IS '乐观锁版本号';
-
-
---
--- Name: COLUMN ntf_template.state; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.state IS '模板生命周期状态：DRAFT、PUBLISHED、DISABLED或ARCHIVED';
-
-
---
--- Name: COLUMN ntf_template.version_digest; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.version_digest IS '模板版本内容 SHA-256 摘要，发布后用于不可变追溯';
-
-
---
--- Name: COLUMN ntf_template.template_name; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_template.template_name IS '模板名称，供管理端识别和展示';
-
-
---
--- Name: ntf_user_preference; Type: TABLE; Schema: spectra_notification; Owner: -
---
-
-CREATE TABLE spectra_notification.ntf_user_preference (
-    id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    purpose character varying(50) NOT NULL,
-    channel character varying(16) NOT NULL,
+    builtin boolean DEFAULT false NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
-    do_not_disturb boolean DEFAULT false NOT NULL,
-    do_not_disturb_start timestamp(6) with time zone,
-    do_not_disturb_end timestamp(6) with time zone,
     created_by uuid,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_by uuid,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted timestamp(6) with time zone,
     version bigint DEFAULT 0 NOT NULL,
-    CONSTRAINT "CK_NTF_USER_PREFERENCE_CHANNEL" CHECK (((channel)::text = ANY (ARRAY[('IN_APP'::character varying)::text, ('SMS'::character varying)::text, ('EMAIL'::character varying)::text])))
+    CONSTRAINT "CK_NTF_TEMPLATE_CHANNEL" CHECK (((channel)::text = ANY (ARRAY[('IN_APP'::character varying)::text, ('SMS'::character varying)::text, ('EMAIL'::character varying)::text])))
 );
 
+COMMENT ON TABLE spectra_core.ntf_template IS '通知模板表';
+COMMENT ON COLUMN spectra_core.ntf_template.code IS '模板编码';
+COMMENT ON COLUMN spectra_core.ntf_template.name IS '模板名称';
+COMMENT ON COLUMN spectra_core.ntf_template.channel IS '发送渠道';
+COMMENT ON COLUMN spectra_core.ntf_template.title_template IS '标题模板';
+COMMENT ON COLUMN spectra_core.ntf_template.content_template IS '纯文本正文模板';
+COMMENT ON COLUMN spectra_core.ntf_template.html_template IS 'HTML 正文模板';
+COMMENT ON COLUMN spectra_core.ntf_template.provider_template_code IS '供应商模板编码';
+COMMENT ON COLUMN spectra_core.ntf_template.builtin IS '是否内置模板';
+COMMENT ON COLUMN spectra_core.ntf_template.enabled IS '是否启用';
 
---
--- Name: TABLE ntf_user_preference; Type: COMMENT; Schema: spectra_notification; Owner: -
---
+ALTER TABLE ONLY spectra_core.ntf_template
+    ADD CONSTRAINT "PK_NTF_TEMPLATE" PRIMARY KEY (id);
 
-COMMENT ON TABLE spectra_notification.ntf_user_preference IS '用户用途和渠道偏好表';
-
-
---
--- Name: COLUMN ntf_user_preference.id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.id IS '主键ID';
-
-
---
--- Name: COLUMN ntf_user_preference.user_id; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.user_id IS '用户ID';
+CREATE UNIQUE INDEX "UK_NTF_TEMPLATE_CODE_CHANNEL" ON spectra_core.ntf_template USING btree (code, channel) WHERE (deleted IS NULL);
 
 
 --
--- Name: COLUMN ntf_user_preference.purpose; Type: COMMENT; Schema: spectra_notification; Owner: -
+-- Name: ntf_message; Type: TABLE; Schema: spectra_core; Owner: -
 --
 
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.purpose IS '通知用途';
+CREATE TABLE spectra_core.ntf_message (
+    id uuid NOT NULL,
+    channel character varying(16) NOT NULL,
+    template_code character varying(100) NOT NULL,
+    title text,
+    content text,
+    html_content text,
+    status character varying(16) NOT NULL,
+    error_code character varying(100),
+    error_message text,
+    provider character varying(32),
+    config_id uuid,
+    recipient_user_id uuid,
+    recipient_address character varying(500),
+    read_at timestamp(6) with time zone,
+    business_type character varying(100),
+    business_id character varying(200),
+    source_module character varying(50),
+    link character varying(1000),
+    created_by uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_by uuid,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted timestamp(6) with time zone,
+    version bigint DEFAULT 0 NOT NULL,
+    CONSTRAINT "CK_NTF_MESSAGE_CHANNEL" CHECK (((channel)::text = ANY (ARRAY[('IN_APP'::character varying)::text, ('SMS'::character varying)::text, ('EMAIL'::character varying)::text]))),
+    CONSTRAINT "CK_NTF_MESSAGE_STATUS" CHECK (((status)::text = ANY (ARRAY[('SUCCESS'::character varying)::text, ('FAILED'::character varying)::text])))
+);
 
+COMMENT ON TABLE spectra_core.ntf_message IS '通知发送历史表';
+COMMENT ON COLUMN spectra_core.ntf_message.channel IS '发送渠道';
+COMMENT ON COLUMN spectra_core.ntf_message.template_code IS '模板编码快照';
+COMMENT ON COLUMN spectra_core.ntf_message.title IS '渲染标题';
+COMMENT ON COLUMN spectra_core.ntf_message.content IS '渲染正文';
+COMMENT ON COLUMN spectra_core.ntf_message.html_content IS '渲染 HTML 正文';
+COMMENT ON COLUMN spectra_core.ntf_message.status IS '发送结果状态';
+COMMENT ON COLUMN spectra_core.ntf_message.error_code IS '失败码';
+COMMENT ON COLUMN spectra_core.ntf_message.error_message IS '失败信息';
+COMMENT ON COLUMN spectra_core.ntf_message.provider IS '供应商编码';
+COMMENT ON COLUMN spectra_core.ntf_message.config_id IS '使用的配置行 ID';
+COMMENT ON COLUMN spectra_core.ntf_message.recipient_user_id IS '收件用户 ID';
+COMMENT ON COLUMN spectra_core.ntf_message.recipient_address IS '收件地址';
+COMMENT ON COLUMN spectra_core.ntf_message.read_at IS '站内信已读时间';
+COMMENT ON COLUMN spectra_core.ntf_message.business_type IS '业务类型';
+COMMENT ON COLUMN spectra_core.ntf_message.business_id IS '业务 ID';
+COMMENT ON COLUMN spectra_core.ntf_message.source_module IS '来源模块';
+COMMENT ON COLUMN spectra_core.ntf_message.link IS '站内跳转链接';
 
---
--- Name: COLUMN ntf_user_preference.channel; Type: COMMENT; Schema: spectra_notification; Owner: -
---
+ALTER TABLE ONLY spectra_core.ntf_message
+    ADD CONSTRAINT "PK_NTF_MESSAGE" PRIMARY KEY (id);
 
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.channel IS '投递渠道：IN_APP、SMS或EMAIL';
-
-
---
--- Name: COLUMN ntf_user_preference.enabled; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.enabled IS '是否允许该用途通过该渠道投递';
-
-
---
--- Name: COLUMN ntf_user_preference.do_not_disturb; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.do_not_disturb IS '是否启用免打扰';
-
-
---
--- Name: COLUMN ntf_user_preference.do_not_disturb_start; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.do_not_disturb_start IS '免打扰开始时间';
-
-
---
--- Name: COLUMN ntf_user_preference.do_not_disturb_end; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.do_not_disturb_end IS '免打扰结束时间';
-
-
---
--- Name: COLUMN ntf_user_preference.created_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.created_by IS '创建人ID';
-
-
---
--- Name: COLUMN ntf_user_preference.created_at; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.created_at IS '创建时间';
-
-
---
--- Name: COLUMN ntf_user_preference.updated_by; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.updated_by IS '最后更新人ID';
+CREATE INDEX "IDX_NTF_MESSAGE_CREATED" ON spectra_core.ntf_message USING btree (created_at DESC) WHERE (deleted IS NULL);
+CREATE INDEX "IDX_NTF_MESSAGE_RECIPIENT" ON spectra_core.ntf_message USING btree (recipient_user_id, channel, created_at DESC) WHERE (deleted IS NULL);
+CREATE INDEX "IDX_NTF_MESSAGE_STATUS" ON spectra_core.ntf_message USING btree (status, created_at DESC) WHERE (deleted IS NULL);
 
 
 --
--- Name: COLUMN ntf_user_preference.updated_at; Type: COMMENT; Schema: spectra_notification; Owner: -
+-- Name: ntf_sms_config; Type: TABLE; Schema: spectra_core; Owner: -
 --
 
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.updated_at IS '最后更新时间';
+CREATE TABLE spectra_core.ntf_sms_config (
+    id uuid NOT NULL,
+    name character varying(200) NOT NULL,
+    provider character varying(32) NOT NULL,
+    access_key_id character varying(200),
+    access_key_secret character varying(500),
+    sign_name character varying(100),
+    provider_template_code character varying(200),
+    region character varying(100),
+    extra jsonb DEFAULT '{}'::jsonb NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    created_by uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_by uuid,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted timestamp(6) with time zone,
+    version bigint DEFAULT 0 NOT NULL
+);
+
+COMMENT ON TABLE spectra_core.ntf_sms_config IS '短信发送配置表';
+
+ALTER TABLE ONLY spectra_core.ntf_sms_config
+    ADD CONSTRAINT "PK_NTF_SMS_CONFIG" PRIMARY KEY (id);
+
+CREATE UNIQUE INDEX "UK_NTF_SMS_CONFIG_ACTIVE" ON spectra_core.ntf_sms_config USING btree (active) WHERE ((active = true) AND (deleted IS NULL));
 
 
 --
--- Name: COLUMN ntf_user_preference.deleted; Type: COMMENT; Schema: spectra_notification; Owner: -
+-- Name: ntf_email_config; Type: TABLE; Schema: spectra_core; Owner: -
 --
 
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.deleted IS '删除时间；NULL表示未删除';
+CREATE TABLE spectra_core.ntf_email_config (
+    id uuid NOT NULL,
+    name character varying(200) NOT NULL,
+    provider character varying(32) NOT NULL,
+    host character varying(255),
+    port integer,
+    username character varying(200),
+    password character varying(500),
+    from_address character varying(255),
+    from_name character varying(200),
+    ssl_mode character varying(16) DEFAULT 'NONE'::character varying NOT NULL,
+    extra jsonb DEFAULT '{}'::jsonb NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    created_by uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_by uuid,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted timestamp(6) with time zone,
+    version bigint DEFAULT 0 NOT NULL
+);
+
+COMMENT ON TABLE spectra_core.ntf_email_config IS '邮件发送配置表';
+
+ALTER TABLE ONLY spectra_core.ntf_email_config
+    ADD CONSTRAINT "PK_NTF_EMAIL_CONFIG" PRIMARY KEY (id);
+
+CREATE UNIQUE INDEX "UK_NTF_EMAIL_CONFIG_ACTIVE" ON spectra_core.ntf_email_config USING btree (active) WHERE ((active = true) AND (deleted IS NULL));
 
 
---
--- Name: COLUMN ntf_user_preference.version; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON COLUMN spectra_notification.ntf_user_preference.version IS '乐观锁版本号';
-
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001001', 'security.login-code', '登录验证码', 'SMS', '登录验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001002', 'security.login-code', '登录验证码', 'EMAIL', '登录验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001003', 'security.bind-phone-code', '绑定手机号验证码', 'SMS', '绑定手机号验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001004', 'security.bind-email-code', '绑定邮箱验证码', 'EMAIL', '绑定邮箱验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001005', 'security.reset-password-code', '重置密码验证码', 'SMS', '重置密码验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001006', 'security.reset-password-code', '重置密码验证码', 'EMAIL', '重置密码验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001007', 'workflow.task.todo', '流程待办任务通知', 'IN_APP', '新的待办任务', '您有新的流程待办任务：{{task_name}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001008', 'workflow.task.todo', '流程待办任务通知', 'SMS', '新的待办任务', '您有新的流程待办任务：{{task_name}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001009', 'workflow.task.todo', '流程待办任务通知', 'EMAIL', '新的待办任务', '您有新的流程待办任务：{{task_name}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000100a', 'workflow.task.result', '流程任务处理结果通知', 'IN_APP', '流程任务{{result}}', '您处理的流程任务已{{result}}。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000100b', 'workflow.task.result', '流程任务处理结果通知', 'SMS', '流程任务{{result}}', '您处理的流程任务已{{result}}。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000100c', 'workflow.task.result', '流程任务处理结果通知', 'EMAIL', '流程任务{{result}}', '您处理的流程任务已{{result}}。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000100d', 'oa.meeting.invitation', '会议邀请通知', 'IN_APP', '会议邀请：{{meeting_title}}', '您收到会议邀请：「{{meeting_title}}」。{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000100e', 'oa.meeting.invitation', '会议邀请通知', 'SMS', '会议邀请：{{meeting_title}}', '您收到会议邀请：「{{meeting_title}}」。{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000100f', 'oa.meeting.invitation', '会议邀请通知', 'EMAIL', '会议邀请：{{meeting_title}}', '您收到会议邀请：「{{meeting_title}}」。{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001010', 'oa.notice.published', '公告发布通知', 'IN_APP', '{{title}}', '公告《{{title}}》已发布，请及时查看。{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001011', 'oa.notice.published', '公告发布通知', 'SMS', '{{title}}', '公告《{{title}}》已发布，请及时查看。{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001012', 'oa.notice.published', '公告发布通知', 'EMAIL', '{{title}}', '公告《{{title}}》已发布，请及时查看。{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001013', 'oa.document.published', '文档发布通知', 'IN_APP', '文档已发布：{{document_title}}', '文档《{{document_title}}》已发布。摘要：{{summary}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001014', 'oa.document.published', '文档发布通知', 'SMS', '文档已发布：{{document_title}}', '文档《{{document_title}}》已发布。摘要：{{summary}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001015', 'oa.document.published', '文档发布通知', 'EMAIL', '文档已发布：{{document_title}}', '文档《{{document_title}}》已发布。摘要：{{summary}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001016', 'oa.application.status', 'OA申请状态通知', 'IN_APP', '{{title}}', '您的申请「{{title}}」状态已更新：{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001017', 'oa.application.status', 'OA申请状态通知', 'SMS', '{{title}}', '您的申请「{{title}}」状态已更新：{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001018', 'oa.application.status', 'OA申请状态通知', 'EMAIL', '{{title}}', '您的申请「{{title}}」状态已更新：{{content}}', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001019', 'oa.contract.milestone.reminder', '合同履约节点提醒', 'IN_APP', '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000101a', 'oa.contract.milestone.reminder', '合同履约节点提醒', 'SMS', '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000101b', 'oa.contract.milestone.reminder', '合同履约节点提醒', 'EMAIL', '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000101c', 'system.service-monitor-alert', '服务监控告警', 'IN_APP', '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000101d', 'system.service-monitor-alert', '服务监控告警', 'SMS', '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000101e', 'system.service-monitor-alert', '服务监控告警', 'EMAIL', '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-00000000101f', 'system.notice', '系统通知', 'IN_APP', '系统通知', '系统通知', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001020', 'system.notice', '系统通知', 'SMS', '系统通知', '系统通知', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_template VALUES ('00000000-0000-0000-0000-000000001021', 'system.notice', '系统通知', 'EMAIL', '系统通知', '系统通知', NULL, NULL, true, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_sms_config VALUES ('00000000-0000-0000-0000-000000002001', '内置模拟短信', 'MOCK', NULL, NULL, NULL, NULL, NULL, '{}'::jsonb, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.ntf_email_config VALUES ('00000000-0000-0000-0000-000000002002', '内置模拟邮件', 'MOCK', NULL, NULL, NULL, NULL, NULL, NULL, 'NONE', '{}'::jsonb, true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 
 --
 -- Name: oa_application; Type: TABLE; Schema: spectra_oa; Owner: -
@@ -11506,62 +10369,6 @@ ALTER TABLE ONLY spectra_core.sys_user_department_membership
 
 
 --
--- Name: ntf_delivery PK_NTF_DELIVERY; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_delivery
-    ADD CONSTRAINT "PK_NTF_DELIVERY" PRIMARY KEY (id);
-
-
---
--- Name: ntf_inbox_message PK_NTF_INBOX_MESSAGE; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_inbox_message
-    ADD CONSTRAINT "PK_NTF_INBOX_MESSAGE" PRIMARY KEY (id);
-
-
---
--- Name: ntf_request PK_NTF_REQUEST; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_request
-    ADD CONSTRAINT "PK_NTF_REQUEST" PRIMARY KEY (id);
-
-
---
--- Name: ntf_task PK_NTF_TASK; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_task
-    ADD CONSTRAINT "PK_NTF_TASK" PRIMARY KEY (id);
-
-
---
--- Name: ntf_template PK_NTF_TEMPLATE; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_template
-    ADD CONSTRAINT "PK_NTF_TEMPLATE" PRIMARY KEY (id);
-
-
---
--- Name: ntf_user_preference PK_NTF_USER_PREFERENCE; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_user_preference
-    ADD CONSTRAINT "PK_NTF_USER_PREFERENCE" PRIMARY KEY (id);
-
-
---
--- Name: ntf_send_preview ntf_send_preview_pkey; Type: CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_send_preview
-    ADD CONSTRAINT ntf_send_preview_pkey PRIMARY KEY (id);
-
-
---
 -- Name: oa_application oa_application_application_no_key; Type: CONSTRAINT; Schema: spectra_oa; Owner: -
 --
 
@@ -12620,132 +11427,6 @@ CREATE UNIQUE INDEX uk_sys_user_import_task_idempotency ON spectra_core.sys_user
 --
 
 CREATE UNIQUE INDEX uk_sys_user_primary_department_membership ON spectra_core.sys_user_department_membership USING btree (user_id) WHERE ((membership_type)::text = 'PRIMARY'::text);
-
-
---
--- Name: IDX_NTF_DELIVERY_TASK_CREATED; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_DELIVERY_TASK_CREATED" ON spectra_notification.ntf_delivery USING btree (notification_task_id, created_at DESC) WHERE (deleted IS NULL);
-
-
---
--- Name: IDX_NTF_INBOX_RECEIVER_CREATED; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_INBOX_RECEIVER_CREATED" ON spectra_notification.ntf_inbox_message USING btree (receiver_user_id, created_at DESC) WHERE (deleted IS NULL);
-
-
---
--- Name: IDX_NTF_INBOX_RECEIVER_UNREAD; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_INBOX_RECEIVER_UNREAD" ON spectra_notification.ntf_inbox_message USING btree (receiver_user_id, created_at DESC) WHERE ((deleted IS NULL) AND (is_read = false));
-
-
---
--- Name: IDX_NTF_SEND_PREVIEW_EXPIRES; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_SEND_PREVIEW_EXPIRES" ON spectra_notification.ntf_send_preview USING btree (expires_at, status);
-
-
---
--- Name: IDX_NTF_SEND_PREVIEW_OPERATOR; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_SEND_PREVIEW_OPERATOR" ON spectra_notification.ntf_send_preview USING btree (operator_user_id, created_at DESC) WHERE (deleted IS NULL);
-
-
---
--- Name: IDX_NTF_TASK_EXPIRES_AT; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_TASK_EXPIRES_AT" ON spectra_notification.ntf_task USING btree (expires_at) WHERE (deleted IS NULL);
-
-
---
--- Name: IDX_NTF_TASK_PENDING; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_TASK_PENDING" ON spectra_notification.ntf_task USING btree (status, next_retry_at, priority DESC, created_at) WHERE (deleted IS NULL);
-
-
---
--- Name: IDX_NTF_TASK_RECEIVER_CREATED; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_TASK_RECEIVER_CREATED" ON spectra_notification.ntf_task USING btree (receiver_user_id, created_at DESC) WHERE (deleted IS NULL);
-
-
---
--- Name: IDX_NTF_USER_PREFERENCE_USER; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE INDEX "IDX_NTF_USER_PREFERENCE_USER" ON spectra_notification.ntf_user_preference USING btree (user_id) WHERE (deleted IS NULL);
-
-
---
--- Name: UK_NTF_DELIVERY_ATTEMPT; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_DELIVERY_ATTEMPT" ON spectra_notification.ntf_delivery USING btree (notification_task_id, attempt_no) WHERE (deleted IS NULL);
-
-
---
--- Name: UK_NTF_DELIVERY_PROVIDER_MESSAGE; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_DELIVERY_PROVIDER_MESSAGE" ON spectra_notification.ntf_delivery USING btree (provider, provider_message_id) WHERE ((provider_message_id IS NOT NULL) AND (deleted IS NULL));
-
-
---
--- Name: INDEX "UK_NTF_DELIVERY_PROVIDER_MESSAGE"; Type: COMMENT; Schema: spectra_notification; Owner: -
---
-
-COMMENT ON INDEX spectra_notification."UK_NTF_DELIVERY_PROVIDER_MESSAGE" IS 'Provider 与消息 ID 唯一，防止重复外部回执产生重复投递记录';
-
-
---
--- Name: UK_NTF_INBOX_TASK; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_INBOX_TASK" ON spectra_notification.ntf_inbox_message USING btree (notification_task_id) WHERE ((notification_task_id IS NOT NULL) AND (deleted IS NULL));
-
-
---
--- Name: UK_NTF_REQUEST_EXTERNAL_ID; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_REQUEST_EXTERNAL_ID" ON spectra_notification.ntf_request USING btree (external_request_id) WHERE (deleted IS NULL);
-
-
---
--- Name: UK_NTF_REQUEST_IDEMPOTENCY; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_REQUEST_IDEMPOTENCY" ON spectra_notification.ntf_request USING btree (idempotency_key) WHERE (deleted IS NULL);
-
-
---
--- Name: UK_NTF_TASK_RECIPIENT_CHANNEL; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_TASK_RECIPIENT_CHANNEL" ON spectra_notification.ntf_task USING btree (notification_request_id, recipient_key_hash, channel) WHERE (deleted IS NULL);
-
-
---
--- Name: UK_NTF_TEMPLATE_VERSION; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_TEMPLATE_VERSION" ON spectra_notification.ntf_template USING btree (template_group_code, channel, version_no) WHERE (deleted IS NULL);
-
-
---
--- Name: UK_NTF_USER_PREFERENCE; Type: INDEX; Schema: spectra_notification; Owner: -
---
-
-CREATE UNIQUE INDEX "UK_NTF_USER_PREFERENCE" ON spectra_notification.ntf_user_preference USING btree (user_id, purpose, channel) WHERE (deleted IS NULL);
 
 
 --
@@ -14179,54 +12860,6 @@ ALTER TABLE ONLY spectra_core.sys_user_import_task
 
 
 --
--- Name: ntf_delivery FK_NTF_DELIVERY_TASK; Type: FK CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_delivery
-    ADD CONSTRAINT "FK_NTF_DELIVERY_TASK" FOREIGN KEY (notification_task_id) REFERENCES spectra_notification.ntf_task(id);
-
-
---
--- Name: ntf_delivery FK_NTF_DELIVERY_TEMPLATE; Type: FK CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_delivery
-    ADD CONSTRAINT "FK_NTF_DELIVERY_TEMPLATE" FOREIGN KEY (template_id) REFERENCES spectra_notification.ntf_template(id);
-
-
---
--- Name: ntf_inbox_message FK_NTF_INBOX_REQUEST; Type: FK CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_inbox_message
-    ADD CONSTRAINT "FK_NTF_INBOX_REQUEST" FOREIGN KEY (notification_request_id) REFERENCES spectra_notification.ntf_request(id);
-
-
---
--- Name: ntf_inbox_message FK_NTF_INBOX_TASK; Type: FK CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_inbox_message
-    ADD CONSTRAINT "FK_NTF_INBOX_TASK" FOREIGN KEY (notification_task_id) REFERENCES spectra_notification.ntf_task(id);
-
-
---
--- Name: ntf_task FK_NTF_TASK_REQUEST; Type: FK CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_task
-    ADD CONSTRAINT "FK_NTF_TASK_REQUEST" FOREIGN KEY (notification_request_id) REFERENCES spectra_notification.ntf_request(id);
-
-
---
--- Name: ntf_task FK_NTF_TASK_TEMPLATE; Type: FK CONSTRAINT; Schema: spectra_notification; Owner: -
---
-
-ALTER TABLE ONLY spectra_notification.ntf_task
-    ADD CONSTRAINT "FK_NTF_TASK_TEMPLATE" FOREIGN KEY (template_id) REFERENCES spectra_notification.ntf_template(id);
-
-
---
 -- Name: sec_assignment_grant_boundary fk_sec_assignment_grant_boundary_assignment_id; Type: FK CONSTRAINT; Schema: spectra_security; Owner: -
 --
 
@@ -14867,16 +13500,13 @@ INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b67'
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b68', '任务调度', '019fdba9-f00a-7716-918c-0ca1ae929b65', 'icon-setting', 'DIRECTORY', NULL, 2, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b69', '系统维护', '019fdba9-f00a-7716-918c-0ca1ae929b65', 'icon-setting', 'DIRECTORY', NULL, 3, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6a', '应用健康检查', '019fdba9-f00a-7716-918c-0ca1ae929b66', 'icon-module', 'MENU', 'DevopsApplicationHealth', 2, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6b', '通知运行概览', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationOverview', 0, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6c', '通知请求', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationRequest', 1, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6d', '投递任务', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationDeliveryTask', 2, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6e', '投递记录', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationDeliveryRecord', 3, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6b', '通知历史', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationHistory', 0, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6c', '短信配置', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationSmsConfig', 2, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
+INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6d', '邮件配置', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationEmailConfig', 3, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b6f', '调度执行记录', '019fdba9-f00a-7716-918c-0ca1ae929b68', 'icon-module', 'MENU', 'DevopsSchedulerExecution', 1, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b70', '缓存清理', '019fdba9-f00a-7716-918c-0ca1ae929b69', 'icon-module', 'MENU', 'DevopsCacheClear', 3, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b73', '密钥管理', '019fdba9-f00a-7716-918c-0ca1ae929b69', 'icon-setting-role', 'MENU', 'DevopsSecretManagement', 4, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b75', '模板管理', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationTemplate', 4, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b76', '渠道配置', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-setting', 'MENU', 'DevopsNotificationProvider', 5, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b77', '受控发送', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationSend', 6, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.202686+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.364611+08', NULL, 1);
+INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b75', '模板管理', '019fdba9-f00a-7716-918c-0ca1ae929b67', 'icon-module', 'MENU', 'DevopsNotificationTemplate', 1, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b80', '访问控制', '019bdfc5-b32c-74e9-90ac-0540954c4e4a', 'icon-setting-role', 'DIRECTORY', NULL, 1, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.704882+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.704882+08', NULL, 0);
 INSERT INTO spectra_core.sys_menu VALUES ('019fdba9-f00a-7716-918c-0ca1ae929b82', '授权方案', '019fdba9-f00a-7716-918c-0ca1ae929b80', 'icon-module', 'MENU', 'SystemAuthorizationProfiles', 1, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.70864+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.70864+08', NULL, 0);
 INSERT INTO spectra_core.sys_organization_version VALUES ('00000000-0000-0000-0000-000000000000', 'SYSTEM', 0, '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
@@ -14889,39 +13519,6 @@ INSERT INTO spectra_core.sys_service_monitor_alert_rule VALUES ('01a036f4-6936-7
 INSERT INTO spectra_core.sys_service_monitor_alert_rule VALUES ('01a036f4-6936-7a91-9bbd-d035ad36ad57', 'REDIS_STATUS', 'Redis 不可用', 'REDIS_STATUS', 'NE', NULL, 'UP', 'CRITICAL', true, 1, 300, 'Redis 连通性检查异常时通知运维管理员', NULL, '2026-08-25 11:26:22.51855+08', NULL, '2026-08-25 11:26:22.51855+08', NULL, 0);
 INSERT INTO spectra_core.sys_system_state VALUES ('00000000-0000-0000-0000-000000000000', 'SYSTEM', 'UNINITIALIZED', NULL, NULL, NULL, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_core.sys_system_state VALUES ('00000000-0000-0000-0000-000000000001', 'SYSTEM_GUIDE', 'PENDING', NULL, NULL, NULL, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_notification.ntf_template VALUES ('0acc38c6-7c5e-4257-93d3-4cca9fcd6a80', 'security.login-code', 'SMS', 'LOGIN_CODE', 1, '登录验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, '{"properties": {"code": {"type": "string", "sensitive": true}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'ca50221869d98d03c525c8b91ad23ffd9ba37322d9442d56334a673feff7a885', '登录验证码');
-INSERT INTO spectra_notification.ntf_template VALUES ('921a845f-107b-4adb-88d9-f9126792aabf', 'security.login-code', 'EMAIL', 'LOGIN_CODE', 1, '登录验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, '{"properties": {"code": {"type": "string", "sensitive": true}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '8113be9f911cc8aa864da878a61d92f976d7100e99f4b337aedb4b99fc661d08', '登录验证码');
-INSERT INTO spectra_notification.ntf_template VALUES ('7eb5f9b7-1031-4569-bbf7-a21384ea62e0', 'security.bind-phone-code', 'SMS', 'BIND_PHONE_CODE', 1, '绑定手机号验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, '{"properties": {"code": {"type": "string", "sensitive": true}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'cc853859e617e0c1eab5b27be89bd6f9e320d3ab7bc438a3b7c5465f08f90c9f', '绑定手机号验证码');
-INSERT INTO spectra_notification.ntf_template VALUES ('f2f772c9-9bee-475e-b7bd-f9226857c764', 'oa.notice.published', 'EMAIL', 'OA_NOTICE', 1, '{{title}}', '公告《{{title}}》已发布，请及时查看。{{content}}', NULL, '{"properties": {"title": {"type": "string"}, "content": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'f3a99e3fc591e86872b96c3ec097463811b7e7c0bb69da162a7cc509eb69d356', '公告发布通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('c3764b09-df4f-4a64-8050-ae3e95d7bfbf', 'workflow.task.todo', 'IN_APP', 'WORKFLOW_TODO', 1, '新的待办任务', '您有新的流程待办任务：{{task_name}}', NULL, '{"properties": {"task_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'b5d6538e1df6a92be06d78fddd7d5fc432587baef86e9c679bd6ab88fe9d3670', '流程待办任务通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('978734a0-9372-421f-b8bc-879eff77f27d', 'workflow.task.todo', 'SMS', 'WORKFLOW_TODO', 1, '新的待办任务', '您有新的流程待办任务：{{task_name}}', NULL, '{"properties": {"task_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '34343fdcc9a92182b44e77a837c4b0f0a7c158f254ecac9b74257961c7ea789c', '流程待办任务通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('6bd0f28d-ec5e-4d43-9dda-e2ec09b47f87', 'workflow.task.todo', 'EMAIL', 'WORKFLOW_TODO', 1, '新的待办任务', '您有新的流程待办任务：{{task_name}}', NULL, '{"properties": {"task_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '3dd300175ffdb0cbd0e84565e95eb7b972f9398f69d3e4b7a358be23c76c3136', '流程待办任务通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('d3780cf1-ca6a-43dd-88db-aa384456c75d', 'workflow.task.result', 'IN_APP', 'WORKFLOW_RESULT', 1, '流程任务{{result}}', '您处理的流程任务已{{result}}。', NULL, '{"properties": {"result": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '3805e7046e354b16dfb0a145fc96d1acd2a3b5f940d0b2be0550ee7726ce2de7', '流程任务处理结果通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('1477101c-d15c-471f-b1d3-4dad0152b11b', 'workflow.task.result', 'SMS', 'WORKFLOW_RESULT', 1, '流程任务{{result}}', '您处理的流程任务已{{result}}。', NULL, '{"properties": {"result": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '4d36cb3ced1c24abd48e6bfbc05a1a3313d90eed148dd3b0009f6d2433a26ce2', '流程任务处理结果通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('38d769f9-82ab-4edf-978b-385cdd6c4d04', 'workflow.task.result', 'EMAIL', 'WORKFLOW_RESULT', 1, '流程任务{{result}}', '您处理的流程任务已{{result}}。', NULL, '{"properties": {"result": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'cb964a61e4f68325a49ba2273500441048590153b0f3e023afd735d732b350b1', '流程任务处理结果通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('83036657-bbe0-4d02-9816-0a834f73c900', 'oa.meeting.invitation', 'IN_APP', 'OA_REMINDER', 1, '会议邀请：{{meeting_title}}', '您收到会议邀请：「{{meeting_title}}」。{{content}}', NULL, '{"properties": {"content": {"type": "string"}, "meeting_title": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '8de2cd3be122e5700215cbb16326e6b70030d849c6d945c8ba19d11ca528c604', '会议邀请通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('6a70bcf2-487c-4a32-8732-b9905da129ff', 'oa.meeting.invitation', 'SMS', 'OA_REMINDER', 1, '会议邀请：{{meeting_title}}', '您收到会议邀请：「{{meeting_title}}」。{{content}}', NULL, '{"properties": {"content": {"type": "string"}, "meeting_title": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '0e9e2df19ecf543fd530258a2d2c6a672b4be0089ff19797244ccc4a19f1dee8', '会议邀请通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('c1b1a733-cce5-4fed-853a-f6faf2df2388', 'oa.meeting.invitation', 'EMAIL', 'OA_REMINDER', 1, '会议邀请：{{meeting_title}}', '您收到会议邀请：「{{meeting_title}}」。{{content}}', NULL, '{"properties": {"content": {"type": "string"}, "meeting_title": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '3617e1633391e88f2cb99754c02b387bcd5dce87fbb366c373c01d25053333cb', '会议邀请通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('00f9fc96-794d-4474-8601-3c7b1d8f520e', 'oa.notice.published', 'IN_APP', 'OA_NOTICE', 1, '{{title}}', '公告《{{title}}》已发布，请及时查看。{{content}}', NULL, '{"properties": {"title": {"type": "string"}, "content": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '9875dfbe8180e3d223a49387aa8e9688c739e1d0bf75ea4457fde58c2698d22f', '公告发布通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('0360d18c-9e4c-4c86-9f9a-9256a3514029', 'oa.notice.published', 'SMS', 'OA_NOTICE', 1, '{{title}}', '公告《{{title}}》已发布，请及时查看。{{content}}', NULL, '{"properties": {"title": {"type": "string"}, "content": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '193d7a249ae8ecc6585f0a73842fa8e07d7135d59e2b7d4522336196d7138886', '公告发布通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('1a03773c-e95c-4d75-9d59-90db5453abe2', 'oa.document.published', 'IN_APP', 'OA_NOTICE', 1, '文档已发布：{{document_title}}', '文档《{{document_title}}》已发布。摘要：{{summary}}', NULL, '{"properties": {"summary": {"type": "string"}, "document_title": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '215f972cb0c57ff8a0ca60149465d96f647ecfd77099d14cf00e2fa9f239e8ea', '文档发布通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('4cc1f25a-c3e8-4933-8eef-e86750fc94ec', 'oa.document.published', 'SMS', 'OA_NOTICE', 1, '文档已发布：{{document_title}}', '文档《{{document_title}}》已发布。摘要：{{summary}}', NULL, '{"properties": {"summary": {"type": "string"}, "document_title": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '2bcb4798e74ebc412567dcc3ce4c5acaf9e41ee2715eb96760c0a3e1d551df07', '文档发布通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('e0dfb119-8a9d-4ecd-8433-26f0ba75b90c', 'oa.contract.milestone.reminder', 'IN_APP', 'OA_REMINDER', 1, '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', NULL, '{"properties": {"due_date": {"type": "string"}, "contract_title": {"type": "string"}, "milestone_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'a445dd50180510061b1a4db7fb6e144e21841b2dd2e65738750615fb46b7a9b3', '合同履约节点提醒');
-INSERT INTO spectra_notification.ntf_template VALUES ('ac8dbce5-876d-4282-8358-fd1c6f259b83', 'oa.contract.milestone.reminder', 'SMS', 'OA_REMINDER', 1, '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', NULL, '{"properties": {"due_date": {"type": "string"}, "contract_title": {"type": "string"}, "milestone_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '7f4c65778c661647758d2e93ff1952b0765a5af77c91f5d17df879641596cac9', '合同履约节点提醒');
-INSERT INTO spectra_notification.ntf_template VALUES ('2bf8ea88-ab2c-4ce5-9da9-b887943bfa1c', 'oa.contract.milestone.reminder', 'EMAIL', 'OA_REMINDER', 1, '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', NULL, '{"properties": {"due_date": {"type": "string"}, "contract_title": {"type": "string"}, "milestone_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '09980c4ef0649ca31ff8950b0cb36e8981d3d2dbebcf07fb80fba90e0ad5e729', '合同履约节点提醒');
-INSERT INTO spectra_notification.ntf_template VALUES ('b049d611-7c87-4d96-806f-1ddba4508d39', 'system.service-monitor-alert', 'IN_APP', 'SYSTEM_NOTICE', 1, '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', NULL, '{"properties": {"message": {"type": "string"}, "rule_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '9e96d4b2394ce02837f980e9144a0f1c846aaebe80c812bed7dbb26d0e148c71', '服务监控告警');
-INSERT INTO spectra_notification.ntf_template VALUES ('f846a702-9bbd-4e1a-b258-5f7c34ed4a1b', 'system.service-monitor-alert', 'SMS', 'SYSTEM_NOTICE', 1, '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', NULL, '{"properties": {"message": {"type": "string"}, "rule_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '57f37872b4c7a74abc1d2c87c489fd9d00978b685fa0673389d834bd5efc2591', '服务监控告警');
-INSERT INTO spectra_notification.ntf_template VALUES ('833924a6-e7e9-4836-83e7-99f3eaffc528', 'system.service-monitor-alert', 'EMAIL', 'SYSTEM_NOTICE', 1, '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', NULL, '{"properties": {"message": {"type": "string"}, "rule_name": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'a966dcc0c43b2403dc582e63c3af53c0d000d7b1b040c3a97d275423045b9550', '服务监控告警');
-INSERT INTO spectra_notification.ntf_template VALUES ('ceee18a1-fd7c-4b84-84db-a0dcfa579e48', 'system.notice', 'IN_APP', 'SYSTEM_NOTICE', 1, '系统通知', '系统通知', NULL, '{"properties": {}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '71f690da1d60f6c3edb294c69652a6296890a41b8fbdfb51c88ce4bce28677de', '系统通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('5e1fa59d-ee18-4026-92a0-e151c35d7e87', 'system.notice', 'SMS', 'SYSTEM_NOTICE', 1, '系统通知', '系统通知', NULL, '{"properties": {}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'b14588faefed02726f9f0cc279ded69a622874b8c93a7d0abb373c3e1319c2f3', '系统通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('75fd6046-a202-4155-99f5-a3b9948087a4', 'system.notice', 'EMAIL', 'SYSTEM_NOTICE', 1, '系统通知', '系统通知', NULL, '{"properties": {}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '9e15bbcb5c86408fa5badfb382eabf1f887177cb0ad284c4ae6fc10d911aef5a', '系统通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('32c33e96-7693-445c-966b-4720cb9f4f00', 'oa.application.status', 'IN_APP', 'OA_NOTICE', 1, '{{title}}', '您的申请「{{title}}」状态已更新：{{content}}', NULL, '{"properties": {"title": {"type": "string"}, "content": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'a6e0deb779cafcc5d41de2ab8b6065d67913764948be6c71cc1a265a4b5e48df', 'OA申请状态通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('bbace285-d5cd-4e1a-ade3-0cce2a015e92', 'oa.application.status', 'SMS', 'OA_NOTICE', 1, '{{title}}', '您的申请「{{title}}」状态已更新：{{content}}', NULL, '{"properties": {"title": {"type": "string"}, "content": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '74e8fc0d9d5cb97d8cbd6e6b023e2e855649f47a0ebeb941c9c557bb3eadf744', 'OA申请状态通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('9ccff227-f4be-4ff2-bdb2-8428e2562096', 'oa.application.status', 'EMAIL', 'OA_NOTICE', 1, '{{title}}', '您的申请「{{title}}」状态已更新：{{content}}', NULL, '{"properties": {"title": {"type": "string"}, "content": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '1051164ab08b5e15c5dc85d4c55dc37606204bd23ded66fa68e57a48fbe16734', 'OA申请状态通知');
-INSERT INTO spectra_notification.ntf_template VALUES ('594edb27-7ab7-480f-bb16-794e385aa639', 'security.bind-email-code', 'EMAIL', 'BIND_EMAIL_CODE', 1, '绑定邮箱验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, '{"properties": {"code": {"type": "string", "sensitive": true}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', 'e90cad070d474adefeb5e10e03989551334c139f908b0261323781f25e43ff69', '绑定邮箱验证码');
-INSERT INTO spectra_notification.ntf_template VALUES ('a86a783f-ff77-4fe8-b420-db415bbadd9e', 'security.reset-password-code', 'SMS', 'RESET_PASSWORD_CODE', 1, '重置密码验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, '{"properties": {"code": {"type": "string", "sensitive": true}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '0049d0bfcdf1c1b0c8a8938519707ae069657369455916304ae27fe69c5d3f83', '重置密码验证码');
-INSERT INTO spectra_notification.ntf_template VALUES ('69101974-3f1a-4b71-91dc-3484fd87f8b5', 'security.reset-password-code', 'EMAIL', 'RESET_PASSWORD_CODE', 1, '重置密码验证码', '您的验证码为 {{code}}，请在有效期内完成操作。', NULL, '{"properties": {"code": {"type": "string", "sensitive": true}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '62594ef236c0d816552fc5f094847783a1bb30cc86813ca5ca421cbff3c342f0', '重置密码验证码');
-INSERT INTO spectra_notification.ntf_template VALUES ('b0da5636-15f1-46a0-9b93-e3527a4c4d80', 'oa.document.published', 'EMAIL', 'OA_NOTICE', 1, '文档已发布：{{document_title}}', '文档《{{document_title}}》已发布。摘要：{{summary}}', NULL, '{"properties": {"summary": {"type": "string"}, "document_title": {"type": "string"}}}', NULL, NULL, '2026-08-25 11:26:23.437085+08', NULL, '2026-08-25 11:26:23.437085+08', NULL, 0, 'PUBLISHED', '5db856ab56f666a96465bcc1699cf0bea3514eeff68f9628360bcb56419b30e9', '文档发布通知');
 INSERT INTO spectra_oa.oa_application_type VALUES ('00000000-0000-0000-0000-000000000001', 'leave', '请假申请', NULL, 'oa_leave_approval', true, 10, '通用 OA 请假审批', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_oa.oa_application_type VALUES ('00000000-0000-0000-0000-000000000003', 'purchase', '采购申请', NULL, 'oa_purchase_approval', true, 30, 'P1 采购申请审批', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_oa.oa_application_type VALUES ('00000000-0000-0000-0000-000000000002', 'reimbursement', '费用报销', NULL, 'oa_reimbursement_approval', true, 20, 'P1 费用报销审批', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
@@ -14974,8 +13571,6 @@ INSERT INTO spectra_security.sec_permission VALUES ('8f96814c-cc40-c321-bde4-000
 INSERT INTO spectra_security.sec_permission VALUES ('0b703922-cfd8-c15f-192c-a82cb927a083', 'notification:read', '通知查看', 'notification', 'read', 'SELF', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('20b5eb03-9455-47d5-cc54-4441f2241da9', 'notification:update', '通知标记已读', 'notification', 'update', 'SELF', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('b608f871-7e3a-e23e-5c75-842d639ef90a', 'notification:delete', '通知删除', 'notification', 'delete', 'SELF', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('159c1807-9c8f-20f4-66ec-86e947b95597', 'notification-setting:read', '通知设置查看', 'notification-setting', 'read', 'SELF', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('e33917d4-5a8f-19eb-3361-60225ffb2568', 'notification-setting:update', '通知设置维护', 'notification-setting', 'update', 'SELF', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('03a10a46-803a-657c-d72c-26320c44b935', 'oa:application-type:create', 'OA 申请类型创建', 'oa:application-type', 'create', 'NONE', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('3008b88a-32ff-dcb3-1d2d-520ee15a9e32', 'oa:application-type:read', 'OA 申请类型查看', 'oa:application-type', 'read', 'NONE', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('b30d34e9-7ade-c0a2-c0b8-1e0cfe408fbc', 'oa:application-type:update', 'OA 申请类型维护', 'oa:application-type', 'update', 'NONE', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
@@ -15041,8 +13636,6 @@ INSERT INTO spectra_security.sec_permission VALUES ('bb41761d-8b76-76ab-e194-4c5
 INSERT INTO spectra_security.sec_permission VALUES ('2376f46e-217c-9018-83f7-82573f485ef0', 'file:admin:delete', '文件资产管理删除', 'file:admin', 'delete', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('120762c2-54e4-426a-8119-ac6a898f270c', 'file:admin:manage', '文件管理操作', 'file:admin', 'manage', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('906708c1-5702-fc55-310f-a6238619d659', 'notification:admin:read', '通知运维记录查看', 'notification:admin', 'read', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('1f363394-354f-e22f-5864-09e26952efbb', 'notification:admin:retry', '通知任务重试', 'notification:admin', 'retry', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('3e062ded-da21-f4f8-7a5f-c3d6f66fb0a6', 'notification:admin:cancel', '通知任务取消', 'notification:admin', 'cancel', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('59228c0e-7058-90f3-537f-e65e7a1f7a81', 'department:disable', '部门停用', 'department', 'disable', 'RULES', 'DEPRECATED', false, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('c14d04e6-0d37-4c03-b5dd-80de3a2fcb31', 'role:delete', '角色删除', 'role', 'delete', 'NONE', 'ACTIVE', false, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:21.814015+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:21.814015+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('01a036f4-6932-7e9e-9466-f4ce2acebb99', 'system:monitor:alert', '服务监控告警查看', 'system:monitor', 'alert', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.514203+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.514203+08', NULL, 0);
@@ -15050,11 +13643,8 @@ INSERT INTO spectra_security.sec_permission VALUES ('01a036f4-6933-7888-8334-533
 INSERT INTO spectra_security.sec_permission VALUES ('01a036f4-6933-7f14-998a-f3e6fc699fcd', 'system:monitor:diagnose', '服务监控诊断', 'system:monitor', 'diagnose', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.515805+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.515805+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('005e0c09-4906-446b-9c8e-4ac31d92df62', 'notification:template:read', '通知模板查看', 'notification:template', 'read', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.671024+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.671024+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('cc0cc4ab-7069-4960-b521-cfcab08e47c7', 'notification:template:write', '通知模板维护', 'notification:template', 'write', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.671024+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.671024+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('1ea1d016-81ad-454d-a428-9b484d4473ca', 'notification:template:publish', '通知模板发布与回滚', 'notification:template', 'publish', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.671024+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.671024+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('dd98600a-3389-4285-9cda-6f3525acbb1a', 'notification:provider:read', '通知 Provider 查看', 'notification:provider', 'read', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.83282+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.83282+08', NULL, 0);
 INSERT INTO spectra_security.sec_permission VALUES ('b8853a09-26fb-4207-89a3-75c078d55036', 'notification:provider:configure', '通知 Provider 配置', 'notification:provider', 'configure', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.83282+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.83282+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('5981a17e-6ddd-47ff-a396-27cbe39c3cc3', 'notification:send:preview', '通知受控发送预览', 'notification:send', 'preview', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.198225+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.198225+08', NULL, 0);
-INSERT INTO spectra_security.sec_permission VALUES ('a116d5ee-eafa-443b-a36c-ab2e47dffc16', 'notification:send:apply', '通知受控发送确认', 'notification:send', 'apply', 'NONE', 'ACTIVE', true, '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.198225+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.198225+08', NULL, 0);
 INSERT INTO spectra_security.sec_role VALUES ('e716069e-b170-e939-3317-1fadec2d9dbf', 'ROLE_DEV_OPS', 'Root 运维管理员', 1000, 'ACTIVE', 'DEV_OPS', true, '初始化默认 Root；高风险授权仍受审计与治理流程约束', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 1);
 INSERT INTO spectra_security.sec_role VALUES ('c3a6a45c-3a62-4e7d-9a48-4e7f9f0c6e41', 'ROLE_ADMIN_SYSTEM', '系统管理员', 100, 'ACTIVE', 'SYSTEM_ADMIN', true, '内置系统管理员角色，不可修改', NULL, '2026-08-25 11:26:21.887457+08', NULL, '2026-08-25 11:26:21.887457+08', NULL, 0);
 INSERT INTO spectra_security.sec_role VALUES ('f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', 'ROLE_AUDIT', '审计员', 10, 'ACTIVE', 'AUDITOR', true, '内置审计角色，不可修改', NULL, '2026-08-25 11:26:21.887457+08', NULL, '2026-08-25 11:26:21.887457+08', NULL, 0);
@@ -15065,29 +13655,21 @@ INSERT INTO spectra_security.sec_security_client VALUES ('d4d1bb85-2f9f-33ea-84c
 INSERT INTO spectra_security.sec_password_policy VALUES ('00000000-0000-0000-0000-000000000000', 'SYSTEM', 12, true, true, true, true, NULL, '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', '00000000-0000-0000-0000-000000000000', '1996-10-15 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_menu VALUES ('a5bfc33c-e39e-474b-9c52-85008f5dfb30', 'e716069e-b170-e939-3317-1fadec2d9dbf', '019fdba9-f00a-7716-918c-0ca1ae929b75', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.677344+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.677344+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_menu VALUES ('9277ea09-1da9-4bbf-bffc-3e1bbd980c52', 'f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', '019fdba9-f00a-7716-918c-0ca1ae929b75', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.677344+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.677344+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_menu VALUES ('f17ebdf0-a1cb-436b-9fb8-eab914b30663', 'e716069e-b170-e939-3317-1fadec2d9dbf', '019fdba9-f00a-7716-918c-0ca1ae929b76', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.838527+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.838527+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_menu VALUES ('cef84fbf-ec40-48fc-b0b1-81aab175301d', 'f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', '019fdba9-f00a-7716-918c-0ca1ae929b76', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.838527+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.838527+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_menu VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d02', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '019fdba9-f00a-7716-918c-0ca1ae929b75', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_menu VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d10', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '927b660e-a5cd-42b4-b55a-286e54533206', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_menu VALUES ('9f7b1325-c133-4692-96cf-c2082ee17742', 'e716069e-b170-e939-3317-1fadec2d9dbf', '019fdba9-f00a-7716-918c-0ca1ae929b77', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.203288+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.203288+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('3919c61a-2d9f-4c1f-9a50-8e3a2dcc22a6', 'f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', '3dfb92f5-6d4f-1d0a-e006-fc1f438ccb1d', NULL, '2026-08-25 11:26:21.887457+08', NULL, '2026-08-25 11:26:21.887457+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('ef3ad28b-24d2-4e50-adb1-f2f3e65747ac', 'f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', '243e13bd-62de-077a-9018-45c32053a3e3', NULL, '2026-08-25 11:26:21.887457+08', NULL, '2026-08-25 11:26:21.887457+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('3ff16502-781b-4fd6-8845-fd300a12f9b9', 'e716069e-b170-e939-3317-1fadec2d9dbf', '005e0c09-4906-446b-9c8e-4ac31d92df62', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.673862+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.673862+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('16ece6fc-48a8-400c-b574-e51ebfc6e021', 'e716069e-b170-e939-3317-1fadec2d9dbf', 'cc0cc4ab-7069-4960-b521-cfcab08e47c7', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.673862+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.673862+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_permission VALUES ('ffaaaad7-ec06-45bf-832c-515424a0a397', 'e716069e-b170-e939-3317-1fadec2d9dbf', '1ea1d016-81ad-454d-a428-9b484d4473ca', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.673862+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.673862+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('f272a627-12f1-44dc-ac01-6b13181b1cac', 'f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', '005e0c09-4906-446b-9c8e-4ac31d92df62', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.676131+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.676131+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('1031071b-0a8e-4aa7-a33e-3ddc27a390b3', 'e716069e-b170-e939-3317-1fadec2d9dbf', 'dd98600a-3389-4285-9cda-6f3525acbb1a', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.835307+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.835307+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('9588db82-0580-4427-a7fc-2e4ec69f9926', 'e716069e-b170-e939-3317-1fadec2d9dbf', 'b8853a09-26fb-4207-89a3-75c078d55036', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.835307+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.835307+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4035ea50-940e-497f-a474-fda87d5379b7', 'f32e6c5c-3f8f-4df8-8f0e-2c6b5c8e6a3b', 'dd98600a-3389-4285-9cda-6f3525acbb1a', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.837292+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:22.837292+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_permission VALUES ('92a44cac-ba8f-40ab-a214-2a260d1a1bdd', 'e716069e-b170-e939-3317-1fadec2d9dbf', '5981a17e-6ddd-47ff-a396-27cbe39c3cc3', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.200637+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.200637+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_permission VALUES ('bce833df-851b-48c9-b117-6fbf8870bbf6', 'e716069e-b170-e939-3317-1fadec2d9dbf', 'a116d5ee-eafa-443b-a36c-ab2e47dffc16', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.200637+08', '00000000-0000-0000-0000-000000000000', '2026-08-25 11:26:23.200637+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d03', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', 'f528144d-0a52-cbc0-32be-72cf089970ad', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d04', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '9620f9c6-fc52-34a2-a92a-78cb3e4ebb2a', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d05', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '0b703922-cfd8-c15f-192c-a82cb927a083', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d06', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '20b5eb03-9455-47d5-cc54-4441f2241da9', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d07', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', 'b608f871-7e3a-e23e-5c75-842d639ef90a', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d08', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '159c1807-9c8f-20f4-66ec-86e947b95597', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
-INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d09', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', 'e33917d4-5a8f-19eb-3361-60225ffb2568', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d0a', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '40015c40-0f44-c635-58ae-d80857e0e615', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d0b', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', '363b24cb-2c80-c6d6-e025-d06a93d8a540', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
 INSERT INTO spectra_security.sec_role_permission VALUES ('4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d0c', '4adf7f3b-2b11-4ca6-8b15-8c8b0e4e5d01', 'b18959b0-6948-d630-fc87-eecb96b42244', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', '00000000-0000-0000-0000-000000000000', '2026-08-26 00:00:00+08', NULL, 0);
@@ -15139,16 +13721,6 @@ END
 $$;
 
 -- Final structures and fixed seeds folded from the previous incremental migrations.
-
-CREATE UNIQUE INDEX "UK_NTF_TEMPLATE_RELEASED"
-    ON spectra_notification.ntf_template (template_group_code, channel)
-    WHERE state IN ('PUBLISHED', 'DISABLED')
-      AND deleted IS NULL;
-
-CREATE UNIQUE INDEX "UK_NTF_TEMPLATE_DRAFT"
-    ON spectra_notification.ntf_template (template_group_code, channel)
-    WHERE state = 'DRAFT'
-      AND deleted IS NULL;
 
 CREATE UNIQUE INDEX uk_sys_user_username
     ON spectra_core.sys_user (lower(btrim(username)))
@@ -16079,23 +14651,21 @@ WHERE role.code = 'ROLE_DEV_OPS' AND role.deleted IS NULL
 ON CONFLICT (role_id, menu_id) DO NOTHING;
 
 REVOKE CREATE ON SCHEMA spectra_core, spectra_security, spectra_oa,
-    spectra_workflow, spectra_notification, spectra_quartz FROM PUBLIC;
+    spectra_workflow, spectra_quartz FROM PUBLIC;
 
 GRANT USAGE ON SCHEMA spectra_core, spectra_security, spectra_oa,
-    spectra_workflow, spectra_notification, spectra_quartz TO spectra_runtime;
+    spectra_workflow, spectra_quartz TO spectra_runtime;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA spectra_core TO spectra_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA spectra_security TO spectra_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA spectra_oa TO spectra_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA spectra_workflow TO spectra_runtime;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA spectra_notification TO spectra_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA spectra_quartz TO spectra_runtime;
 
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA spectra_core TO spectra_runtime;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA spectra_security TO spectra_runtime;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA spectra_oa TO spectra_runtime;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA spectra_workflow TO spectra_runtime;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA spectra_notification TO spectra_runtime;
 
 -- Unified operation and security audit facts. DBA-owned RANGE partitions use occurred_at.
 CREATE TABLE spectra_core.sys_audit_event (
@@ -16178,8 +14748,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_oa
     GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO spectra_runtime;
 ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_workflow
     GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO spectra_runtime;
-ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_notification
-    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO spectra_runtime;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_core
     GRANT USAGE, SELECT ON SEQUENCES TO spectra_runtime;
@@ -16188,8 +14756,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_security
 ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_oa
     GRANT USAGE, SELECT ON SEQUENCES TO spectra_runtime;
 ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_workflow
-    GRANT USAGE, SELECT ON SEQUENCES TO spectra_runtime;
-ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_notification
     GRANT USAGE, SELECT ON SEQUENCES TO spectra_runtime;
 
 -- End of clean development baseline V1.
@@ -16893,3 +15459,4 @@ COMMENT ON COLUMN spectra_core.sys_audit_event_default.reason IS '调用方提�
 COMMENT ON COLUMN spectra_core.sys_audit_event_default.failure_code IS '失败原因稳定编码';
 COMMENT ON COLUMN spectra_core.sys_audit_event_default.failure_type IS '失败类型或异常类别';
 COMMENT ON COLUMN spectra_core.sys_audit_event_default.failure_reason IS '脱敏并限长的失败说明';
+

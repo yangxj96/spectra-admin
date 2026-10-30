@@ -18,28 +18,18 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
-import com.devops00.spectra.common.notification.NotificationSystemActor;
-import com.devops00.spectra.core.system.service.DepartmentService;
+import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
+import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
-import com.devops00.spectra.core.security.authentication.service.UserContactService;
-import com.devops00.spectra.common.security.authorization.AuthorizationSnapshot;
-import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.common.security.authorization.ScopeMode;
-import com.devops00.spectra.common.security.authorization.ScopeQuery;
-import com.devops00.spectra.common.port.security.SecurityContextAccessor;
-import com.devops00.spectra.core.user.mapper.UserDepartmentMembershipMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.LinkedHashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -47,7 +37,7 @@ import java.util.UUID;
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/09/13
+ * @since 2026/10/30
  */
 @Service
 @RequiredArgsConstructor
@@ -57,46 +47,23 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
 
     private final UserContactService userContactService;
 
-    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
-
-    private final DepartmentService departmentService;
-
-    private final SecurityContextAccessor securityContextAccessor;
-
-    private final UserDepartmentMembershipMapper membershipMapper;
-
     @Override
-    public List<NotificationRecipient> resolve(List<UUID> userIds) {
-        if (userIds == null || userIds.isEmpty()) {
-            return List.of();
-        }
-        requireCurrentUser();
-        return userIds.stream()
-                .filter(Objects::nonNull)
-                .distinct()
-                .map(userId -> resolveOne(userId, false))
-                .toList();
-    }
-
-    @Override
-    public List<NotificationRecipient> resolveAsSystem(List<UUID> userIds, NotificationSystemActor actor) {
-        requireSystemActor(actor);
+    public List<NotificationRecipient> resolve(Collection<UUID> userIds) {
         if (userIds == null || userIds.isEmpty()) {
             return List.of();
         }
         return userIds.stream()
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(userId -> resolveOne(userId, true))
+                .map(this::resolveOne)
                 .toList();
     }
 
     @Override
-    public List<NotificationRecipient> resolveByLoginNames(List<String> loginNames) {
+    public List<NotificationRecipient> resolveByLoginNames(Collection<String> loginNames) {
         if (loginNames == null || loginNames.isEmpty()) {
             return List.of();
         }
-        requireCurrentUser();
         return loginNames.stream()
                 .filter(StringUtils::hasText)
                 .distinct()
@@ -108,98 +75,34 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .toList();
     }
 
-    @Override
-    public List<NotificationRecipient> resolveByLoginNamesAsSystem(List<String> loginNames, NotificationSystemActor actor) {
-        requireSystemActor(actor);
-        if (!actor.permitsLoginNameLookup()) {
-            throw new AccessDeniedException("该系统身份不能按登录名查询通知收件人");
-        }
-        if (loginNames == null || loginNames.isEmpty()) {
-            return List.of();
-        }
-        return loginNames.stream()
-                .filter(StringUtils::hasText)
-                .distinct()
-                .map(userService::getByUsername)
-                .filter(Objects::nonNull)
-                .map(User::getId)
-                .filter(Objects::nonNull)
-                .flatMap(userId -> resolveAsSystem(List.of(userId), actor).stream())
-                .toList();
-    }
-
     /**
-     * 转换、解析或规范化数据（{@code resolveOne}）。
+     * 解析单个用户的通知收件人快照。
+     *
+     * @param userId 用户 ID
+     * @return 收件人快照
      */
-    private NotificationRecipient resolveOne(UUID userId, boolean systemActor) {
-        if (!systemActor && !allowedByCurrentUserScope(userId)) {
-            return new NotificationRecipient(userId, null, null, false, false, null);
-        }
+    private NotificationRecipient resolveOne(UUID userId) {
         var user = userService.getById(userId);
         var active = user != null && UserStatus.ACTIVE.equals(user.getStatus());
         var contacts = user == null ? List.<UserContact>of() : userContactService.listActiveByUserId(userId);
-        var phone = contacts.stream()
-                .filter(contact -> UserContactService.PHONE.equals(contact.getContactType()))
-                .map(UserContact::getContactValue)
-                .findFirst()
-                .orElse(null);
-        var email = contacts.stream()
-                .filter(contact -> UserContactService.EMAIL.equals(contact.getContactType()))
-                .map(UserContact::getContactValue)
-                .findFirst()
-                .orElse(null);
+        var phone = contactValue(contacts, UserContactService.PHONE);
+        var email = contactValue(contacts, UserContactService.EMAIL);
         var verified = active && (StringUtils.hasText(phone) || StringUtils.hasText(email));
         return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
     }
 
-    /** 当前登录用户发起的通知必须遵守其有效数据范围。 */
-    private boolean allowedByCurrentUserScope(UUID recipientUserId) {
-        var currentUserId = requireCurrentUser();
-        AuthorizationSnapshot snapshot = authorizationSnapshotProvider.load(currentUserId);
-        var boundaries = snapshot.accessBoundaries("user:read");
-        if (!boundaries.isEmpty()
-                && boundaries.stream().allMatch(boundary -> boundary.scope().mode() == ScopeMode.SELF)
-                && !currentUserId.equals(recipientUserId)) {
-            return false;
-        }
-        if (snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId, null, Set.of()))) {
-            return true;
-        }
-        var recipient = userService.getById(recipientUserId);
-        if (recipient == null) {
-            return false;
-        }
-        return membershipMapper.selectDepartmentIdsForAuthorization(recipientUserId)
-                .stream()
-                .anyMatch(departmentId -> snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId,
-                        departmentId, departmentLineage(departmentId))));
-    }
-
-    private UUID requireCurrentUser() {
-        var currentUserId = securityContextAccessor.currentUserId();
-        if (currentUserId == null) {
-            throw new AccessDeniedException("通知收件人查询缺少认证身份");
-        }
-        return currentUserId;
-    }
-
-    private void requireSystemActor(NotificationSystemActor actor) {
-        if (actor == null) {
-            throw new AccessDeniedException("通知收件人查询缺少系统运行身份");
-        }
-    }
-
     /**
-     * 处理内部业务逻辑（{@code departmentLineage}）。
+     * 读取指定类型的联系人。
+     *
+     * @param contacts    联系人集合
+     * @param contactType 联系人类型
+     * @return 联系人值；不存在时返回 {@code null}
      */
-    private Set<UUID> departmentLineage(UUID departmentId) {
-        var lineage = new LinkedHashSet<UUID>();
-        var current = departmentId;
-        while (current != null && lineage.add(current)) {
-            var department = departmentService.getById(current);
-            current = department == null ? null : department.getPid();
-        }
-        return lineage;
+    private String contactValue(List<UserContact> contacts, String contactType) {
+        return contacts.stream()
+                .filter(contact -> contactType.equals(contact.getContactType()))
+                .map(UserContact::getContactValue)
+                .findFirst()
+                .orElse(null);
     }
-
 }

@@ -19,48 +19,60 @@ package com.devops00.spectra.core.notification.javabean.vo;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 /**
- * 通知模板管理视图。
+ * 通知模板响应对象。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/10/30
  */
 @Data
 public class NotificationTemplateVO {
 
+    /**
+     * 模板 ID。
+     */
     private UUID id;
-
-    private String templateGroupCode;
-
-    private String templateName;
-
+    /**
+     * 模板编码。
+     */
+    private String code;
+    /**
+     * 模板名称。
+     */
+    private String name;
+    /**
+     * 适用渠道。
+     */
     private String channel;
-
-    private String purpose;
-
-    private Integer versionNo;
-
-    private String state;
-
-    private String versionDigest;
-
+    /**
+     * 标题模板。
+     */
     private String titleTemplate;
-
+    /**
+     * 纯文本正文模板。
+     */
     private String contentTemplate;
-
+    /**
+     * HTML 正文模板。
+     */
     private String htmlTemplate;
-
-    private Map<String, Object> parameterSchema;
-
+    /**
+     * 供应商模板编码。
+     */
     private String providerTemplateCode;
-
-    private Long version;
-
+    /**
+     * 是否内置模板。
+     */
+    private Boolean builtin;
+    /**
+     * 是否启用。
+     */
+    private Boolean enabled;
+    /**
+     * 创建时间。
+     */
     private OffsetDateTime createdAt;
-
-    private OffsetDateTime updatedAt;
 }

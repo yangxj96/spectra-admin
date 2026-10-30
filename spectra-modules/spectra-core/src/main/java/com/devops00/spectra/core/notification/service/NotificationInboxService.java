@@ -17,9 +17,9 @@
 package com.devops00.spectra.core.notification.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationInboxVO;
+import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,65 +29,65 @@ import java.util.UUID;
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 public interface NotificationInboxService {
 
     /**
-     * 查询当前用户消息，查询条件始终附带收件人所有权。
+     * 分页查询当前用户消息。
      *
-     * @param page   分页条件，包含页码、页大小和排序字段。
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
-     * @param params 消息状态、渠道、通知用途和时间范围等当前用户收件箱筛选条件。
-     * @return 返回按分页条件查询的用户收件箱消息分页；无匹配时 records 为空、total 为 0，结果对象不返回 null。
+     * @param page   分页参数
+     * @param userId 当前用户 ID
+     * @param query  查询条件
+     * @return 消息分页
      */
-    IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom params);
+    IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom query);
 
     /**
-     * 查询当前用户未读数。
+     * 统计当前用户未读消息数量。
      *
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
-     * @return 返回指定用户当前未读通知数量；没有未读通知时返回 0，不返回 null。
+     * @param userId 当前用户 ID
+     * @return 未读数量
      */
     long unreadCount(UUID userId);
 
     /**
      * 查询当前用户消息详情。
      *
-     * @param id     目标通知记录的唯一标识。
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
-     * @return 返回符合条件的用户收件箱消息详情；记录不存在或当前用户不可见时抛出业务异常，不返回 null。
+     * @param id     消息 ID
+     * @param userId 当前用户 ID
+     * @return 消息详情
      */
     NotificationInboxVO detail(UUID id, UUID userId);
 
     /**
-     * 标记单条已读。
+     * 标记单条消息已读。
      *
-     * @param id     目标通知记录的唯一标识。
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @param id     消息 ID
+     * @param userId 当前用户 ID
      */
     void markAsRead(UUID id, UUID userId);
 
     /**
-     * 标记当前用户全部已读。
+     * 标记当前用户全部消息已读。
      *
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @param userId 当前用户 ID
      */
     void markAllAsRead(UUID userId);
 
     /**
-     * 删除当前用户消息。
+     * 删除当前用户一条消息。
      *
-     * @param id     目标通知记录的唯一标识。
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @param id     消息 ID
+     * @param userId 当前用户 ID
      */
     void deleteById(UUID id, UUID userId);
 
     /**
-     * 批量删除当前用户消息，混合 ID 不影响其他用户记录。
+     * 批量删除当前用户消息。
      *
-     * @param ids    要从当前用户收件箱删除的通知记录 ID；空列表不删除任何记录，列表中的其他用户记录会被忽略。
-     * @param userId 目标用户的唯一标识，用于限定查询或变更范围。
+     * @param ids    消息 ID 列表
+     * @param userId 当前用户 ID
      */
     void batchDelete(List<UUID> ids, UUID userId);
 }

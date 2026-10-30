@@ -19,19 +19,15 @@ package com.devops00.spectra.core.notification.javabean.from;
 import lombok.Data;
 
 /**
- * 消息中心分页查询参数。
+ * 当前用户消息中心分页查询参数。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @Data
 public class NotificationQueryFrom {
 
-    /**
-     * 通知用途。
-     */
-    private String purpose;
     /**
      * 是否只查询已读或未读消息。
      */

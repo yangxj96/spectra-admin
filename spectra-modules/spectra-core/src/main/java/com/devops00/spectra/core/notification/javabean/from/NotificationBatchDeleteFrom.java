@@ -27,7 +27,7 @@ import java.util.UUID;
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 @Data
 public class NotificationBatchDeleteFrom {

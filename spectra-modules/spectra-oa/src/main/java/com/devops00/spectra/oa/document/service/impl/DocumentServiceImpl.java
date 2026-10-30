@@ -24,7 +24,6 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
@@ -354,8 +353,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             if (receiverIds.isEmpty()) {
                 return;
             }
-            notificationService.send(NotificationSendRequest.inApp("oa:document:" + document.getId() + ":publish",
-                    NotificationPurpose.OA_NOTICE, receiverIds, NotificationTemplateCode.OA_DOCUMENT_PUBLISHED)
+            notificationService.send(NotificationSendRequest.inApp(NotificationTemplateCode.OA_DOCUMENT_PUBLISHED,
+                    receiverIds)
                     .parameter("document_title", Objects.toString(document.getTitle(), ""))
                     .parameter("summary", Objects.toString(document.getSummary(), ""))
                     .businessReference("OA_DOCUMENT", document.getId().toString())

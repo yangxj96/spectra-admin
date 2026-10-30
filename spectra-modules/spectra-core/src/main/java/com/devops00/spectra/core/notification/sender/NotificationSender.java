@@ -17,39 +17,29 @@
 package com.devops00.spectra.core.notification.sender;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.core.notification.javabean.domain.ChannelSendResult;
-import com.devops00.spectra.core.notification.javabean.entity.NotificationTaskEntity;
 
 /**
- * 单一通知渠道的发送端口。
+ * 单一渠道的同步发送端口。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
 public interface NotificationSender {
 
     /**
-     * 当前 Sender 支持的渠道。
+     * 当前发送器支持的渠道。
+     *
+     * @return 通知渠道
      */
     NotificationChannel channel();
 
     /**
-     * 当前 Sender 是否已配置为可用。
+     * 同步发送一条已渲染通知。
+     *
+     * @param target  发送目标
+     * @param message 已渲染内容
+     * @return 发送结果
      */
-    default boolean available() {
-        return true;
-    }
-
-    /**
-     * 不可用时返回脱敏原因。
-     */
-    default String unavailableReason() {
-        return "CHANNEL_NOT_CONFIGURED";
-    }
-
-    /**
-     * 执行一次投递；不得记录明文敏感载荷。
-     */
-    ChannelSendResult send(NotificationTaskEntity task);
+    SendOutcome send(NotificationSendTarget target, RenderedMessage message);
 }

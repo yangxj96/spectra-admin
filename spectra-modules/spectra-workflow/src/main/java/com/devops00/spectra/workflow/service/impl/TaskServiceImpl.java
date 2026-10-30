@@ -20,11 +20,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.common.port.security.SecurityContextAccessor;
 import com.devops00.spectra.common.security.authorization.AuthorizationSnapshotProvider;
@@ -314,7 +312,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
      * 执行内部处理逻辑（{@code notifyWorkflowResult}）。
      */
     private void notifyWorkflowResult(org.flowable.task.api.Task task, String operator, boolean approved) {
-        var recipients = recipientDirectory.resolveByLoginNamesAsSystem(List.of(operator), NotificationSystemActor.WORKFLOW_TASK)
+        var recipients = recipientDirectory.resolveByLoginNames(List.of(operator))
                 .stream()
                 .filter(item -> item.active() && item.userId() != null)
                 .map(item -> item.userId())
@@ -323,16 +321,14 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskSe
         if (recipients.isEmpty()) {
             return;
         }
-        notificationService.sendAsSystem(NotificationSendRequest.inApp(
-                "workflow:result:" + task.getId() + ":" + approved,
-                NotificationPurpose.WORKFLOW_RESULT,
-                recipients,
-                NotificationTemplateCode.WORKFLOW_TASK_RESULT)
+        notificationService.send(NotificationSendRequest.inApp(
+                NotificationTemplateCode.WORKFLOW_TASK_RESULT,
+                recipients)
                 .parameter("result", approved ? "通过" : "驳回")
                 .businessReference("WORKFLOW", task.getProcessInstanceId())
                 .sourceModule("WORKFLOW")
                 .link("/workflow/tasks/done")
-                .build(), NotificationSystemActor.WORKFLOW_TASK);
+                .build());
     }
 
     /**

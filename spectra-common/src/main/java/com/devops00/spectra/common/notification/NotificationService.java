@@ -17,153 +17,113 @@
 package com.devops00.spectra.common.notification;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
- * 业务模块使用的快捷通知服务。
+ * 业务模块使用的同步通知服务。
  *
- * <p>调用方只需要组装模板、渠道、收件人和参数；通知模块负责转换为统一网关请求并执行后续投递流程。</p>
+ * <p>调用方提供模板编码、渠道、收件人和模板参数，通知模块同步完成渲染、发送和历史记录。</p>
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/24
+ * @since 2026/10/30
  */
 public interface NotificationService {
 
     /**
-     * 按用户和多个渠道快捷发送通知；单渠道和多渠道统一走此入口。
+     * 同步发送通知并返回逐目标结果。
      *
-     * @param idempotencyKey    业务幂等键
-     * @param purpose           通知用途
-     * @param recipientUserIds  收件用户 ID
-     * @param channels          投递渠道，可传一个或多个
-     * @param templateGroupCode 模板组编码
-     * @param parameters        用于渲染标题、正文和链接的普通模板参数，不应放入密码、验证码等敏感值。
-     * @return 返回包含幂等键和请求标识的通知入队回执；已存在相同幂等键时返回原有回执，校验或入队失败时抛出异常，不返回 null。
-     */
-    default NotificationReceipt sendToUsers(UserNotificationRequest request) {
-        return send(NotificationSendRequest.builder()
-                .idempotencyKey(request.idempotencyKey())
-                .purpose(request.purpose())
-                .recipientUserIds(request.recipientUserIds())
-                .channels(request.channels())
-                .templateGroupCode(request.templateGroupCode())
-                .parameters(request.parameters())
-                .build());
-    }
-
-    /**
-     * 快捷发送站内信。
-     *
-     * @param idempotencyKey    业务幂等键
-     * @param purpose           通知用途
-     * @param recipientUserIds  收件用户 ID
-     * @param templateGroupCode 模板组编码
-     * @param parameters        用于渲染站内信标题、正文和链接的普通模板参数，不应放入敏感值。
-     * @return 返回站内信的通知入队回执；已存在相同幂等键时返回原有回执，校验或入队失败时抛出异常，不返回 null。
-     */
-    default NotificationReceipt sendInApp(String idempotencyKey, NotificationPurpose purpose,
-                                          Collection<UUID> recipientUserIds, String templateGroupCode,
-                                          Map<String, ?> parameters) {
-        return sendToUsers(new UserNotificationRequest(idempotencyKey, purpose, recipientUserIds,
-                List.of(NotificationChannel.IN_APP), templateGroupCode, parameters));
-    }
-
-    /**
-     * 快捷发送短信给已登记并通过验证的用户。
-     *
-     * @param idempotencyKey    业务幂等键
-     * @param purpose           通知用途
-     * @param recipientUserIds  收件用户 ID
-     * @param templateGroupCode 模板组编码
-     * @param parameters        用于渲染短信正文的普通模板参数，不应放入未受控的敏感值。
-     * @return 返回短信通知的入队回执；收件人没有已验证手机号或入队失败时抛出异常，不返回 null。
-     */
-    default NotificationReceipt sendSms(String idempotencyKey, NotificationPurpose purpose,
-                                        Collection<UUID> recipientUserIds, String templateGroupCode,
-                                        Map<String, ?> parameters) {
-        return sendToUsers(new UserNotificationRequest(idempotencyKey, purpose, recipientUserIds,
-                List.of(NotificationChannel.SMS), templateGroupCode, parameters));
-    }
-
-    /**
-     * 快捷发送邮件给已登记并通过验证的用户。
-     *
-     * @param idempotencyKey    业务幂等键
-     * @param purpose           通知用途
-     * @param recipientUserIds  收件用户 ID
-     * @param templateGroupCode 模板组编码
-     * @param parameters        用于渲染邮件标题和正文的普通模板参数，不应放入未受控的敏感值。
-     * @return 返回邮件通知的入队回执；收件人没有已验证邮箱或入队失败时抛出异常，不返回 null。
-     */
-    default NotificationReceipt sendEmail(String idempotencyKey, NotificationPurpose purpose,
-                                          Collection<UUID> recipientUserIds, String templateGroupCode,
-                                          Map<String, ?> parameters) {
-        return sendToUsers(new UserNotificationRequest(idempotencyKey, purpose, recipientUserIds,
-                List.of(NotificationChannel.EMAIL), templateGroupCode, parameters));
-    }
-
-    /**
-     * 按多个直接地址快捷发送安全通知，例如验证码。
-     *
-     * @param idempotencyKey      业务幂等键
-     * @param purpose             通知用途
-     * @param directAddresses     渠道与直接地址，可传一个或多个
-     * @param templateGroupCode   模板组编码
-     * @param parameters          用于渲染标题、正文和链接的普通模板参数。
-     * @param sensitiveParameters 仅供受控模板渲染使用的敏感参数；不会作为普通通知字段记录或写入日志。
-     * @return 返回按直接地址生成的通知入队回执；地址或模板校验失败时抛出异常，不返回 null。
-     */
-    default NotificationReceipt sendDirect(DirectNotificationRequest request) {
-        return send(NotificationSendRequest.direct(request.idempotencyKey(), request.purpose(),
-                request.directAddresses(), request.templateGroupCode())
-                .parameters(request.parameters())
-                .sensitiveParameters(request.sensitiveParameters())
-                .build());
-    }
-
-    /**
-     * 发送通知并返回入队回执。
-     *
-     * @param request 快捷通知请求
-     * @return 返回统一通知网关生成的入队回执，包含请求标识和幂等处理结果；请求校验或入队失败时抛出异常，不返回 null。
+     * @param request 通知请求
+     * @return 发送回执
      */
     NotificationReceipt send(NotificationSendRequest request);
 
     /**
-     * 以已登记的内部运行身份发送明确收件人的系统通知。
-     * 来源模块、用途和模板必须与运行身份匹配。
+     * 向用户发送站内信。
+     *
+     * @param templateCode     模板编码
+     * @param recipientUserIds 收件用户 ID
+     * @param parameters       模板参数
+     * @return 发送回执
      */
-    NotificationReceipt sendAsSystem(NotificationSendRequest request, NotificationSystemActor actor);
-
-    /** 用户通知快捷入口的参数对象。 */
-    record UserNotificationRequest(String idempotencyKey, NotificationPurpose purpose,
-                                   Collection<UUID> recipientUserIds,
-                                   Collection<NotificationChannel> channels, String templateGroupCode,
-                                   Map<String, ?> parameters) {
-        public UserNotificationRequest {
-            recipientUserIds = recipientUserIds == null ? List.of() : List.copyOf(recipientUserIds);
-            channels = channels == null
-                    ? List.of()
-                    : List.copyOf(channels.stream().filter(Objects::nonNull).toList());
-            parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
-        }
+    default NotificationReceipt sendInApp(String templateCode, Collection<UUID> recipientUserIds,
+                                          Map<String, ?> parameters) {
+        return send(NotificationSendRequest.inApp(templateCode, recipientUserIds)
+                .parameters(parameters)
+                .build());
     }
 
-    /** 直接地址通知快捷入口的参数对象。 */
-    record DirectNotificationRequest(String idempotencyKey, NotificationPurpose purpose,
-                                     Collection<NotificationDirectAddress> directAddresses,
-                                     String templateGroupCode, Map<String, ?> parameters,
-                                     Map<String, ?> sensitiveParameters) {
-        public DirectNotificationRequest {
-            directAddresses = directAddresses == null
-                    ? List.of()
-                    : List.copyOf(directAddresses.stream().filter(Objects::nonNull).toList());
-            parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
-            sensitiveParameters = sensitiveParameters == null ? Map.of() : Map.copyOf(sensitiveParameters);
-        }
+    /**
+     * 向用户发送短信。
+     *
+     * @param templateCode     模板编码
+     * @param recipientUserIds 收件用户 ID
+     * @param parameters       模板参数
+     * @return 发送回执
+     */
+    default NotificationReceipt sendSms(String templateCode, Collection<UUID> recipientUserIds,
+                                        Map<String, ?> parameters) {
+        return send(NotificationSendRequest.builder()
+                .templateCode(templateCode)
+                .channels(NotificationChannel.SMS)
+                .recipientUserIds(recipientUserIds)
+                .parameters(parameters)
+                .build());
+    }
+
+    /**
+     * 向用户发送邮件。
+     *
+     * @param templateCode     模板编码
+     * @param recipientUserIds 收件用户 ID
+     * @param parameters       模板参数
+     * @return 发送回执
+     */
+    default NotificationReceipt sendEmail(String templateCode, Collection<UUID> recipientUserIds,
+                                          Map<String, ?> parameters) {
+        return send(NotificationSendRequest.builder()
+                .templateCode(templateCode)
+                .channels(NotificationChannel.EMAIL)
+                .recipientUserIds(recipientUserIds)
+                .parameters(parameters)
+                .build());
+    }
+
+    /**
+     * 向用户发送多个渠道的通知。
+     *
+     * @param templateCode     模板编码
+     * @param channels         发送渠道
+     * @param recipientUserIds 收件用户 ID
+     * @param parameters       模板参数
+     * @return 发送回执
+     */
+    default NotificationReceipt sendToUsers(String templateCode, Collection<NotificationChannel> channels,
+                                            Collection<UUID> recipientUserIds, Map<String, ?> parameters) {
+        return send(NotificationSendRequest.builder()
+                .templateCode(templateCode)
+                .channels(channels)
+                .recipientUserIds(recipientUserIds)
+                .parameters(parameters)
+                .build());
+    }
+
+    /**
+     * 向直接地址发送通知，未登录安全场景使用。
+     *
+     * @param templateCode        模板编码
+     * @param directAddresses     直接地址
+     * @param parameters          普通模板参数
+     * @param sensitiveParameters 敏感模板参数
+     * @return 发送回执
+     */
+    default NotificationReceipt sendDirect(String templateCode,
+                                           Collection<NotificationDirectAddress> directAddresses,
+                                           Map<String, ?> parameters, Map<String, ?> sensitiveParameters) {
+        return send(NotificationSendRequest.direct(templateCode, directAddresses)
+                .parameters(parameters)
+                .sensitiveParameters(sensitiveParameters)
+                .build());
     }
 }

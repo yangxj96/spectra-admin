@@ -16,18 +16,65 @@
 
 package com.devops00.spectra.common.notification;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
- * 通知请求完成持久化和任务展开后的入队回执。
+ * 同步通知发送回执，逐目标记录本次发送结果。
  *
- * @param requestId        通知模块内部的逻辑请求 ID
- * @param status           逻辑请求当前状态
- * @param taskCount        本次请求已展开的接收人×渠道任务数
- * @param idempotentReplay 是否因命中幂等键而返回已存在的请求结果
+ * @param results 每个收件人×渠道的发送结果
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/10/30
  */
-public record NotificationReceipt(UUID requestId, String status, int taskCount, boolean idempotentReplay) {
+public record NotificationReceipt(List<SendResult> results) {
+
+    /**
+     * 归一化结果集合，避免调用方修改发送回执。
+     */
+    public NotificationReceipt {
+        results = results == null ? List.of() : List.copyOf(results);
+    }
+
+    /**
+     * 统计发送成功的目标数量。
+     *
+     * @return 成功数量
+     */
+    public long successCount() {
+        return results.stream().filter(SendResult::success).count();
+    }
+
+    /**
+     * 统计发送失败的目标数量。
+     *
+     * @return 失败数量
+     */
+    public long failureCount() {
+        return results.size() - successCount();
+    }
+
+    /**
+     * 判断是否存在失败目标。
+     *
+     * @return 存在失败时返回 {@code true}
+     */
+    public boolean failed() {
+        return failureCount() > 0;
+    }
+
+    /**
+     * 单个目标的同步发送结果。
+     *
+     * @param channel       通知渠道
+     * @param recipientUser 收件用户 ID；直接地址场景为空
+     * @param address       实际收件地址；站内信场景为空
+     * @param messageId     发送历史主键
+     * @param success       是否成功
+     * @param errorCode     失败码；成功时为空
+     * @param errorMessage  失败信息；成功时为空
+     */
+    public record SendResult(NotificationChannel channel, UUID recipientUser, String address, UUID messageId,
+                             boolean success, String errorCode, String errorMessage) {
+    }
 }

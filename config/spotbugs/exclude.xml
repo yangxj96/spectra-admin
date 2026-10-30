@@ -294,4 +294,8 @@
     <Match><Class name="com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
     <!-- EX-B04-SPOTBUGS-001: Quartz edit-version and history collaborators are Spring-injected. -->
     <Match><Class name="com.devops00.spectra.core.quartz.service.impl.QuartzJobManagementSupport"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <!-- 通知同步发送服务保留 Spring 注入的模板服务、收件人目录和配置对象，不作为可变领域值向外暴露。 -->
+    <Match><Class name="com.devops00.spectra.core.notification.service.impl.NotificationServiceImpl"/><Bug pattern="EI_EXPOSE_REP2"/></Match>
+    <!-- 本地上传分片组装统一把文件系统异常包装为存储错误，宽泛 catch 是既有边界语义。 -->
+    <Match><Class name="com.devops00.spectra.core.upload.storage.local.LocalFileStorageProvider"/><Bug pattern="REC_CATCH_EXCEPTION"/></Match>
 </FindBugsFilter>

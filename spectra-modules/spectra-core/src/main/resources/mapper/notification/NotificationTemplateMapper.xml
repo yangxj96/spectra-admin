@@ -14,7 +14,6 @@
   ~  See the License for the specific language governing permissions and
   ~  limitations under the License.
   -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.core.notification.mapper.NotificationTemplateMapper">
     <!-- @formatter:off -->
@@ -22,172 +21,30 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.core.notification.javabean.entity.NotificationTemplateEntity">
         <!--@mbg.generated-->
-        <!--@Table spectra_notification.ntf_template-->
-        <result column="template_group_code"    property="templateGroupCode"/>
-        <result column="template_name"          property="templateName"/>
-        <result column="channel"                property="channel"/>
-        <result column="purpose"                property="purpose"/>
-        <result column="version_no"             property="versionNo"/>
-        <result column="title_template"         property="titleTemplate"/>
-        <result column="content_template"       property="contentTemplate"/>
-        <result column="html_template"          property="htmlTemplate"/>
-        <result column="parameter_schema"       property="parameterSchema" typeHandler="com.devops00.spectra.framework.persistence.mybatis.PgJsonbTypeHandler"/>
+        <!--@Table spectra_core.ntf_template-->
+        <result column="code"                  property="code"/>
+        <result column="name"                  property="name"/>
+        <result column="channel"               property="channel"/>
+        <result column="title_template"        property="titleTemplate"/>
+        <result column="content_template"      property="contentTemplate"/>
+        <result column="html_template"         property="htmlTemplate"/>
         <result column="provider_template_code" property="providerTemplateCode"/>
-        <result column="state"                  property="state"/>
-        <result column="version_digest"         property="versionDigest"/>
+        <result column="builtin"               property="builtin"/>
+        <result column="enabled"               property="enabled"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        template_group_code,
-        template_name,
+        code,
+        name,
         channel,
-        purpose,
-        version_no,
         title_template,
         content_template,
         html_template,
-        parameter_schema,
         provider_template_code,
-        state,
-        version_digest,
+        builtin,
+        enabled,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
-
-    <!-- 一个通知批次一次加载所有实际渠道使用的已发布模板。 -->
-    <select id="selectPublishedTemplates" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM spectra_notification.ntf_template
-        WHERE deleted IS NULL
-          AND state = 'PUBLISHED'
-          AND purpose = #{purpose}
-        <choose>
-            <when test="channels != null and channels.size() > 0">
-                AND channel IN
-                <foreach collection="channels" item="channel" open="(" separator="," close=")">
-                    #{channel}
-                </foreach>
-            </when>
-            <otherwise>
-                AND 1 = 0
-            </otherwise>
-        </choose>
-        <choose>
-            <when test="templateVersionIds != null and templateVersionIds.size() > 0">
-                AND id IN
-                <foreach collection="templateVersionIds" item="templateVersionId" open="(" separator="," close=")">
-                    #{templateVersionId}
-                </foreach>
-            </when>
-            <otherwise>
-                AND template_group_code = #{templateGroupCode}
-            </otherwise>
-        </choose>
-        ORDER BY channel, version_no DESC
-    </select>
-    <sql id="Template_Filter">
-        <if test="filter != null">
-            <if test="filter.templateGroupCode != null and filter.templateGroupCode != ''">
-                AND t.template_group_code LIKE CONCAT('%', #{filter.templateGroupCode}, '%')
-            </if>
-            <if test="filter.channel != null and filter.channel != ''">
-                AND t.channel = #{filter.channel}
-            </if>
-            <if test="filter.purpose != null and filter.purpose != ''">
-                AND t.purpose = #{filter.purpose}
-            </if>
-            <if test="filter.state != null and filter.state != ''">
-                AND t.state = #{filter.state}
-            </if>
-        </if>
-    </sql>
-
-    <select id="selectLatestPage" resultMap="BaseResultMap">
-        WITH ranked AS (
-            SELECT t.*,
-                   ROW_NUMBER() OVER (
-                       PARTITION BY t.template_group_code, t.channel
-                       ORDER BY CASE WHEN t.state = 'PUBLISHED' THEN 1 ELSE 0 END DESC,
-                                t.version_no DESC,
-                                t.updated_at DESC
-                   ) AS rn
-            FROM spectra_notification.ntf_template t
-            WHERE t.deleted IS NULL
-            <include refid="Template_Filter"/>
-        )
-        SELECT ranked.* FROM ranked
-        WHERE ranked.rn = 1
-        ORDER BY ranked.updated_at DESC, ranked.version_no DESC
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
-
-    <select id="countLatest" resultType="long">
-        SELECT COUNT(*)
-        FROM (
-            SELECT DISTINCT t.template_group_code, t.channel
-            FROM spectra_notification.ntf_template t
-            WHERE t.deleted IS NULL
-            <include refid="Template_Filter"/>
-        ) latest
-    </select>
-
-    <select id="selectGroupPageCodes" resultType="string">
-        SELECT t.template_group_code
-        FROM spectra_notification.ntf_template t
-        WHERE t.deleted IS NULL
-        <include refid="Template_Filter"/>
-        GROUP BY t.template_group_code
-        ORDER BY MAX(t.updated_at) DESC, t.template_group_code
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
-
-    <select id="countGroupPageCodes" resultType="long">
-        SELECT COUNT(DISTINCT t.template_group_code)
-        FROM spectra_notification.ntf_template t
-        WHERE t.deleted IS NULL
-        <include refid="Template_Filter"/>
-    </select>
-
-    <select id="selectRowsByGroupCodes" resultMap="BaseResultMap">
-        WITH ranked AS (
-            SELECT t.*,
-                   ROW_NUMBER() OVER (
-                       PARTITION BY t.template_group_code, t.channel
-                       ORDER BY CASE WHEN t.state = 'PUBLISHED' THEN 1 ELSE 0 END DESC,
-                                t.version_no DESC,
-                                t.updated_at DESC
-                   ) AS rn
-            FROM spectra_notification.ntf_template t
-            WHERE t.deleted IS NULL
-              AND t.template_group_code IN
-              <foreach collection="codes" item="code" open="(" separator="," close=")">
-                  #{code}
-              </foreach>
-            <include refid="Template_Filter"/>
-        )
-        SELECT ranked.* FROM ranked
-        WHERE ranked.rn &lt;= 50
-        ORDER BY ranked.template_group_code, ranked.channel, ranked.version_no DESC
-    </select>
-
-    <select id="selectVersions" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM spectra_notification.ntf_template
-        WHERE deleted IS NULL
-          AND template_group_code = #{groupCode}
-          AND channel = #{channel}
-        ORDER BY version_no DESC
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
-
-    <select id="countVersions" resultType="long">
-        SELECT COUNT(*)
-        FROM spectra_notification.ntf_template
-        WHERE deleted IS NULL
-          AND template_group_code = #{groupCode}
-          AND channel = #{channel}
-    </select>
 </mapper>

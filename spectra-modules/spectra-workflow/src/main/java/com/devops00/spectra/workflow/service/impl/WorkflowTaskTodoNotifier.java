@@ -16,11 +16,9 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationSystemActor;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import lombok.RequiredArgsConstructor;
 import org.flowable.engine.TaskService;
@@ -54,8 +52,7 @@ public class WorkflowTaskTodoNotifier {
             if (!StringUtils.hasText(task.getAssignee())) {
                 return;
             }
-            var recipients = recipientDirectory.resolveByLoginNamesAsSystem(List.of(task.getAssignee()),
-                    NotificationSystemActor.WORKFLOW_TASK)
+            var recipients = recipientDirectory.resolveByLoginNames(List.of(task.getAssignee()))
                     .stream()
                     .filter(item -> item.active() && item.userId() != null)
                     .map(item -> item.userId())
@@ -64,16 +61,14 @@ public class WorkflowTaskTodoNotifier {
             if (recipients.isEmpty()) {
                 return;
             }
-            notificationService.sendAsSystem(NotificationSendRequest.inApp(
-                    "workflow:todo:" + task.getId(),
-                    NotificationPurpose.WORKFLOW_TODO,
-                    recipients,
-                    NotificationTemplateCode.WORKFLOW_TASK_TODO)
+            notificationService.send(NotificationSendRequest.inApp(
+                    NotificationTemplateCode.WORKFLOW_TASK_TODO,
+                    recipients)
                     .parameter("task_name", task.getName())
                     .businessReference("WORKFLOW", processInstanceId)
                     .sourceModule("WORKFLOW")
                     .link("/workflow/tasks/todo")
-                    .build(), NotificationSystemActor.WORKFLOW_TASK);
+                    .build());
         });
     }
 }

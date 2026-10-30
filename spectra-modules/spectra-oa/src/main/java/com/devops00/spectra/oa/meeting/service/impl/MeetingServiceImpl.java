@@ -23,7 +23,6 @@ import com.devops00.spectra.framework.persistence.base.BaseServiceImpl;
 import com.devops00.spectra.framework.persistence.pagination.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
@@ -146,9 +145,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
 
     private void sendMeetingNotification(Meeting entity, List<UUID> receivers) {
         if (!receivers.isEmpty()) {
-            notificationService.send(NotificationSendRequest.inApp("oa:meeting:" + entity.getId(),
-                    NotificationPurpose.OA_REMINDER, receivers.stream().distinct().toList(),
-                    NotificationTemplateCode.OA_MEETING_INVITATION)
+            notificationService.send(NotificationSendRequest.inApp(NotificationTemplateCode.OA_MEETING_INVITATION,
+                    receivers.stream().distinct().toList())
                     .parameter("meeting_title", Objects.toString(entity.getTitle(), ""))
                     .parameter("content", Objects.toString(entity.getContent(), ""))
                     .businessReference("OA_MEETING", entity.getId().toString())

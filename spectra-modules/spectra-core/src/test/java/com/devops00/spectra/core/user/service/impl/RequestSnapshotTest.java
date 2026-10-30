@@ -1,18 +1,14 @@
 package com.devops00.spectra.core.user.service.impl;
 
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.core.notification.service.NotificationTaskBatchPlanner;
 import com.devops00.spectra.core.security.authorization.AuthorizationDepartmentScope;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.user.javabean.entity.UserImportRow;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,26 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RequestSnapshotTest {
-
-    @Test
-    void notificationPlanRetainsTargetsAndTemplatesWhenInputsChange() {
-        var target = new NotificationTaskBatchPlanner.TaskTarget(null, NotificationChannel.EMAIL, "test@example.invalid");
-        var targets = new ArrayList<>(List.of(target));
-        var templates = new HashMap<NotificationChannel, NotificationTaskBatchPlanner.TemplateSnapshot>();
-        templates.put(NotificationChannel.EMAIL,
-                new NotificationTaskBatchPlanner.TemplateSnapshot(UUID.randomUUID(), 1, "digest", null, "title", "body"));
-        var request = new NotificationTaskBatchPlanner.PlanRequest(null, UUID.randomUUID(), Instant.EPOCH, null,
-                targets, templates);
-
-        targets.clear();
-        templates.clear();
-
-        assertEquals(List.of(target), request.targets());
-        assertEquals(1, request.templateSnapshots().size());
-        assertThrows(UnsupportedOperationException.class, () -> request.targets().clear());
-        assertThrows(NullPointerException.class, () -> new NotificationTaskBatchPlanner.PlanRequest(
-                null, UUID.randomUUID(), Instant.EPOCH, null, null, Map.of()));
-    }
 
     @Test
     void authorizationQueryRetainsDepartmentSelectionAndNullCompatibility() {

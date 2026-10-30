@@ -16,91 +16,58 @@
 
 package com.devops00.spectra.core.notification.javabean.from;
 
-import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Map;
-import java.util.UUID;
 
 /**
- * 通知模板草稿保存入参。
+ * 通知模板保存参数。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/10/30
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class NotificationTemplateSaveFrom {
 
     /**
-     * 模板版本 ID。
+     * 模板编码。
      */
-    @Null(message = "新增模板时不能有ID", groups = Verify.Insert.class)
-    @NotNull(message = "修改模板时必须提供ID", groups = Verify.Update.class)
-    private UUID id;
-
-    /**
-     * 逻辑模板组编码。
-     */
-    @NotBlank(message = "模板组编码不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private String templateGroupCode;
-
+    @NotBlank(message = "模板编码不能为空")
+    @Size(max = 100, message = "模板编码长度不能超过100")
+    private String code;
     /**
      * 模板名称。
      */
-    @NotBlank(message = "模板名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private String templateName;
-
+    @NotBlank(message = "模板名称不能为空")
+    @Size(max = 200, message = "模板名称长度不能超过200")
+    private String name;
     /**
-     * 投递渠道。
+     * 适用渠道。
      */
-    @NotNull(message = "通知渠道不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @NotNull(message = "模板渠道不能为空")
     private NotificationChannel channel;
-
-    /**
-     * 通知用途。
-     */
-    @NotBlank(message = "通知用途不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private String purpose;
-
     /**
      * 标题模板。
      */
     private String titleTemplate;
-
     /**
      * 纯文本正文模板。
      */
-    @NotBlank(message = "正文模板不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @NotBlank(message = "模板正文不能为空")
     private String contentTemplate;
-
     /**
      * HTML 正文模板。
      */
     private String htmlTemplate;
-
     /**
-     * 模板参数 JSON Schema。
-     */
-    @NotNull(message = "模板参数 schema 不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Map<String, Object> parameterSchema;
-
-    /**
-     * 外部供应商模板编码。
+     * 供应商模板编码。
      */
     private String providerTemplateCode;
-
     /**
-     * 乐观锁版本号。
+     * 是否启用。
      */
-    @NotNull(message = "修改模板时必须提供版本号", groups = Verify.Update.class)
-    private Long version;
+    private Boolean enabled;
 }
